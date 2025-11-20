@@ -6,7 +6,7 @@ Future<void> main(List<String> arguments) async {
   // Determine the output directory
   final scriptDir = path.dirname(Platform.script.toFilePath());
   final projectRoot = path.normalize(path.join(scriptDir, '..', '..'));
-  final outputDir = path.join(projectRoot, 'lib', 'ix_colors', 'theme');
+  final outputDir = path.join(projectRoot, 'lib', 'src', 'ix_colors', 'theme');
 
   print('Project root: $projectRoot');
   print('Output directory: $outputDir');

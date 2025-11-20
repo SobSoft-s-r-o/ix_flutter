@@ -1,26 +1,37 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:path/path.dart' as p;
 import 'package:recase/recase.dart';
 
 class ColorGenerator {
   static const String _baseUrl =
       'https://raw.githubusercontent.com/siemens/ix/main/packages/core/scss/theme';
 
+  static final Map<String, Map<String, _ThemeModeSource>> _themeSources = {
+    'classic': {
+      'dark': _ThemeModeSource.remote('classic/dark/_variables.scss'),
+      'light': _ThemeModeSource.remote('classic/light/_variables.scss'),
+    },
+    'brand': {
+      'dark': _ThemeModeSource.local(
+        'brand_theme_source/brand/dark/_variables.scss',
+      ),
+      'light': _ThemeModeSource.local(
+        'brand_theme_source/brand/light/_variables.scss',
+      ),
+    },
+  };
+
   /// Generate color token classes from Siemens IX repository
-  static Future<void> generateColors({
-    required String outputDir,
-  }) async {
+  static Future<void> generateColors({required String outputDir}) async {
     print('Starting color token generation...');
 
-    // Only classic theme has dark/light variations
-    // Core theme uses CSS variables that reference the classic theme
-    final themes = ['classic'];
-    final modes = ['dark', 'light'];
-
-    for (final theme in themes) {
-      for (final mode in modes) {
+    for (final themeEntry in _themeSources.entries) {
+      final theme = themeEntry.key;
+      for (final modeEntry in themeEntry.value.entries) {
+        final mode = modeEntry.key;
         print('Processing $theme theme - $mode mode...');
-        await _generateThemeColors(theme, mode, outputDir);
+        await _generateThemeColors(theme, mode, outputDir, modeEntry.value);
       }
     }
 
@@ -31,19 +42,15 @@ class ColorGenerator {
     String theme,
     String mode,
     String outputDir,
+    _ThemeModeSource source,
   ) async {
-    // Download the variables file
-    final url = '$_baseUrl/$theme/$mode/_variables.scss';
-    print('  Downloading from: $url');
-
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode != 200) {
-      print('  Warning: Failed to download $url (${response.statusCode})');
+    final content = await _loadThemeContent(theme, mode, source);
+    if (content == null) {
       return;
     }
 
     // Parse color tokens
-    final tokens = _parseScssVariables(response.body);
+    final tokens = _parseScssVariables(content);
     print('  Found ${tokens.length} tokens');
 
     // Generate Dart code
@@ -64,8 +71,9 @@ class ColorGenerator {
       final trimmed = line.trim();
       if (trimmed.startsWith('--theme-color')) {
         // Parse CSS variable definition: --theme-color-xxx: value;
-        final match = RegExp(r'(--theme-color-[^:]+):\s*([^;]+);')
-            .firstMatch(trimmed);
+        final match = RegExp(
+          r'(--theme-color-[^:]+):\s*([^;]+);',
+        ).firstMatch(trimmed);
         if (match != null) {
           final name = match.group(1)!;
           var value = match.group(2)!.trim();
@@ -96,8 +104,11 @@ class ColorGenerator {
       ..writeln()
       ..writeln('/// Color tokens for Siemens IX $theme theme in $mode mode')
       ..writeln(
-          'class Ix${ReCase(theme).pascalCase}${ReCase(mode).pascalCase}Colors {')
-      ..writeln('  Ix${ReCase(theme).pascalCase}${ReCase(mode).pascalCase}Colors._();')
+        'class Ix${ReCase(theme).pascalCase}${ReCase(mode).pascalCase}Colors {',
+      )
+      ..writeln(
+        '  Ix${ReCase(theme).pascalCase}${ReCase(mode).pascalCase}Colors._();',
+      )
       ..writeln();
 
     // Sort tokens by name for consistency
@@ -182,8 +193,9 @@ class ColorGenerator {
   }
 
   static String _rgbaToFlutterColor(String rgba) {
-    final match = RegExp(r'rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)')
-        .firstMatch(rgba);
+    final match = RegExp(
+      r'rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)',
+    ).firstMatch(rgba);
 
     if (match != null) {
       final r = int.parse(match.group(1)!);
@@ -202,8 +214,7 @@ class ColorGenerator {
   }
 
   static String _rgbToFlutterColor(String rgb) {
-    final match =
-        RegExp(r'rgb\((\d+),\s*(\d+),\s*(\d+)\)').firstMatch(rgb);
+    final match = RegExp(r'rgb\((\d+),\s*(\d+),\s*(\d+)\)').firstMatch(rgb);
 
     if (match != null) {
       final r = int.parse(match.group(1)!);
@@ -218,4 +229,40 @@ class ColorGenerator {
 
     return 'Color(0xFF000000)'; // fallback
   }
+
+  static Future<String?> _loadThemeContent(
+    String theme,
+    String mode,
+    _ThemeModeSource source,
+  ) async {
+    if (source.isLocal) {
+      final root = Directory.current.path;
+      final filePath = p.normalize(p.join(root, source.location));
+      print('  Reading local file: $filePath');
+      final file = File(filePath);
+      if (!await file.exists()) {
+        print('  Warning: Local file missing for $theme/$mode');
+        return null;
+      }
+      return file.readAsString();
+    }
+
+    final url = '$_baseUrl/${source.location}';
+    print('  Downloading from: $url');
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode != 200) {
+      print('  Warning: Failed to download $url (${response.statusCode})');
+      return null;
+    }
+    return response.body;
+  }
+}
+
+class _ThemeModeSource {
+  final String location;
+  final bool isLocal;
+
+  const _ThemeModeSource.remote(this.location) : isLocal = false;
+
+  const _ThemeModeSource.local(this.location) : isLocal = true;
 }
