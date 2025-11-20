@@ -22,6 +22,8 @@ class ColorGenerator {
     },
   };
 
+  static Set<String>? _cachedIxThemeTokens;
+
   /// Generate color token classes from Siemens IX repository
   static Future<void> generateColors({required String outputDir}) async {
     print('Starting color token generation...');
@@ -53,8 +55,10 @@ class ColorGenerator {
     final tokens = _parseScssVariables(content);
     print('  Found ${tokens.length} tokens');
 
+    final supportedTokens = await _loadIxThemeTokenNames();
+
     // Generate Dart code
-    final dartCode = _generateDartCode(theme, mode, tokens);
+    final dartCode = _generateDartCode(theme, mode, tokens, supportedTokens);
 
     // Save to file
     final fileName = 'ix_${theme}_${mode}_colors.dart';
@@ -93,23 +97,14 @@ class ColorGenerator {
     String theme,
     String mode,
     Map<String, String> tokens,
+    Set<String> supportedTokens,
   ) {
-    final buffer = StringBuffer()
-      ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
-      ..writeln('// Generated from Siemens IX Design System')
-      ..writeln('// Theme: $theme, Mode: $mode')
-      ..writeln('// Source: https://github.com/siemens/ix')
-      ..writeln()
-      ..writeln("import 'package:flutter/material.dart';")
-      ..writeln()
-      ..writeln('/// Color tokens for Siemens IX $theme theme in $mode mode')
-      ..writeln(
-        'class Ix${ReCase(theme).pascalCase}${ReCase(mode).pascalCase}Colors {',
-      )
-      ..writeln(
-        '  Ix${ReCase(theme).pascalCase}${ReCase(mode).pascalCase}Colors._();',
-      )
-      ..writeln();
+    final className =
+        'Ix${ReCase(theme).pascalCase}${ReCase(mode).pascalCase}Colors';
+    final constantsBuffer = StringBuffer();
+    final paletteEntriesBuffer = StringBuffer();
+    final missingPaletteTokens = <String>[];
+    var hasPaletteEntries = false;
 
     // Sort tokens by name for consistency
     final sortedKeys = tokens.keys.toList()..sort();
@@ -125,11 +120,57 @@ class ColorGenerator {
         final propertyName = _cssVarToDartProperty(key);
         final docComment = '  /// CSS Variable: $key';
 
-        buffer
+        constantsBuffer
           ..writeln(docComment)
           ..writeln('  static const Color $propertyName = $color;')
           ..writeln();
+
+        if (supportedTokens.contains(propertyName)) {
+          paletteEntriesBuffer.writeln(
+            '    IxThemeColorToken.$propertyName: $propertyName,',
+          );
+          hasPaletteEntries = true;
+        } else {
+          missingPaletteTokens.add(propertyName);
+        }
       }
+    }
+
+    if (missingPaletteTokens.isNotEmpty) {
+      print(
+        '  Warning: Skipped ${missingPaletteTokens.length} tokens missing '
+        'in IxThemeColorToken enum for $theme/$mode: '
+        '${missingPaletteTokens.join(', ')}',
+      );
+    }
+
+    final buffer = StringBuffer()
+      ..writeln('// GENERATED CODE - DO NOT MODIFY BY HAND')
+      ..writeln('// Generated from Siemens IX Design System')
+      ..writeln('// Theme: $theme, Mode: $mode')
+      ..writeln('// Source: https://github.com/siemens/ix')
+      ..writeln()
+      ..writeln("import 'package:flutter/material.dart';");
+
+    if (hasPaletteEntries) {
+      buffer.writeln("import '../ix_theme_color_tokens.dart';");
+    }
+
+    buffer
+      ..writeln()
+      ..writeln('/// Color tokens for Siemens IX $theme theme in $mode mode')
+      ..writeln('class $className {')
+      ..writeln('  $className._();')
+      ..writeln()
+      ..write(constantsBuffer.toString());
+
+    if (hasPaletteEntries) {
+      buffer
+        ..writeln('  /// Complete palette keyed by IxThemeColorToken.')
+        ..writeln('  static const Map<IxThemeColorToken, Color> palette = {')
+        ..write(paletteEntriesBuffer.toString())
+        ..writeln('  };')
+        ..writeln();
     }
 
     buffer.writeln('}');
@@ -255,6 +296,55 @@ class ColorGenerator {
       return null;
     }
     return response.body;
+  }
+
+  static Future<Set<String>> _loadIxThemeTokenNames() async {
+    if (_cachedIxThemeTokens != null) {
+      return _cachedIxThemeTokens!;
+    }
+
+    final root = Directory.current.path;
+    final filePath = p.normalize(
+      p.join(root, 'lib/src/ix_colors/ix_theme_color_tokens.dart'),
+    );
+
+    final file = File(filePath);
+    if (!await file.exists()) {
+      print(
+        '  Warning: Could not locate IxThemeColorToken enum at $filePath. '
+        'Palette maps will be empty.',
+      );
+      _cachedIxThemeTokens = <String>{};
+      return _cachedIxThemeTokens!;
+    }
+
+    final content = await file.readAsString();
+    _cachedIxThemeTokens = _parseIxThemeTokenNames(content);
+    return _cachedIxThemeTokens!;
+  }
+
+  static Set<String> _parseIxThemeTokenNames(String content) {
+    final match = RegExp(
+      r'enum\s+IxThemeColorToken\s*{([^}]*)}',
+      dotAll: true,
+    ).firstMatch(content);
+
+    if (match == null) {
+      print(
+        '  Warning: Could not parse IxThemeColorToken enum. '
+        'Palette maps will be empty.',
+      );
+      return <String>{};
+    }
+
+    final body = match.group(1)!;
+    final tokens = body
+        .split(',')
+        .map((part) => part.split('//').first.trim())
+        .where((part) => part.isNotEmpty)
+        .toSet();
+
+    return tokens;
   }
 }
 
