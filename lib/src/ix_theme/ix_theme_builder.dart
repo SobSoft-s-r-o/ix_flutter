@@ -11,6 +11,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_form_field_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_radio_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_slider_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
@@ -75,6 +76,7 @@ class IxThemeBuilder {
     final cardTheme = IxCardTheme.fromPalette(palette: palette);
     final checkboxTheme = IxCheckboxTheme.fromPalette(palette: palette);
     final radioTheme = IxRadioTheme.fromPalette(palette: palette);
+    final sliderTheme = IxSliderTheme.fromPalette(palette: palette);
     final tabsTheme = IxTabsTheme.fromPalette(
       palette: palette,
       typography: typeScale,
@@ -114,6 +116,7 @@ class IxThemeBuilder {
       datePickerTheme: formFieldTheme.datePickerTheme,
       checkboxTheme: checkboxTheme.materialCheckboxTheme,
       radioTheme: radioTheme.materialRadioTheme,
+      sliderTheme: sliderTheme.materialSliderTheme,
       filledButtonTheme: FilledButtonThemeData(style: buttonTheme.primary),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: buttonTheme.secondary,
@@ -148,6 +151,7 @@ class IxThemeBuilder {
         formFieldTheme,
         checkboxTheme,
         radioTheme,
+        sliderTheme,
       ],
     );
   }
