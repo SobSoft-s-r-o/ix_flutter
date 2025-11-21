@@ -9,9 +9,11 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_card_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_checkbox_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_form_field_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_label_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_radio_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_slider_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_toggle_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
@@ -77,6 +79,11 @@ class IxThemeBuilder {
     final checkboxTheme = IxCheckboxTheme.fromPalette(palette: palette);
     final radioTheme = IxRadioTheme.fromPalette(palette: palette);
     final sliderTheme = IxSliderTheme.fromPalette(palette: palette);
+    final toggleTheme = IxToggleTheme.fromPalette(palette: palette);
+    final labelTheme = IxLabelTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
     final tabsTheme = IxTabsTheme.fromPalette(
       palette: palette,
       typography: typeScale,
@@ -84,6 +91,7 @@ class IxThemeBuilder {
     final formFieldTheme = IxFormFieldTheme.fromPalette(
       palette: palette,
       typography: typeScale,
+      labelTheme: labelTheme,
     );
     final ixThemeExtension = IxTheme(
       family: family,
@@ -117,6 +125,7 @@ class IxThemeBuilder {
       checkboxTheme: checkboxTheme.materialCheckboxTheme,
       radioTheme: radioTheme.materialRadioTheme,
       sliderTheme: sliderTheme.materialSliderTheme,
+      switchTheme: toggleTheme.materialSwitchTheme,
       filledButtonTheme: FilledButtonThemeData(style: buttonTheme.primary),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: buttonTheme.secondary,
@@ -152,6 +161,8 @@ class IxThemeBuilder {
         checkboxTheme,
         radioTheme,
         sliderTheme,
+        toggleTheme,
+        labelTheme,
       ],
     );
   }

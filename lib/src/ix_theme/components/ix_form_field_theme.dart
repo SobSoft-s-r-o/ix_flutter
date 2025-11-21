@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_label_theme.dart';
 
 const _defaultCssFontSizePx = 16.0;
 const _smallBorderRadiusRem = 0.125;
@@ -113,6 +114,7 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
   factory IxFormFieldTheme.fromPalette({
     required Map<IxThemeColorToken, Color> palette,
     required IxTypography typography,
+    IxLabelTheme? labelTheme,
   }) {
     Color pick(IxThemeColorToken token) => palette[token]!;
 
@@ -146,13 +148,11 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
       error: pick(IxThemeColorToken.alarmText),
     );
 
-    final labelStyle = typography.label.copyWith(
-      fontWeight: FontWeight.w600,
-      color: pick(IxThemeColorToken.stdText),
-    );
-    final floatingLabelStyle = labelStyle.copyWith(
-      color: pick(IxThemeColorToken.dynamic),
-    );
+    final labels =
+        labelTheme ??
+        IxLabelTheme.fromPalette(palette: palette, typography: typography);
+    final labelStyle = labels.textStyle;
+    final floatingLabelStyle = labels.style(IxLabelState.focus);
     final hintStyle = typography.body.copyWith(
       color: pick(IxThemeColorToken.softText),
     );
@@ -185,6 +185,8 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
       helperStyle: helperStyle,
       errorStyle: errorStyle,
       counterStyle: helperStyle,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      floatingLabelAlignment: FloatingLabelAlignment.start,
       prefixStyle: typography.body.copyWith(
         color: pick(IxThemeColorToken.stdText),
       ),

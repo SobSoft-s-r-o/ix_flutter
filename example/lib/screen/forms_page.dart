@@ -19,6 +19,10 @@ class _FormsPageState extends State<FormsPage> {
   final TextEditingController _unitController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _dropdownController = TextEditingController();
+  final TextEditingController _notesController = TextEditingController(
+    text:
+        'Summaries from Aleo dispatchers sync here so investigators can triage.',
+  );
 
   final List<DropdownMenuEntry<String>> _statusEntries = const [
     DropdownMenuEntry(value: 'backlog', label: 'Backlog'),
@@ -32,6 +36,10 @@ class _FormsPageState extends State<FormsPage> {
   bool _aleoMonitoring = true;
   bool _aleoAlarmRouting = false;
   bool _aleoBetaFeatures = true;
+  bool _aleoNotifications = true;
+  bool _aleoGlobalBroadcast = false;
+  bool _aleoMaintenanceThrottle = true;
+  bool _aleoAlarmMute = false;
   String _aleoDeployment = 'regional';
 
   @override
@@ -50,6 +58,7 @@ class _FormsPageState extends State<FormsPage> {
     _unitController.dispose();
     _dateController.dispose();
     _dropdownController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
@@ -82,6 +91,7 @@ class _FormsPageState extends State<FormsPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final ixFields = theme.extension<IxFormFieldTheme>();
+    final ixToggles = theme.extension<IxToggleTheme>();
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -98,18 +108,20 @@ class _FormsPageState extends State<FormsPage> {
           description:
               'InputDecorationTheme drives spacing, typography, and token-based borders.',
           children: [
+            const _FieldLabel('Project name'),
+            const SizedBox(height: 8),
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(
-                labelText: 'Project name',
                 helperText: 'Autofills retain the same component background.',
               ),
             ),
             const SizedBox(height: 16),
+            const _FieldLabel('Search assets'),
+            const SizedBox(height: 8),
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                labelText: 'Search assets',
                 prefixIcon: _FormIcon(child: IxIcons.search),
                 suffixIcon: _searchController.text.isEmpty
                     ? null
@@ -125,10 +137,11 @@ class _FormsPageState extends State<FormsPage> {
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 16),
+            const _FieldLabel('Tolerance window'),
+            const SizedBox(height: 8),
             TextField(
               controller: _unitController,
               decoration: const InputDecoration(
-                labelText: 'Tolerance window',
                 prefixText: '±',
                 suffixText: 'ms',
                 helperText:
@@ -137,23 +150,40 @@ class _FormsPageState extends State<FormsPage> {
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 16),
+            const _FieldLabel('Disabled input', state: IxLabelState.disabled),
+            const SizedBox(height: 8),
             const TextField(
               enabled: false,
               decoration: InputDecoration(
-                labelText: 'Disabled input',
                 hintText: 'Component surfaces drop to color-0.',
               ),
             ),
             const SizedBox(height: 16),
+            const _FieldLabel('Email address'),
+            const SizedBox(height: 8),
             TextField(
               decoration: InputDecoration(
-                labelText: 'Email address',
                 helperText: 'Validation errors pick up alarm borders.',
                 errorText: 'Please enter a valid email',
                 suffixIcon: _FormIcon(
                   child: IxIcons.alarm,
                   color: ixFields?.error.icon,
                 ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            const _FieldLabel('Incident summary'),
+            const SizedBox(height: 8),
+            TextField(
+              controller: _notesController,
+              minLines: 3,
+              maxLines: 6,
+              keyboardType: TextInputType.multiline,
+              decoration: const InputDecoration(
+                alignLabelWithHint: true,
+                helperText:
+                    'Multi-line text areas reuse IxFormFieldTheme states.',
+                hintText: 'Describe the Aleo site context and mitigation plan.',
               ),
             ),
           ],
@@ -164,10 +194,11 @@ class _FormsPageState extends State<FormsPage> {
           description:
               'DropdownMenu and date pickers reuse the same rounded corners and outlines.',
           children: [
+            const _FieldLabel('Workflow status'),
+            const SizedBox(height: 8),
             DropdownMenu<String>(
               controller: _dropdownController,
               initialSelection: _selectedStatus,
-              label: const Text('Workflow status'),
               onSelected: (value) {
                 setState(() => _selectedStatus = value);
               },
@@ -182,9 +213,13 @@ class _FormsPageState extends State<FormsPage> {
               style: theme.textTheme.bodySmall,
             ),
             const SizedBox(height: 16),
+            const _FieldLabel(
+              'Disabled dropdown',
+              state: IxLabelState.disabled,
+            ),
+            const SizedBox(height: 8),
             DropdownMenu<String>(
               enabled: false,
-              label: Text('Disabled dropdown'),
               dropdownMenuEntries: [
                 DropdownMenuEntry(value: 'disabled', label: 'Unavailable'),
               ],
@@ -192,6 +227,8 @@ class _FormsPageState extends State<FormsPage> {
               selectedTrailingIcon: IxIcons.chevronUpSmall,
             ),
             const SizedBox(height: 16),
+            const _FieldLabel('Due date'),
+            const SizedBox(height: 8),
             GestureDetector(
               onTap: _pickDate,
               child: AbsorbPointer(
@@ -199,7 +236,6 @@ class _FormsPageState extends State<FormsPage> {
                   controller: _dateController,
                   readOnly: true,
                   decoration: InputDecoration(
-                    labelText: 'Due date',
                     helperText:
                         'Tap to open showDatePicker themed by IX tokens.',
                     suffixIcon: _FormIcon(child: IxIcons.calendar),
@@ -244,6 +280,76 @@ class _FormsPageState extends State<FormsPage> {
               subtitle: const Text(
                 'Unlock experimental UI controls for upcoming Aleo releases.',
               ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _FormSection(
+          title: 'Aleo toggles',
+          description:
+              'SwitchListTile controls showcase IxToggleTheme track, thumb, and semantic accents.',
+          children: [
+            SwitchListTile(
+              value: _aleoNotifications,
+              onChanged: (value) => setState(() => _aleoNotifications = value),
+              title: const Text('Notifications enabled'),
+              subtitle: const Text(
+                'Standard toggle styling covers hover, press, and disabled states.',
+              ),
+              controlAffinity: ListTileControlAffinity.leading,
+            ),
+            SwitchTheme(
+              data:
+                  ixToggles?.themeData(IxToggleStatus.info) ??
+                  const SwitchThemeData(),
+              child: SwitchListTile(
+                value: _aleoGlobalBroadcast,
+                onChanged: (value) =>
+                    setState(() => _aleoGlobalBroadcast = value),
+                title: const Text('Global broadcast'),
+                subtitle: const Text(
+                  'Info semantics align with guidance for mission-critical cues.',
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+            SwitchTheme(
+              data:
+                  ixToggles?.themeData(IxToggleStatus.warning) ??
+                  const SwitchThemeData(),
+              child: SwitchListTile(
+                value: _aleoMaintenanceThrottle,
+                onChanged: (value) =>
+                    setState(() => _aleoMaintenanceThrottle = value),
+                title: const Text('Maintenance throttle'),
+                subtitle: const Text(
+                  'Warning styling communicates partial capacity windows.',
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+            SwitchTheme(
+              data:
+                  ixToggles?.themeData(IxToggleStatus.invalid) ??
+                  const SwitchThemeData(),
+              child: SwitchListTile(
+                value: _aleoAlarmMute,
+                onChanged: (value) => setState(() => _aleoAlarmMute = value),
+                title: const Text('Mute alarm relays'),
+                subtitle: const Text(
+                  'Invalid semantics highlight destructive or error-prone choices.',
+                ),
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            ),
+            SwitchListTile(
+              value: false,
+              onChanged: null,
+              title: const Text('Disabled toggle'),
+              subtitle: const Text(
+                'Disabled sample inherits IxToggleTheme weaker thumb and track.',
+              ),
+              controlAffinity: ListTileControlAffinity.leading,
             ),
           ],
         ),
@@ -364,6 +470,24 @@ class _FormSection extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  const _FieldLabel(this.text, {this.state = IxLabelState.standard});
+
+  final String text;
+  final IxLabelState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final ixLabelTheme = theme.extension<IxLabelTheme>();
+    final fallback = theme.textTheme.labelLarge?.copyWith(
+      fontWeight: FontWeight.w600,
+    );
+    final style = ixLabelTheme?.style(state) ?? fallback;
+    return Text(text, style: style);
   }
 }
 
