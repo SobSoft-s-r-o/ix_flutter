@@ -5,6 +5,7 @@ import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_header_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_button_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
@@ -62,6 +63,10 @@ class IxThemeBuilder {
       palette: palette,
       typography: typeScale,
     );
+    final chipTheme = IxChipTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
     final ixThemeExtension = IxTheme(
       family: family,
       mode: mode,
@@ -106,6 +111,7 @@ class IxThemeBuilder {
       appBarTheme: appHeaderTheme.appBarTheme,
       menuTheme: appMenuTheme.menuTheme,
       navigationRailTheme: sidebarTheme.navigationRailTheme,
+      chipTheme: chipTheme.materialChipTheme,
       textTheme: textTheme,
       fontFamily: typeScale.fontFamily,
       visualDensity: VisualDensity.standard,
@@ -116,6 +122,7 @@ class IxThemeBuilder {
         appHeaderTheme,
         appMenuTheme,
         sidebarTheme,
+        chipTheme,
       ],
     );
   }

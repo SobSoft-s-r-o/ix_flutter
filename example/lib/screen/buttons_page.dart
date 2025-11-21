@@ -11,66 +11,202 @@ class ButtonsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final ixButtons = Theme.of(context).extension<IxButtonTheme>();
     final ixTheme = Theme.of(context).extension<IxTheme>();
+    final ixChips = Theme.of(context).extension<IxChipTheme>();
 
-    if (ixButtons == null) {
-      return const Center(
-        child: Text('IxButtonTheme extension is not available.'),
-      );
+    if (ixButtons == null || ixChips == null) {
+      return const Center(child: Text('IxTheme extensions were not found.'));
     }
 
     final variants = IxButtonVariant.values;
+    final baseChipVariants = IxChipVariant.values;
+    const statusVariants = IxChipStatus.values;
 
     return ListView.separated(
       padding: const EdgeInsets.all(24),
       itemBuilder: (context, index) {
-        final variant = variants[index];
-        final style = ixButtons.style(variant);
-        return Card(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _variantLabel(variant),
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 12,
-                  children: [
-                    FilledButton(
-                      style: style,
-                      onPressed: () {},
-                      child: const Text('Enabled'),
-                    ),
-                    FilledButton.icon(
-                      style: style,
-                      onPressed: () {},
-                      icon: IxIcons.add,
-                      label: const Text('With icon'),
-                    ),
-                    FilledButton(
-                      style: style,
-                      onPressed: null,
-                      child: const Text('Disabled'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  _variantDescription(variant, ixTheme),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
+        if (index < variants.length) {
+          final variant = variants[index];
+          final style = ixButtons.style(variant);
+          return Card(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _variantLabel(variant),
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 16,
+                    runSpacing: 12,
+                    children: [
+                      FilledButton(
+                        style: style,
+                        onPressed: () {},
+                        child: const Text('Enabled'),
+                      ),
+                      FilledButton.icon(
+                        style: style,
+                        onPressed: () {},
+                        icon: IxIcons.add,
+                        label: const Text('With icon'),
+                      ),
+                      FilledButton(
+                        style: style,
+                        onPressed: null,
+                        child: const Text('Disabled'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    _variantDescription(variant, ixTheme),
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                ],
+              ),
             ),
-          ),
+          );
+        }
+
+        return _ChipExamples(
+          ixChips: ixChips,
+          baseVariants: baseChipVariants,
+          statusVariants: statusVariants,
         );
       },
       separatorBuilder: (_, index) => const SizedBox(height: 16),
-      itemCount: variants.length,
+      itemCount: variants.length + 1,
     );
+  }
+}
+
+class _ChipExamples extends StatelessWidget {
+  const _ChipExamples({
+    required this.ixChips,
+    required this.baseVariants,
+    required this.statusVariants,
+  });
+
+  final IxChipTheme ixChips;
+  final List<IxChipVariant> baseVariants;
+  final List<IxChipStatus> statusVariants;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Chips', style: textTheme.titleMedium),
+            const SizedBox(height: 12),
+            Text('Base treatments', style: textTheme.labelLarge),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                for (final variant in baseVariants)
+                  _buildChip(
+                    context,
+                    label: _chipVariantLabel(variant),
+                    style: ixChips.variant(variant),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text('Semantic statuses', style: textTheme.labelLarge),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                for (final status in statusVariants)
+                  _buildChip(
+                    context,
+                    label: _chipStatusLabel(status),
+                    style: ixChips.statusStyle(status),
+                    closable: true,
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Text('Semantic outlines', style: textTheme.labelLarge),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                for (final status in statusVariants)
+                  _buildChip(
+                    context,
+                    label: _chipStatusLabel(status),
+                    style: ixChips.statusStyle(status, outline: true),
+                    outlined: true,
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChip(
+    BuildContext context, {
+    required String label,
+    required IxChipStyle style,
+    bool closable = false,
+    bool outlined = false,
+  }) {
+    return Chip(
+      label: Text(
+        label,
+        style: Theme.of(
+          context,
+        ).textTheme.labelMedium?.copyWith(color: style.foreground),
+      ),
+      backgroundColor: style.background,
+      side: outlined ? BorderSide(color: style.borderColor) : null,
+      deleteIcon: closable ? const Icon(Icons.close, size: 16) : null,
+      onDeleted: closable ? () {} : null,
+      deleteIconColor: style.closeForeground,
+    );
+  }
+}
+
+String _chipVariantLabel(IxChipVariant variant) {
+  switch (variant) {
+    case IxChipVariant.standard:
+      return 'Standard';
+    case IxChipVariant.outline:
+      return 'Outline';
+    case IxChipVariant.primary:
+      return 'Primary';
+    case IxChipVariant.primaryOutline:
+      return 'Primary / Outline';
+  }
+}
+
+String _chipStatusLabel(IxChipStatus status) {
+  switch (status) {
+    case IxChipStatus.alarm:
+      return 'Alarm';
+    case IxChipStatus.critical:
+      return 'Critical';
+    case IxChipStatus.warning:
+      return 'Warning';
+    case IxChipStatus.info:
+      return 'Info';
+    case IxChipStatus.neutral:
+      return 'Neutral';
+    case IxChipStatus.success:
+      return 'Success';
   }
 }
 

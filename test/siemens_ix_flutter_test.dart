@@ -134,6 +134,40 @@ void main() {
     expect(theme.iconTheme.size, 24);
   });
 
+  test('wires Siemens IX chip theme', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    );
+
+    final theme = builder.build();
+    final ixTheme = theme.extension<IxTheme>()!;
+    final ixChips = theme.extension<IxChipTheme>();
+
+    expect(ixChips, isNotNull);
+    expect(theme.chipTheme.shape, const StadiumBorder());
+    expect(
+      theme.chipTheme.backgroundColor,
+      ixTheme.color(IxThemeColorToken.component1),
+    );
+
+    final primary = ixChips!.variant(IxChipVariant.primary);
+    expect(primary.background, ixTheme.color(IxThemeColorToken.primary));
+    expect(
+      primary.foreground,
+      ixTheme.color(IxThemeColorToken.primaryContrast),
+    );
+
+    final warningOutline = ixChips.statusStyle(
+      IxChipStatus.warning,
+      outline: true,
+    );
+    expect(
+      warningOutline.borderColor,
+      ixTheme.color(IxThemeColorToken.warning),
+    );
+  });
+
   test('wires Siemens IX sidebar theme', () {
     const builder = IxThemeBuilder(
       family: IxThemeFamily.brand,
