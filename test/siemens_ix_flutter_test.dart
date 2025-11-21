@@ -279,4 +279,28 @@ void main() {
 
     expect(selectedIconColor, ixTheme.color(IxThemeColorToken.primary));
   });
+
+  test('wires Siemens IX modal theme', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    );
+
+    final theme = builder.build();
+    final ixModal = theme.extension<IxModalTheme>();
+
+    expect(ixModal, isNotNull);
+    final dialogTheme = theme.dialogTheme;
+    expect(dialogTheme.backgroundColor, ixModal!.backgroundColor);
+
+    final shape = dialogTheme.shape as RoundedRectangleBorder?;
+    expect(shape, isNotNull);
+    final radii = shape!.borderRadius.resolve(TextDirection.ltr);
+    expect(radii.topLeft.x, closeTo(ixModal.borderRadius, 0.001));
+
+    final EdgeInsets? inset = dialogTheme.insetPadding;
+    expect(inset?.left, closeTo(ixModal.dialogPadding, 0.001));
+    expect(ixModal.size(IxModalSize.md).width, 600);
+    expect(ixModal.shadow.length, greaterThanOrEqualTo(1));
+  });
 }

@@ -6,6 +6,7 @@ import 'screen/buttons_page.dart';
 import 'screen/cards_page.dart';
 import 'screen/forms_page.dart';
 import 'screen/home_page.dart';
+import 'screen/modals_page.dart';
 import 'screen/slider_page.dart';
 import 'screen/tabs_page.dart';
 import 'theme_controller.dart';
@@ -74,6 +75,14 @@ class _SiemensIxDemoAppState extends State<SiemensIxDemoApp> {
               pageBuilder: (context, state) => NoTransitionPage(
                 key: state.pageKey,
                 child: const FormsPage(),
+              ),
+            ),
+            GoRoute(
+              path: ModalsPage.routePath,
+              name: ModalsPage.routeName,
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: const ModalsPage(),
               ),
             ),
           ],
@@ -314,5 +323,11 @@ final List<_NavDestination> _navDestinations = [
     label: 'Form inputs',
     iconBuilder: () => IxIcons.documentInfo,
     selectedIconBuilder: () => IxIcons.documentInfo,
+  ),
+  _NavDestination(
+    path: ModalsPage.routePath,
+    label: 'Modals',
+    iconBuilder: () => IxIcons.info,
+    selectedIconBuilder: () => IxIcons.infoFilled,
   ),
 ];

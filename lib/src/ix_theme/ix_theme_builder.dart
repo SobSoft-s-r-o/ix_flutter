@@ -10,6 +10,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_checkbox_theme.dar
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_form_field_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_label_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_modal_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_radio_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_slider_theme.dart';
@@ -81,6 +82,7 @@ class IxThemeBuilder {
     final radioTheme = IxRadioTheme.fromPalette(palette: palette);
     final sliderTheme = IxSliderTheme.fromPalette(palette: palette);
     final toggleTheme = IxToggleTheme.fromPalette(palette: palette);
+    final modalTheme = IxModalTheme.fromPalette(palette: palette);
     final uploadTheme = IxUploadTheme.fromPalette(palette: palette);
     final labelTheme = IxLabelTheme.fromPalette(
       palette: palette,
@@ -110,7 +112,16 @@ class IxThemeBuilder {
       scaffoldBackgroundColor: palette[IxThemeColorToken.color1],
       canvasColor: palette[IxThemeColorToken.color1],
       dialogTheme: DialogThemeData(
-        backgroundColor: palette[IxThemeColorToken.color2],
+        backgroundColor: modalTheme.backgroundColor,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(modalTheme.borderRadius),
+          side: BorderSide(
+            color: modalTheme.borderColor,
+            width: modalTheme.borderWidth,
+          ),
+        ),
+        insetPadding: EdgeInsets.all(modalTheme.dialogPadding),
       ),
       cardColor: palette[IxThemeColorToken.color3],
       dividerColor: palette[IxThemeColorToken.softBdr],
@@ -165,6 +176,7 @@ class IxThemeBuilder {
         sliderTheme,
         toggleTheme,
         uploadTheme,
+        modalTheme,
         labelTheme,
       ],
     );

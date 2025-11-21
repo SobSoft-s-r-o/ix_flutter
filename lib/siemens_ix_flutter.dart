@@ -9,6 +9,7 @@ export 'src/ix_theme/components/ix_card_theme.dart';
 export 'src/ix_theme/components/ix_checkbox_theme.dart';
 export 'src/ix_theme/components/ix_chip_theme.dart';
 export 'src/ix_theme/components/ix_label_theme.dart';
+export 'src/ix_theme/components/ix_modal_theme.dart';
 export 'src/ix_theme/components/ix_toggle_theme.dart';
 export 'src/ix_theme/components/ix_radio_theme.dart';
 export 'src/ix_theme/components/ix_slider_theme.dart';
