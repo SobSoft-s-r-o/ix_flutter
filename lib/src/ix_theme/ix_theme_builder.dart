@@ -8,6 +8,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_button_theme.dart'
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_card_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
 /// scale guidance.
@@ -69,6 +70,10 @@ class IxThemeBuilder {
       typography: typeScale,
     );
     final cardTheme = IxCardTheme.fromPalette(palette: palette);
+    final tabsTheme = IxTabsTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
     final ixThemeExtension = IxTheme(
       family: family,
       mode: mode,
@@ -94,9 +99,7 @@ class IxThemeBuilder {
       splashColor: palette[IxThemeColorToken.component1],
       disabledColor: palette[IxThemeColorToken.weakText],
       shadowColor: palette[IxThemeColorToken.shadow1],
-      tabBarTheme: TabBarThemeData(
-        indicatorColor: palette[IxThemeColorToken.primary],
-      ),
+      tabBarTheme: tabsTheme.materialTabTheme,
       filledButtonTheme: FilledButtonThemeData(style: buttonTheme.primary),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: buttonTheme.secondary,
@@ -127,6 +130,7 @@ class IxThemeBuilder {
         sidebarTheme,
         chipTheme,
         cardTheme,
+        tabsTheme,
       ],
     );
   }

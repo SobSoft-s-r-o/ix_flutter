@@ -220,6 +220,45 @@ void main() {
     expect(alarm.selectedBorderColor, ixTheme.color(IxThemeColorToken.dynamic));
   });
 
+  test('wires Siemens IX tabs theme', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    );
+
+    final theme = builder.build();
+    final ixTheme = theme.extension<IxTheme>()!;
+    final ixTabs = theme.extension<IxTabsTheme>();
+
+    expect(ixTabs, isNotNull);
+    expect(theme.tabBarTheme, same(ixTabs!.materialTabTheme));
+
+    final indicator = theme.tabBarTheme.indicator as UnderlineTabIndicator?;
+    expect(indicator, isNotNull);
+    expect(indicator!.borderSide.width, closeTo(ixTabs.indicatorHeight, 0.001));
+    expect(
+      ixTabs.tab.background.hover,
+      ixTheme.color(IxThemeColorToken.ghostPrimaryHover),
+    );
+    expect(
+      ixTabs.circle.border.selected,
+      ixTheme.color(IxThemeColorToken.dynamic),
+    );
+    expect(ixTabs.circleDiameter, closeTo(48, 0.001));
+    expect(ixTabs.tabPadding.horizontal, closeTo(48, 0.001));
+    expect(ixTabs.materialTabTheme.labelStyle?.fontWeight, FontWeight.w700);
+    final overlay = ixTabs.materialTabTheme.overlayColor!;
+    expect(overlay.resolve(<WidgetState>{}), ixTabs.tab.background.base);
+    expect(
+      overlay.resolve(<WidgetState>{WidgetState.hovered}),
+      ixTabs.tab.background.hover,
+    );
+    expect(
+      overlay.resolve(<WidgetState>{WidgetState.pressed}),
+      ixTabs.tab.background.active,
+    );
+  });
+
   test('wires Siemens IX sidebar theme', () {
     const builder = IxThemeBuilder(
       family: IxThemeFamily.brand,

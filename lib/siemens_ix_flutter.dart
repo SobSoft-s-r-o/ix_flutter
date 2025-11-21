@@ -8,5 +8,6 @@ export 'src/ix_theme/components/ix_button_theme.dart';
 export 'src/ix_theme/components/ix_card_theme.dart';
 export 'src/ix_theme/components/ix_chip_theme.dart';
 export 'src/ix_theme/components/ix_sidebar_theme.dart';
+export 'src/ix_theme/components/ix_tabs_theme.dart';
 export 'src/ix_theme/ix_theme_builder.dart';
 export 'src/ix_icons/ix_icons.dart';

@@ -5,6 +5,7 @@ import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 import 'screen/buttons_page.dart';
 import 'screen/cards_page.dart';
 import 'screen/home_page.dart';
+import 'screen/tabs_page.dart';
 import 'theme_controller.dart';
 
 class SiemensIxDemoApp extends StatefulWidget {
@@ -50,6 +51,12 @@ class _SiemensIxDemoAppState extends State<SiemensIxDemoApp> {
                 key: state.pageKey,
                 child: const CardsPage(),
               ),
+            ),
+            GoRoute(
+              path: TabsPage.routePath,
+              name: TabsPage.routeName,
+              pageBuilder: (context, state) =>
+                  NoTransitionPage(key: state.pageKey, child: const TabsPage()),
             ),
           ],
         ),
@@ -205,7 +212,7 @@ class _NavigationDrawer extends StatelessWidget {
                     Text('Pages', style: theme.titleMedium),
                     const SizedBox(height: 8),
                     Text(
-                      'Navigate between the overview plus the button and card showcases.',
+                      'Navigate between the overview plus the button, card, and tabs showcases.',
                       style: theme.bodySmall,
                     ),
                   ],
@@ -271,5 +278,11 @@ final List<_NavDestination> _navDestinations = [
     label: 'Cards',
     iconBuilder: () => IxIcons.dashboard,
     selectedIconBuilder: () => IxIcons.dashboardFilled,
+  ),
+  _NavDestination(
+    path: TabsPage.routePath,
+    label: 'Tabs',
+    iconBuilder: () => IxIcons.layers,
+    selectedIconBuilder: () => IxIcons.layersFilled,
   ),
 ];
