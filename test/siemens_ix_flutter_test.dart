@@ -47,6 +47,14 @@ void main() {
     expect(baseColor, ixTheme.color(IxThemeColorToken.secondary));
     expect(disabledColor, ixTheme.color(IxThemeColorToken.ghost));
 
+    const expectedRadiusPx = 0.125 * 16;
+    final shape = ixButtons.style(IxButtonVariant.primary).shape;
+    final resolvedShape = shape?.resolve(<WidgetState>{});
+    expect(resolvedShape, isA<RoundedRectangleBorder>());
+    final borderRadius = (resolvedShape! as RoundedRectangleBorder).borderRadius
+        .resolve(TextDirection.ltr);
+    expect(borderRadius.topLeft.x, expectedRadiusPx);
+
     final warningBorder = ixButtons
         .style(IxButtonVariant.warningSecondary)
         .side

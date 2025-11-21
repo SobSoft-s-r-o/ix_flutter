@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
 
+const _defaultCssFontSizePx = 16.0; // Browser default for 1rem.
+const _smallBorderRadiusRem = 0.125; // --theme-small-border-radius token.
+const _smallBorderRadiusPx = _defaultCssFontSizePx * _smallBorderRadiusRem;
+
 /// Enumerates the Siemens IX button variants.
 enum IxButtonVariant {
   primary,
@@ -56,7 +60,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
 
     const basePadding = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
     const baseShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(8)),
+      borderRadius: BorderRadius.all(Radius.circular(_smallBorderRadiusPx)),
     );
     final labelStyle = typography.label;
 
