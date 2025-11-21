@@ -6,7 +6,10 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_header_theme.d
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_button_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_card_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_checkbox_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_form_field_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_radio_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 
@@ -70,7 +73,13 @@ class IxThemeBuilder {
       typography: typeScale,
     );
     final cardTheme = IxCardTheme.fromPalette(palette: palette);
+    final checkboxTheme = IxCheckboxTheme.fromPalette(palette: palette);
+    final radioTheme = IxRadioTheme.fromPalette(palette: palette);
     final tabsTheme = IxTabsTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
+    final formFieldTheme = IxFormFieldTheme.fromPalette(
       palette: palette,
       typography: typeScale,
     );
@@ -100,6 +109,11 @@ class IxThemeBuilder {
       disabledColor: palette[IxThemeColorToken.weakText],
       shadowColor: palette[IxThemeColorToken.shadow1],
       tabBarTheme: tabsTheme.materialTabTheme,
+      inputDecorationTheme: formFieldTheme.inputDecorationTheme,
+      dropdownMenuTheme: formFieldTheme.dropdownMenuTheme,
+      datePickerTheme: formFieldTheme.datePickerTheme,
+      checkboxTheme: checkboxTheme.materialCheckboxTheme,
+      radioTheme: radioTheme.materialRadioTheme,
       filledButtonTheme: FilledButtonThemeData(style: buttonTheme.primary),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: buttonTheme.secondary,
@@ -131,6 +145,9 @@ class IxThemeBuilder {
         chipTheme,
         cardTheme,
         tabsTheme,
+        formFieldTheme,
+        checkboxTheme,
+        radioTheme,
       ],
     );
   }

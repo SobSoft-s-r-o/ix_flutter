@@ -445,7 +445,7 @@ class _CircleTab extends StatelessWidget {
           spec.label,
           style: theme.textTheme.labelMedium?.copyWith(
             color: spec.disabled
-                ? theme.textTheme.labelMedium?.color?.withOpacity(0.5)
+                ? theme.textTheme.labelMedium?.color?.withValues(alpha: 0.5)
                 : theme.textTheme.labelMedium?.color,
           ),
         ),

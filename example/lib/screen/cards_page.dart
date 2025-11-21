@@ -164,7 +164,7 @@ class _CardExample extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: theme.shadowColor.withOpacity(0.1),
+              color: theme.shadowColor.withValues(alpha: 0.1),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -178,7 +178,7 @@ class _CardExample extends StatelessWidget {
               Text(
                 _variantLabel(demo.variant).toUpperCase(),
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: style.foreground.withOpacity(0.7),
+                  color: style.foreground.withValues(alpha: 0.7),
                   letterSpacing: 0.6,
                 ),
               ),
@@ -201,7 +201,7 @@ class _CardExample extends StatelessWidget {
               Text(
                 demo.subtitle,
                 style: theme.textTheme.bodySmall?.copyWith(
-                  color: style.foreground.withOpacity(0.85),
+                  color: style.foreground.withValues(alpha: 0.85),
                 ),
               ),
             ],
@@ -222,7 +222,7 @@ class _CardIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: style.foreground.withOpacity(0.12),
+        color: style.foreground.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Padding(
