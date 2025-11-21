@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_svg: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:
@@ -21,6 +22,7 @@ dev_dependencies:
   args: ^2.7.0
   recase: ^4.1.0
   meta: ^1.17.0
+  archive: ^3.6.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -51,3 +53,5 @@ flutter:
         - asset: assets/fonts/JetBrains_Mono/static/JetBrainsMono-BoldItalic.ttf
           weight: 700
           style: italic
+  assets:
+    - assets/svg/
