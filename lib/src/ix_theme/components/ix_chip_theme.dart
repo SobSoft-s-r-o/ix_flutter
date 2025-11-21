@@ -18,6 +18,8 @@ class IxChipStyle {
     required this.borderColor,
     required this.closeBackground,
     required this.closeForeground,
+    required this.closeHoverBackground,
+    required this.closeActiveBackground,
   });
 
   final Color background;
@@ -27,6 +29,8 @@ class IxChipStyle {
   final Color borderColor;
   final Color closeBackground;
   final Color closeForeground;
+  final Color closeHoverBackground;
+  final Color closeActiveBackground;
 
   IxChipStyle copyWith({
     Color? background,
@@ -36,6 +40,8 @@ class IxChipStyle {
     Color? borderColor,
     Color? closeBackground,
     Color? closeForeground,
+    Color? closeHoverBackground,
+    Color? closeActiveBackground,
   }) {
     return IxChipStyle(
       background: background ?? this.background,
@@ -45,6 +51,9 @@ class IxChipStyle {
       borderColor: borderColor ?? this.borderColor,
       closeBackground: closeBackground ?? this.closeBackground,
       closeForeground: closeForeground ?? this.closeForeground,
+      closeHoverBackground: closeHoverBackground ?? this.closeHoverBackground,
+      closeActiveBackground:
+          closeActiveBackground ?? this.closeActiveBackground,
     );
   }
 
@@ -65,6 +74,12 @@ class IxChipStyle {
       closeForeground:
           Color.lerp(a.closeForeground, b.closeForeground, t) ??
           a.closeForeground,
+      closeHoverBackground:
+          Color.lerp(a.closeHoverBackground, b.closeHoverBackground, t) ??
+          a.closeHoverBackground,
+      closeActiveBackground:
+          Color.lerp(a.closeActiveBackground, b.closeActiveBackground, t) ??
+          a.closeActiveBackground,
     );
   }
 }
@@ -95,6 +110,8 @@ class IxChipTheme extends ThemeExtension<IxChipTheme> {
       IxThemeColorToken? border,
       IxThemeColorToken? closeBackground,
       IxThemeColorToken? closeForeground,
+      IxThemeColorToken? closeHoverBackground,
+      IxThemeColorToken? closeActiveBackground,
     }) {
       return IxChipStyle(
         background: resolve(background),
@@ -104,6 +121,12 @@ class IxChipTheme extends ThemeExtension<IxChipTheme> {
         borderColor: border == null ? Colors.transparent : resolve(border),
         closeBackground: resolve(closeBackground ?? IxThemeColorToken.ghost),
         closeForeground: resolve(closeForeground ?? IxThemeColorToken.softText),
+        closeHoverBackground: resolve(
+          closeHoverBackground ?? IxThemeColorToken.ghostHover,
+        ),
+        closeActiveBackground: resolve(
+          closeActiveBackground ?? IxThemeColorToken.ghostActive,
+        ),
       );
     }
 
@@ -117,6 +140,7 @@ class IxChipTheme extends ThemeExtension<IxChipTheme> {
       secondarySelectedColor: resolve(IxThemeColorToken.component1Hover),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       shape: pillShape,
+      side: const BorderSide(color: Colors.transparent, width: 0),
       labelStyle: labelStyle.copyWith(
         color: resolve(IxThemeColorToken.stdText),
       ),
@@ -208,6 +232,8 @@ class IxChipTheme extends ThemeExtension<IxChipTheme> {
         borderColor: Colors.transparent,
         closeBackground: resolve(IxThemeColorToken.ghost),
         closeForeground: resolve(tokens.contrast),
+        closeHoverBackground: resolve(IxThemeColorToken.ghostHover),
+        closeActiveBackground: resolve(IxThemeColorToken.ghostActive),
       );
     }
 
@@ -220,6 +246,8 @@ class IxChipTheme extends ThemeExtension<IxChipTheme> {
         borderColor: resolve(tokens.fill),
         closeBackground: resolve(IxThemeColorToken.ghost),
         closeForeground: resolve(IxThemeColorToken.stdText),
+        closeHoverBackground: resolve(IxThemeColorToken.ghostHover),
+        closeActiveBackground: resolve(IxThemeColorToken.ghostActive),
       );
     }
 

@@ -147,6 +147,10 @@ void main() {
     expect(ixChips, isNotNull);
     expect(theme.chipTheme.shape, const StadiumBorder());
     expect(
+      theme.chipTheme.side,
+      const BorderSide(color: Colors.transparent, width: 0),
+    );
+    expect(
       theme.chipTheme.backgroundColor,
       ixTheme.color(IxThemeColorToken.component1),
     );
@@ -157,6 +161,10 @@ void main() {
       primary.foreground,
       ixTheme.color(IxThemeColorToken.primaryContrast),
     );
+    expect(
+      primary.closeHoverBackground,
+      ixTheme.color(IxThemeColorToken.ghostHover),
+    );
 
     final warningOutline = ixChips.statusStyle(
       IxChipStatus.warning,
@@ -166,6 +174,50 @@ void main() {
       warningOutline.borderColor,
       ixTheme.color(IxThemeColorToken.warning),
     );
+    expect(
+      warningOutline.closeActiveBackground,
+      ixTheme.color(IxThemeColorToken.ghostActive),
+    );
+  });
+
+  test('wires Siemens IX card theme', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    );
+
+    final theme = builder.build();
+    final ixTheme = theme.extension<IxTheme>()!;
+    final ixCards = theme.extension<IxCardTheme>();
+
+    expect(ixCards, isNotNull);
+    expect(theme.cardTheme, same(ixCards!.materialCardTheme));
+
+    final shape = theme.cardTheme.shape as RoundedRectangleBorder?;
+    expect(shape, isNotNull);
+    final radii = shape!.borderRadius.resolve(TextDirection.ltr);
+    expect(radii.topLeft.x, closeTo(4, 0.001));
+
+    expect(ixCards.borderWidth, closeTo(1, 0.001));
+    expect(ixCards.focusOutlineOffset, closeTo(2, 0.001));
+
+    final outline = ixCards.style(IxCardVariant.outline);
+    expect(outline.borderColor, ixTheme.color(IxThemeColorToken.softBdr));
+    expect(
+      outline.hoverBackground,
+      ixTheme.color(IxThemeColorToken.ghostHover),
+    );
+
+    final filled = ixCards.style(IxCardVariant.filled);
+    expect(
+      filled.selectedBackground,
+      ixTheme.color(IxThemeColorToken.ghostSelected),
+    );
+
+    final alarm = ixCards.style(IxCardVariant.alarm);
+    expect(alarm.background, ixTheme.color(IxThemeColorToken.alarm));
+    expect(alarm.foreground, ixTheme.color(IxThemeColorToken.alarmContrast));
+    expect(alarm.selectedBorderColor, ixTheme.color(IxThemeColorToken.dynamic));
   });
 
   test('wires Siemens IX sidebar theme', () {

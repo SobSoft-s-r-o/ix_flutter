@@ -117,6 +117,12 @@ class _ChipExamples extends StatelessWidget {
                     label: _chipVariantLabel(variant),
                     style: ixChips.variant(variant),
                   ),
+                _buildChip(
+                  context,
+                  label: 'With icon',
+                  style: ixChips.variant(IxChipVariant.standard),
+                  icon: IxIcons.filter,
+                ),
               ],
             ),
             const SizedBox(height: 16),
@@ -163,6 +169,7 @@ class _ChipExamples extends StatelessWidget {
     required IxChipStyle style,
     bool closable = false,
     bool outlined = false,
+    Widget? icon,
   }) {
     return Chip(
       label: Text(
@@ -171,6 +178,12 @@ class _ChipExamples extends StatelessWidget {
           context,
         ).textTheme.labelMedium?.copyWith(color: style.foreground),
       ),
+      avatar: icon == null
+          ? null
+          : IconTheme.merge(
+              data: IconThemeData(color: style.foreground, size: 16),
+              child: icon,
+            ),
       backgroundColor: style.background,
       side: outlined ? BorderSide(color: style.borderColor) : null,
       deleteIcon: closable ? const Icon(Icons.close, size: 16) : null,
