@@ -46,6 +46,25 @@ void main() {
 
     expect(baseColor, ixTheme.color(IxThemeColorToken.secondary));
     expect(disabledColor, ixTheme.color(IxThemeColorToken.ghost));
+
+    final warningBorder = ixButtons
+        .style(IxButtonVariant.warningSecondary)
+        .side
+        ?.resolve(<WidgetState>{});
+    expect(warningBorder, isNotNull);
+    expect(warningBorder!.color, ixTheme.color(IxThemeColorToken.warningBdr));
+
+    final successPrimaryBackground = ixButtons
+        .style(IxButtonVariant.successPrimary)
+        .backgroundColor!
+        .resolve(<WidgetState>{});
+    expect(successPrimaryBackground, ixTheme.color(IxThemeColorToken.success));
+
+    final infoGhostForeground = ixButtons
+        .style(IxButtonVariant.infoTertiary)
+        .foregroundColor!
+        .resolve(<WidgetState>{});
+    expect(infoGhostForeground, ixTheme.color(IxThemeColorToken.info));
   });
 
   test('wires Siemens IX app header theme', () {

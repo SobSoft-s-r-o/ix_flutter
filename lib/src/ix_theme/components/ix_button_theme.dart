@@ -13,6 +13,15 @@ enum IxButtonVariant {
   dangerPrimary,
   dangerSecondary,
   dangerTertiary,
+  warningPrimary,
+  warningSecondary,
+  warningTertiary,
+  infoPrimary,
+  infoSecondary,
+  infoTertiary,
+  successPrimary,
+  successSecondary,
+  successTertiary,
 }
 
 /// Theme extension that surfaces Siemens IX button styles.
@@ -27,6 +36,15 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
     required this.dangerPrimary,
     required this.dangerSecondary,
     required this.dangerTertiary,
+    required this.warningPrimary,
+    required this.warningSecondary,
+    required this.warningTertiary,
+    required this.infoPrimary,
+    required this.infoSecondary,
+    required this.infoTertiary,
+    required this.successPrimary,
+    required this.successSecondary,
+    required this.successTertiary,
   });
 
   /// Generates Siemens IX button styles from the resolved color palette.
@@ -334,6 +352,195 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       side: borderStates(base: transparentSide()),
     );
 
+    final warningOverlay = overlayStates(
+      hovered: color(IxThemeColorToken.warning40),
+      pressed: color(IxThemeColorToken.warning40),
+    );
+
+    final warningPrimary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.warning),
+        hovered: color(IxThemeColorToken.warningHover),
+        focused: color(IxThemeColorToken.warningActive),
+        pressed: color(IxThemeColorToken.warningActive),
+        disabled: color(IxThemeColorToken.component4),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.warningContrast),
+        disabled: color(IxThemeColorToken.primaryContrast),
+      ),
+      overlay: warningOverlay,
+      side: borderStates(base: transparentSide()),
+    );
+
+    final warningSecondary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.color0),
+        hovered: color(IxThemeColorToken.warning40),
+        focused: color(IxThemeColorToken.warning40),
+        pressed: color(IxThemeColorToken.warning40),
+        disabled: color(IxThemeColorToken.ghost),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.warningText),
+        hovered: color(IxThemeColorToken.warningText),
+        pressed: color(IxThemeColorToken.warningText),
+        disabled: color(IxThemeColorToken.weakText),
+      ),
+      overlay: warningOverlay,
+      side: borderStates(
+        base: border(color(IxThemeColorToken.warningBdr)),
+        hovered: border(color(IxThemeColorToken.warningText)),
+        focused: border(color(IxThemeColorToken.warningText)),
+        pressed: border(color(IxThemeColorToken.warningText)),
+        disabled: border(color(IxThemeColorToken.component4)),
+      ),
+    );
+
+    final warningTertiary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.ghost),
+        hovered: color(IxThemeColorToken.warning10),
+        focused: color(IxThemeColorToken.warning10),
+        pressed: color(IxThemeColorToken.warning40),
+        disabled: color(IxThemeColorToken.ghost),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.warningText),
+        hovered: color(IxThemeColorToken.warningText),
+        pressed: color(IxThemeColorToken.warningText),
+        disabled: color(IxThemeColorToken.weakText),
+      ),
+      overlay: warningOverlay,
+      side: borderStates(base: transparentSide()),
+    );
+
+    final infoOverlay = overlayStates(
+      hovered: color(IxThemeColorToken.info40),
+      pressed: color(IxThemeColorToken.info40),
+    );
+
+    final infoPrimary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.info),
+        hovered: color(IxThemeColorToken.infoHover),
+        focused: color(IxThemeColorToken.infoActive),
+        pressed: color(IxThemeColorToken.infoActive),
+        disabled: color(IxThemeColorToken.component4),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.infoContrast),
+        disabled: color(IxThemeColorToken.primaryContrast),
+      ),
+      overlay: infoOverlay,
+      side: borderStates(base: transparentSide()),
+    );
+
+    final infoSecondary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.color0),
+        hovered: color(IxThemeColorToken.info40),
+        focused: color(IxThemeColorToken.info40),
+        pressed: color(IxThemeColorToken.info40),
+        disabled: color(IxThemeColorToken.ghost),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.info),
+        hovered: color(IxThemeColorToken.info),
+        pressed: color(IxThemeColorToken.info),
+        disabled: color(IxThemeColorToken.weakText),
+      ),
+      overlay: infoOverlay,
+      side: borderStates(
+        base: border(color(IxThemeColorToken.info)),
+        hovered: border(color(IxThemeColorToken.info)),
+        focused: border(color(IxThemeColorToken.info)),
+        pressed: border(color(IxThemeColorToken.info)),
+        disabled: border(color(IxThemeColorToken.component4)),
+      ),
+    );
+
+    final infoTertiary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.ghost),
+        hovered: color(IxThemeColorToken.info40),
+        focused: color(IxThemeColorToken.info40),
+        pressed: color(IxThemeColorToken.info40),
+        disabled: color(IxThemeColorToken.ghost),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.info),
+        hovered: color(IxThemeColorToken.info),
+        pressed: color(IxThemeColorToken.info),
+        disabled: color(IxThemeColorToken.weakText),
+      ),
+      overlay: infoOverlay,
+      side: borderStates(base: transparentSide()),
+    );
+
+    final successOverlay = overlayStates(
+      hovered: color(IxThemeColorToken.success40),
+      pressed: color(IxThemeColorToken.success40),
+    );
+
+    final successPrimary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.success),
+        hovered: color(IxThemeColorToken.successHover),
+        focused: color(IxThemeColorToken.successActive),
+        pressed: color(IxThemeColorToken.successActive),
+        disabled: color(IxThemeColorToken.component4),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.successContrast),
+        disabled: color(IxThemeColorToken.primaryContrast),
+      ),
+      overlay: successOverlay,
+      side: borderStates(base: transparentSide()),
+    );
+
+    final successSecondary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.color0),
+        hovered: color(IxThemeColorToken.success40),
+        focused: color(IxThemeColorToken.success40),
+        pressed: color(IxThemeColorToken.success40),
+        disabled: color(IxThemeColorToken.ghost),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.success),
+        hovered: color(IxThemeColorToken.success),
+        pressed: color(IxThemeColorToken.success),
+        disabled: color(IxThemeColorToken.weakText),
+      ),
+      overlay: successOverlay,
+      side: borderStates(
+        base: border(color(IxThemeColorToken.success)),
+        hovered: border(color(IxThemeColorToken.success)),
+        focused: border(color(IxThemeColorToken.success)),
+        pressed: border(color(IxThemeColorToken.success)),
+        disabled: border(color(IxThemeColorToken.component4)),
+      ),
+    );
+
+    final successTertiary = baseStyle(
+      background: colorStates(
+        base: color(IxThemeColorToken.ghost),
+        hovered: color(IxThemeColorToken.success40),
+        focused: color(IxThemeColorToken.success40),
+        pressed: color(IxThemeColorToken.success40),
+        disabled: color(IxThemeColorToken.ghost),
+      ),
+      foreground: colorStates(
+        base: color(IxThemeColorToken.success),
+        hovered: color(IxThemeColorToken.success),
+        pressed: color(IxThemeColorToken.success),
+        disabled: color(IxThemeColorToken.weakText),
+      ),
+      overlay: successOverlay,
+      side: borderStates(base: transparentSide()),
+    );
+
     return IxButtonTheme(
       primary: primary,
       secondary: secondary,
@@ -344,6 +551,15 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       dangerPrimary: dangerPrimary,
       dangerSecondary: dangerSecondary,
       dangerTertiary: dangerTertiary,
+      warningPrimary: warningPrimary,
+      warningSecondary: warningSecondary,
+      warningTertiary: warningTertiary,
+      infoPrimary: infoPrimary,
+      infoSecondary: infoSecondary,
+      infoTertiary: infoTertiary,
+      successPrimary: successPrimary,
+      successSecondary: successSecondary,
+      successTertiary: successTertiary,
     );
   }
 
@@ -356,6 +572,15 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
   final ButtonStyle dangerPrimary;
   final ButtonStyle dangerSecondary;
   final ButtonStyle dangerTertiary;
+  final ButtonStyle warningPrimary;
+  final ButtonStyle warningSecondary;
+  final ButtonStyle warningTertiary;
+  final ButtonStyle infoPrimary;
+  final ButtonStyle infoSecondary;
+  final ButtonStyle infoTertiary;
+  final ButtonStyle successPrimary;
+  final ButtonStyle successSecondary;
+  final ButtonStyle successTertiary;
 
   /// Returns the [ButtonStyle] for a given [variant].
   ButtonStyle style(IxButtonVariant variant) {
@@ -378,6 +603,24 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         return dangerSecondary;
       case IxButtonVariant.dangerTertiary:
         return dangerTertiary;
+      case IxButtonVariant.warningPrimary:
+        return warningPrimary;
+      case IxButtonVariant.warningSecondary:
+        return warningSecondary;
+      case IxButtonVariant.warningTertiary:
+        return warningTertiary;
+      case IxButtonVariant.infoPrimary:
+        return infoPrimary;
+      case IxButtonVariant.infoSecondary:
+        return infoSecondary;
+      case IxButtonVariant.infoTertiary:
+        return infoTertiary;
+      case IxButtonVariant.successPrimary:
+        return successPrimary;
+      case IxButtonVariant.successSecondary:
+        return successSecondary;
+      case IxButtonVariant.successTertiary:
+        return successTertiary;
     }
   }
 
@@ -392,6 +635,15 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
     ButtonStyle? dangerPrimary,
     ButtonStyle? dangerSecondary,
     ButtonStyle? dangerTertiary,
+    ButtonStyle? warningPrimary,
+    ButtonStyle? warningSecondary,
+    ButtonStyle? warningTertiary,
+    ButtonStyle? infoPrimary,
+    ButtonStyle? infoSecondary,
+    ButtonStyle? infoTertiary,
+    ButtonStyle? successPrimary,
+    ButtonStyle? successSecondary,
+    ButtonStyle? successTertiary,
   }) {
     return IxButtonTheme(
       primary: primary ?? this.primary,
@@ -403,6 +655,15 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       dangerPrimary: dangerPrimary ?? this.dangerPrimary,
       dangerSecondary: dangerSecondary ?? this.dangerSecondary,
       dangerTertiary: dangerTertiary ?? this.dangerTertiary,
+      warningPrimary: warningPrimary ?? this.warningPrimary,
+      warningSecondary: warningSecondary ?? this.warningSecondary,
+      warningTertiary: warningTertiary ?? this.warningTertiary,
+      infoPrimary: infoPrimary ?? this.infoPrimary,
+      infoSecondary: infoSecondary ?? this.infoSecondary,
+      infoTertiary: infoTertiary ?? this.infoTertiary,
+      successPrimary: successPrimary ?? this.successPrimary,
+      successSecondary: successSecondary ?? this.successSecondary,
+      successTertiary: successTertiary ?? this.successTertiary,
     );
   }
 
@@ -425,6 +686,15 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       dangerPrimary: lerpStyle(dangerPrimary, other.dangerPrimary),
       dangerSecondary: lerpStyle(dangerSecondary, other.dangerSecondary),
       dangerTertiary: lerpStyle(dangerTertiary, other.dangerTertiary),
+      warningPrimary: lerpStyle(warningPrimary, other.warningPrimary),
+      warningSecondary: lerpStyle(warningSecondary, other.warningSecondary),
+      warningTertiary: lerpStyle(warningTertiary, other.warningTertiary),
+      infoPrimary: lerpStyle(infoPrimary, other.infoPrimary),
+      infoSecondary: lerpStyle(infoSecondary, other.infoSecondary),
+      infoTertiary: lerpStyle(infoTertiary, other.infoTertiary),
+      successPrimary: lerpStyle(successPrimary, other.successPrimary),
+      successSecondary: lerpStyle(successSecondary, other.successSecondary),
+      successTertiary: lerpStyle(successTertiary, other.successTertiary),
     );
   }
 }

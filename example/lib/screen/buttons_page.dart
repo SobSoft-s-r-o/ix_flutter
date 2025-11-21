@@ -94,6 +94,24 @@ String _variantLabel(IxButtonVariant variant) {
       return 'Danger / Secondary';
     case IxButtonVariant.dangerTertiary:
       return 'Danger / Tertiary';
+    case IxButtonVariant.warningPrimary:
+      return 'Warning / Primary';
+    case IxButtonVariant.warningSecondary:
+      return 'Warning / Secondary';
+    case IxButtonVariant.warningTertiary:
+      return 'Warning / Tertiary';
+    case IxButtonVariant.infoPrimary:
+      return 'Info / Primary';
+    case IxButtonVariant.infoSecondary:
+      return 'Info / Secondary';
+    case IxButtonVariant.infoTertiary:
+      return 'Info / Tertiary';
+    case IxButtonVariant.successPrimary:
+      return 'Success / Primary';
+    case IxButtonVariant.successSecondary:
+      return 'Success / Secondary';
+    case IxButtonVariant.successTertiary:
+      return 'Success / Tertiary';
   }
 }
 
@@ -125,5 +143,23 @@ String _variantDescription(IxButtonVariant variant, IxTheme? ixTheme) {
       return 'Outlined danger action accenting ${token(IxThemeColorToken.alarmText)} borders.';
     case IxButtonVariant.dangerTertiary:
       return 'Text treatment for alarm flows with hover/error overlays.';
+    case IxButtonVariant.warningPrimary:
+      return 'Prominent caution state using ${token(IxThemeColorToken.warning)} fills with ${token(IxThemeColorToken.warningContrast)} text.';
+    case IxButtonVariant.warningSecondary:
+      return 'Warning outline featuring ${token(IxThemeColorToken.warningText)} ink and ${token(IxThemeColorToken.warningBdr)} borders.';
+    case IxButtonVariant.warningTertiary:
+      return 'Ghost warning action that keeps ${token(IxThemeColorToken.warningText)} copy on ${token(IxThemeColorToken.ghost)} surfaces.';
+    case IxButtonVariant.infoPrimary:
+      return 'Informational highlight using ${token(IxThemeColorToken.info)} backgrounds and ${token(IxThemeColorToken.infoContrast)} text.';
+    case IxButtonVariant.infoSecondary:
+      return 'Info outline pairing neutral fills with ${token(IxThemeColorToken.info)} strokes.';
+    case IxButtonVariant.infoTertiary:
+      return 'Ghost info button reserved for inline help cues with ${token(IxThemeColorToken.info)} ink.';
+    case IxButtonVariant.successPrimary:
+      return 'Affirmative confirmation state driven by ${token(IxThemeColorToken.success)} fills and ${token(IxThemeColorToken.successContrast)} text.';
+    case IxButtonVariant.successSecondary:
+      return 'Success outline balancing ${token(IxThemeColorToken.success)} borders over ${token(IxThemeColorToken.color0)} surfaces.';
+    case IxButtonVariant.successTertiary:
+      return 'Ghost success control for passive confirmations relying on ${token(IxThemeColorToken.success)} text.';
   }
 }
