@@ -3,7 +3,9 @@ import 'package:siemens_ix_flutter/src/ix_colors/ix_colors.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_color_palette.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_header_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_button_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
 /// scale guidance.
@@ -52,6 +54,14 @@ class IxThemeBuilder {
       palette: palette,
       typography: typeScale,
     );
+    final appMenuTheme = IxAppMenuTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
+    final sidebarTheme = IxSidebarTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
     final ixThemeExtension = IxTheme(
       family: family,
       mode: mode,
@@ -85,12 +95,28 @@ class IxThemeBuilder {
         style: buttonTheme.secondary,
       ),
       textButtonTheme: TextButtonThemeData(style: buttonTheme.tertiary),
+      iconTheme: IconThemeData(
+        color: palette[IxThemeColorToken.stdText],
+        size: 24,
+      ),
+      primaryIconTheme: IconThemeData(
+        color: palette[IxThemeColorToken.contrastText],
+        size: 24,
+      ),
       appBarTheme: appHeaderTheme.appBarTheme,
+      menuTheme: appMenuTheme.menuTheme,
+      navigationRailTheme: sidebarTheme.navigationRailTheme,
       textTheme: textTheme,
       fontFamily: typeScale.fontFamily,
       visualDensity: VisualDensity.standard,
       applyElevationOverlayColor: brightness == Brightness.dark,
-      extensions: [ixThemeExtension, buttonTheme, appHeaderTheme],
+      extensions: [
+        ixThemeExtension,
+        buttonTheme,
+        appHeaderTheme,
+        appMenuTheme,
+        sidebarTheme,
+      ],
     );
   }
 

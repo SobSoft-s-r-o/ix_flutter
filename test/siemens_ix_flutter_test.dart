@@ -68,4 +68,63 @@ void main() {
     expect(shape?.bottom.color, ixAppHeader.borderColor);
     expect(shape?.bottom.width, ixAppHeader.borderWidth);
   });
+
+  test('wires Siemens IX app menu theme', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    );
+
+    final theme = builder.build();
+    final ixTheme = theme.extension<IxTheme>()!;
+    final ixAppMenu = theme.extension<IxAppMenuTheme>();
+
+    expect(ixAppMenu, isNotNull);
+    expect(theme.menuTheme, same(ixAppMenu!.menuTheme));
+    expect(ixAppMenu.backgroundColor, ixTheme.color(IxThemeColorToken.color2));
+
+    final selectedTextColor = ixAppMenu.itemForeground.resolve(<WidgetState>{
+      WidgetState.selected,
+    });
+
+    expect(selectedTextColor, ixTheme.color(IxThemeColorToken.primary));
+  });
+
+  test('provides icon theming tied to Siemens IX palette', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.classic,
+      mode: ThemeMode.dark,
+    );
+
+    final theme = builder.build();
+    final ixTheme = theme.extension<IxTheme>()!;
+
+    expect(theme.iconTheme.color, ixTheme.color(IxThemeColorToken.stdText));
+    expect(
+      theme.primaryIconTheme.color,
+      ixTheme.color(IxThemeColorToken.contrastText),
+    );
+    expect(theme.iconTheme.size, 24);
+  });
+
+  test('wires Siemens IX sidebar theme', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.dark,
+    );
+
+    final theme = builder.build();
+    final ixTheme = theme.extension<IxTheme>()!;
+    final ixSidebar = theme.extension<IxSidebarTheme>();
+
+    expect(ixSidebar, isNotNull);
+    expect(theme.navigationRailTheme, same(ixSidebar!.navigationRailTheme));
+    expect(ixSidebar.backgroundColor, ixTheme.color(IxThemeColorToken.color2));
+
+    final selectedIconColor = ixSidebar.itemIconColor.resolve(<WidgetState>{
+      WidgetState.selected,
+    });
+
+    expect(selectedIconColor, ixTheme.color(IxThemeColorToken.primary));
+  });
 }

@@ -1,6 +1,4 @@
 // GENERATED FILE - DO NOT EDIT
-// Generated from @siemens/ix-icons@3.2.0
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -8,9853 +6,7066 @@ import 'package:flutter_svg/flutter_svg.dart';
 class IxIcons {
   IxIcons._();
 
+  static const _assetPackage = 'siemens_ix_flutter';
+
   /// Icon: about-filled.svg
-  static Widget get aboutFilled => SvgPicture.asset(
+  static Widget get aboutFilled => const _IxIconWidget(
     'assets/svg/about-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: about.svg
-  static Widget get about => SvgPicture.asset(
+  static Widget get about => const _IxIconWidget(
     'assets/svg/about.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-application.svg
-  static Widget get addApplication => SvgPicture.asset(
+  static Widget get addApplication => const _IxIconWidget(
     'assets/svg/add-application.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-circle-filled.svg
-  static Widget get addCircleFilled => SvgPicture.asset(
+  static Widget get addCircleFilled => const _IxIconWidget(
     'assets/svg/add-circle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-circle-small-filled.svg
-  static Widget get addCircleSmallFilled => SvgPicture.asset(
+  static Widget get addCircleSmallFilled => const _IxIconWidget(
     'assets/svg/add-circle-small-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-circle-small.svg
-  static Widget get addCircleSmall => SvgPicture.asset(
+  static Widget get addCircleSmall => const _IxIconWidget(
     'assets/svg/add-circle-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-circle.svg
-  static Widget get addCircle => SvgPicture.asset(
+  static Widget get addCircle => const _IxIconWidget(
     'assets/svg/add-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-document-note.svg
-  static Widget get addDocumentNote => SvgPicture.asset(
+  static Widget get addDocumentNote => const _IxIconWidget(
     'assets/svg/add-document-note.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-eye-filled.svg
-  static Widget get addEyeFilled => SvgPicture.asset(
+  static Widget get addEyeFilled => const _IxIconWidget(
     'assets/svg/add-eye-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-eye.svg
-  static Widget get addEye => SvgPicture.asset(
+  static Widget get addEye => const _IxIconWidget(
     'assets/svg/add-eye.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-filter-filled.svg
-  static Widget get addFilterFilled => SvgPicture.asset(
+  static Widget get addFilterFilled => const _IxIconWidget(
     'assets/svg/add-filter-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-filter.svg
-  static Widget get addFilter => SvgPicture.asset(
+  static Widget get addFilter => const _IxIconWidget(
     'assets/svg/add-filter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-selection.svg
-  static Widget get addSelection => SvgPicture.asset(
+  static Widget get addSelection => const _IxIconWidget(
     'assets/svg/add-selection.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-shield-half.svg
-  static Widget get addShieldHalf => SvgPicture.asset(
+  static Widget get addShieldHalf => const _IxIconWidget(
     'assets/svg/add-shield-half.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-task-list.svg
-  static Widget get addTaskList => SvgPicture.asset(
+  static Widget get addTaskList => const _IxIconWidget(
     'assets/svg/add-task-list.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-task.svg
-  static Widget get addTask => SvgPicture.asset(
+  static Widget get addTask => const _IxIconWidget(
     'assets/svg/add-task.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-user-filled.svg
-  static Widget get addUserFilled => SvgPicture.asset(
+  static Widget get addUserFilled => const _IxIconWidget(
     'assets/svg/add-user-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add-user.svg
-  static Widget get addUser => SvgPicture.asset(
+  static Widget get addUser => const _IxIconWidget(
     'assets/svg/add-user.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: add.svg
-  static Widget get add => SvgPicture.asset(
+  static Widget get add => const _IxIconWidget(
     'assets/svg/add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: agent-filled.svg
-  static Widget get agentFilled => SvgPicture.asset(
+  static Widget get agentFilled => const _IxIconWidget(
     'assets/svg/agent-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: agent.svg
-  static Widget get agent => SvgPicture.asset(
+  static Widget get agent => const _IxIconWidget(
     'assets/svg/agent.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ai.svg
-  static Widget get ai => SvgPicture.asset(
+  static Widget get ai => const _IxIconWidget(
     'assets/svg/ai.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-bell-cancelled-filled.svg
-  static Widget get alarmBellCancelledFilled => SvgPicture.asset(
+  static Widget get alarmBellCancelledFilled => const _IxIconWidget(
     'assets/svg/alarm-bell-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-bell-cancelled.svg
-  static Widget get alarmBellCancelled => SvgPicture.asset(
+  static Widget get alarmBellCancelled => const _IxIconWidget(
     'assets/svg/alarm-bell-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-bell-filled.svg
-  static Widget get alarmBellFilled => SvgPicture.asset(
+  static Widget get alarmBellFilled => const _IxIconWidget(
     'assets/svg/alarm-bell-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-bell.svg
-  static Widget get alarmBell => SvgPicture.asset(
+  static Widget get alarmBell => const _IxIconWidget(
     'assets/svg/alarm-bell.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-clock-cancelled.svg
-  static Widget get alarmClockCancelled => SvgPicture.asset(
+  static Widget get alarmClockCancelled => const _IxIconWidget(
     'assets/svg/alarm-clock-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-clock-filled.svg
-  static Widget get alarmClockFilled => SvgPicture.asset(
+  static Widget get alarmClockFilled => const _IxIconWidget(
     'assets/svg/alarm-clock-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-clock-success.svg
-  static Widget get alarmClockSuccess => SvgPicture.asset(
+  static Widget get alarmClockSuccess => const _IxIconWidget(
     'assets/svg/alarm-clock-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-clock.svg
-  static Widget get alarmClock => SvgPicture.asset(
+  static Widget get alarmClock => const _IxIconWidget(
     'assets/svg/alarm-clock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm-filled.svg
-  static Widget get alarmFilled => SvgPicture.asset(
+  static Widget get alarmFilled => const _IxIconWidget(
     'assets/svg/alarm-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: alarm.svg
-  static Widget get alarm => SvgPicture.asset(
+  static Widget get alarm => const _IxIconWidget(
     'assets/svg/alarm.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-center-horizontally.svg
-  static Widget get alignCenterHorizontally => SvgPicture.asset(
+  static Widget get alignCenterHorizontally => const _IxIconWidget(
     'assets/svg/align-center-horizontally.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-center-vertically.svg
-  static Widget get alignCenterVertically => SvgPicture.asset(
+  static Widget get alignCenterVertically => const _IxIconWidget(
     'assets/svg/align-center-vertically.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-object-dimensions.svg
-  static Widget get alignObjectDimensions => SvgPicture.asset(
+  static Widget get alignObjectDimensions => const _IxIconWidget(
     'assets/svg/align-object-dimensions.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-object-height.svg
-  static Widget get alignObjectHeight => SvgPicture.asset(
+  static Widget get alignObjectHeight => const _IxIconWidget(
     'assets/svg/align-object-height.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-object-width.svg
-  static Widget get alignObjectWidth => SvgPicture.asset(
+  static Widget get alignObjectWidth => const _IxIconWidget(
     'assets/svg/align-object-width.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-objects-bottom.svg
-  static Widget get alignObjectsBottom => SvgPicture.asset(
+  static Widget get alignObjectsBottom => const _IxIconWidget(
     'assets/svg/align-objects-bottom.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-objects-centered.svg
-  static Widget get alignObjectsCentered => SvgPicture.asset(
+  static Widget get alignObjectsCentered => const _IxIconWidget(
     'assets/svg/align-objects-centered.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-objects-horizontally.svg
-  static Widget get alignObjectsHorizontally => SvgPicture.asset(
+  static Widget get alignObjectsHorizontally => const _IxIconWidget(
     'assets/svg/align-objects-horizontally.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-objects-left.svg
-  static Widget get alignObjectsLeft => SvgPicture.asset(
+  static Widget get alignObjectsLeft => const _IxIconWidget(
     'assets/svg/align-objects-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-objects-right.svg
-  static Widget get alignObjectsRight => SvgPicture.asset(
+  static Widget get alignObjectsRight => const _IxIconWidget(
     'assets/svg/align-objects-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-objects-top.svg
-  static Widget get alignObjectsTop => SvgPicture.asset(
+  static Widget get alignObjectsTop => const _IxIconWidget(
     'assets/svg/align-objects-top.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-objects-vertically.svg
-  static Widget get alignObjectsVertically => SvgPicture.asset(
+  static Widget get alignObjectsVertically => const _IxIconWidget(
     'assets/svg/align-objects-vertically.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: align-objects.svg
-  static Widget get alignObjects => SvgPicture.asset(
+  static Widget get alignObjects => const _IxIconWidget(
     'assets/svg/align-objects.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: analysis-filled.svg
-  static Widget get analysisFilled => SvgPicture.asset(
+  static Widget get analysisFilled => const _IxIconWidget(
     'assets/svg/analysis-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: analysis.svg
-  static Widget get analysis => SvgPicture.asset(
+  static Widget get analysis => const _IxIconWidget(
     'assets/svg/analysis.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: analyze.svg
-  static Widget get analyze => SvgPicture.asset(
+  static Widget get analyze => const _IxIconWidget(
     'assets/svg/analyze.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: anomaly-found.svg
-  static Widget get anomalyFound => SvgPicture.asset(
+  static Widget get anomalyFound => const _IxIconWidget(
     'assets/svg/anomaly-found.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: anomaly-none.svg
-  static Widget get anomalyNone => SvgPicture.asset(
+  static Widget get anomalyNone => const _IxIconWidget(
     'assets/svg/anomaly-none.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: anomaly.svg
-  static Widget get anomaly => SvgPicture.asset(
+  static Widget get anomaly => const _IxIconWidget(
     'assets/svg/anomaly.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: app-document-filled.svg
-  static Widget get appDocumentFilled => SvgPicture.asset(
+  static Widget get appDocumentFilled => const _IxIconWidget(
     'assets/svg/app-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: app-document.svg
-  static Widget get appDocument => SvgPicture.asset(
+  static Widget get appDocument => const _IxIconWidget(
     'assets/svg/app-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: app-menu.svg
-  static Widget get appMenu => SvgPicture.asset(
+  static Widget get appMenu => const _IxIconWidget(
     'assets/svg/app-menu.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: app-update.svg
-  static Widget get appUpdate => SvgPicture.asset(
+  static Widget get appUpdate => const _IxIconWidget(
     'assets/svg/app-update.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: application-screen-alarm-classes.svg
-  static Widget get applicationScreenAlarmClasses => SvgPicture.asset(
+  static Widget get applicationScreenAlarmClasses => const _IxIconWidget(
     'assets/svg/application-screen-alarm-classes.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: application-screen-globe.svg
-  static Widget get applicationScreenGlobe => SvgPicture.asset(
+  static Widget get applicationScreenGlobe => const _IxIconWidget(
     'assets/svg/application-screen-globe.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: application-screen-play.svg
-  static Widget get applicationScreenPlay => SvgPicture.asset(
+  static Widget get applicationScreenPlay => const _IxIconWidget(
     'assets/svg/application-screen-play.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: application-screen.svg
-  static Widget get applicationScreen => SvgPicture.asset(
+  static Widget get applicationScreen => const _IxIconWidget(
     'assets/svg/application-screen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: application-screens.svg
-  static Widget get applicationScreens => SvgPicture.asset(
+  static Widget get applicationScreens => const _IxIconWidget(
     'assets/svg/application-screens.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: applications.svg
-  static Widget get applications => SvgPicture.asset(
+  static Widget get applications => const _IxIconWidget(
     'assets/svg/applications.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: apps.svg
-  static Widget get apps => SvgPicture.asset(
+  static Widget get apps => const _IxIconWidget(
     'assets/svg/apps.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: archive-document-filled.svg
-  static Widget get archiveDocumentFilled => SvgPicture.asset(
+  static Widget get archiveDocumentFilled => const _IxIconWidget(
     'assets/svg/archive-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: archive-document.svg
-  static Widget get archiveDocument => SvgPicture.asset(
+  static Widget get archiveDocument => const _IxIconWidget(
     'assets/svg/archive-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: areachart.svg
-  static Widget get areachart => SvgPicture.asset(
+  static Widget get areachart => const _IxIconWidget(
     'assets/svg/areachart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-diagonal-bottom-left.svg
-  static Widget get arrowDiagonalBottomLeft => SvgPicture.asset(
+  static Widget get arrowDiagonalBottomLeft => const _IxIconWidget(
     'assets/svg/arrow-diagonal-bottom-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-diagonal-bottom-right.svg
-  static Widget get arrowDiagonalBottomRight => SvgPicture.asset(
+  static Widget get arrowDiagonalBottomRight => const _IxIconWidget(
     'assets/svg/arrow-diagonal-bottom-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-diagonal-top-left.svg
-  static Widget get arrowDiagonalTopLeft => SvgPicture.asset(
+  static Widget get arrowDiagonalTopLeft => const _IxIconWidget(
     'assets/svg/arrow-diagonal-top-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-diagonal-top-right.svg
-  static Widget get arrowDiagonalTopRight => SvgPicture.asset(
+  static Widget get arrowDiagonalTopRight => const _IxIconWidget(
     'assets/svg/arrow-diagonal-top-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-down-right.svg
-  static Widget get arrowDownRight => SvgPicture.asset(
+  static Widget get arrowDownRight => const _IxIconWidget(
     'assets/svg/arrow-down-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-down.svg
-  static Widget get arrowDown => SvgPicture.asset(
+  static Widget get arrowDown => const _IxIconWidget(
     'assets/svg/arrow-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-left.svg
-  static Widget get arrowLeft => SvgPicture.asset(
+  static Widget get arrowLeft => const _IxIconWidget(
     'assets/svg/arrow-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-right-down.svg
-  static Widget get arrowRightDown => SvgPicture.asset(
+  static Widget get arrowRightDown => const _IxIconWidget(
     'assets/svg/arrow-right-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-right.svg
-  static Widget get arrowRight => SvgPicture.asset(
+  static Widget get arrowRight => const _IxIconWidget(
     'assets/svg/arrow-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-up-left.svg
-  static Widget get arrowUpLeft => SvgPicture.asset(
+  static Widget get arrowUpLeft => const _IxIconWidget(
     'assets/svg/arrow-up-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: arrow-up.svg
-  static Widget get arrowUp => SvgPicture.asset(
+  static Widget get arrowUp => const _IxIconWidget(
     'assets/svg/arrow-up.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: aspects-filled.svg
-  static Widget get aspectsFilled => SvgPicture.asset(
+  static Widget get aspectsFilled => const _IxIconWidget(
     'assets/svg/aspects-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: aspects.svg
-  static Widget get aspects => SvgPicture.asset(
+  static Widget get aspects => const _IxIconWidget(
     'assets/svg/aspects.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: asset-indoor.svg
-  static Widget get assetIndoor => SvgPicture.asset(
+  static Widget get assetIndoor => const _IxIconWidget(
     'assets/svg/asset-indoor.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: asset-network-filled.svg
-  static Widget get assetNetworkFilled => SvgPicture.asset(
+  static Widget get assetNetworkFilled => const _IxIconWidget(
     'assets/svg/asset-network-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: asset-network.svg
-  static Widget get assetNetwork => SvgPicture.asset(
+  static Widget get assetNetwork => const _IxIconWidget(
     'assets/svg/asset-network.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: asset-outdoor.svg
-  static Widget get assetOutdoor => SvgPicture.asset(
+  static Widget get assetOutdoor => const _IxIconWidget(
     'assets/svg/asset-outdoor.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: asterisk.svg
-  static Widget get asterisk => SvgPicture.asset(
+  static Widget get asterisk => const _IxIconWidget(
     'assets/svg/asterisk.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: attach.svg
-  static Widget get attach => SvgPicture.asset(
+  static Widget get attach => const _IxIconWidget(
     'assets/svg/attach.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: attachment-upload.svg
-  static Widget get attachmentUpload => SvgPicture.asset(
+  static Widget get attachmentUpload => const _IxIconWidget(
     'assets/svg/attachment-upload.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: audio-description1.svg
-  static Widget get audioDescription1 => SvgPicture.asset(
+  static Widget get audioDescription1 => const _IxIconWidget(
     'assets/svg/audio-description1.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: audio-description2.svg
-  static Widget get audioDescription2 => SvgPicture.asset(
+  static Widget get audioDescription2 => const _IxIconWidget(
     'assets/svg/audio-description2.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: audit-report.svg
-  static Widget get auditReport => SvgPicture.asset(
+  static Widget get auditReport => const _IxIconWidget(
     'assets/svg/audit-report.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: average.svg
-  static Widget get average => SvgPicture.asset(
+  static Widget get average => const _IxIconWidget(
     'assets/svg/average.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: axes-synchronous.svg
-  static Widget get axesSynchronous => SvgPicture.asset(
+  static Widget get axesSynchronous => const _IxIconWidget(
     'assets/svg/axes-synchronous.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: axis-positioning.svg
-  static Widget get axisPositioning => SvgPicture.asset(
+  static Widget get axisPositioning => const _IxIconWidget(
     'assets/svg/axis-positioning.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: axis-rotation.svg
-  static Widget get axisRotation => SvgPicture.asset(
+  static Widget get axisRotation => const _IxIconWidget(
     'assets/svg/axis-rotation.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: backup-filled.svg
-  static Widget get backupFilled => SvgPicture.asset(
+  static Widget get backupFilled => const _IxIconWidget(
     'assets/svg/backup-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: backup.svg
-  static Widget get backup => SvgPicture.asset(
+  static Widget get backup => const _IxIconWidget(
     'assets/svg/backup.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bar-code.svg
-  static Widget get barCode => SvgPicture.asset(
+  static Widget get barCode => const _IxIconWidget(
     'assets/svg/bar-code.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: barchart-horizontal.svg
-  static Widget get barchartHorizontal => SvgPicture.asset(
+  static Widget get barchartHorizontal => const _IxIconWidget(
     'assets/svg/barchart-horizontal.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: barchart.svg
-  static Widget get barchart => SvgPicture.asset(
+  static Widget get barchart => const _IxIconWidget(
     'assets/svg/barchart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-charge.svg
-  static Widget get batteryCharge => SvgPicture.asset(
+  static Widget get batteryCharge => const _IxIconWidget(
     'assets/svg/battery-charge.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-check.svg
-  static Widget get batteryCheck => SvgPicture.asset(
+  static Widget get batteryCheck => const _IxIconWidget(
     'assets/svg/battery-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-empty-question.svg
-  static Widget get batteryEmptyQuestion => SvgPicture.asset(
+  static Widget get batteryEmptyQuestion => const _IxIconWidget(
     'assets/svg/battery-empty-question.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-empty.svg
-  static Widget get batteryEmpty => SvgPicture.asset(
+  static Widget get batteryEmpty => const _IxIconWidget(
     'assets/svg/battery-empty.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-exclamation.svg
-  static Widget get batteryExclamation => SvgPicture.asset(
+  static Widget get batteryExclamation => const _IxIconWidget(
     'assets/svg/battery-exclamation.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-full-check.svg
-  static Widget get batteryFullCheck => SvgPicture.asset(
+  static Widget get batteryFullCheck => const _IxIconWidget(
     'assets/svg/battery-full-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-full.svg
-  static Widget get batteryFull => SvgPicture.asset(
+  static Widget get batteryFull => const _IxIconWidget(
     'assets/svg/battery-full.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-half.svg
-  static Widget get batteryHalf => SvgPicture.asset(
+  static Widget get batteryHalf => const _IxIconWidget(
     'assets/svg/battery-half.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-low.svg
-  static Widget get batteryLow => SvgPicture.asset(
+  static Widget get batteryLow => const _IxIconWidget(
     'assets/svg/battery-low.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-quarter.svg
-  static Widget get batteryQuarter => SvgPicture.asset(
+  static Widget get batteryQuarter => const _IxIconWidget(
     'assets/svg/battery-quarter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-slash.svg
-  static Widget get batterySlash => SvgPicture.asset(
+  static Widget get batterySlash => const _IxIconWidget(
     'assets/svg/battery-slash.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-three-quarter.svg
-  static Widget get batteryThreeQuarter => SvgPicture.asset(
+  static Widget get batteryThreeQuarter => const _IxIconWidget(
     'assets/svg/battery-three-quarter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-charge.svg
-  static Widget get batteryUprightCharge => SvgPicture.asset(
+  static Widget get batteryUprightCharge => const _IxIconWidget(
     'assets/svg/battery-upright-charge.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-check.svg
-  static Widget get batteryUprightCheck => SvgPicture.asset(
+  static Widget get batteryUprightCheck => const _IxIconWidget(
     'assets/svg/battery-upright-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-empty.svg
-  static Widget get batteryUprightEmpty => SvgPicture.asset(
+  static Widget get batteryUprightEmpty => const _IxIconWidget(
     'assets/svg/battery-upright-empty.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-exclamation.svg
-  static Widget get batteryUprightExclamation => SvgPicture.asset(
+  static Widget get batteryUprightExclamation => const _IxIconWidget(
     'assets/svg/battery-upright-exclamation.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-full-check.svg
-  static Widget get batteryUprightFullCheck => SvgPicture.asset(
+  static Widget get batteryUprightFullCheck => const _IxIconWidget(
     'assets/svg/battery-upright-full-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-full.svg
-  static Widget get batteryUprightFull => SvgPicture.asset(
+  static Widget get batteryUprightFull => const _IxIconWidget(
     'assets/svg/battery-upright-full.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-half.svg
-  static Widget get batteryUprightHalf => SvgPicture.asset(
+  static Widget get batteryUprightHalf => const _IxIconWidget(
     'assets/svg/battery-upright-half.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-low.svg
-  static Widget get batteryUprightLow => SvgPicture.asset(
+  static Widget get batteryUprightLow => const _IxIconWidget(
     'assets/svg/battery-upright-low.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-quarter.svg
-  static Widget get batteryUprightQuarter => SvgPicture.asset(
+  static Widget get batteryUprightQuarter => const _IxIconWidget(
     'assets/svg/battery-upright-quarter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-question.svg
-  static Widget get batteryUprightQuestion => SvgPicture.asset(
+  static Widget get batteryUprightQuestion => const _IxIconWidget(
     'assets/svg/battery-upright-question.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-slash.svg
-  static Widget get batteryUprightSlash => SvgPicture.asset(
+  static Widget get batteryUprightSlash => const _IxIconWidget(
     'assets/svg/battery-upright-slash.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-three-quarter.svg
-  static Widget get batteryUprightThreeQuarter => SvgPicture.asset(
+  static Widget get batteryUprightThreeQuarter => const _IxIconWidget(
     'assets/svg/battery-upright-three-quarter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-upright-xmark.svg
-  static Widget get batteryUprightXmark => SvgPicture.asset(
+  static Widget get batteryUprightXmark => const _IxIconWidget(
     'assets/svg/battery-upright-xmark.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: battery-xmark.svg
-  static Widget get batteryXmark => SvgPicture.asset(
+  static Widget get batteryXmark => const _IxIconWidget(
     'assets/svg/battery-xmark.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bezier-curve.svg
-  static Widget get bezierCurve => SvgPicture.asset(
+  static Widget get bezierCurve => const _IxIconWidget(
     'assets/svg/bezier-curve.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bilibili-logo.svg
-  static Widget get bilibiliLogo => SvgPicture.asset(
+  static Widget get bilibiliLogo => const _IxIconWidget(
     'assets/svg/bilibili-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: binoculars-filled.svg
-  static Widget get binocularsFilled => SvgPicture.asset(
+  static Widget get binocularsFilled => const _IxIconWidget(
     'assets/svg/binoculars-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: binoculars.svg
-  static Widget get binoculars => SvgPicture.asset(
+  static Widget get binoculars => const _IxIconWidget(
     'assets/svg/binoculars.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: blazor.svg
-  static Widget get blazor => SvgPicture.asset(
+  static Widget get blazor => const _IxIconWidget(
     'assets/svg/blazor.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: book.svg
-  static Widget get book => SvgPicture.asset(
+  static Widget get book => const _IxIconWidget(
     'assets/svg/book.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bookmark-filled.svg
-  static Widget get bookmarkFilled => SvgPicture.asset(
+  static Widget get bookmarkFilled => const _IxIconWidget(
     'assets/svg/bookmark-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bookmark.svg
-  static Widget get bookmark => SvgPicture.asset(
+  static Widget get bookmark => const _IxIconWidget(
     'assets/svg/bookmark.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: boundary-signals.svg
-  static Widget get boundarySignals => SvgPicture.asset(
+  static Widget get boundarySignals => const _IxIconWidget(
     'assets/svg/boundary-signals.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: box-closed.svg
-  static Widget get boxClosed => SvgPicture.asset(
+  static Widget get boxClosed => const _IxIconWidget(
     'assets/svg/box-closed.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: box-ipc-fail.svg
-  static Widget get boxIpcFail => SvgPicture.asset(
+  static Widget get boxIpcFail => const _IxIconWidget(
     'assets/svg/box-ipc-fail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: box-ipc-question.svg
-  static Widget get boxIpcQuestion => SvgPicture.asset(
+  static Widget get boxIpcQuestion => const _IxIconWidget(
     'assets/svg/box-ipc-question.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: box-ipc-success.svg
-  static Widget get boxIpcSuccess => SvgPicture.asset(
+  static Widget get boxIpcSuccess => const _IxIconWidget(
     'assets/svg/box-ipc-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: box-ipc.svg
-  static Widget get boxIpc => SvgPicture.asset(
+  static Widget get boxIpc => const _IxIconWidget(
     'assets/svg/box-ipc.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: box-open.svg
-  static Widget get boxOpen => SvgPicture.asset(
+  static Widget get boxOpen => const _IxIconWidget(
     'assets/svg/box-open.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: box-plot-filled.svg
-  static Widget get boxPlotFilled => SvgPicture.asset(
+  static Widget get boxPlotFilled => const _IxIconWidget(
     'assets/svg/box-plot-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: box-plot.svg
-  static Widget get boxPlot => SvgPicture.asset(
+  static Widget get boxPlot => const _IxIconWidget(
     'assets/svg/box-plot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bring-forward.svg
-  static Widget get bringForward => SvgPicture.asset(
+  static Widget get bringForward => const _IxIconWidget(
     'assets/svg/bring-forward.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bring-to-front.svg
-  static Widget get bringToFront => SvgPicture.asset(
+  static Widget get bringToFront => const _IxIconWidget(
     'assets/svg/bring-to-front.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: brush.svg
-  static Widget get brush => SvgPicture.asset(
+  static Widget get brush => const _IxIconWidget(
     'assets/svg/brush.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bug-filled.svg
-  static Widget get bugFilled => SvgPicture.asset(
+  static Widget get bugFilled => const _IxIconWidget(
     'assets/svg/bug-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bug-runtime-filled.svg
-  static Widget get bugRuntimeFilled => SvgPicture.asset(
+  static Widget get bugRuntimeFilled => const _IxIconWidget(
     'assets/svg/bug-runtime-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bug-runtime.svg
-  static Widget get bugRuntime => SvgPicture.asset(
+  static Widget get bugRuntime => const _IxIconWidget(
     'assets/svg/bug-runtime.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bug.svg
-  static Widget get bug => SvgPicture.asset(
+  static Widget get bug => const _IxIconWidget(
     'assets/svg/bug.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: building-block-filled.svg
-  static Widget get buildingBlockFilled => SvgPicture.asset(
+  static Widget get buildingBlockFilled => const _IxIconWidget(
     'assets/svg/building-block-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: building-block.svg
-  static Widget get buildingBlock => SvgPicture.asset(
+  static Widget get buildingBlock => const _IxIconWidget(
     'assets/svg/building-block.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: building1-filled.svg
-  static Widget get building1Filled => SvgPicture.asset(
+  static Widget get building1Filled => const _IxIconWidget(
     'assets/svg/building1-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: building1.svg
-  static Widget get building1 => SvgPicture.asset(
+  static Widget get building1 => const _IxIconWidget(
     'assets/svg/building1.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: building2-filled.svg
-  static Widget get building2Filled => SvgPicture.asset(
+  static Widget get building2Filled => const _IxIconWidget(
     'assets/svg/building2-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: building2.svg
-  static Widget get building2 => SvgPicture.asset(
+  static Widget get building2 => const _IxIconWidget(
     'assets/svg/building2.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bulb-filled.svg
-  static Widget get bulbFilled => SvgPicture.asset(
+  static Widget get bulbFilled => const _IxIconWidget(
     'assets/svg/bulb-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: bulb.svg
-  static Widget get bulb => SvgPicture.asset(
+  static Widget get bulb => const _IxIconWidget(
     'assets/svg/bulb.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: calculator.svg
-  static Widget get calculator => SvgPicture.asset(
+  static Widget get calculator => const _IxIconWidget(
     'assets/svg/calculator.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: calendar-day-filled.svg
-  static Widget get calendarDayFilled => SvgPicture.asset(
+  static Widget get calendarDayFilled => const _IxIconWidget(
     'assets/svg/calendar-day-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: calendar-day.svg
-  static Widget get calendarDay => SvgPicture.asset(
+  static Widget get calendarDay => const _IxIconWidget(
     'assets/svg/calendar-day.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: calendar-filled.svg
-  static Widget get calendarFilled => SvgPicture.asset(
+  static Widget get calendarFilled => const _IxIconWidget(
     'assets/svg/calendar-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: calendar-settings.svg
-  static Widget get calendarSettings => SvgPicture.asset(
+  static Widget get calendarSettings => const _IxIconWidget(
     'assets/svg/calendar-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: calendar-week-filled.svg
-  static Widget get calendarWeekFilled => SvgPicture.asset(
+  static Widget get calendarWeekFilled => const _IxIconWidget(
     'assets/svg/calendar-week-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: calendar-week.svg
-  static Widget get calendarWeek => SvgPicture.asset(
+  static Widget get calendarWeek => const _IxIconWidget(
     'assets/svg/calendar-week.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: calendar.svg
-  static Widget get calendar => SvgPicture.asset(
+  static Widget get calendar => const _IxIconWidget(
     'assets/svg/calendar.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cam-disk-10k.svg
-  static Widget get camDisk10k => SvgPicture.asset(
+  static Widget get camDisk10k => const _IxIconWidget(
     'assets/svg/cam-disk-10k.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cam-disk-600-seg.svg
-  static Widget get camDisk600Seg => SvgPicture.asset(
+  static Widget get camDisk600Seg => const _IxIconWidget(
     'assets/svg/cam-disk-600-seg.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cam-disk-6k-seg.svg
-  static Widget get camDisk6kSeg => SvgPicture.asset(
+  static Widget get camDisk6kSeg => const _IxIconWidget(
     'assets/svg/cam-disk-6k-seg.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cam-disk.svg
-  static Widget get camDisk => SvgPicture.asset(
+  static Widget get camDisk => const _IxIconWidget(
     'assets/svg/cam-disk.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cam-track.svg
-  static Widget get camTrack => SvgPicture.asset(
+  static Widget get camTrack => const _IxIconWidget(
     'assets/svg/cam-track.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cam.svg
-  static Widget get cam => SvgPicture.asset(
+  static Widget get cam => const _IxIconWidget(
     'assets/svg/cam.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cancel.svg
-  static Widget get cancel => SvgPicture.asset(
+  static Widget get cancel => const _IxIconWidget(
     'assets/svg/cancel.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cancelled.svg
-  static Widget get cancelled => SvgPicture.asset(
+  static Widget get cancelled => const _IxIconWidget(
     'assets/svg/cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capacity-check-filled.svg
-  static Widget get capacityCheckFilled => SvgPicture.asset(
+  static Widget get capacityCheckFilled => const _IxIconWidget(
     'assets/svg/capacity-check-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capacity-check.svg
-  static Widget get capacityCheck => SvgPicture.asset(
+  static Widget get capacityCheck => const _IxIconWidget(
     'assets/svg/capacity-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capacity-filled.svg
-  static Widget get capacityFilled => SvgPicture.asset(
+  static Widget get capacityFilled => const _IxIconWidget(
     'assets/svg/capacity-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capacity-locked-filled.svg
-  static Widget get capacityLockedFilled => SvgPicture.asset(
+  static Widget get capacityLockedFilled => const _IxIconWidget(
     'assets/svg/capacity-locked-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capacity-locked.svg
-  static Widget get capacityLocked => SvgPicture.asset(
+  static Widget get capacityLocked => const _IxIconWidget(
     'assets/svg/capacity-locked.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capacity-pen-filled.svg
-  static Widget get capacityPenFilled => SvgPicture.asset(
+  static Widget get capacityPenFilled => const _IxIconWidget(
     'assets/svg/capacity-pen-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capacity-pen.svg
-  static Widget get capacityPen => SvgPicture.asset(
+  static Widget get capacityPen => const _IxIconWidget(
     'assets/svg/capacity-pen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capacity.svg
-  static Widget get capacity => SvgPicture.asset(
+  static Widget get capacity => const _IxIconWidget(
     'assets/svg/capacity.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: capture.svg
-  static Widget get capture => SvgPicture.asset(
+  static Widget get capture => const _IxIconWidget(
     'assets/svg/capture.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: car-filled.svg
-  static Widget get carFilled => SvgPicture.asset(
+  static Widget get carFilled => const _IxIconWidget(
     'assets/svg/car-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: car.svg
-  static Widget get car => SvgPicture.asset(
+  static Widget get car => const _IxIconWidget(
     'assets/svg/car.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: card-layout-filled.svg
-  static Widget get cardLayoutFilled => SvgPicture.asset(
+  static Widget get cardLayoutFilled => const _IxIconWidget(
     'assets/svg/card-layout-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: card-layout.svg
-  static Widget get cardLayout => SvgPicture.asset(
+  static Widget get cardLayout => const _IxIconWidget(
     'assets/svg/card-layout.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: certificate-error-filled.svg
-  static Widget get certificateErrorFilled => SvgPicture.asset(
+  static Widget get certificateErrorFilled => const _IxIconWidget(
     'assets/svg/certificate-error-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: certificate-error.svg
-  static Widget get certificateError => SvgPicture.asset(
+  static Widget get certificateError => const _IxIconWidget(
     'assets/svg/certificate-error.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: certificate-exclamation-filled.svg
-  static Widget get certificateExclamationFilled => SvgPicture.asset(
+  static Widget get certificateExclamationFilled => const _IxIconWidget(
     'assets/svg/certificate-exclamation-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: certificate-exclamation.svg
-  static Widget get certificateExclamation => SvgPicture.asset(
+  static Widget get certificateExclamation => const _IxIconWidget(
     'assets/svg/certificate-exclamation.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: certificate-success-filled.svg
-  static Widget get certificateSuccessFilled => SvgPicture.asset(
+  static Widget get certificateSuccessFilled => const _IxIconWidget(
     'assets/svg/certificate-success-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: certificate-success.svg
-  static Widget get certificateSuccess => SvgPicture.asset(
+  static Widget get certificateSuccess => const _IxIconWidget(
     'assets/svg/certificate-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: certificate.svg
-  static Widget get certificate => SvgPicture.asset(
+  static Widget get certificate => const _IxIconWidget(
     'assets/svg/certificate.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chain-alternative.svg
-  static Widget get chainAlternative => SvgPicture.asset(
+  static Widget get chainAlternative => const _IxIconWidget(
     'assets/svg/chain-alternative.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chain-parallel.svg
-  static Widget get chainParallel => SvgPicture.asset(
+  static Widget get chainParallel => const _IxIconWidget(
     'assets/svg/chain-parallel.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chain-step.svg
-  static Widget get chainStep => SvgPicture.asset(
+  static Widget get chainStep => const _IxIconWidget(
     'assets/svg/chain-step.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-cursor.svg
-  static Widget get chartCursor => SvgPicture.asset(
+  static Widget get chartCursor => const _IxIconWidget(
     'assets/svg/chart-cursor.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-curve-linear.svg
-  static Widget get chartCurveLinear => SvgPicture.asset(
+  static Widget get chartCurveLinear => const _IxIconWidget(
     'assets/svg/chart-curve-linear.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-curve-spline.svg
-  static Widget get chartCurveSpline => SvgPicture.asset(
+  static Widget get chartCurveSpline => const _IxIconWidget(
     'assets/svg/chart-curve-spline.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-curve-stepped.svg
-  static Widget get chartCurveStepped => SvgPicture.asset(
+  static Widget get chartCurveStepped => const _IxIconWidget(
     'assets/svg/chart-curve-stepped.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-diagram-add.svg
-  static Widget get chartDiagramAdd => SvgPicture.asset(
+  static Widget get chartDiagramAdd => const _IxIconWidget(
     'assets/svg/chart-diagram-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-diagram.svg
-  static Widget get chartDiagram => SvgPicture.asset(
+  static Widget get chartDiagram => const _IxIconWidget(
     'assets/svg/chart-diagram.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-diagrams.svg
-  static Widget get chartDiagrams => SvgPicture.asset(
+  static Widget get chartDiagrams => const _IxIconWidget(
     'assets/svg/chart-diagrams.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-duration-curve.svg
-  static Widget get chartDurationCurve => SvgPicture.asset(
+  static Widget get chartDurationCurve => const _IxIconWidget(
     'assets/svg/chart-duration-curve.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-error-bar.svg
-  static Widget get chartErrorBar => SvgPicture.asset(
+  static Widget get chartErrorBar => const _IxIconWidget(
     'assets/svg/chart-error-bar.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-labels-filled.svg
-  static Widget get chartLabelsFilled => SvgPicture.asset(
+  static Widget get chartLabelsFilled => const _IxIconWidget(
     'assets/svg/chart-labels-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-labels.svg
-  static Widget get chartLabels => SvgPicture.asset(
+  static Widget get chartLabels => const _IxIconWidget(
     'assets/svg/chart-labels.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-types-filled.svg
-  static Widget get chartTypesFilled => SvgPicture.asset(
+  static Widget get chartTypesFilled => const _IxIconWidget(
     'assets/svg/chart-types-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-types.svg
-  static Widget get chartTypes => SvgPicture.asset(
+  static Widget get chartTypes => const _IxIconWidget(
     'assets/svg/chart-types.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-value-horizontal.svg
-  static Widget get chartValueHorizontal => SvgPicture.asset(
+  static Widget get chartValueHorizontal => const _IxIconWidget(
     'assets/svg/chart-value-horizontal.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chart-value-vertical.svg
-  static Widget get chartValueVertical => SvgPicture.asset(
+  static Widget get chartValueVertical => const _IxIconWidget(
     'assets/svg/chart-value-vertical.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: check-in.svg
-  static Widget get checkIn => SvgPicture.asset(
+  static Widget get checkIn => const _IxIconWidget(
     'assets/svg/check-in.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: check-out.svg
-  static Widget get checkOut => SvgPicture.asset(
+  static Widget get checkOut => const _IxIconWidget(
     'assets/svg/check-out.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: check.svg
-  static Widget get check => SvgPicture.asset(
+  static Widget get check => const _IxIconWidget(
     'assets/svg/check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkbox-empty-filled.svg
-  static Widget get checkboxEmptyFilled => SvgPicture.asset(
+  static Widget get checkboxEmptyFilled => const _IxIconWidget(
     'assets/svg/checkbox-empty-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkbox-empty.svg
-  static Widget get checkboxEmpty => SvgPicture.asset(
+  static Widget get checkboxEmpty => const _IxIconWidget(
     'assets/svg/checkbox-empty.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkbox-filled.svg
-  static Widget get checkboxFilled => SvgPicture.asset(
+  static Widget get checkboxFilled => const _IxIconWidget(
     'assets/svg/checkbox-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkbox-mixed-filled.svg
-  static Widget get checkboxMixedFilled => SvgPicture.asset(
+  static Widget get checkboxMixedFilled => const _IxIconWidget(
     'assets/svg/checkbox-mixed-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkbox-mixed.svg
-  static Widget get checkboxMixed => SvgPicture.asset(
+  static Widget get checkboxMixed => const _IxIconWidget(
     'assets/svg/checkbox-mixed.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkbox.svg
-  static Widget get checkbox => SvgPicture.asset(
+  static Widget get checkbox => const _IxIconWidget(
     'assets/svg/checkbox.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkboxes-empty-filled.svg
-  static Widget get checkboxesEmptyFilled => SvgPicture.asset(
+  static Widget get checkboxesEmptyFilled => const _IxIconWidget(
     'assets/svg/checkboxes-empty-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkboxes-empty.svg
-  static Widget get checkboxesEmpty => SvgPicture.asset(
+  static Widget get checkboxesEmpty => const _IxIconWidget(
     'assets/svg/checkboxes-empty.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkboxes-filled.svg
-  static Widget get checkboxesFilled => SvgPicture.asset(
+  static Widget get checkboxesFilled => const _IxIconWidget(
     'assets/svg/checkboxes-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: checkboxes.svg
-  static Widget get checkboxes => SvgPicture.asset(
+  static Widget get checkboxes => const _IxIconWidget(
     'assets/svg/checkboxes.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-down-bar-small.svg
-  static Widget get chevronDownBarSmall => SvgPicture.asset(
+  static Widget get chevronDownBarSmall => const _IxIconWidget(
     'assets/svg/chevron-down-bar-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-down-bar.svg
-  static Widget get chevronDownBar => SvgPicture.asset(
+  static Widget get chevronDownBar => const _IxIconWidget(
     'assets/svg/chevron-down-bar.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-down-small.svg
-  static Widget get chevronDownSmall => SvgPicture.asset(
+  static Widget get chevronDownSmall => const _IxIconWidget(
     'assets/svg/chevron-down-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-down.svg
-  static Widget get chevronDown => SvgPicture.asset(
+  static Widget get chevronDown => const _IxIconWidget(
     'assets/svg/chevron-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-left-bar-small.svg
-  static Widget get chevronLeftBarSmall => SvgPicture.asset(
+  static Widget get chevronLeftBarSmall => const _IxIconWidget(
     'assets/svg/chevron-left-bar-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-left-bar.svg
-  static Widget get chevronLeftBar => SvgPicture.asset(
+  static Widget get chevronLeftBar => const _IxIconWidget(
     'assets/svg/chevron-left-bar.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-left-small.svg
-  static Widget get chevronLeftSmall => SvgPicture.asset(
+  static Widget get chevronLeftSmall => const _IxIconWidget(
     'assets/svg/chevron-left-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-left.svg
-  static Widget get chevronLeft => SvgPicture.asset(
+  static Widget get chevronLeft => const _IxIconWidget(
     'assets/svg/chevron-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-right-bar-small.svg
-  static Widget get chevronRightBarSmall => SvgPicture.asset(
+  static Widget get chevronRightBarSmall => const _IxIconWidget(
     'assets/svg/chevron-right-bar-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-right-bar.svg
-  static Widget get chevronRightBar => SvgPicture.asset(
+  static Widget get chevronRightBar => const _IxIconWidget(
     'assets/svg/chevron-right-bar.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-right-small.svg
-  static Widget get chevronRightSmall => SvgPicture.asset(
+  static Widget get chevronRightSmall => const _IxIconWidget(
     'assets/svg/chevron-right-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-right.svg
-  static Widget get chevronRight => SvgPicture.asset(
+  static Widget get chevronRight => const _IxIconWidget(
     'assets/svg/chevron-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-up-bar-small.svg
-  static Widget get chevronUpBarSmall => SvgPicture.asset(
+  static Widget get chevronUpBarSmall => const _IxIconWidget(
     'assets/svg/chevron-up-bar-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-up-bar.svg
-  static Widget get chevronUpBar => SvgPicture.asset(
+  static Widget get chevronUpBar => const _IxIconWidget(
     'assets/svg/chevron-up-bar.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-up-small.svg
-  static Widget get chevronUpSmall => SvgPicture.asset(
+  static Widget get chevronUpSmall => const _IxIconWidget(
     'assets/svg/chevron-up-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: chevron-up.svg
-  static Widget get chevronUp => SvgPicture.asset(
+  static Widget get chevronUp => const _IxIconWidget(
     'assets/svg/chevron-up.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-dot-filled.svg
-  static Widget get circleDotFilled => SvgPicture.asset(
+  static Widget get circleDotFilled => const _IxIconWidget(
     'assets/svg/circle-dot-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-dot.svg
-  static Widget get circleDot => SvgPicture.asset(
+  static Widget get circleDot => const _IxIconWidget(
     'assets/svg/circle-dot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-filled.svg
-  static Widget get circleFilled => SvgPicture.asset(
+  static Widget get circleFilled => const _IxIconWidget(
     'assets/svg/circle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-pause-filled.svg
-  static Widget get circlePauseFilled => SvgPicture.asset(
+  static Widget get circlePauseFilled => const _IxIconWidget(
     'assets/svg/circle-pause-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-pause.svg
-  static Widget get circlePause => SvgPicture.asset(
+  static Widget get circlePause => const _IxIconWidget(
     'assets/svg/circle-pause.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-play-filled.svg
-  static Widget get circlePlayFilled => SvgPicture.asset(
+  static Widget get circlePlayFilled => const _IxIconWidget(
     'assets/svg/circle-play-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-play.svg
-  static Widget get circlePlay => SvgPicture.asset(
+  static Widget get circlePlay => const _IxIconWidget(
     'assets/svg/circle-play.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-stop-filled.svg
-  static Widget get circleStopFilled => SvgPicture.asset(
+  static Widget get circleStopFilled => const _IxIconWidget(
     'assets/svg/circle-stop-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle-stop.svg
-  static Widget get circleStop => SvgPicture.asset(
+  static Widget get circleStop => const _IxIconWidget(
     'assets/svg/circle-stop.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: circle.svg
-  static Widget get circle => SvgPicture.asset(
+  static Widget get circle => const _IxIconWidget(
     'assets/svg/circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: clear-filter-filled.svg
-  static Widget get clearFilterFilled => SvgPicture.asset(
+  static Widget get clearFilterFilled => const _IxIconWidget(
     'assets/svg/clear-filter-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: clear-filter.svg
-  static Widget get clearFilter => SvgPicture.asset(
+  static Widget get clearFilter => const _IxIconWidget(
     'assets/svg/clear-filter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: clear.svg
-  static Widget get clear => SvgPicture.asset(
+  static Widget get clear => const _IxIconWidget(
     'assets/svg/clear.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: client-interface.svg
-  static Widget get clientInterface => SvgPicture.asset(
+  static Widget get clientInterface => const _IxIconWidget(
     'assets/svg/client-interface.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: clipboard-filled.svg
-  static Widget get clipboardFilled => SvgPicture.asset(
+  static Widget get clipboardFilled => const _IxIconWidget(
     'assets/svg/clipboard-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: clipboard.svg
-  static Widget get clipboard => SvgPicture.asset(
+  static Widget get clipboard => const _IxIconWidget(
     'assets/svg/clipboard.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: clock-filled.svg
-  static Widget get clockFilled => SvgPicture.asset(
+  static Widget get clockFilled => const _IxIconWidget(
     'assets/svg/clock-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: clock-person.svg
-  static Widget get clockPerson => SvgPicture.asset(
+  static Widget get clockPerson => const _IxIconWidget(
     'assets/svg/clock-person.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: clock.svg
-  static Widget get clock => SvgPicture.asset(
+  static Widget get clock => const _IxIconWidget(
     'assets/svg/clock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: close-small.svg
-  static Widget get closeSmall => SvgPicture.asset(
+  static Widget get closeSmall => const _IxIconWidget(
     'assets/svg/close-small.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: close.svg
-  static Widget get close => SvgPicture.asset(
+  static Widget get close => const _IxIconWidget(
     'assets/svg/close.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-cancelled-filled.svg
-  static Widget get cloudCancelledFilled => SvgPicture.asset(
+  static Widget get cloudCancelledFilled => const _IxIconWidget(
     'assets/svg/cloud-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-cancelled.svg
-  static Widget get cloudCancelled => SvgPicture.asset(
+  static Widget get cloudCancelled => const _IxIconWidget(
     'assets/svg/cloud-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-download-add-filled.svg
-  static Widget get cloudDownloadAddFilled => SvgPicture.asset(
+  static Widget get cloudDownloadAddFilled => const _IxIconWidget(
     'assets/svg/cloud-download-add-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-download-add.svg
-  static Widget get cloudDownloadAdd => SvgPicture.asset(
+  static Widget get cloudDownloadAdd => const _IxIconWidget(
     'assets/svg/cloud-download-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-download-filled.svg
-  static Widget get cloudDownloadFilled => SvgPicture.asset(
+  static Widget get cloudDownloadFilled => const _IxIconWidget(
     'assets/svg/cloud-download-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-download-list-filled.svg
-  static Widget get cloudDownloadListFilled => SvgPicture.asset(
+  static Widget get cloudDownloadListFilled => const _IxIconWidget(
     'assets/svg/cloud-download-list-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-download-list.svg
-  static Widget get cloudDownloadList => SvgPicture.asset(
+  static Widget get cloudDownloadList => const _IxIconWidget(
     'assets/svg/cloud-download-list.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-download.svg
-  static Widget get cloudDownload => SvgPicture.asset(
+  static Widget get cloudDownload => const _IxIconWidget(
     'assets/svg/cloud-download.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-fail-filled.svg
-  static Widget get cloudFailFilled => SvgPicture.asset(
+  static Widget get cloudFailFilled => const _IxIconWidget(
     'assets/svg/cloud-fail-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-fail.svg
-  static Widget get cloudFail => SvgPicture.asset(
+  static Widget get cloudFail => const _IxIconWidget(
     'assets/svg/cloud-fail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-filled.svg
-  static Widget get cloudFilled => SvgPicture.asset(
+  static Widget get cloudFilled => const _IxIconWidget(
     'assets/svg/cloud-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-new-filled.svg
-  static Widget get cloudNewFilled => SvgPicture.asset(
+  static Widget get cloudNewFilled => const _IxIconWidget(
     'assets/svg/cloud-new-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-new.svg
-  static Widget get cloudNew => SvgPicture.asset(
+  static Widget get cloudNew => const _IxIconWidget(
     'assets/svg/cloud-new.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-rain-filled.svg
-  static Widget get cloudRainFilled => SvgPicture.asset(
+  static Widget get cloudRainFilled => const _IxIconWidget(
     'assets/svg/cloud-rain-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-rain.svg
-  static Widget get cloudRain => SvgPicture.asset(
+  static Widget get cloudRain => const _IxIconWidget(
     'assets/svg/cloud-rain.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-snow-filled.svg
-  static Widget get cloudSnowFilled => SvgPicture.asset(
+  static Widget get cloudSnowFilled => const _IxIconWidget(
     'assets/svg/cloud-snow-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-snow.svg
-  static Widget get cloudSnow => SvgPicture.asset(
+  static Widget get cloudSnow => const _IxIconWidget(
     'assets/svg/cloud-snow.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-success-filled.svg
-  static Widget get cloudSuccessFilled => SvgPicture.asset(
+  static Widget get cloudSuccessFilled => const _IxIconWidget(
     'assets/svg/cloud-success-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-success.svg
-  static Widget get cloudSuccess => SvgPicture.asset(
+  static Widget get cloudSuccess => const _IxIconWidget(
     'assets/svg/cloud-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-thunder-filled.svg
-  static Widget get cloudThunderFilled => SvgPicture.asset(
+  static Widget get cloudThunderFilled => const _IxIconWidget(
     'assets/svg/cloud-thunder-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-thunder.svg
-  static Widget get cloudThunder => SvgPicture.asset(
+  static Widget get cloudThunder => const _IxIconWidget(
     'assets/svg/cloud-thunder.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-upload-filled.svg
-  static Widget get cloudUploadFilled => SvgPicture.asset(
+  static Widget get cloudUploadFilled => const _IxIconWidget(
     'assets/svg/cloud-upload-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud-upload.svg
-  static Widget get cloudUpload => SvgPicture.asset(
+  static Widget get cloudUpload => const _IxIconWidget(
     'assets/svg/cloud-upload.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cloud.svg
-  static Widget get cloud => SvgPicture.asset(
+  static Widget get cloud => const _IxIconWidget(
     'assets/svg/cloud.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: code-document-check.svg
-  static Widget get codeDocumentCheck => SvgPicture.asset(
+  static Widget get codeDocumentCheck => const _IxIconWidget(
     'assets/svg/code-document-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: code-function.svg
-  static Widget get codeFunction => SvgPicture.asset(
+  static Widget get codeFunction => const _IxIconWidget(
     'assets/svg/code-function.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: code-script.svg
-  static Widget get codeScript => SvgPicture.asset(
+  static Widget get codeScript => const _IxIconWidget(
     'assets/svg/code-script.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: code.svg
-  static Widget get code => SvgPicture.asset(
+  static Widget get code => const _IxIconWidget(
     'assets/svg/code.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coffee-empty-filled.svg
-  static Widget get coffeeEmptyFilled => SvgPicture.asset(
+  static Widget get coffeeEmptyFilled => const _IxIconWidget(
     'assets/svg/coffee-empty-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coffee-empty.svg
-  static Widget get coffeeEmpty => SvgPicture.asset(
+  static Widget get coffeeEmpty => const _IxIconWidget(
     'assets/svg/coffee-empty.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coffee-filled.svg
-  static Widget get coffeeFilled => SvgPicture.asset(
+  static Widget get coffeeFilled => const _IxIconWidget(
     'assets/svg/coffee-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coffee.svg
-  static Widget get coffee => SvgPicture.asset(
+  static Widget get coffee => const _IxIconWidget(
     'assets/svg/coffee.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cogwheel-filled.svg
-  static Widget get cogwheelFilled => SvgPicture.asset(
+  static Widget get cogwheelFilled => const _IxIconWidget(
     'assets/svg/cogwheel-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cogwheel.svg
-  static Widget get cogwheel => SvgPicture.asset(
+  static Widget get cogwheel => const _IxIconWidget(
     'assets/svg/cogwheel.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coin-filled.svg
-  static Widget get coinFilled => SvgPicture.asset(
+  static Widget get coinFilled => const _IxIconWidget(
     'assets/svg/coin-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coin-stack-filled.svg
-  static Widget get coinStackFilled => SvgPicture.asset(
+  static Widget get coinStackFilled => const _IxIconWidget(
     'assets/svg/coin-stack-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coin-stack.svg
-  static Widget get coinStack => SvgPicture.asset(
+  static Widget get coinStack => const _IxIconWidget(
     'assets/svg/coin-stack.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coin.svg
-  static Widget get coin => SvgPicture.asset(
+  static Widget get coin => const _IxIconWidget(
     'assets/svg/coin.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coins-filled.svg
-  static Widget get coinsFilled => SvgPicture.asset(
+  static Widget get coinsFilled => const _IxIconWidget(
     'assets/svg/coins-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: coins.svg
-  static Widget get coins => SvgPicture.asset(
+  static Widget get coins => const _IxIconWidget(
     'assets/svg/coins.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: collapse-all.svg
-  static Widget get collapseAll => SvgPicture.asset(
+  static Widget get collapseAll => const _IxIconWidget(
     'assets/svg/collapse-all.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: combine.svg
-  static Widget get combine => SvgPicture.asset(
+  static Widget get combine => const _IxIconWidget(
     'assets/svg/combine.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: comment-alt-filled.svg
-  static Widget get commentAltFilled => SvgPicture.asset(
+  static Widget get commentAltFilled => const _IxIconWidget(
     'assets/svg/comment-alt-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: comment-alt.svg
-  static Widget get commentAlt => SvgPicture.asset(
+  static Widget get commentAlt => const _IxIconWidget(
     'assets/svg/comment-alt.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: communication-filled.svg
-  static Widget get communicationFilled => SvgPicture.asset(
+  static Widget get communicationFilled => const _IxIconWidget(
     'assets/svg/communication-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: communication.svg
-  static Widget get communication => SvgPicture.asset(
+  static Widget get communication => const _IxIconWidget(
     'assets/svg/communication.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: compact-disc-filled.svg
-  static Widget get compactDiscFilled => SvgPicture.asset(
+  static Widget get compactDiscFilled => const _IxIconWidget(
     'assets/svg/compact-disc-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: compact-disc.svg
-  static Widget get compactDisc => SvgPicture.asset(
+  static Widget get compactDisc => const _IxIconWidget(
     'assets/svg/compact-disc.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: compare.svg
-  static Widget get compare => SvgPicture.asset(
+  static Widget get compare => const _IxIconWidget(
     'assets/svg/compare.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: compound-block.svg
-  static Widget get compoundBlock => SvgPicture.asset(
+  static Widget get compoundBlock => const _IxIconWidget(
     'assets/svg/compound-block.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: configuration-safety.svg
-  static Widget get configurationSafety => SvgPicture.asset(
+  static Widget get configurationSafety => const _IxIconWidget(
     'assets/svg/configuration-safety.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: configuration.svg
-  static Widget get configuration => SvgPicture.asset(
+  static Widget get configuration => const _IxIconWidget(
     'assets/svg/configuration.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: configure-filled.svg
-  static Widget get configureFilled => SvgPicture.asset(
+  static Widget get configureFilled => const _IxIconWidget(
     'assets/svg/configure-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: configure.svg
-  static Widget get configure => SvgPicture.asset(
+  static Widget get configure => const _IxIconWidget(
     'assets/svg/configure.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connected-circle-filled.svg
-  static Widget get connectedCircleFilled => SvgPicture.asset(
+  static Widget get connectedCircleFilled => const _IxIconWidget(
     'assets/svg/connected-circle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connected-circle.svg
-  static Widget get connectedCircle => SvgPicture.asset(
+  static Widget get connectedCircle => const _IxIconWidget(
     'assets/svg/connected-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connected.svg
-  static Widget get connected => SvgPicture.asset(
+  static Widget get connected => const _IxIconWidget(
     'assets/svg/connected.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connection-bulb.svg
-  static Widget get connectionBulb => SvgPicture.asset(
+  static Widget get connectionBulb => const _IxIconWidget(
     'assets/svg/connection-bulb.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connection-fail.svg
-  static Widget get connectionFail => SvgPicture.asset(
+  static Widget get connectionFail => const _IxIconWidget(
     'assets/svg/connection-fail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connection-local.svg
-  static Widget get connectionLocal => SvgPicture.asset(
+  static Widget get connectionLocal => const _IxIconWidget(
     'assets/svg/connection-local.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connection-signal.svg
-  static Widget get connectionSignal => SvgPicture.asset(
+  static Widget get connectionSignal => const _IxIconWidget(
     'assets/svg/connection-signal.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connection-success.svg
-  static Widget get connectionSuccess => SvgPicture.asset(
+  static Widget get connectionSuccess => const _IxIconWidget(
     'assets/svg/connection-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connections-settings.svg
-  static Widget get connectionsSettings => SvgPicture.asset(
+  static Widget get connectionsSettings => const _IxIconWidget(
     'assets/svg/connections-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connections.svg
-  static Widget get connections => SvgPicture.asset(
+  static Widget get connections => const _IxIconWidget(
     'assets/svg/connections.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connectivity.svg
-  static Widget get connectivity => SvgPicture.asset(
+  static Widget get connectivity => const _IxIconWidget(
     'assets/svg/connectivity.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-chart-filled.svg
-  static Widget get connectorChartFilled => SvgPicture.asset(
+  static Widget get connectorChartFilled => const _IxIconWidget(
     'assets/svg/connector-chart-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-chart.svg
-  static Widget get connectorChart => SvgPicture.asset(
+  static Widget get connectorChart => const _IxIconWidget(
     'assets/svg/connector-chart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-filled.svg
-  static Widget get connectorFilled => SvgPicture.asset(
+  static Widget get connectorFilled => const _IxIconWidget(
     'assets/svg/connector-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-hex-filled.svg
-  static Widget get connectorHexFilled => SvgPicture.asset(
+  static Widget get connectorHexFilled => const _IxIconWidget(
     'assets/svg/connector-hex-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-hex.svg
-  static Widget get connectorHex => SvgPicture.asset(
+  static Widget get connectorHex => const _IxIconWidget(
     'assets/svg/connector-hex.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-rect-filled.svg
-  static Widget get connectorRectFilled => SvgPicture.asset(
+  static Widget get connectorRectFilled => const _IxIconWidget(
     'assets/svg/connector-rect-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-rect.svg
-  static Widget get connectorRect => SvgPicture.asset(
+  static Widget get connectorRect => const _IxIconWidget(
     'assets/svg/connector-rect.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-rhomb-filled.svg
-  static Widget get connectorRhombFilled => SvgPicture.asset(
+  static Widget get connectorRhombFilled => const _IxIconWidget(
     'assets/svg/connector-rhomb-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector-rhomb.svg
-  static Widget get connectorRhomb => SvgPicture.asset(
+  static Widget get connectorRhomb => const _IxIconWidget(
     'assets/svg/connector-rhomb.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: connector.svg
-  static Widget get connector => SvgPicture.asset(
+  static Widget get connector => const _IxIconWidget(
     'assets/svg/connector.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: consistency-check.svg
-  static Widget get consistencyCheck => SvgPicture.asset(
+  static Widget get consistencyCheck => const _IxIconWidget(
     'assets/svg/consistency-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: contact-details-filled.svg
-  static Widget get contactDetailsFilled => SvgPicture.asset(
+  static Widget get contactDetailsFilled => const _IxIconWidget(
     'assets/svg/contact-details-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: contact-details.svg
-  static Widget get contactDetails => SvgPicture.asset(
+  static Widget get contactDetails => const _IxIconWidget(
     'assets/svg/contact-details.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: context-menu.svg
-  static Widget get contextMenu => SvgPicture.asset(
+  static Widget get contextMenu => const _IxIconWidget(
     'assets/svg/context-menu.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-button.svg
-  static Widget get controlButton => SvgPicture.asset(
+  static Widget get controlButton => const _IxIconWidget(
     'assets/svg/control-button.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-checkbox.svg
-  static Widget get controlCheckbox => SvgPicture.asset(
+  static Widget get controlCheckbox => const _IxIconWidget(
     'assets/svg/control-checkbox.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-io-field.svg
-  static Widget get controlIoField => SvgPicture.asset(
+  static Widget get controlIoField => const _IxIconWidget(
     'assets/svg/control-io-field.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-label.svg
-  static Widget get controlLabel => SvgPicture.asset(
+  static Widget get controlLabel => const _IxIconWidget(
     'assets/svg/control-label.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-list-box.svg
-  static Widget get controlListBox => SvgPicture.asset(
+  static Widget get controlListBox => const _IxIconWidget(
     'assets/svg/control-list-box.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-radiobutton.svg
-  static Widget get controlRadiobutton => SvgPicture.asset(
+  static Widget get controlRadiobutton => const _IxIconWidget(
     'assets/svg/control-radiobutton.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-select.svg
-  static Widget get controlSelect => SvgPicture.asset(
+  static Widget get controlSelect => const _IxIconWidget(
     'assets/svg/control-select.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-slider.svg
-  static Widget get controlSlider => SvgPicture.asset(
+  static Widget get controlSlider => const _IxIconWidget(
     'assets/svg/control-slider.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-spinner.svg
-  static Widget get controlSpinner => SvgPicture.asset(
+  static Widget get controlSpinner => const _IxIconWidget(
     'assets/svg/control-spinner.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-switch.svg
-  static Widget get controlSwitch => SvgPicture.asset(
+  static Widget get controlSwitch => const _IxIconWidget(
     'assets/svg/control-switch.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-text-button.svg
-  static Widget get controlTextButton => SvgPicture.asset(
+  static Widget get controlTextButton => const _IxIconWidget(
     'assets/svg/control-text-button.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-textbox.svg
-  static Widget get controlTextbox => SvgPicture.asset(
+  static Widget get controlTextbox => const _IxIconWidget(
     'assets/svg/control-textbox.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-touch-area.svg
-  static Widget get controlTouchArea => SvgPicture.asset(
+  static Widget get controlTouchArea => const _IxIconWidget(
     'assets/svg/control-touch-area.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: control-value-bar.svg
-  static Widget get controlValueBar => SvgPicture.asset(
+  static Widget get controlValueBar => const _IxIconWidget(
     'assets/svg/control-value-bar.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: controlled-device.svg
-  static Widget get controlledDevice => SvgPicture.asset(
+  static Widget get controlledDevice => const _IxIconWidget(
     'assets/svg/controlled-device.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: controller-device-safety.svg
-  static Widget get controllerDeviceSafety => SvgPicture.asset(
+  static Widget get controllerDeviceSafety => const _IxIconWidget(
     'assets/svg/controller-device-safety.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: controller-device.svg
-  static Widget get controllerDevice => SvgPicture.asset(
+  static Widget get controllerDevice => const _IxIconWidget(
     'assets/svg/controller-device.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: conversation-filled.svg
-  static Widget get conversationFilled => SvgPicture.asset(
+  static Widget get conversationFilled => const _IxIconWidget(
     'assets/svg/conversation-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: conversation.svg
-  static Widget get conversation => SvgPicture.asset(
+  static Widget get conversation => const _IxIconWidget(
     'assets/svg/conversation.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: copy-filled.svg
-  static Widget get copyFilled => SvgPicture.asset(
+  static Widget get copyFilled => const _IxIconWidget(
     'assets/svg/copy-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: copy.svg
-  static Widget get copy => SvgPicture.asset(
+  static Widget get copy => const _IxIconWidget(
     'assets/svg/copy.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: couch-filled.svg
-  static Widget get couchFilled => SvgPicture.asset(
+  static Widget get couchFilled => const _IxIconWidget(
     'assets/svg/couch-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: couch.svg
-  static Widget get couch => SvgPicture.asset(
+  static Widget get couch => const _IxIconWidget(
     'assets/svg/couch.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: counter.svg
-  static Widget get counter => SvgPicture.asset(
+  static Widget get counter => const _IxIconWidget(
     'assets/svg/counter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: create-plant-filled.svg
-  static Widget get createPlantFilled => SvgPicture.asset(
+  static Widget get createPlantFilled => const _IxIconWidget(
     'assets/svg/create-plant-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: create-plant.svg
-  static Widget get createPlant => SvgPicture.asset(
+  static Widget get createPlant => const _IxIconWidget(
     'assets/svg/create-plant.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: crosshairs-filled.svg
-  static Widget get crosshairsFilled => SvgPicture.asset(
+  static Widget get crosshairsFilled => const _IxIconWidget(
     'assets/svg/crosshairs-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: crosshairs.svg
-  static Widget get crosshairs => SvgPicture.asset(
+  static Widget get crosshairs => const _IxIconWidget(
     'assets/svg/crosshairs.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: customer-filled.svg
-  static Widget get customerFilled => SvgPicture.asset(
+  static Widget get customerFilled => const _IxIconWidget(
     'assets/svg/customer-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: customer.svg
-  static Widget get customer => SvgPicture.asset(
+  static Widget get customer => const _IxIconWidget(
     'assets/svg/customer.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cut-filled.svg
-  static Widget get cutFilled => SvgPicture.asset(
+  static Widget get cutFilled => const _IxIconWidget(
     'assets/svg/cut-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cut.svg
-  static Widget get cut => SvgPicture.asset(
+  static Widget get cut => const _IxIconWidget(
     'assets/svg/cut.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cycle-alt.svg
-  static Widget get cycleAlt => SvgPicture.asset(
+  static Widget get cycleAlt => const _IxIconWidget(
     'assets/svg/cycle-alt.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: cycle.svg
-  static Widget get cycle => SvgPicture.asset(
+  static Widget get cycle => const _IxIconWidget(
     'assets/svg/cycle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: dashboard-filled.svg
-  static Widget get dashboardFilled => SvgPicture.asset(
+  static Widget get dashboardFilled => const _IxIconWidget(
     'assets/svg/dashboard-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: dashboard-pen-filled.svg
-  static Widget get dashboardPenFilled => SvgPicture.asset(
+  static Widget get dashboardPenFilled => const _IxIconWidget(
     'assets/svg/dashboard-pen-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: dashboard-pen.svg
-  static Widget get dashboardPen => SvgPicture.asset(
+  static Widget get dashboardPen => const _IxIconWidget(
     'assets/svg/dashboard-pen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: dashboard.svg
-  static Widget get dashboard => SvgPicture.asset(
+  static Widget get dashboard => const _IxIconWidget(
     'assets/svg/dashboard.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-egress.svg
-  static Widget get dataEgress => SvgPicture.asset(
+  static Widget get dataEgress => const _IxIconWidget(
     'assets/svg/data-egress.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-ingress-egress.svg
-  static Widget get dataIngressEgress => SvgPicture.asset(
+  static Widget get dataIngressEgress => const _IxIconWidget(
     'assets/svg/data-ingress-egress.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-ingress.svg
-  static Widget get dataIngress => SvgPicture.asset(
+  static Widget get dataIngress => const _IxIconWidget(
     'assets/svg/data-ingress.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-management-filled.svg
-  static Widget get dataManagementFilled => SvgPicture.asset(
+  static Widget get dataManagementFilled => const _IxIconWidget(
     'assets/svg/data-management-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-management.svg
-  static Widget get dataManagement => SvgPicture.asset(
+  static Widget get dataManagement => const _IxIconWidget(
     'assets/svg/data-management.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-type-boolean.svg
-  static Widget get dataTypeBoolean => SvgPicture.asset(
+  static Widget get dataTypeBoolean => const _IxIconWidget(
     'assets/svg/data-type-boolean.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-type-double.svg
-  static Widget get dataTypeDouble => SvgPicture.asset(
+  static Widget get dataTypeDouble => const _IxIconWidget(
     'assets/svg/data-type-double.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-type-enum.svg
-  static Widget get dataTypeEnum => SvgPicture.asset(
+  static Widget get dataTypeEnum => const _IxIconWidget(
     'assets/svg/data-type-enum.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-type-integer.svg
-  static Widget get dataTypeInteger => SvgPicture.asset(
+  static Widget get dataTypeInteger => const _IxIconWidget(
     'assets/svg/data-type-integer.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-type-string-list.svg
-  static Widget get dataTypeStringList => SvgPicture.asset(
+  static Widget get dataTypeStringList => const _IxIconWidget(
     'assets/svg/data-type-string-list.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: data-type-string.svg
-  static Widget get dataTypeString => SvgPicture.asset(
+  static Widget get dataTypeString => const _IxIconWidget(
     'assets/svg/data-type-string.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: database-arrow-left.svg
-  static Widget get databaseArrowLeft => SvgPicture.asset(
+  static Widget get databaseArrowLeft => const _IxIconWidget(
     'assets/svg/database-arrow-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: database-filled.svg
-  static Widget get databaseFilled => SvgPicture.asset(
+  static Widget get databaseFilled => const _IxIconWidget(
     'assets/svg/database-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: database-safety.svg
-  static Widget get databaseSafety => SvgPicture.asset(
+  static Widget get databaseSafety => const _IxIconWidget(
     'assets/svg/database-safety.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: database.svg
-  static Widget get database => SvgPicture.asset(
+  static Widget get database => const _IxIconWidget(
     'assets/svg/database.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: details.svg
-  static Widget get details => SvgPicture.asset(
+  static Widget get details => const _IxIconWidget(
     'assets/svg/details.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: device-driver.svg
-  static Widget get deviceDriver => SvgPicture.asset(
+  static Widget get deviceDriver => const _IxIconWidget(
     'assets/svg/device-driver.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: device-fan.svg
-  static Widget get deviceFan => SvgPicture.asset(
+  static Widget get deviceFan => const _IxIconWidget(
     'assets/svg/device-fan.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: device-manager.svg
-  static Widget get deviceManager => SvgPicture.asset(
+  static Widget get deviceManager => const _IxIconWidget(
     'assets/svg/device-manager.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: device-play-filled.svg
-  static Widget get devicePlayFilled => SvgPicture.asset(
+  static Widget get devicePlayFilled => const _IxIconWidget(
     'assets/svg/device-play-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: device-play.svg
-  static Widget get devicePlay => SvgPicture.asset(
+  static Widget get devicePlay => const _IxIconWidget(
     'assets/svg/device-play.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: device-view-flat.svg
-  static Widget get deviceViewFlat => SvgPicture.asset(
+  static Widget get deviceViewFlat => const _IxIconWidget(
     'assets/svg/device-view-flat.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: device-view-hierarchical.svg
-  static Widget get deviceViewHierarchical => SvgPicture.asset(
+  static Widget get deviceViewHierarchical => const _IxIconWidget(
     'assets/svg/device-view-hierarchical.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: diagram-module-library.svg
-  static Widget get diagramModuleLibrary => SvgPicture.asset(
+  static Widget get diagramModuleLibrary => const _IxIconWidget(
     'assets/svg/diagram-module-library.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: diagram-module-new.svg
-  static Widget get diagramModuleNew => SvgPicture.asset(
+  static Widget get diagramModuleNew => const _IxIconWidget(
     'assets/svg/diagram-module-new.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: diagram-module.svg
-  static Widget get diagramModule => SvgPicture.asset(
+  static Widget get diagramModule => const _IxIconWidget(
     'assets/svg/diagram-module.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: diamond.svg
-  static Widget get diamond => SvgPicture.asset(
+  static Widget get diamond => const _IxIconWidget(
     'assets/svg/diamond.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: disconnected-circle-filled.svg
-  static Widget get disconnectedCircleFilled => SvgPicture.asset(
+  static Widget get disconnectedCircleFilled => const _IxIconWidget(
     'assets/svg/disconnected-circle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: disconnected-circle.svg
-  static Widget get disconnectedCircle => SvgPicture.asset(
+  static Widget get disconnectedCircle => const _IxIconWidget(
     'assets/svg/disconnected-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: disconnected.svg
-  static Widget get disconnected => SvgPicture.asset(
+  static Widget get disconnected => const _IxIconWidget(
     'assets/svg/disconnected.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: disk-filled.svg
-  static Widget get diskFilled => SvgPicture.asset(
+  static Widget get diskFilled => const _IxIconWidget(
     'assets/svg/disk-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: disk-pen.svg
-  static Widget get diskPen => SvgPicture.asset(
+  static Widget get diskPen => const _IxIconWidget(
     'assets/svg/disk-pen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: disk.svg
-  static Widget get disk => SvgPicture.asset(
+  static Widget get disk => const _IxIconWidget(
     'assets/svg/disk.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: distribute-objects-horizontally.svg
-  static Widget get distributeObjectsHorizontally => SvgPicture.asset(
+  static Widget get distributeObjectsHorizontally => const _IxIconWidget(
     'assets/svg/distribute-objects-horizontally.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: distribute-objects-vertically.svg
-  static Widget get distributeObjectsVertically => SvgPicture.asset(
+  static Widget get distributeObjectsVertically => const _IxIconWidget(
     'assets/svg/distribute-objects-vertically.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: distribution.svg
-  static Widget get distribution => SvgPicture.asset(
+  static Widget get distribution => const _IxIconWidget(
     'assets/svg/distribution.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: doc-document.svg
-  static Widget get docDocument => SvgPicture.asset(
+  static Widget get docDocument => const _IxIconWidget(
     'assets/svg/doc-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-bulk.svg
-  static Widget get documentBulk => SvgPicture.asset(
+  static Widget get documentBulk => const _IxIconWidget(
     'assets/svg/document-bulk.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-code-filled.svg
-  static Widget get documentCodeFilled => SvgPicture.asset(
+  static Widget get documentCodeFilled => const _IxIconWidget(
     'assets/svg/document-code-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-code.svg
-  static Widget get documentCode => SvgPicture.asset(
+  static Widget get documentCode => const _IxIconWidget(
     'assets/svg/document-code.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-fail.svg
-  static Widget get documentFail => SvgPicture.asset(
+  static Widget get documentFail => const _IxIconWidget(
     'assets/svg/document-fail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-filled.svg
-  static Widget get documentFilled => SvgPicture.asset(
+  static Widget get documentFilled => const _IxIconWidget(
     'assets/svg/document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-info.svg
-  static Widget get documentInfo => SvgPicture.asset(
+  static Widget get documentInfo => const _IxIconWidget(
     'assets/svg/document-info.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-link.svg
-  static Widget get documentLink => SvgPicture.asset(
+  static Widget get documentLink => const _IxIconWidget(
     'assets/svg/document-link.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-management.svg
-  static Widget get documentManagement => SvgPicture.asset(
+  static Widget get documentManagement => const _IxIconWidget(
     'assets/svg/document-management.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-mapping-filled.svg
-  static Widget get documentMappingFilled => SvgPicture.asset(
+  static Widget get documentMappingFilled => const _IxIconWidget(
     'assets/svg/document-mapping-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-mapping.svg
-  static Widget get documentMapping => SvgPicture.asset(
+  static Widget get documentMapping => const _IxIconWidget(
     'assets/svg/document-mapping.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-plus-minus-filled.svg
-  static Widget get documentPlusMinusFilled => SvgPicture.asset(
+  static Widget get documentPlusMinusFilled => const _IxIconWidget(
     'assets/svg/document-plus-minus-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-plus-minus.svg
-  static Widget get documentPlusMinus => SvgPicture.asset(
+  static Widget get documentPlusMinus => const _IxIconWidget(
     'assets/svg/document-plus-minus.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-program-filled.svg
-  static Widget get documentProgramFilled => SvgPicture.asset(
+  static Widget get documentProgramFilled => const _IxIconWidget(
     'assets/svg/document-program-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-program.svg
-  static Widget get documentProgram => SvgPicture.asset(
+  static Widget get documentProgram => const _IxIconWidget(
     'assets/svg/document-program.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-reference.svg
-  static Widget get documentReference => SvgPicture.asset(
+  static Widget get documentReference => const _IxIconWidget(
     'assets/svg/document-reference.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-settings.svg
-  static Widget get documentSettings => SvgPicture.asset(
+  static Widget get documentSettings => const _IxIconWidget(
     'assets/svg/document-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document-success.svg
-  static Widget get documentSuccess => SvgPicture.asset(
+  static Widget get documentSuccess => const _IxIconWidget(
     'assets/svg/document-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: document.svg
-  static Widget get document => SvgPicture.asset(
+  static Widget get document => const _IxIconWidget(
     'assets/svg/document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: double-check.svg
-  static Widget get doubleCheck => SvgPicture.asset(
+  static Widget get doubleCheck => const _IxIconWidget(
     'assets/svg/double-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: double-chevron-down.svg
-  static Widget get doubleChevronDown => SvgPicture.asset(
+  static Widget get doubleChevronDown => const _IxIconWidget(
     'assets/svg/double-chevron-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: double-chevron-left.svg
-  static Widget get doubleChevronLeft => SvgPicture.asset(
+  static Widget get doubleChevronLeft => const _IxIconWidget(
     'assets/svg/double-chevron-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: double-chevron-right.svg
-  static Widget get doubleChevronRight => SvgPicture.asset(
+  static Widget get doubleChevronRight => const _IxIconWidget(
     'assets/svg/double-chevron-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: double-chevron-up.svg
-  static Widget get doubleChevronUp => SvgPicture.asset(
+  static Widget get doubleChevronUp => const _IxIconWidget(
     'assets/svg/double-chevron-up.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: doublet-filled.svg
-  static Widget get doubletFilled => SvgPicture.asset(
+  static Widget get doubletFilled => const _IxIconWidget(
     'assets/svg/doublet-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: doublet.svg
-  static Widget get doublet => SvgPicture.asset(
+  static Widget get doublet => const _IxIconWidget(
     'assets/svg/doublet.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: doughnutchart-filled.svg
-  static Widget get doughnutchartFilled => SvgPicture.asset(
+  static Widget get doughnutchartFilled => const _IxIconWidget(
     'assets/svg/doughnutchart-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: doughnutchart.svg
-  static Widget get doughnutchart => SvgPicture.asset(
+  static Widget get doughnutchart => const _IxIconWidget(
     'assets/svg/doughnutchart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: download-add.svg
-  static Widget get downloadAdd => SvgPicture.asset(
+  static Widget get downloadAdd => const _IxIconWidget(
     'assets/svg/download-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: download-delta.svg
-  static Widget get downloadDelta => SvgPicture.asset(
+  static Widget get downloadDelta => const _IxIconWidget(
     'assets/svg/download-delta.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: download-full.svg
-  static Widget get downloadFull => SvgPicture.asset(
+  static Widget get downloadFull => const _IxIconWidget(
     'assets/svg/download-full.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: download-list.svg
-  static Widget get downloadList => SvgPicture.asset(
+  static Widget get downloadList => const _IxIconWidget(
     'assets/svg/download-list.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: download.svg
-  static Widget get download => SvgPicture.asset(
+  static Widget get download => const _IxIconWidget(
     'assets/svg/download.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: downtime.svg
-  static Widget get downtime => SvgPicture.asset(
+  static Widget get downtime => const _IxIconWidget(
     'assets/svg/downtime.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drag-and-drop.svg
-  static Widget get dragAndDrop => SvgPicture.asset(
+  static Widget get dragAndDrop => const _IxIconWidget(
     'assets/svg/drag-and-drop.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drag-gripper.svg
-  static Widget get dragGripper => SvgPicture.asset(
+  static Widget get dragGripper => const _IxIconWidget(
     'assets/svg/drag-gripper.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: draw-circle-arc.svg
-  static Widget get drawCircleArc => SvgPicture.asset(
+  static Widget get drawCircleArc => const _IxIconWidget(
     'assets/svg/draw-circle-arc.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: draw-circle-segment.svg
-  static Widget get drawCircleSegment => SvgPicture.asset(
+  static Widget get drawCircleSegment => const _IxIconWidget(
     'assets/svg/draw-circle-segment.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: draw-circle.svg
-  static Widget get drawCircle => SvgPicture.asset(
+  static Widget get drawCircle => const _IxIconWidget(
     'assets/svg/draw-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: draw-ellipse-segment.svg
-  static Widget get drawEllipseSegment => SvgPicture.asset(
+  static Widget get drawEllipseSegment => const _IxIconWidget(
     'assets/svg/draw-ellipse-segment.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drawer-documents.svg
-  static Widget get drawerDocuments => SvgPicture.asset(
+  static Widget get drawerDocuments => const _IxIconWidget(
     'assets/svg/drawer-documents.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drawing-document-filled.svg
-  static Widget get drawingDocumentFilled => SvgPicture.asset(
+  static Widget get drawingDocumentFilled => const _IxIconWidget(
     'assets/svg/drawing-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drawing-document.svg
-  static Widget get drawingDocument => SvgPicture.asset(
+  static Widget get drawingDocument => const _IxIconWidget(
     'assets/svg/drawing-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drive-safety.svg
-  static Widget get driveSafety => SvgPicture.asset(
+  static Widget get driveSafety => const _IxIconWidget(
     'assets/svg/drive-safety.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drive.svg
-  static Widget get drive => SvgPicture.asset(
+  static Widget get drive => const _IxIconWidget(
     'assets/svg/drive.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drop-zone.svg
-  static Widget get dropZone => SvgPicture.asset(
+  static Widget get dropZone => const _IxIconWidget(
     'assets/svg/drop-zone.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: drop.svg
-  static Widget get drop => SvgPicture.asset(
+  static Widget get drop => const _IxIconWidget(
     'assets/svg/drop.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: duplicate-document.svg
-  static Widget get duplicateDocument => SvgPicture.asset(
+  static Widget get duplicateDocument => const _IxIconWidget(
     'assets/svg/duplicate-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: duplicate-filled.svg
-  static Widget get duplicateFilled => SvgPicture.asset(
+  static Widget get duplicateFilled => const _IxIconWidget(
     'assets/svg/duplicate-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: duplicate.svg
-  static Widget get duplicate => SvgPicture.asset(
+  static Widget get duplicate => const _IxIconWidget(
     'assets/svg/duplicate.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: e-mail-filled.svg
-  static Widget get eMailFilled => SvgPicture.asset(
+  static Widget get eMailFilled => const _IxIconWidget(
     'assets/svg/e-mail-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: e-mail.svg
-  static Widget get eMail => SvgPicture.asset(
+  static Widget get eMail => const _IxIconWidget(
     'assets/svg/e-mail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: earth-filled.svg
-  static Widget get earthFilled => SvgPicture.asset(
+  static Widget get earthFilled => const _IxIconWidget(
     'assets/svg/earth-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: earth.svg
-  static Widget get earth => SvgPicture.asset(
+  static Widget get earth => const _IxIconWidget(
     'assets/svg/earth.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: edit-document-filled.svg
-  static Widget get editDocumentFilled => SvgPicture.asset(
+  static Widget get editDocumentFilled => const _IxIconWidget(
     'assets/svg/edit-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: edit-document.svg
-  static Widget get editDocument => SvgPicture.asset(
+  static Widget get editDocument => const _IxIconWidget(
     'assets/svg/edit-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: edit-plant-filled.svg
-  static Widget get editPlantFilled => SvgPicture.asset(
+  static Widget get editPlantFilled => const _IxIconWidget(
     'assets/svg/edit-plant-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: edit-plant.svg
-  static Widget get editPlant => SvgPicture.asset(
+  static Widget get editPlant => const _IxIconWidget(
     'assets/svg/edit-plant.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: editor-grid-dots.svg
-  static Widget get editorGridDots => SvgPicture.asset(
+  static Widget get editorGridDots => const _IxIconWidget(
     'assets/svg/editor-grid-dots.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: editor-grid-lines.svg
-  static Widget get editorGridLines => SvgPicture.asset(
+  static Widget get editorGridLines => const _IxIconWidget(
     'assets/svg/editor-grid-lines.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: editor-grid-magnet.svg
-  static Widget get editorGridMagnet => SvgPicture.asset(
+  static Widget get editorGridMagnet => const _IxIconWidget(
     'assets/svg/editor-grid-magnet.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: editor-grid-none.svg
-  static Widget get editorGridNone => SvgPicture.asset(
+  static Widget get editorGridNone => const _IxIconWidget(
     'assets/svg/editor-grid-none.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: editor-grid.svg
-  static Widget get editorGrid => SvgPicture.asset(
+  static Widget get editorGrid => const _IxIconWidget(
     'assets/svg/editor-grid.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: editor-guide-lines-magnet.svg
-  static Widget get editorGuideLinesMagnet => SvgPicture.asset(
+  static Widget get editorGuideLinesMagnet => const _IxIconWidget(
     'assets/svg/editor-guide-lines-magnet.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: editor-guides.svg
-  static Widget get editorGuides => SvgPicture.asset(
+  static Widget get editorGuides => const _IxIconWidget(
     'assets/svg/editor-guides.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: editor-resources.svg
-  static Widget get editorResources => SvgPicture.asset(
+  static Widget get editorResources => const _IxIconWidget(
     'assets/svg/editor-resources.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: electrical-energy-filled.svg
-  static Widget get electricalEnergyFilled => SvgPicture.asset(
+  static Widget get electricalEnergyFilled => const _IxIconWidget(
     'assets/svg/electrical-energy-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: electrical-energy.svg
-  static Widget get electricalEnergy => SvgPicture.asset(
+  static Widget get electricalEnergy => const _IxIconWidget(
     'assets/svg/electrical-energy.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: element-filled.svg
-  static Widget get elementFilled => SvgPicture.asset(
+  static Widget get elementFilled => const _IxIconWidget(
     'assets/svg/element-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: element.svg
-  static Widget get element => SvgPicture.asset(
+  static Widget get element => const _IxIconWidget(
     'assets/svg/element.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ellipse-arc.svg
-  static Widget get ellipseArc => SvgPicture.asset(
+  static Widget get ellipseArc => const _IxIconWidget(
     'assets/svg/ellipse-arc.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ellipse-filled.svg
-  static Widget get ellipseFilled => SvgPicture.asset(
+  static Widget get ellipseFilled => const _IxIconWidget(
     'assets/svg/ellipse-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ellipse.svg
-  static Widget get ellipse => SvgPicture.asset(
+  static Widget get ellipse => const _IxIconWidget(
     'assets/svg/ellipse.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: email-document-filled.svg
-  static Widget get emailDocumentFilled => SvgPicture.asset(
+  static Widget get emailDocumentFilled => const _IxIconWidget(
     'assets/svg/email-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: email-document.svg
-  static Widget get emailDocument => SvgPicture.asset(
+  static Widget get emailDocument => const _IxIconWidget(
     'assets/svg/email-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: emergency-stop-filled.svg
-  static Widget get emergencyStopFilled => SvgPicture.asset(
+  static Widget get emergencyStopFilled => const _IxIconWidget(
     'assets/svg/emergency-stop-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: emergency-stop.svg
-  static Widget get emergencyStop => SvgPicture.asset(
+  static Widget get emergencyStop => const _IxIconWidget(
     'assets/svg/emergency-stop.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: emote-happy-filled.svg
-  static Widget get emoteHappyFilled => SvgPicture.asset(
+  static Widget get emoteHappyFilled => const _IxIconWidget(
     'assets/svg/emote-happy-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: emote-happy.svg
-  static Widget get emoteHappy => SvgPicture.asset(
+  static Widget get emoteHappy => const _IxIconWidget(
     'assets/svg/emote-happy.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: emote-neutral-filled.svg
-  static Widget get emoteNeutralFilled => SvgPicture.asset(
+  static Widget get emoteNeutralFilled => const _IxIconWidget(
     'assets/svg/emote-neutral-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: emote-neutral.svg
-  static Widget get emoteNeutral => SvgPicture.asset(
+  static Widget get emoteNeutral => const _IxIconWidget(
     'assets/svg/emote-neutral.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: emote-sad-filled.svg
-  static Widget get emoteSadFilled => SvgPicture.asset(
+  static Widget get emoteSadFilled => const _IxIconWidget(
     'assets/svg/emote-sad-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: emote-sad.svg
-  static Widget get emoteSad => SvgPicture.asset(
+  static Widget get emoteSad => const _IxIconWidget(
     'assets/svg/emote-sad.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: error-filled.svg
-  static Widget get errorFilled => SvgPicture.asset(
+  static Widget get errorFilled => const _IxIconWidget(
     'assets/svg/error-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: error-multiple-filled.svg
-  static Widget get errorMultipleFilled => SvgPicture.asset(
+  static Widget get errorMultipleFilled => const _IxIconWidget(
     'assets/svg/error-multiple-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: error-multiple.svg
-  static Widget get errorMultiple => SvgPicture.asset(
+  static Widget get errorMultiple => const _IxIconWidget(
     'assets/svg/error-multiple.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: error.svg
-  static Widget get error => SvgPicture.asset(
+  static Widget get error => const _IxIconWidget(
     'assets/svg/error.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: exclamation-mark.svg
-  static Widget get exclamationMark => SvgPicture.asset(
+  static Widget get exclamationMark => const _IxIconWidget(
     'assets/svg/exclamation-mark.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: expand-all.svg
-  static Widget get expandAll => SvgPicture.asset(
+  static Widget get expandAll => const _IxIconWidget(
     'assets/svg/expand-all.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: explore-filled.svg
-  static Widget get exploreFilled => SvgPicture.asset(
+  static Widget get exploreFilled => const _IxIconWidget(
     'assets/svg/explore-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: explore.svg
-  static Widget get explore => SvgPicture.asset(
+  static Widget get explore => const _IxIconWidget(
     'assets/svg/explore.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: export-check.svg
-  static Widget get exportCheck => SvgPicture.asset(
+  static Widget get exportCheck => const _IxIconWidget(
     'assets/svg/export-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: export-failed.svg
-  static Widget get exportFailed => SvgPicture.asset(
+  static Widget get exportFailed => const _IxIconWidget(
     'assets/svg/export-failed.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: export-progress.svg
-  static Widget get exportProgress => SvgPicture.asset(
+  static Widget get exportProgress => const _IxIconWidget(
     'assets/svg/export-progress.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: export.svg
-  static Widget get export => SvgPicture.asset(
+  static Widget get export => const _IxIconWidget(
     'assets/svg/export.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: extension.svg
-  static Widget get extension => SvgPicture.asset(
+  static Widget get extension => const _IxIconWidget(
     'assets/svg/extension.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: external-encoder.svg
-  static Widget get externalEncoder => SvgPicture.asset(
+  static Widget get externalEncoder => const _IxIconWidget(
     'assets/svg/external-encoder.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: eye-cancelled-filled.svg
-  static Widget get eyeCancelledFilled => SvgPicture.asset(
+  static Widget get eyeCancelledFilled => const _IxIconWidget(
     'assets/svg/eye-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: eye-cancelled.svg
-  static Widget get eyeCancelled => SvgPicture.asset(
+  static Widget get eyeCancelled => const _IxIconWidget(
     'assets/svg/eye-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: eye-dropper.svg
-  static Widget get eyeDropper => SvgPicture.asset(
+  static Widget get eyeDropper => const _IxIconWidget(
     'assets/svg/eye-dropper.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: eye-filled.svg
-  static Widget get eyeFilled => SvgPicture.asset(
+  static Widget get eyeFilled => const _IxIconWidget(
     'assets/svg/eye-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: eye-focus.svg
-  static Widget get eyeFocus => SvgPicture.asset(
+  static Widget get eyeFocus => const _IxIconWidget(
     'assets/svg/eye-focus.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: eye-magnifying-glass.svg
-  static Widget get eyeMagnifyingGlass => SvgPicture.asset(
+  static Widget get eyeMagnifyingGlass => const _IxIconWidget(
     'assets/svg/eye-magnifying-glass.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: eye.svg
-  static Widget get eye => SvgPicture.asset(
+  static Widget get eye => const _IxIconWidget(
     'assets/svg/eye.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: facebook-logo.svg
-  static Widget get facebookLogo => SvgPicture.asset(
+  static Widget get facebookLogo => const _IxIconWidget(
     'assets/svg/facebook-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: faceplate-container.svg
-  static Widget get faceplateContainer => SvgPicture.asset(
+  static Widget get faceplateContainer => const _IxIconWidget(
     'assets/svg/faceplate-container.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: factory-reset-filled.svg
-  static Widget get factoryResetFilled => SvgPicture.asset(
+  static Widget get factoryResetFilled => const _IxIconWidget(
     'assets/svg/factory-reset-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: factory-reset.svg
-  static Widget get factoryReset => SvgPicture.asset(
+  static Widget get factoryReset => const _IxIconWidget(
     'assets/svg/factory-reset.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: fast-forward-filled.svg
-  static Widget get fastForwardFilled => SvgPicture.asset(
+  static Widget get fastForwardFilled => const _IxIconWidget(
     'assets/svg/fast-forward-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: fast-forward.svg
-  static Widget get fastForward => SvgPicture.asset(
+  static Widget get fastForward => const _IxIconWidget(
     'assets/svg/fast-forward.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: feedback-filled.svg
-  static Widget get feedbackFilled => SvgPicture.asset(
+  static Widget get feedbackFilled => const _IxIconWidget(
     'assets/svg/feedback-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: feedback.svg
-  static Widget get feedback => SvgPicture.asset(
+  static Widget get feedback => const _IxIconWidget(
     'assets/svg/feedback.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: filter-filled.svg
-  static Widget get filterFilled => SvgPicture.asset(
+  static Widget get filterFilled => const _IxIconWidget(
     'assets/svg/filter-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: filter-update.svg
-  static Widget get filterUpdate => SvgPicture.asset(
+  static Widget get filterUpdate => const _IxIconWidget(
     'assets/svg/filter-update.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: filter.svg
-  static Widget get filter => SvgPicture.asset(
+  static Widget get filter => const _IxIconWidget(
     'assets/svg/filter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: firmware.svg
-  static Widget get firmware => SvgPicture.asset(
+  static Widget get firmware => const _IxIconWidget(
     'assets/svg/firmware.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: fit-to-screen.svg
-  static Widget get fitToScreen => SvgPicture.asset(
+  static Widget get fitToScreen => const _IxIconWidget(
     'assets/svg/fit-to-screen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: flag-alt-filled.svg
-  static Widget get flagAltFilled => SvgPicture.asset(
+  static Widget get flagAltFilled => const _IxIconWidget(
     'assets/svg/flag-alt-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: flag-alt.svg
-  static Widget get flagAlt => SvgPicture.asset(
+  static Widget get flagAlt => const _IxIconWidget(
     'assets/svg/flag-alt.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: flag-filled.svg
-  static Widget get flagFilled => SvgPicture.asset(
+  static Widget get flagFilled => const _IxIconWidget(
     'assets/svg/flag-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: flag.svg
-  static Widget get flag => SvgPicture.asset(
+  static Widget get flag => const _IxIconWidget(
     'assets/svg/flag.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: flare.svg
-  static Widget get flare => SvgPicture.asset(
+  static Widget get flare => const _IxIconWidget(
     'assets/svg/flare.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: flashing.svg
-  static Widget get flashing => SvgPicture.asset(
+  static Widget get flashing => const _IxIconWidget(
     'assets/svg/flashing.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: flow-physically.svg
-  static Widget get flowPhysically => SvgPicture.asset(
+  static Widget get flowPhysically => const _IxIconWidget(
     'assets/svg/flow-physically.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-application-screen.svg
-  static Widget get folderApplicationScreen => SvgPicture.asset(
+  static Widget get folderApplicationScreen => const _IxIconWidget(
     'assets/svg/folder-application-screen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-collapse-all.svg
-  static Widget get folderCollapseAll => SvgPicture.asset(
+  static Widget get folderCollapseAll => const _IxIconWidget(
     'assets/svg/folder-collapse-all.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-down-filled.svg
-  static Widget get folderDownFilled => SvgPicture.asset(
+  static Widget get folderDownFilled => const _IxIconWidget(
     'assets/svg/folder-down-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-down.svg
-  static Widget get folderDown => SvgPicture.asset(
+  static Widget get folderDown => const _IxIconWidget(
     'assets/svg/folder-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-expand-all.svg
-  static Widget get folderExpandAll => SvgPicture.asset(
+  static Widget get folderExpandAll => const _IxIconWidget(
     'assets/svg/folder-expand-all.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-filled.svg
-  static Widget get folderFilled => SvgPicture.asset(
+  static Widget get folderFilled => const _IxIconWidget(
     'assets/svg/folder-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-new-filled.svg
-  static Widget get folderNewFilled => SvgPicture.asset(
+  static Widget get folderNewFilled => const _IxIconWidget(
     'assets/svg/folder-new-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-new.svg
-  static Widget get folderNew => SvgPicture.asset(
+  static Widget get folderNew => const _IxIconWidget(
     'assets/svg/folder-new.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-open-filled.svg
-  static Widget get folderOpenFilled => SvgPicture.asset(
+  static Widget get folderOpenFilled => const _IxIconWidget(
     'assets/svg/folder-open-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-open.svg
-  static Widget get folderOpen => SvgPicture.asset(
+  static Widget get folderOpen => const _IxIconWidget(
     'assets/svg/folder-open.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-tag.svg
-  static Widget get folderTag => SvgPicture.asset(
+  static Widget get folderTag => const _IxIconWidget(
     'assets/svg/folder-tag.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-up-filled.svg
-  static Widget get folderUpFilled => SvgPicture.asset(
+  static Widget get folderUpFilled => const _IxIconWidget(
     'assets/svg/folder-up-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder-up.svg
-  static Widget get folderUp => SvgPicture.asset(
+  static Widget get folderUp => const _IxIconWidget(
     'assets/svg/folder-up.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: folder.svg
-  static Widget get folder => SvgPicture.asset(
+  static Widget get folder => const _IxIconWidget(
     'assets/svg/folder.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: frames-filled.svg
-  static Widget get framesFilled => SvgPicture.asset(
+  static Widget get framesFilled => const _IxIconWidget(
     'assets/svg/frames-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: frames.svg
-  static Widget get frames => SvgPicture.asset(
+  static Widget get frames => const _IxIconWidget(
     'assets/svg/frames.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: full-screen-exit.svg
-  static Widget get fullScreenExit => SvgPicture.asset(
+  static Widget get fullScreenExit => const _IxIconWidget(
     'assets/svg/full-screen-exit.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: full-screen.svg
-  static Widget get fullScreen => SvgPicture.asset(
+  static Widget get fullScreen => const _IxIconWidget(
     'assets/svg/full-screen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: function-block-library.svg
-  static Widget get functionBlockLibrary => SvgPicture.asset(
+  static Widget get functionBlockLibrary => const _IxIconWidget(
     'assets/svg/function-block-library.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: function-block-new.svg
-  static Widget get functionBlockNew => SvgPicture.asset(
+  static Widget get functionBlockNew => const _IxIconWidget(
     'assets/svg/function-block-new.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: function-block-safety.svg
-  static Widget get functionBlockSafety => SvgPicture.asset(
+  static Widget get functionBlockSafety => const _IxIconWidget(
     'assets/svg/function-block-safety.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: function-block.svg
-  static Widget get functionBlock => SvgPicture.asset(
+  static Widget get functionBlock => const _IxIconWidget(
     'assets/svg/function-block.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: function-diagram-new.svg
-  static Widget get functionDiagramNew => SvgPicture.asset(
+  static Widget get functionDiagramNew => const _IxIconWidget(
     'assets/svg/function-diagram-new.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: function-diagram.svg
-  static Widget get functionDiagram => SvgPicture.asset(
+  static Widget get functionDiagram => const _IxIconWidget(
     'assets/svg/function-diagram.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ganttchart.svg
-  static Widget get ganttchart => SvgPicture.asset(
+  static Widget get ganttchart => const _IxIconWidget(
     'assets/svg/ganttchart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: gauge-filled.svg
-  static Widget get gaugeFilled => SvgPicture.asset(
+  static Widget get gaugeFilled => const _IxIconWidget(
     'assets/svg/gauge-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: gauge.svg
-  static Widget get gauge => SvgPicture.asset(
+  static Widget get gauge => const _IxIconWidget(
     'assets/svg/gauge.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: gaugechart.svg
-  static Widget get gaugechart => SvgPicture.asset(
+  static Widget get gaugechart => const _IxIconWidget(
     'assets/svg/gaugechart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-alarm.svg
-  static Widget get genericDeviceAlarm => SvgPicture.asset(
+  static Widget get genericDeviceAlarm => const _IxIconWidget(
     'assets/svg/generic-device-alarm.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-brackets.svg
-  static Widget get genericDeviceBrackets => SvgPicture.asset(
+  static Widget get genericDeviceBrackets => const _IxIconWidget(
     'assets/svg/generic-device-brackets.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-cancelled.svg
-  static Widget get genericDeviceCancelled => SvgPicture.asset(
+  static Widget get genericDeviceCancelled => const _IxIconWidget(
     'assets/svg/generic-device-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-connected.svg
-  static Widget get genericDeviceConnected => SvgPicture.asset(
+  static Widget get genericDeviceConnected => const _IxIconWidget(
     'assets/svg/generic-device-connected.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-dashed.svg
-  static Widget get genericDeviceDashed => SvgPicture.asset(
+  static Widget get genericDeviceDashed => const _IxIconWidget(
     'assets/svg/generic-device-dashed.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-disconnected.svg
-  static Widget get genericDeviceDisconnected => SvgPicture.asset(
+  static Widget get genericDeviceDisconnected => const _IxIconWidget(
     'assets/svg/generic-device-disconnected.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-error.svg
-  static Widget get genericDeviceError => SvgPicture.asset(
+  static Widget get genericDeviceError => const _IxIconWidget(
     'assets/svg/generic-device-error.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-flare.svg
-  static Widget get genericDeviceFlare => SvgPicture.asset(
+  static Widget get genericDeviceFlare => const _IxIconWidget(
     'assets/svg/generic-device-flare.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-forced-mode.svg
-  static Widget get genericDeviceForcedMode => SvgPicture.asset(
+  static Widget get genericDeviceForcedMode => const _IxIconWidget(
     'assets/svg/generic-device-forced-mode.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-incompatible.svg
-  static Widget get genericDeviceIncompatible => SvgPicture.asset(
+  static Widget get genericDeviceIncompatible => const _IxIconWidget(
     'assets/svg/generic-device-incompatible.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-io-unavailable.svg
-  static Widget get genericDeviceIoUnavailable => SvgPicture.asset(
+  static Widget get genericDeviceIoUnavailable => const _IxIconWidget(
     'assets/svg/generic-device-io-unavailable.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-lock.svg
-  static Widget get genericDeviceLock => SvgPicture.asset(
+  static Widget get genericDeviceLock => const _IxIconWidget(
     'assets/svg/generic-device-lock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-maintenance.svg
-  static Widget get genericDeviceMaintenance => SvgPicture.asset(
+  static Widget get genericDeviceMaintenance => const _IxIconWidget(
     'assets/svg/generic-device-maintenance.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-pause.svg
-  static Widget get genericDevicePause => SvgPicture.asset(
+  static Widget get genericDevicePause => const _IxIconWidget(
     'assets/svg/generic-device-pause.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-play.svg
-  static Widget get genericDevicePlay => SvgPicture.asset(
+  static Widget get genericDevicePlay => const _IxIconWidget(
     'assets/svg/generic-device-play.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-power-saving.svg
-  static Widget get genericDevicePowerSaving => SvgPicture.asset(
+  static Widget get genericDevicePowerSaving => const _IxIconWidget(
     'assets/svg/generic-device-power-saving.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-published.svg
-  static Widget get genericDevicePublished => SvgPicture.asset(
+  static Widget get genericDevicePublished => const _IxIconWidget(
     'assets/svg/generic-device-published.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-question.svg
-  static Widget get genericDeviceQuestion => SvgPicture.asset(
+  static Widget get genericDeviceQuestion => const _IxIconWidget(
     'assets/svg/generic-device-question.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-refresh.svg
-  static Widget get genericDeviceRefresh => SvgPicture.asset(
+  static Widget get genericDeviceRefresh => const _IxIconWidget(
     'assets/svg/generic-device-refresh.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-reset.svg
-  static Widget get genericDeviceReset => SvgPicture.asset(
+  static Widget get genericDeviceReset => const _IxIconWidget(
     'assets/svg/generic-device-reset.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-restart.svg
-  static Widget get genericDeviceRestart => SvgPicture.asset(
+  static Widget get genericDeviceRestart => const _IxIconWidget(
     'assets/svg/generic-device-restart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-rocket.svg
-  static Widget get genericDeviceRocket => SvgPicture.asset(
+  static Widget get genericDeviceRocket => const _IxIconWidget(
     'assets/svg/generic-device-rocket.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-safety.svg
-  static Widget get genericDeviceSafety => SvgPicture.asset(
+  static Widget get genericDeviceSafety => const _IxIconWidget(
     'assets/svg/generic-device-safety.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-shield.svg
-  static Widget get genericDeviceShield => SvgPicture.asset(
+  static Widget get genericDeviceShield => const _IxIconWidget(
     'assets/svg/generic-device-shield.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-shutdown.svg
-  static Widget get genericDeviceShutdown => SvgPicture.asset(
+  static Widget get genericDeviceShutdown => const _IxIconWidget(
     'assets/svg/generic-device-shutdown.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-slash.svg
-  static Widget get genericDeviceSlash => SvgPicture.asset(
+  static Widget get genericDeviceSlash => const _IxIconWidget(
     'assets/svg/generic-device-slash.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-software-alarm.svg
-  static Widget get genericDeviceSoftwareAlarm => SvgPicture.asset(
+  static Widget get genericDeviceSoftwareAlarm => const _IxIconWidget(
     'assets/svg/generic-device-software-alarm.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-standby.svg
-  static Widget get genericDeviceStandby => SvgPicture.asset(
+  static Widget get genericDeviceStandby => const _IxIconWidget(
     'assets/svg/generic-device-standby.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-stop-userprogram.svg
-  static Widget get genericDeviceStopUserprogram => SvgPicture.asset(
+  static Widget get genericDeviceStopUserprogram => const _IxIconWidget(
     'assets/svg/generic-device-stop-userprogram.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-stop.svg
-  static Widget get genericDeviceStop => SvgPicture.asset(
+  static Widget get genericDeviceStop => const _IxIconWidget(
     'assets/svg/generic-device-stop.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-success.svg
-  static Widget get genericDeviceSuccess => SvgPicture.asset(
+  static Widget get genericDeviceSuccess => const _IxIconWidget(
     'assets/svg/generic-device-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-synchronized.svg
-  static Widget get genericDeviceSynchronized => SvgPicture.asset(
+  static Widget get genericDeviceSynchronized => const _IxIconWidget(
     'assets/svg/generic-device-synchronized.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device-traffic.svg
-  static Widget get genericDeviceTraffic => SvgPicture.asset(
+  static Widget get genericDeviceTraffic => const _IxIconWidget(
     'assets/svg/generic-device-traffic.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: generic-device.svg
-  static Widget get genericDevice => SvgPicture.asset(
+  static Widget get genericDevice => const _IxIconWidget(
     'assets/svg/generic-device.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: github-logo.svg
-  static Widget get githubLogo => SvgPicture.asset(
+  static Widget get githubLogo => const _IxIconWidget(
     'assets/svg/github-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: glasses-play.svg
-  static Widget get glassesPlay => SvgPicture.asset(
+  static Widget get glassesPlay => const _IxIconWidget(
     'assets/svg/glasses-play.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: global-plant-filled.svg
-  static Widget get globalPlantFilled => SvgPicture.asset(
+  static Widget get globalPlantFilled => const _IxIconWidget(
     'assets/svg/global-plant-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: global-plant.svg
-  static Widget get globalPlant => SvgPicture.asset(
+  static Widget get globalPlant => const _IxIconWidget(
     'assets/svg/global-plant.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: globe-filled.svg
-  static Widget get globeFilled => SvgPicture.asset(
+  static Widget get globeFilled => const _IxIconWidget(
     'assets/svg/globe-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: globe-tag.svg
-  static Widget get globeTag => SvgPicture.asset(
+  static Widget get globeTag => const _IxIconWidget(
     'assets/svg/globe-tag.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: globe.svg
-  static Widget get globe => SvgPicture.asset(
+  static Widget get globe => const _IxIconWidget(
     'assets/svg/globe.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: goto.svg
-  static Widget get goto => SvgPicture.asset(
+  static Widget get goto => const _IxIconWidget(
     'assets/svg/goto.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: graph-filled.svg
-  static Widget get graphFilled => SvgPicture.asset(
+  static Widget get graphFilled => const _IxIconWidget(
     'assets/svg/graph-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: graph.svg
-  static Widget get graph => SvgPicture.asset(
+  static Widget get graph => const _IxIconWidget(
     'assets/svg/graph.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: grid-pen.svg
-  static Widget get gridPen => SvgPicture.asset(
+  static Widget get gridPen => const _IxIconWidget(
     'assets/svg/grid-pen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: group-objects.svg
-  static Widget get groupObjects => SvgPicture.asset(
+  static Widget get groupObjects => const _IxIconWidget(
     'assets/svg/group-objects.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: group.svg
-  static Widget get group => SvgPicture.asset(
+  static Widget get group => const _IxIconWidget(
     'assets/svg/group.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hand-filled.svg
-  static Widget get handFilled => SvgPicture.asset(
+  static Widget get handFilled => const _IxIconWidget(
     'assets/svg/hand-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hand.svg
-  static Widget get hand => SvgPicture.asset(
+  static Widget get hand => const _IxIconWidget(
     'assets/svg/hand.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: handshake.svg
-  static Widget get handshake => SvgPicture.asset(
+  static Widget get handshake => const _IxIconWidget(
     'assets/svg/handshake.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hard-disk-drive.svg
-  static Widget get hardDiskDrive => SvgPicture.asset(
+  static Widget get hardDiskDrive => const _IxIconWidget(
     'assets/svg/hard-disk-drive.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hard-reset.svg
-  static Widget get hardReset => SvgPicture.asset(
+  static Widget get hardReset => const _IxIconWidget(
     'assets/svg/hard-reset.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hardware-cabinet.svg
-  static Widget get hardwareCabinet => SvgPicture.asset(
+  static Widget get hardwareCabinet => const _IxIconWidget(
     'assets/svg/hardware-cabinet.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hat-man-filled.svg
-  static Widget get hatManFilled => SvgPicture.asset(
+  static Widget get hatManFilled => const _IxIconWidget(
     'assets/svg/hat-man-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hat-man.svg
-  static Widget get hatMan => SvgPicture.asset(
+  static Widget get hatMan => const _IxIconWidget(
     'assets/svg/hat-man.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: heading.svg
-  static Widget get heading => SvgPicture.asset(
+  static Widget get heading => const _IxIconWidget(
     'assets/svg/heading.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: health-filled.svg
-  static Widget get healthFilled => SvgPicture.asset(
+  static Widget get healthFilled => const _IxIconWidget(
     'assets/svg/health-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: health.svg
-  static Widget get health => SvgPicture.asset(
+  static Widget get health => const _IxIconWidget(
     'assets/svg/health.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: heart-filled.svg
-  static Widget get heartFilled => SvgPicture.asset(
+  static Widget get heartFilled => const _IxIconWidget(
     'assets/svg/heart-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: heart.svg
-  static Widget get heart => SvgPicture.asset(
+  static Widget get heart => const _IxIconWidget(
     'assets/svg/heart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: heat-map-chart-filled.svg
-  static Widget get heatMapChartFilled => SvgPicture.asset(
+  static Widget get heatMapChartFilled => const _IxIconWidget(
     'assets/svg/heat-map-chart-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: heat-map-chart.svg
-  static Widget get heatMapChart => SvgPicture.asset(
+  static Widget get heatMapChart => const _IxIconWidget(
     'assets/svg/heat-map-chart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: height.svg
-  static Widget get height => SvgPicture.asset(
+  static Widget get height => const _IxIconWidget(
     'assets/svg/height.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: helmet-safety-filled.svg
-  static Widget get helmetSafetyFilled => SvgPicture.asset(
+  static Widget get helmetSafetyFilled => const _IxIconWidget(
     'assets/svg/helmet-safety-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: helmet-safety.svg
-  static Widget get helmetSafety => SvgPicture.asset(
+  static Widget get helmetSafety => const _IxIconWidget(
     'assets/svg/helmet-safety.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hexagon-vertical-bars-database-filled.svg
-  static Widget get hexagonVerticalBarsDatabaseFilled => SvgPicture.asset(
+  static Widget get hexagonVerticalBarsDatabaseFilled => const _IxIconWidget(
     'assets/svg/hexagon-vertical-bars-database-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hexagon-vertical-bars-database.svg
-  static Widget get hexagonVerticalBarsDatabase => SvgPicture.asset(
+  static Widget get hexagonVerticalBarsDatabase => const _IxIconWidget(
     'assets/svg/hexagon-vertical-bars-database.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hexagon-vertical-bars-filled.svg
-  static Widget get hexagonVerticalBarsFilled => SvgPicture.asset(
+  static Widget get hexagonVerticalBarsFilled => const _IxIconWidget(
     'assets/svg/hexagon-vertical-bars-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hexagon-vertical-bars.svg
-  static Widget get hexagonVerticalBars => SvgPicture.asset(
+  static Widget get hexagonVerticalBars => const _IxIconWidget(
     'assets/svg/hexagon-vertical-bars.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hierarchy.svg
-  static Widget get hierarchy => SvgPicture.asset(
+  static Widget get hierarchy => const _IxIconWidget(
     'assets/svg/hierarchy.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: highlight-filled.svg
-  static Widget get highlightFilled => SvgPicture.asset(
+  static Widget get highlightFilled => const _IxIconWidget(
     'assets/svg/highlight-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: highlight.svg
-  static Widget get highlight => SvgPicture.asset(
+  static Widget get highlight => const _IxIconWidget(
     'assets/svg/highlight.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: history-list.svg
-  static Widget get historyList => SvgPicture.asset(
+  static Widget get historyList => const _IxIconWidget(
     'assets/svg/history-list.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: history.svg
-  static Widget get history => SvgPicture.asset(
+  static Widget get history => const _IxIconWidget(
     'assets/svg/history.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: home-filled.svg
-  static Widget get homeFilled => SvgPicture.asset(
+  static Widget get homeFilled => const _IxIconWidget(
     'assets/svg/home-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: home.svg
-  static Widget get home => SvgPicture.asset(
+  static Widget get home => const _IxIconWidget(
     'assets/svg/home.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hourglass-empty.svg
-  static Widget get hourglassEmpty => SvgPicture.asset(
+  static Widget get hourglassEmpty => const _IxIconWidget(
     'assets/svg/hourglass-empty.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hourglass-end.svg
-  static Widget get hourglassEnd => SvgPicture.asset(
+  static Widget get hourglassEnd => const _IxIconWidget(
     'assets/svg/hourglass-end.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hourglass-filled.svg
-  static Widget get hourglassFilled => SvgPicture.asset(
+  static Widget get hourglassFilled => const _IxIconWidget(
     'assets/svg/hourglass-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hourglass-start.svg
-  static Widget get hourglassStart => SvgPicture.asset(
+  static Widget get hourglassStart => const _IxIconWidget(
     'assets/svg/hourglass-start.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: hourglass.svg
-  static Widget get hourglass => SvgPicture.asset(
+  static Widget get hourglass => const _IxIconWidget(
     'assets/svg/hourglass.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: id-filled.svg
-  static Widget get idFilled => SvgPicture.asset(
+  static Widget get idFilled => const _IxIconWidget(
     'assets/svg/id-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: id.svg
-  static Widget get id => SvgPicture.asset(
+  static Widget get id => const _IxIconWidget(
     'assets/svg/id.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: image-filled.svg
-  static Widget get imageFilled => SvgPicture.asset(
+  static Widget get imageFilled => const _IxIconWidget(
     'assets/svg/image-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: image.svg
-  static Widget get image => SvgPicture.asset(
+  static Widget get image => const _IxIconWidget(
     'assets/svg/image.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: import-check.svg
-  static Widget get importCheck => SvgPicture.asset(
+  static Widget get importCheck => const _IxIconWidget(
     'assets/svg/import-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: import-failed.svg
-  static Widget get importFailed => SvgPicture.asset(
+  static Widget get importFailed => const _IxIconWidget(
     'assets/svg/import-failed.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: import-progress.svg
-  static Widget get importProgress => SvgPicture.asset(
+  static Widget get importProgress => const _IxIconWidget(
     'assets/svg/import-progress.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: import.svg
-  static Widget get import => SvgPicture.asset(
+  static Widget get import => const _IxIconWidget(
     'assets/svg/import.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: incompatible.svg
-  static Widget get incompatible => SvgPicture.asset(
+  static Widget get incompatible => const _IxIconWidget(
     'assets/svg/incompatible.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: indicator-filled.svg
-  static Widget get indicatorFilled => SvgPicture.asset(
+  static Widget get indicatorFilled => const _IxIconWidget(
     'assets/svg/indicator-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: indicator.svg
-  static Widget get indicator => SvgPicture.asset(
+  static Widget get indicator => const _IxIconWidget(
     'assets/svg/indicator.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: info-feed.svg
-  static Widget get infoFeed => SvgPicture.asset(
+  static Widget get infoFeed => const _IxIconWidget(
     'assets/svg/info-feed.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: info-filled.svg
-  static Widget get infoFilled => SvgPicture.asset(
+  static Widget get infoFilled => const _IxIconWidget(
     'assets/svg/info-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: info-multiple-filled.svg
-  static Widget get infoMultipleFilled => SvgPicture.asset(
+  static Widget get infoMultipleFilled => const _IxIconWidget(
     'assets/svg/info-multiple-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: info-multiple.svg
-  static Widget get infoMultiple => SvgPicture.asset(
+  static Widget get infoMultiple => const _IxIconWidget(
     'assets/svg/info-multiple.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: info.svg
-  static Widget get info => SvgPicture.asset(
+  static Widget get info => const _IxIconWidget(
     'assets/svg/info.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ingestion-report.svg
-  static Widget get ingestionReport => SvgPicture.asset(
+  static Widget get ingestionReport => const _IxIconWidget(
     'assets/svg/ingestion-report.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ingestion.svg
-  static Widget get ingestion => SvgPicture.asset(
+  static Widget get ingestion => const _IxIconWidget(
     'assets/svg/ingestion.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ink-pen-add.svg
-  static Widget get inkPenAdd => SvgPicture.asset(
+  static Widget get inkPenAdd => const _IxIconWidget(
     'assets/svg/ink-pen-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ink-pen-filled.svg
-  static Widget get inkPenFilled => SvgPicture.asset(
+  static Widget get inkPenFilled => const _IxIconWidget(
     'assets/svg/ink-pen-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ink-pen.svg
-  static Widget get inkPen => SvgPicture.asset(
+  static Widget get inkPen => const _IxIconWidget(
     'assets/svg/ink-pen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: inquiry-filled.svg
-  static Widget get inquiryFilled => SvgPicture.asset(
+  static Widget get inquiryFilled => const _IxIconWidget(
     'assets/svg/inquiry-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: inquiry-mail.svg
-  static Widget get inquiryMail => SvgPicture.asset(
+  static Widget get inquiryMail => const _IxIconWidget(
     'assets/svg/inquiry-mail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: inquiry.svg
-  static Widget get inquiry => SvgPicture.asset(
+  static Widget get inquiry => const _IxIconWidget(
     'assets/svg/inquiry.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: instagram-logo.svg
-  static Widget get instagramLogo => SvgPicture.asset(
+  static Widget get instagramLogo => const _IxIconWidget(
     'assets/svg/instagram-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: interpreter-filled.svg
-  static Widget get interpreterFilled => SvgPicture.asset(
+  static Widget get interpreterFilled => const _IxIconWidget(
     'assets/svg/interpreter-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: interpreter.svg
-  static Widget get interpreter => SvgPicture.asset(
+  static Widget get interpreter => const _IxIconWidget(
     'assets/svg/interpreter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ipcs.svg
-  static Widget get ipcs => SvgPicture.asset(
+  static Widget get ipcs => const _IxIconWidget(
     'assets/svg/ipcs.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: item-details-filled.svg
-  static Widget get itemDetailsFilled => SvgPicture.asset(
+  static Widget get itemDetailsFilled => const _IxIconWidget(
     'assets/svg/item-details-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: item-details.svg
-  static Widget get itemDetails => SvgPicture.asset(
+  static Widget get itemDetails => const _IxIconWidget(
     'assets/svg/item-details.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: java-script-connection.svg
-  static Widget get javaScriptConnection => SvgPicture.asset(
+  static Widget get javaScriptConnection => const _IxIconWidget(
     'assets/svg/java-script-connection.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: java-script.svg
-  static Widget get javaScript => SvgPicture.asset(
+  static Widget get javaScript => const _IxIconWidget(
     'assets/svg/java-script.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: jigsaw-details-filled.svg
-  static Widget get jigsawDetailsFilled => SvgPicture.asset(
+  static Widget get jigsawDetailsFilled => const _IxIconWidget(
     'assets/svg/jigsaw-details-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: jigsaw-details.svg
-  static Widget get jigsawDetails => SvgPicture.asset(
+  static Widget get jigsawDetails => const _IxIconWidget(
     'assets/svg/jigsaw-details.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: jigsaw-filled.svg
-  static Widget get jigsawFilled => SvgPicture.asset(
+  static Widget get jigsawFilled => const _IxIconWidget(
     'assets/svg/jigsaw-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: jigsaw.svg
-  static Widget get jigsaw => SvgPicture.asset(
+  static Widget get jigsaw => const _IxIconWidget(
     'assets/svg/jigsaw.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: join.svg
-  static Widget get join => SvgPicture.asset(
+  static Widget get join => const _IxIconWidget(
     'assets/svg/join.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: json-document-filled.svg
-  static Widget get jsonDocumentFilled => SvgPicture.asset(
+  static Widget get jsonDocumentFilled => const _IxIconWidget(
     'assets/svg/json-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: json-document.svg
-  static Widget get jsonDocument => SvgPicture.asset(
+  static Widget get jsonDocument => const _IxIconWidget(
     'assets/svg/json-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: key.svg
-  static Widget get key => SvgPicture.asset(
+  static Widget get key => const _IxIconWidget(
     'assets/svg/key.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: keyboard-docked-bottom.svg
-  static Widget get keyboardDockedBottom => SvgPicture.asset(
+  static Widget get keyboardDockedBottom => const _IxIconWidget(
     'assets/svg/keyboard-docked-bottom.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: keyboard-floating.svg
-  static Widget get keyboardFloating => SvgPicture.asset(
+  static Widget get keyboardFloating => const _IxIconWidget(
     'assets/svg/keyboard-floating.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: keyboard-framed.svg
-  static Widget get keyboardFramed => SvgPicture.asset(
+  static Widget get keyboardFramed => const _IxIconWidget(
     'assets/svg/keyboard-framed.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: keyboard.svg
-  static Widget get keyboard => SvgPicture.asset(
+  static Widget get keyboard => const _IxIconWidget(
     'assets/svg/keyboard.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: kinematics.svg
-  static Widget get kinematics => SvgPicture.asset(
+  static Widget get kinematics => const _IxIconWidget(
     'assets/svg/kinematics.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: kpi-filled.svg
-  static Widget get kpiFilled => SvgPicture.asset(
+  static Widget get kpiFilled => const _IxIconWidget(
     'assets/svg/kpi-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: kpi.svg
-  static Widget get kpi => SvgPicture.asset(
+  static Widget get kpi => const _IxIconWidget(
     'assets/svg/kpi.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: label-filled.svg
-  static Widget get labelFilled => SvgPicture.asset(
+  static Widget get labelFilled => const _IxIconWidget(
     'assets/svg/label-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: label.svg
-  static Widget get label => SvgPicture.asset(
+  static Widget get label => const _IxIconWidget(
     'assets/svg/label.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: language-filled.svg
-  static Widget get languageFilled => SvgPicture.asset(
+  static Widget get languageFilled => const _IxIconWidget(
     'assets/svg/language-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: language.svg
-  static Widget get language => SvgPicture.asset(
+  static Widget get language => const _IxIconWidget(
     'assets/svg/language.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: layers-filled.svg
-  static Widget get layersFilled => SvgPicture.asset(
+  static Widget get layersFilled => const _IxIconWidget(
     'assets/svg/layers-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: layers.svg
-  static Widget get layers => SvgPicture.asset(
+  static Widget get layers => const _IxIconWidget(
     'assets/svg/layers.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: leading-axis-proxy.svg
-  static Widget get leadingAxisProxy => SvgPicture.asset(
+  static Widget get leadingAxisProxy => const _IxIconWidget(
     'assets/svg/leading-axis-proxy.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: leaf.svg
-  static Widget get leaf => SvgPicture.asset(
+  static Widget get leaf => const _IxIconWidget(
     'assets/svg/leaf.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: legal-circle-filled.svg
-  static Widget get legalCircleFilled => SvgPicture.asset(
+  static Widget get legalCircleFilled => const _IxIconWidget(
     'assets/svg/legal-circle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: legal-circle.svg
-  static Widget get legalCircle => SvgPicture.asset(
+  static Widget get legalCircle => const _IxIconWidget(
     'assets/svg/legal-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: legal.svg
-  static Widget get legal => SvgPicture.asset(
+  static Widget get legal => const _IxIconWidget(
     'assets/svg/legal.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: library-new.svg
-  static Widget get libraryNew => SvgPicture.asset(
+  static Widget get libraryNew => const _IxIconWidget(
     'assets/svg/library-new.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: library.svg
-  static Widget get library => SvgPicture.asset(
+  static Widget get library => const _IxIconWidget(
     'assets/svg/library.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: license.svg
-  static Widget get license => SvgPicture.asset(
+  static Widget get license => const _IxIconWidget(
     'assets/svg/license.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: light-dark.svg
-  static Widget get lightDark => SvgPicture.asset(
+  static Widget get lightDark => const _IxIconWidget(
     'assets/svg/light-dark.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: limits-cancelled.svg
-  static Widget get limitsCancelled => SvgPicture.asset(
+  static Widget get limitsCancelled => const _IxIconWidget(
     'assets/svg/limits-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: limits-check.svg
-  static Widget get limitsCheck => SvgPicture.asset(
+  static Widget get limitsCheck => const _IxIconWidget(
     'assets/svg/limits-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-cap-flat.svg
-  static Widget get lineCapFlat => SvgPicture.asset(
+  static Widget get lineCapFlat => const _IxIconWidget(
     'assets/svg/line-cap-flat.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-cap-round.svg
-  static Widget get lineCapRound => SvgPicture.asset(
+  static Widget get lineCapRound => const _IxIconWidget(
     'assets/svg/line-cap-round.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-cap-square.svg
-  static Widget get lineCapSquare => SvgPicture.asset(
+  static Widget get lineCapSquare => const _IxIconWidget(
     'assets/svg/line-cap-square.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-dash-dot-dot.svg
-  static Widget get lineDashDotDot => SvgPicture.asset(
+  static Widget get lineDashDotDot => const _IxIconWidget(
     'assets/svg/line-dash-dot-dot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-dash-dot.svg
-  static Widget get lineDashDot => SvgPicture.asset(
+  static Widget get lineDashDot => const _IxIconWidget(
     'assets/svg/line-dash-dot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-dash.svg
-  static Widget get lineDash => SvgPicture.asset(
+  static Widget get lineDash => const _IxIconWidget(
     'assets/svg/line-dash.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-diagonal.svg
-  static Widget get lineDiagonal => SvgPicture.asset(
+  static Widget get lineDiagonal => const _IxIconWidget(
     'assets/svg/line-diagonal.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-dot.svg
-  static Widget get lineDot => SvgPicture.asset(
+  static Widget get lineDot => const _IxIconWidget(
     'assets/svg/line-dot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: line-solid.svg
-  static Widget get lineSolid => SvgPicture.asset(
+  static Widget get lineSolid => const _IxIconWidget(
     'assets/svg/line-solid.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: linechart.svg
-  static Widget get linechart => SvgPicture.asset(
+  static Widget get linechart => const _IxIconWidget(
     'assets/svg/linechart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: link-break.svg
-  static Widget get linkBreak => SvgPicture.asset(
+  static Widget get linkBreak => const _IxIconWidget(
     'assets/svg/link-break.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: link-diagonal.svg
-  static Widget get linkDiagonal => SvgPicture.asset(
+  static Widget get linkDiagonal => const _IxIconWidget(
     'assets/svg/link-diagonal.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: link.svg
-  static Widget get link => SvgPicture.asset(
+  static Widget get link => const _IxIconWidget(
     'assets/svg/link.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: linkedin-logo.svg
-  static Widget get linkedinLogo => SvgPicture.asset(
+  static Widget get linkedinLogo => const _IxIconWidget(
     'assets/svg/linkedin-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list-add.svg
-  static Widget get listAdd => SvgPicture.asset(
+  static Widget get listAdd => const _IxIconWidget(
     'assets/svg/list-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list-graphics-text.svg
-  static Widget get listGraphicsText => SvgPicture.asset(
+  static Widget get listGraphicsText => const _IxIconWidget(
     'assets/svg/list-graphics-text.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list-graphics.svg
-  static Widget get listGraphics => SvgPicture.asset(
+  static Widget get listGraphics => const _IxIconWidget(
     'assets/svg/list-graphics.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list-percentage.svg
-  static Widget get listPercentage => SvgPicture.asset(
+  static Widget get listPercentage => const _IxIconWidget(
     'assets/svg/list-percentage.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list-remove.svg
-  static Widget get listRemove => SvgPicture.asset(
+  static Widget get listRemove => const _IxIconWidget(
     'assets/svg/list-remove.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list-sorted-alt.svg
-  static Widget get listSortedAlt => SvgPicture.asset(
+  static Widget get listSortedAlt => const _IxIconWidget(
     'assets/svg/list-sorted-alt.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list-sorted.svg
-  static Widget get listSorted => SvgPicture.asset(
+  static Widget get listSorted => const _IxIconWidget(
     'assets/svg/list-sorted.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list-text.svg
-  static Widget get listText => SvgPicture.asset(
+  static Widget get listText => const _IxIconWidget(
     'assets/svg/list-text.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: list.svg
-  static Widget get list => SvgPicture.asset(
+  static Widget get list => const _IxIconWidget(
     'assets/svg/list.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: live-feed.svg
-  static Widget get liveFeed => SvgPicture.asset(
+  static Widget get liveFeed => const _IxIconWidget(
     'assets/svg/live-feed.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: live-schedule.svg
-  static Widget get liveSchedule => SvgPicture.asset(
+  static Widget get liveSchedule => const _IxIconWidget(
     'assets/svg/live-schedule.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: location-filled.svg
-  static Widget get locationFilled => SvgPicture.asset(
+  static Widget get locationFilled => const _IxIconWidget(
     'assets/svg/location-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: location.svg
-  static Widget get location => SvgPicture.asset(
+  static Widget get location => const _IxIconWidget(
     'assets/svg/location.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: lock-check.svg
-  static Widget get lockCheck => SvgPicture.asset(
+  static Widget get lockCheck => const _IxIconWidget(
     'assets/svg/lock-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: lock-filled.svg
-  static Widget get lockFilled => SvgPicture.asset(
+  static Widget get lockFilled => const _IxIconWidget(
     'assets/svg/lock-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: lock-key-filled.svg
-  static Widget get lockKeyFilled => SvgPicture.asset(
+  static Widget get lockKeyFilled => const _IxIconWidget(
     'assets/svg/lock-key-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: lock-key.svg
-  static Widget get lockKey => SvgPicture.asset(
+  static Widget get lockKey => const _IxIconWidget(
     'assets/svg/lock-key.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: lock.svg
-  static Widget get lock => SvgPicture.asset(
+  static Widget get lock => const _IxIconWidget(
     'assets/svg/lock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: log-in.svg
-  static Widget get logIn => SvgPicture.asset(
+  static Widget get logIn => const _IxIconWidget(
     'assets/svg/log-in.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: log-out.svg
-  static Widget get logOut => SvgPicture.asset(
+  static Widget get logOut => const _IxIconWidget(
     'assets/svg/log-out.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: log.svg
-  static Widget get log => SvgPicture.asset(
+  static Widget get log => const _IxIconWidget(
     'assets/svg/log.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: logic-diagram.svg
-  static Widget get logicDiagram => SvgPicture.asset(
+  static Widget get logicDiagram => const _IxIconWidget(
     'assets/svg/logic-diagram.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: longer.svg
-  static Widget get longer => SvgPicture.asset(
+  static Widget get longer => const _IxIconWidget(
     'assets/svg/longer.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: lower-limit.svg
-  static Widget get lowerLimit => SvgPicture.asset(
+  static Widget get lowerLimit => const _IxIconWidget(
     'assets/svg/lower-limit.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: machine-a-filled.svg
-  static Widget get machineAFilled => SvgPicture.asset(
+  static Widget get machineAFilled => const _IxIconWidget(
     'assets/svg/machine-a-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: machine-a.svg
-  static Widget get machineA => SvgPicture.asset(
+  static Widget get machineA => const _IxIconWidget(
     'assets/svg/machine-a.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: machine-b-filled.svg
-  static Widget get machineBFilled => SvgPicture.asset(
+  static Widget get machineBFilled => const _IxIconWidget(
     'assets/svg/machine-b-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: machine-b.svg
-  static Widget get machineB => SvgPicture.asset(
+  static Widget get machineB => const _IxIconWidget(
     'assets/svg/machine-b.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: machine-c-filled.svg
-  static Widget get machineCFilled => SvgPicture.asset(
+  static Widget get machineCFilled => const _IxIconWidget(
     'assets/svg/machine-c-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: machine-c.svg
-  static Widget get machineC => SvgPicture.asset(
+  static Widget get machineC => const _IxIconWidget(
     'assets/svg/machine-c.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: magnet-cancelled.svg
-  static Widget get magnetCancelled => SvgPicture.asset(
+  static Widget get magnetCancelled => const _IxIconWidget(
     'assets/svg/magnet-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: magnet.svg
-  static Widget get magnet => SvgPicture.asset(
+  static Widget get magnet => const _IxIconWidget(
     'assets/svg/magnet.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mail-alarm-analog.svg
-  static Widget get mailAlarmAnalog => SvgPicture.asset(
+  static Widget get mailAlarmAnalog => const _IxIconWidget(
     'assets/svg/mail-alarm-analog.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mail-alarm-classes.svg
-  static Widget get mailAlarmClasses => SvgPicture.asset(
+  static Widget get mailAlarmClasses => const _IxIconWidget(
     'assets/svg/mail-alarm-classes.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mail-alarm-discrete.svg
-  static Widget get mailAlarmDiscrete => SvgPicture.asset(
+  static Widget get mailAlarmDiscrete => const _IxIconWidget(
     'assets/svg/mail-alarm-discrete.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mail-filled.svg
-  static Widget get mailFilled => SvgPicture.asset(
+  static Widget get mailFilled => const _IxIconWidget(
     'assets/svg/mail-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mail.svg
-  static Widget get mail => SvgPicture.asset(
+  static Widget get mail => const _IxIconWidget(
     'assets/svg/mail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-documents.svg
-  static Widget get maintenanceDocuments => SvgPicture.asset(
+  static Widget get maintenanceDocuments => const _IxIconWidget(
     'assets/svg/maintenance-documents.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-filled.svg
-  static Widget get maintenanceFilled => SvgPicture.asset(
+  static Widget get maintenanceFilled => const _IxIconWidget(
     'assets/svg/maintenance-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-info-filled.svg
-  static Widget get maintenanceInfoFilled => SvgPicture.asset(
+  static Widget get maintenanceInfoFilled => const _IxIconWidget(
     'assets/svg/maintenance-info-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-info.svg
-  static Widget get maintenanceInfo => SvgPicture.asset(
+  static Widget get maintenanceInfo => const _IxIconWidget(
     'assets/svg/maintenance-info.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-octagon-filled.svg
-  static Widget get maintenanceOctagonFilled => SvgPicture.asset(
+  static Widget get maintenanceOctagonFilled => const _IxIconWidget(
     'assets/svg/maintenance-octagon-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-octagon.svg
-  static Widget get maintenanceOctagon => SvgPicture.asset(
+  static Widget get maintenanceOctagon => const _IxIconWidget(
     'assets/svg/maintenance-octagon.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-rhomb-filled.svg
-  static Widget get maintenanceRhombFilled => SvgPicture.asset(
+  static Widget get maintenanceRhombFilled => const _IxIconWidget(
     'assets/svg/maintenance-rhomb-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-rhomb.svg
-  static Widget get maintenanceRhomb => SvgPicture.asset(
+  static Widget get maintenanceRhomb => const _IxIconWidget(
     'assets/svg/maintenance-rhomb.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-square-filled.svg
-  static Widget get maintenanceSquareFilled => SvgPicture.asset(
+  static Widget get maintenanceSquareFilled => const _IxIconWidget(
     'assets/svg/maintenance-square-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-square.svg
-  static Widget get maintenanceSquare => SvgPicture.asset(
+  static Widget get maintenanceSquare => const _IxIconWidget(
     'assets/svg/maintenance-square.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-triangle-filled.svg
-  static Widget get maintenanceTriangleFilled => SvgPicture.asset(
+  static Widget get maintenanceTriangleFilled => const _IxIconWidget(
     'assets/svg/maintenance-triangle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-triangle.svg
-  static Widget get maintenanceTriangle => SvgPicture.asset(
+  static Widget get maintenanceTriangle => const _IxIconWidget(
     'assets/svg/maintenance-triangle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-warning-filled.svg
-  static Widget get maintenanceWarningFilled => SvgPicture.asset(
+  static Widget get maintenanceWarningFilled => const _IxIconWidget(
     'assets/svg/maintenance-warning-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance-warning.svg
-  static Widget get maintenanceWarning => SvgPicture.asset(
+  static Widget get maintenanceWarning => const _IxIconWidget(
     'assets/svg/maintenance-warning.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maintenance.svg
-  static Widget get maintenance => SvgPicture.asset(
+  static Widget get maintenance => const _IxIconWidget(
     'assets/svg/maintenance.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mandatory-done.svg
-  static Widget get mandatoryDone => SvgPicture.asset(
+  static Widget get mandatoryDone => const _IxIconWidget(
     'assets/svg/mandatory-done.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mandatory.svg
-  static Widget get mandatory => SvgPicture.asset(
+  static Widget get mandatory => const _IxIconWidget(
     'assets/svg/mandatory.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: map-alt-1-filled.svg
-  static Widget get mapAlt1Filled => SvgPicture.asset(
+  static Widget get mapAlt1Filled => const _IxIconWidget(
     'assets/svg/map-alt-1-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: map-alt-1.svg
-  static Widget get mapAlt1 => SvgPicture.asset(
+  static Widget get mapAlt1 => const _IxIconWidget(
     'assets/svg/map-alt-1.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: map-alt-2-filled.svg
-  static Widget get mapAlt2Filled => SvgPicture.asset(
+  static Widget get mapAlt2Filled => const _IxIconWidget(
     'assets/svg/map-alt-2-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: map-alt-2.svg
-  static Widget get mapAlt2 => SvgPicture.asset(
+  static Widget get mapAlt2 => const _IxIconWidget(
     'assets/svg/map-alt-2.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: map-alt-3-filled.svg
-  static Widget get mapAlt3Filled => SvgPicture.asset(
+  static Widget get mapAlt3Filled => const _IxIconWidget(
     'assets/svg/map-alt-3-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: map-alt-3.svg
-  static Widget get mapAlt3 => SvgPicture.asset(
+  static Widget get mapAlt3 => const _IxIconWidget(
     'assets/svg/map-alt-3.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: map.svg
-  static Widget get map => SvgPicture.asset(
+  static Widget get map => const _IxIconWidget(
     'assets/svg/map.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mastodon-logo.svg
-  static Widget get mastodonLogo => SvgPicture.asset(
+  static Widget get mastodonLogo => const _IxIconWidget(
     'assets/svg/mastodon-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: maximize.svg
-  static Widget get maximize => SvgPicture.asset(
+  static Widget get maximize => const _IxIconWidget(
     'assets/svg/maximize.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: measuring-input.svg
-  static Widget get measuringInput => SvgPicture.asset(
+  static Widget get measuringInput => const _IxIconWidget(
     'assets/svg/measuring-input.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: media-player.svg
-  static Widget get mediaPlayer => SvgPicture.asset(
+  static Widget get mediaPlayer => const _IxIconWidget(
     'assets/svg/media-player.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: microphone-filled.svg
-  static Widget get microphoneFilled => SvgPicture.asset(
+  static Widget get microphoneFilled => const _IxIconWidget(
     'assets/svg/microphone-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: microphone.svg
-  static Widget get microphone => SvgPicture.asset(
+  static Widget get microphone => const _IxIconWidget(
     'assets/svg/microphone.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: minimize.svg
-  static Widget get minimize => SvgPicture.asset(
+  static Widget get minimize => const _IxIconWidget(
     'assets/svg/minimize.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: minus.svg
-  static Widget get minus => SvgPicture.asset(
+  static Widget get minus => const _IxIconWidget(
     'assets/svg/minus.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: missing-symbol.svg
-  static Widget get missingSymbol => SvgPicture.asset(
+  static Widget get missingSymbol => const _IxIconWidget(
     'assets/svg/missing-symbol.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mix.svg
-  static Widget get mix => SvgPicture.asset(
+  static Widget get mix => const _IxIconWidget(
     'assets/svg/mix.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mobile-phone-filled.svg
-  static Widget get mobilePhoneFilled => SvgPicture.asset(
+  static Widget get mobilePhoneFilled => const _IxIconWidget(
     'assets/svg/mobile-phone-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mobile-phone.svg
-  static Widget get mobilePhone => SvgPicture.asset(
+  static Widget get mobilePhone => const _IxIconWidget(
     'assets/svg/mobile-phone.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: monitor-filled.svg
-  static Widget get monitorFilled => SvgPicture.asset(
+  static Widget get monitorFilled => const _IxIconWidget(
     'assets/svg/monitor-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: monitor-trend.svg
-  static Widget get monitorTrend => SvgPicture.asset(
+  static Widget get monitorTrend => const _IxIconWidget(
     'assets/svg/monitor-trend.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: monitor.svg
-  static Widget get monitor => SvgPicture.asset(
+  static Widget get monitor => const _IxIconWidget(
     'assets/svg/monitor.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: monitoring-add.svg
-  static Widget get monitoringAdd => SvgPicture.asset(
+  static Widget get monitoringAdd => const _IxIconWidget(
     'assets/svg/monitoring-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: monitoring.svg
-  static Widget get monitoring => SvgPicture.asset(
+  static Widget get monitoring => const _IxIconWidget(
     'assets/svg/monitoring.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: monitorings.svg
-  static Widget get monitorings => SvgPicture.asset(
+  static Widget get monitorings => const _IxIconWidget(
     'assets/svg/monitorings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: moon-filled.svg
-  static Widget get moonFilled => SvgPicture.asset(
+  static Widget get moonFilled => const _IxIconWidget(
     'assets/svg/moon-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: moon.svg
-  static Widget get moon => SvgPicture.asset(
+  static Widget get moon => const _IxIconWidget(
     'assets/svg/moon.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: more-menu.svg
-  static Widget get moreMenu => SvgPicture.asset(
+  static Widget get moreMenu => const _IxIconWidget(
     'assets/svg/more-menu.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mouse-click-filled.svg
-  static Widget get mouseClickFilled => SvgPicture.asset(
+  static Widget get mouseClickFilled => const _IxIconWidget(
     'assets/svg/mouse-click-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mouse-click.svg
-  static Widget get mouseClick => SvgPicture.asset(
+  static Widget get mouseClick => const _IxIconWidget(
     'assets/svg/mouse-click.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mouse-select-filled.svg
-  static Widget get mouseSelectFilled => SvgPicture.asset(
+  static Widget get mouseSelectFilled => const _IxIconWidget(
     'assets/svg/mouse-select-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mouse-select.svg
-  static Widget get mouseSelect => SvgPicture.asset(
+  static Widget get mouseSelect => const _IxIconWidget(
     'assets/svg/mouse-select.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: move-horizontally.svg
-  static Widget get moveHorizontally => SvgPicture.asset(
+  static Widget get moveHorizontally => const _IxIconWidget(
     'assets/svg/move-horizontally.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: move-layer-down.svg
-  static Widget get moveLayerDown => SvgPicture.asset(
+  static Widget get moveLayerDown => const _IxIconWidget(
     'assets/svg/move-layer-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: move-layer-up.svg
-  static Widget get moveLayerUp => SvgPicture.asset(
+  static Widget get moveLayerUp => const _IxIconWidget(
     'assets/svg/move-layer-up.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: move-vertically.svg
-  static Widget get moveVertically => SvgPicture.asset(
+  static Widget get moveVertically => const _IxIconWidget(
     'assets/svg/move-vertically.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: move.svg
-  static Widget get move => SvgPicture.asset(
+  static Widget get move => const _IxIconWidget(
     'assets/svg/move.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: movie-filled.svg
-  static Widget get movieFilled => SvgPicture.asset(
+  static Widget get movieFilled => const _IxIconWidget(
     'assets/svg/movie-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: movie.svg
-  static Widget get movie => SvgPicture.asset(
+  static Widget get movie => const _IxIconWidget(
     'assets/svg/movie.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mp4-document.svg
-  static Widget get mp4Document => SvgPicture.asset(
+  static Widget get mp4Document => const _IxIconWidget(
     'assets/svg/mp4-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mqtt-filled.svg
-  static Widget get mqttFilled => SvgPicture.asset(
+  static Widget get mqttFilled => const _IxIconWidget(
     'assets/svg/mqtt-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: mqtt.svg
-  static Widget get mqtt => SvgPicture.asset(
+  static Widget get mqtt => const _IxIconWidget(
     'assets/svg/mqtt.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: music-note.svg
-  static Widget get musicNote => SvgPicture.asset(
+  static Widget get musicNote => const _IxIconWidget(
     'assets/svg/music-note.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-check-function-filled.svg
-  static Widget get namurCheckFunctionFilled => SvgPicture.asset(
+  static Widget get namurCheckFunctionFilled => const _IxIconWidget(
     'assets/svg/namur-check-function-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-check-function.svg
-  static Widget get namurCheckFunction => SvgPicture.asset(
+  static Widget get namurCheckFunction => const _IxIconWidget(
     'assets/svg/namur-check-function.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-diagnostics-passive-filled.svg
-  static Widget get namurDiagnosticsPassiveFilled => SvgPicture.asset(
+  static Widget get namurDiagnosticsPassiveFilled => const _IxIconWidget(
     'assets/svg/namur-diagnostics-passive-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-diagnostics-passive.svg
-  static Widget get namurDiagnosticsPassive => SvgPicture.asset(
+  static Widget get namurDiagnosticsPassive => const _IxIconWidget(
     'assets/svg/namur-diagnostics-passive.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-failure-filled.svg
-  static Widget get namurFailureFilled => SvgPicture.asset(
+  static Widget get namurFailureFilled => const _IxIconWidget(
     'assets/svg/namur-failure-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-failure.svg
-  static Widget get namurFailure => SvgPicture.asset(
+  static Widget get namurFailure => const _IxIconWidget(
     'assets/svg/namur-failure.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-maintenance-required-filled.svg
-  static Widget get namurMaintenanceRequiredFilled => SvgPicture.asset(
+  static Widget get namurMaintenanceRequiredFilled => const _IxIconWidget(
     'assets/svg/namur-maintenance-required-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-maintenance-required.svg
-  static Widget get namurMaintenanceRequired => SvgPicture.asset(
+  static Widget get namurMaintenanceRequired => const _IxIconWidget(
     'assets/svg/namur-maintenance-required.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-ok-filled.svg
-  static Widget get namurOkFilled => SvgPicture.asset(
+  static Widget get namurOkFilled => const _IxIconWidget(
     'assets/svg/namur-ok-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-ok.svg
-  static Widget get namurOk => SvgPicture.asset(
+  static Widget get namurOk => const _IxIconWidget(
     'assets/svg/namur-ok.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-out-of-spec-filled.svg
-  static Widget get namurOutOfSpecFilled => SvgPicture.asset(
+  static Widget get namurOutOfSpecFilled => const _IxIconWidget(
     'assets/svg/namur-out-of-spec-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: namur-out-of-spec.svg
-  static Widget get namurOutOfSpec => SvgPicture.asset(
+  static Widget get namurOutOfSpec => const _IxIconWidget(
     'assets/svg/namur-out-of-spec.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: navigation-filled.svg
-  static Widget get navigationFilled => SvgPicture.asset(
+  static Widget get navigationFilled => const _IxIconWidget(
     'assets/svg/navigation-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: navigation-left-hide.svg
-  static Widget get navigationLeftHide => SvgPicture.asset(
+  static Widget get navigationLeftHide => const _IxIconWidget(
     'assets/svg/navigation-left-hide.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: navigation-left.svg
-  static Widget get navigationLeft => SvgPicture.asset(
+  static Widget get navigationLeft => const _IxIconWidget(
     'assets/svg/navigation-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: navigation-right-hide.svg
-  static Widget get navigationRightHide => SvgPicture.asset(
+  static Widget get navigationRightHide => const _IxIconWidget(
     'assets/svg/navigation-right-hide.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: navigation-right.svg
-  static Widget get navigationRight => SvgPicture.asset(
+  static Widget get navigationRight => const _IxIconWidget(
     'assets/svg/navigation-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: navigation.svg
-  static Widget get navigation => SvgPicture.asset(
+  static Widget get navigation => const _IxIconWidget(
     'assets/svg/navigation.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: network-device-filled.svg
-  static Widget get networkDeviceFilled => SvgPicture.asset(
+  static Widget get networkDeviceFilled => const _IxIconWidget(
     'assets/svg/network-device-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: network-device-play-filled.svg
-  static Widget get networkDevicePlayFilled => SvgPicture.asset(
+  static Widget get networkDevicePlayFilled => const _IxIconWidget(
     'assets/svg/network-device-play-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: network-device-play.svg
-  static Widget get networkDevicePlay => SvgPicture.asset(
+  static Widget get networkDevicePlay => const _IxIconWidget(
     'assets/svg/network-device-play.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: network-device.svg
-  static Widget get networkDevice => SvgPicture.asset(
+  static Widget get networkDevice => const _IxIconWidget(
     'assets/svg/network-device.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: network-wired-wireless.svg
-  static Widget get networkWiredWireless => SvgPicture.asset(
+  static Widget get networkWiredWireless => const _IxIconWidget(
     'assets/svg/network-wired-wireless.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: network-wired.svg
-  static Widget get networkWired => SvgPicture.asset(
+  static Widget get networkWired => const _IxIconWidget(
     'assets/svg/network-wired.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: no-filter-filled.svg
-  static Widget get noFilterFilled => SvgPicture.asset(
+  static Widget get noFilterFilled => const _IxIconWidget(
     'assets/svg/no-filter-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: no-filter.svg
-  static Widget get noFilter => SvgPicture.asset(
+  static Widget get noFilter => const _IxIconWidget(
     'assets/svg/no-filter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: no-image.svg
-  static Widget get noImage => SvgPicture.asset(
+  static Widget get noImage => const _IxIconWidget(
     'assets/svg/no-image.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: note-filled.svg
-  static Widget get noteFilled => SvgPicture.asset(
+  static Widget get noteFilled => const _IxIconWidget(
     'assets/svg/note-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: note.svg
-  static Widget get note => SvgPicture.asset(
+  static Widget get note => const _IxIconWidget(
     'assets/svg/note.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: notebook-filled.svg
-  static Widget get notebookFilled => SvgPicture.asset(
+  static Widget get notebookFilled => const _IxIconWidget(
     'assets/svg/notebook-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: notebook.svg
-  static Widget get notebook => SvgPicture.asset(
+  static Widget get notebook => const _IxIconWidget(
     'assets/svg/notebook.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: notification-filled.svg
-  static Widget get notificationFilled => SvgPicture.asset(
+  static Widget get notificationFilled => const _IxIconWidget(
     'assets/svg/notification-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: notification.svg
-  static Widget get notification => SvgPicture.asset(
+  static Widget get notification => const _IxIconWidget(
     'assets/svg/notification.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: notifications-filled.svg
-  static Widget get notificationsFilled => SvgPicture.asset(
+  static Widget get notificationsFilled => const _IxIconWidget(
     'assets/svg/notifications-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: notifications.svg
-  static Widget get notifications => SvgPicture.asset(
+  static Widget get notifications => const _IxIconWidget(
     'assets/svg/notifications.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: objects-tree.svg
-  static Widget get objectsTree => SvgPicture.asset(
+  static Widget get objectsTree => const _IxIconWidget(
     'assets/svg/objects-tree.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: objects.svg
-  static Widget get objects => SvgPicture.asset(
+  static Widget get objects => const _IxIconWidget(
     'assets/svg/objects.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ontology-filled.svg
-  static Widget get ontologyFilled => SvgPicture.asset(
+  static Widget get ontologyFilled => const _IxIconWidget(
     'assets/svg/ontology-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ontology.svg
-  static Widget get ontology => SvgPicture.asset(
+  static Widget get ontology => const _IxIconWidget(
     'assets/svg/ontology.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: open-external.svg
-  static Widget get openExternal => SvgPicture.asset(
+  static Widget get openExternal => const _IxIconWidget(
     'assets/svg/open-external.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: open-file-filled.svg
-  static Widget get openFileFilled => SvgPicture.asset(
+  static Widget get openFileFilled => const _IxIconWidget(
     'assets/svg/open-file-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: open-file.svg
-  static Widget get openFile => SvgPicture.asset(
+  static Widget get openFile => const _IxIconWidget(
     'assets/svg/open-file.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: operate-plant-filled.svg
-  static Widget get operatePlantFilled => SvgPicture.asset(
+  static Widget get operatePlantFilled => const _IxIconWidget(
     'assets/svg/operate-plant-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: operate-plant.svg
-  static Widget get operatePlant => SvgPicture.asset(
+  static Widget get operatePlant => const _IxIconWidget(
     'assets/svg/operate-plant.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: operating-system.svg
-  static Widget get operatingSystem => SvgPicture.asset(
+  static Widget get operatingSystem => const _IxIconWidget(
     'assets/svg/operating-system.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: optimize.svg
-  static Widget get optimize => SvgPicture.asset(
+  static Widget get optimize => const _IxIconWidget(
     'assets/svg/optimize.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: output-cam.svg
-  static Widget get outputCam => SvgPicture.asset(
+  static Widget get outputCam => const _IxIconWidget(
     'assets/svg/output-cam.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: p-and-i-symbols.svg
-  static Widget get pAndISymbols => SvgPicture.asset(
+  static Widget get pAndISymbols => const _IxIconWidget(
     'assets/svg/p-and-i-symbols.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: p-i-diagram.svg
-  static Widget get pIDiagram => SvgPicture.asset(
+  static Widget get pIDiagram => const _IxIconWidget(
     'assets/svg/p-i-diagram.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: package-filled.svg
-  static Widget get packageFilled => SvgPicture.asset(
+  static Widget get packageFilled => const _IxIconWidget(
     'assets/svg/package-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: package.svg
-  static Widget get package => SvgPicture.asset(
+  static Widget get package => const _IxIconWidget(
     'assets/svg/package.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pan.svg
-  static Widget get pan => SvgPicture.asset(
+  static Widget get pan => const _IxIconWidget(
     'assets/svg/pan.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: panel-ipc-fail.svg
-  static Widget get panelIpcFail => SvgPicture.asset(
+  static Widget get panelIpcFail => const _IxIconWidget(
     'assets/svg/panel-ipc-fail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: panel-ipc-question.svg
-  static Widget get panelIpcQuestion => SvgPicture.asset(
+  static Widget get panelIpcQuestion => const _IxIconWidget(
     'assets/svg/panel-ipc-question.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: panel-ipc-success.svg
-  static Widget get panelIpcSuccess => SvgPicture.asset(
+  static Widget get panelIpcSuccess => const _IxIconWidget(
     'assets/svg/panel-ipc-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: panel-ipc.svg
-  static Widget get panelIpc => SvgPicture.asset(
+  static Widget get panelIpc => const _IxIconWidget(
     'assets/svg/panel-ipc.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: parameter.svg
-  static Widget get parameter => SvgPicture.asset(
+  static Widget get parameter => const _IxIconWidget(
     'assets/svg/parameter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: paste-filled.svg
-  static Widget get pasteFilled => SvgPicture.asset(
+  static Widget get pasteFilled => const _IxIconWidget(
     'assets/svg/paste-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: paste.svg
-  static Widget get paste => SvgPicture.asset(
+  static Widget get paste => const _IxIconWidget(
     'assets/svg/paste.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pause.svg
-  static Widget get pause => SvgPicture.asset(
+  static Widget get pause => const _IxIconWidget(
     'assets/svg/pause.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pc-tower-filled.svg
-  static Widget get pcTowerFilled => SvgPicture.asset(
+  static Widget get pcTowerFilled => const _IxIconWidget(
     'assets/svg/pc-tower-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pc-tower-settings-filled.svg
-  static Widget get pcTowerSettingsFilled => SvgPicture.asset(
+  static Widget get pcTowerSettingsFilled => const _IxIconWidget(
     'assets/svg/pc-tower-settings-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pc-tower-settings.svg
-  static Widget get pcTowerSettings => SvgPicture.asset(
+  static Widget get pcTowerSettings => const _IxIconWidget(
     'assets/svg/pc-tower-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pc-tower.svg
-  static Widget get pcTower => SvgPicture.asset(
+  static Widget get pcTower => const _IxIconWidget(
     'assets/svg/pc-tower.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pdf-document-filled.svg
-  static Widget get pdfDocumentFilled => SvgPicture.asset(
+  static Widget get pdfDocumentFilled => const _IxIconWidget(
     'assets/svg/pdf-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pdf-document.svg
-  static Widget get pdfDocument => SvgPicture.asset(
+  static Widget get pdfDocument => const _IxIconWidget(
     'assets/svg/pdf-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pen-cancelled-filled.svg
-  static Widget get penCancelledFilled => SvgPicture.asset(
+  static Widget get penCancelledFilled => const _IxIconWidget(
     'assets/svg/pen-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pen-cancelled.svg
-  static Widget get penCancelled => SvgPicture.asset(
+  static Widget get penCancelled => const _IxIconWidget(
     'assets/svg/pen-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pen-filled.svg
-  static Widget get penFilled => SvgPicture.asset(
+  static Widget get penFilled => const _IxIconWidget(
     'assets/svg/pen-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pen.svg
-  static Widget get pen => SvgPicture.asset(
+  static Widget get pen => const _IxIconWidget(
     'assets/svg/pen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: phone-filled.svg
-  static Widget get phoneFilled => SvgPicture.asset(
+  static Widget get phoneFilled => const _IxIconWidget(
     'assets/svg/phone-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: phone.svg
-  static Widget get phone => SvgPicture.asset(
+  static Widget get phone => const _IxIconWidget(
     'assets/svg/phone.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: photo-camera-add.svg
-  static Widget get photoCameraAdd => SvgPicture.asset(
+  static Widget get photoCameraAdd => const _IxIconWidget(
     'assets/svg/photo-camera-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: photo-camera-cancelled-filled.svg
-  static Widget get photoCameraCancelledFilled => SvgPicture.asset(
+  static Widget get photoCameraCancelledFilled => const _IxIconWidget(
     'assets/svg/photo-camera-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: photo-camera-cancelled.svg
-  static Widget get photoCameraCancelled => SvgPicture.asset(
+  static Widget get photoCameraCancelled => const _IxIconWidget(
     'assets/svg/photo-camera-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: photo-camera-filled.svg
-  static Widget get photoCameraFilled => SvgPicture.asset(
+  static Widget get photoCameraFilled => const _IxIconWidget(
     'assets/svg/photo-camera-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: photo-camera.svg
-  static Widget get photoCamera => SvgPicture.asset(
+  static Widget get photoCamera => const _IxIconWidget(
     'assets/svg/photo-camera.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: photo-cameras.svg
-  static Widget get photoCameras => SvgPicture.asset(
+  static Widget get photoCameras => const _IxIconWidget(
     'assets/svg/photo-cameras.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: piechart-filled.svg
-  static Widget get piechartFilled => SvgPicture.asset(
+  static Widget get piechartFilled => const _IxIconWidget(
     'assets/svg/piechart-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: piechart.svg
-  static Widget get piechart => SvgPicture.asset(
+  static Widget get piechart => const _IxIconWidget(
     'assets/svg/piechart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pin-cancelled-filled.svg
-  static Widget get pinCancelledFilled => SvgPicture.asset(
+  static Widget get pinCancelledFilled => const _IxIconWidget(
     'assets/svg/pin-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pin-cancelled.svg
-  static Widget get pinCancelled => SvgPicture.asset(
+  static Widget get pinCancelled => const _IxIconWidget(
     'assets/svg/pin-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pin-filled.svg
-  static Widget get pinFilled => SvgPicture.asset(
+  static Widget get pinFilled => const _IxIconWidget(
     'assets/svg/pin-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: pin.svg
-  static Widget get pin => SvgPicture.asset(
+  static Widget get pin => const _IxIconWidget(
     'assets/svg/pin.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-details-filled.svg
-  static Widget get plantDetailsFilled => SvgPicture.asset(
+  static Widget get plantDetailsFilled => const _IxIconWidget(
     'assets/svg/plant-details-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-details.svg
-  static Widget get plantDetails => SvgPicture.asset(
+  static Widget get plantDetails => const _IxIconWidget(
     'assets/svg/plant-details.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-filled.svg
-  static Widget get plantFilled => SvgPicture.asset(
+  static Widget get plantFilled => const _IxIconWidget(
     'assets/svg/plant-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-handbook-filled.svg
-  static Widget get plantHandbookFilled => SvgPicture.asset(
+  static Widget get plantHandbookFilled => const _IxIconWidget(
     'assets/svg/plant-handbook-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-handbook.svg
-  static Widget get plantHandbook => SvgPicture.asset(
+  static Widget get plantHandbook => const _IxIconWidget(
     'assets/svg/plant-handbook.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-search-filled.svg
-  static Widget get plantSearchFilled => SvgPicture.asset(
+  static Widget get plantSearchFilled => const _IxIconWidget(
     'assets/svg/plant-search-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-search.svg
-  static Widget get plantSearch => SvgPicture.asset(
+  static Widget get plantSearch => const _IxIconWidget(
     'assets/svg/plant-search.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-security-filled.svg
-  static Widget get plantSecurityFilled => SvgPicture.asset(
+  static Widget get plantSecurityFilled => const _IxIconWidget(
     'assets/svg/plant-security-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-security.svg
-  static Widget get plantSecurity => SvgPicture.asset(
+  static Widget get plantSecurity => const _IxIconWidget(
     'assets/svg/plant-security.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-settings-filled.svg
-  static Widget get plantSettingsFilled => SvgPicture.asset(
+  static Widget get plantSettingsFilled => const _IxIconWidget(
     'assets/svg/plant-settings-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-settings.svg
-  static Widget get plantSettings => SvgPicture.asset(
+  static Widget get plantSettings => const _IxIconWidget(
     'assets/svg/plant-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-user-filled.svg
-  static Widget get plantUserFilled => SvgPicture.asset(
+  static Widget get plantUserFilled => const _IxIconWidget(
     'assets/svg/plant-user-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant-user.svg
-  static Widget get plantUser => SvgPicture.asset(
+  static Widget get plantUser => const _IxIconWidget(
     'assets/svg/plant-user.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plant.svg
-  static Widget get plant => SvgPicture.asset(
+  static Widget get plant => const _IxIconWidget(
     'assets/svg/plant.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plants-filled.svg
-  static Widget get plantsFilled => SvgPicture.asset(
+  static Widget get plantsFilled => const _IxIconWidget(
     'assets/svg/plants-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plants.svg
-  static Widget get plants => SvgPicture.asset(
+  static Widget get plants => const _IxIconWidget(
     'assets/svg/plants.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: play-filled.svg
-  static Widget get playFilled => SvgPicture.asset(
+  static Widget get playFilled => const _IxIconWidget(
     'assets/svg/play-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: play-pause-filled.svg
-  static Widget get playPauseFilled => SvgPicture.asset(
+  static Widget get playPauseFilled => const _IxIconWidget(
     'assets/svg/play-pause-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: play-pause.svg
-  static Widget get playPause => SvgPicture.asset(
+  static Widget get playPause => const _IxIconWidget(
     'assets/svg/play-pause.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: play-stepwise-filled.svg
-  static Widget get playStepwiseFilled => SvgPicture.asset(
+  static Widget get playStepwiseFilled => const _IxIconWidget(
     'assets/svg/play-stepwise-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: play-stepwise.svg
-  static Widget get playStepwise => SvgPicture.asset(
+  static Widget get playStepwise => const _IxIconWidget(
     'assets/svg/play-stepwise.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: play.svg
-  static Widget get play => SvgPicture.asset(
+  static Widget get play => const _IxIconWidget(
     'assets/svg/play.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plc-device-tag.svg
-  static Widget get plcDeviceTag => SvgPicture.asset(
+  static Widget get plcDeviceTag => const _IxIconWidget(
     'assets/svg/plc-device-tag.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plc-device-user-data-type.svg
-  static Widget get plcDeviceUserDataType => SvgPicture.asset(
+  static Widget get plcDeviceUserDataType => const _IxIconWidget(
     'assets/svg/plc-device-user-data-type.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plc-device.svg
-  static Widget get plcDevice => SvgPicture.asset(
+  static Widget get plcDevice => const _IxIconWidget(
     'assets/svg/plc-device.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plc-tag.svg
-  static Widget get plcTag => SvgPicture.asset(
+  static Widget get plcTag => const _IxIconWidget(
     'assets/svg/plc-tag.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plc-user-data-type.svg
-  static Widget get plcUserDataType => SvgPicture.asset(
+  static Widget get plcUserDataType => const _IxIconWidget(
     'assets/svg/plc-user-data-type.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plc.svg
-  static Widget get plc => SvgPicture.asset(
+  static Widget get plc => const _IxIconWidget(
     'assets/svg/plc.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plus-minus-times-divide.svg
-  static Widget get plusMinusTimesDivide => SvgPicture.asset(
+  static Widget get plusMinusTimesDivide => const _IxIconWidget(
     'assets/svg/plus-minus-times-divide.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: plus.svg
-  static Widget get plus => SvgPicture.asset(
+  static Widget get plus => const _IxIconWidget(
     'assets/svg/plus.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: point-up-filled.svg
-  static Widget get pointUpFilled => SvgPicture.asset(
+  static Widget get pointUpFilled => const _IxIconWidget(
     'assets/svg/point-up-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: point-up.svg
-  static Widget get pointUp => SvgPicture.asset(
+  static Widget get pointUp => const _IxIconWidget(
     'assets/svg/point-up.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: polar-plot.svg
-  static Widget get polarPlot => SvgPicture.asset(
+  static Widget get polarPlot => const _IxIconWidget(
     'assets/svg/polar-plot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: polarchart-filled.svg
-  static Widget get polarchartFilled => SvgPicture.asset(
+  static Widget get polarchartFilled => const _IxIconWidget(
     'assets/svg/polarchart-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: polarchart.svg
-  static Widget get polarchart => SvgPicture.asset(
+  static Widget get polarchart => const _IxIconWidget(
     'assets/svg/polarchart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: polygon-filled.svg
-  static Widget get polygonFilled => SvgPicture.asset(
+  static Widget get polygonFilled => const _IxIconWidget(
     'assets/svg/polygon-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: polygon-line.svg
-  static Widget get polygonLine => SvgPicture.asset(
+  static Widget get polygonLine => const _IxIconWidget(
     'assets/svg/polygon-line.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: polygon.svg
-  static Widget get polygon => SvgPicture.asset(
+  static Widget get polygon => const _IxIconWidget(
     'assets/svg/polygon.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: power-supply.svg
-  static Widget get powerSupply => SvgPicture.asset(
+  static Widget get powerSupply => const _IxIconWidget(
     'assets/svg/power-supply.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ppt-document.svg
-  static Widget get pptDocument => SvgPicture.asset(
+  static Widget get pptDocument => const _IxIconWidget(
     'assets/svg/ppt-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: print-filled.svg
-  static Widget get printFilled => SvgPicture.asset(
+  static Widget get printFilled => const _IxIconWidget(
     'assets/svg/print-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: print.svg
-  static Widget get print => SvgPicture.asset(
+  static Widget get print => const _IxIconWidget(
     'assets/svg/print.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: prio-high.svg
-  static Widget get prioHigh => SvgPicture.asset(
+  static Widget get prioHigh => const _IxIconWidget(
     'assets/svg/prio-high.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: prio-low.svg
-  static Widget get prioLow => SvgPicture.asset(
+  static Widget get prioLow => const _IxIconWidget(
     'assets/svg/prio-low.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: prio-middle.svg
-  static Widget get prioMiddle => SvgPicture.asset(
+  static Widget get prioMiddle => const _IxIconWidget(
     'assets/svg/prio-middle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: process-control.svg
-  static Widget get processControl => SvgPicture.asset(
+  static Widget get processControl => const _IxIconWidget(
     'assets/svg/process-control.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: product-catalog.svg
-  static Widget get productCatalog => SvgPicture.asset(
+  static Widget get productCatalog => const _IxIconWidget(
     'assets/svg/product-catalog.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: product-management.svg
-  static Widget get productManagement => SvgPicture.asset(
+  static Widget get productManagement => const _IxIconWidget(
     'assets/svg/product-management.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: product.svg
-  static Widget get product => SvgPicture.asset(
+  static Widget get product => const _IxIconWidget(
     'assets/svg/product.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: profisafe-logo.svg
-  static Widget get profisafeLogo => SvgPicture.asset(
+  static Widget get profisafeLogo => const _IxIconWidget(
     'assets/svg/profisafe-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-arrow-diagonal-top-right.svg
-  static Widget get projectArrowDiagonalTopRight => SvgPicture.asset(
+  static Widget get projectArrowDiagonalTopRight => const _IxIconWidget(
     'assets/svg/project-arrow-diagonal-top-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-arrow-left.svg
-  static Widget get projectArrowLeft => SvgPicture.asset(
+  static Widget get projectArrowLeft => const _IxIconWidget(
     'assets/svg/project-arrow-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-arrow-right.svg
-  static Widget get projectArrowRight => SvgPicture.asset(
+  static Widget get projectArrowRight => const _IxIconWidget(
     'assets/svg/project-arrow-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-close.svg
-  static Widget get projectClose => SvgPicture.asset(
+  static Widget get projectClose => const _IxIconWidget(
     'assets/svg/project-close.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-configuration.svg
-  static Widget get projectConfiguration => SvgPicture.asset(
+  static Widget get projectConfiguration => const _IxIconWidget(
     'assets/svg/project-configuration.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-duplicate.svg
-  static Widget get projectDuplicate => SvgPicture.asset(
+  static Widget get projectDuplicate => const _IxIconWidget(
     'assets/svg/project-duplicate.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-history.svg
-  static Widget get projectHistory => SvgPicture.asset(
+  static Widget get projectHistory => const _IxIconWidget(
     'assets/svg/project-history.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-new.svg
-  static Widget get projectNew => SvgPicture.asset(
+  static Widget get projectNew => const _IxIconWidget(
     'assets/svg/project-new.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-scenarios.svg
-  static Widget get projectScenarios => SvgPicture.asset(
+  static Widget get projectScenarios => const _IxIconWidget(
     'assets/svg/project-scenarios.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-server-filled.svg
-  static Widget get projectServerFilled => SvgPicture.asset(
+  static Widget get projectServerFilled => const _IxIconWidget(
     'assets/svg/project-server-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-server.svg
-  static Widget get projectServer => SvgPicture.asset(
+  static Widget get projectServer => const _IxIconWidget(
     'assets/svg/project-server.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-settings.svg
-  static Widget get projectSettings => SvgPicture.asset(
+  static Widget get projectSettings => const _IxIconWidget(
     'assets/svg/project-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project-simulation.svg
-  static Widget get projectSimulation => SvgPicture.asset(
+  static Widget get projectSimulation => const _IxIconWidget(
     'assets/svg/project-simulation.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: project.svg
-  static Widget get project => SvgPicture.asset(
+  static Widget get project => const _IxIconWidget(
     'assets/svg/project.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: projects-close.svg
-  static Widget get projectsClose => SvgPicture.asset(
+  static Widget get projectsClose => const _IxIconWidget(
     'assets/svg/projects-close.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: projects.svg
-  static Widget get projects => SvgPicture.asset(
+  static Widget get projects => const _IxIconWidget(
     'assets/svg/projects.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: protocol.svg
-  static Widget get protocol => SvgPicture.asset(
+  static Widget get protocol => const _IxIconWidget(
     'assets/svg/protocol.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: publish-document.svg
-  static Widget get publishDocument => SvgPicture.asset(
+  static Widget get publishDocument => const _IxIconWidget(
     'assets/svg/publish-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: publish.svg
-  static Widget get publish => SvgPicture.asset(
+  static Widget get publish => const _IxIconWidget(
     'assets/svg/publish.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: qr-code.svg
-  static Widget get qrCode => SvgPicture.asset(
+  static Widget get qrCode => const _IxIconWidget(
     'assets/svg/qr-code.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: quality-report.svg
-  static Widget get qualityReport => SvgPicture.asset(
+  static Widget get qualityReport => const _IxIconWidget(
     'assets/svg/quality-report.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: question-filled.svg
-  static Widget get questionFilled => SvgPicture.asset(
+  static Widget get questionFilled => const _IxIconWidget(
     'assets/svg/question-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: question-mark.svg
-  static Widget get questionMark => SvgPicture.asset(
+  static Widget get questionMark => const _IxIconWidget(
     'assets/svg/question-mark.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: question.svg
-  static Widget get question => SvgPicture.asset(
+  static Widget get question => const _IxIconWidget(
     'assets/svg/question.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: quote.svg
-  static Widget get quote => SvgPicture.asset(
+  static Widget get quote => const _IxIconWidget(
     'assets/svg/quote.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rack-ipc-fail.svg
-  static Widget get rackIpcFail => SvgPicture.asset(
+  static Widget get rackIpcFail => const _IxIconWidget(
     'assets/svg/rack-ipc-fail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rack-ipc-question.svg
-  static Widget get rackIpcQuestion => SvgPicture.asset(
+  static Widget get rackIpcQuestion => const _IxIconWidget(
     'assets/svg/rack-ipc-question.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rack-ipc-success.svg
-  static Widget get rackIpcSuccess => SvgPicture.asset(
+  static Widget get rackIpcSuccess => const _IxIconWidget(
     'assets/svg/rack-ipc-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rack-ipc.svg
-  static Widget get rackIpc => SvgPicture.asset(
+  static Widget get rackIpc => const _IxIconWidget(
     'assets/svg/rack-ipc.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: radarchart.svg
-  static Widget get radarchart => SvgPicture.asset(
+  static Widget get radarchart => const _IxIconWidget(
     'assets/svg/radarchart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: radio-waves-off.svg
-  static Widget get radioWavesOff => SvgPicture.asset(
+  static Widget get radioWavesOff => const _IxIconWidget(
     'assets/svg/radio-waves-off.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: radio-waves-warning.svg
-  static Widget get radioWavesWarning => SvgPicture.asset(
+  static Widget get radioWavesWarning => const _IxIconWidget(
     'assets/svg/radio-waves-warning.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: radio-waves.svg
-  static Widget get radioWaves => SvgPicture.asset(
+  static Widget get radioWaves => const _IxIconWidget(
     'assets/svg/radio-waves.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: random-filled.svg
-  static Widget get randomFilled => SvgPicture.asset(
+  static Widget get randomFilled => const _IxIconWidget(
     'assets/svg/random-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: random.svg
-  static Widget get random => SvgPicture.asset(
+  static Widget get random => const _IxIconWidget(
     'assets/svg/random.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reboot.svg
-  static Widget get reboot => SvgPicture.asset(
+  static Widget get reboot => const _IxIconWidget(
     'assets/svg/reboot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: record-filled.svg
-  static Widget get recordFilled => SvgPicture.asset(
+  static Widget get recordFilled => const _IxIconWidget(
     'assets/svg/record-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: record.svg
-  static Widget get record => SvgPicture.asset(
+  static Widget get record => const _IxIconWidget(
     'assets/svg/record.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rectangle-filled.svg
-  static Widget get rectangleFilled => SvgPicture.asset(
+  static Widget get rectangleFilled => const _IxIconWidget(
     'assets/svg/rectangle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rectangle.svg
-  static Widget get rectangle => SvgPicture.asset(
+  static Widget get rectangle => const _IxIconWidget(
     'assets/svg/rectangle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reddit-logo.svg
-  static Widget get redditLogo => SvgPicture.asset(
+  static Widget get redditLogo => const _IxIconWidget(
     'assets/svg/reddit-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: redo.svg
-  static Widget get redo => SvgPicture.asset(
+  static Widget get redo => const _IxIconWidget(
     'assets/svg/redo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reference-point-bottom-left.svg
-  static Widget get referencePointBottomLeft => SvgPicture.asset(
+  static Widget get referencePointBottomLeft => const _IxIconWidget(
     'assets/svg/reference-point-bottom-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reference-point-bottom-right.svg
-  static Widget get referencePointBottomRight => SvgPicture.asset(
+  static Widget get referencePointBottomRight => const _IxIconWidget(
     'assets/svg/reference-point-bottom-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reference-point-centered.svg
-  static Widget get referencePointCentered => SvgPicture.asset(
+  static Widget get referencePointCentered => const _IxIconWidget(
     'assets/svg/reference-point-centered.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reference-point-top-left.svg
-  static Widget get referencePointTopLeft => SvgPicture.asset(
+  static Widget get referencePointTopLeft => const _IxIconWidget(
     'assets/svg/reference-point-top-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reference-point-top-right.svg
-  static Widget get referencePointTopRight => SvgPicture.asset(
+  static Widget get referencePointTopRight => const _IxIconWidget(
     'assets/svg/reference-point-top-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reference.svg
-  static Widget get reference => SvgPicture.asset(
+  static Widget get reference => const _IxIconWidget(
     'assets/svg/reference.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: refresh-arrow-down.svg
-  static Widget get refreshArrowDown => SvgPicture.asset(
+  static Widget get refreshArrowDown => const _IxIconWidget(
     'assets/svg/refresh-arrow-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: refresh-cancelled.svg
-  static Widget get refreshCancelled => SvgPicture.asset(
+  static Widget get refreshCancelled => const _IxIconWidget(
     'assets/svg/refresh-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: refresh-exclamation.svg
-  static Widget get refreshExclamation => SvgPicture.asset(
+  static Widget get refreshExclamation => const _IxIconWidget(
     'assets/svg/refresh-exclamation.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: refresh-settings.svg
-  static Widget get refreshSettings => SvgPicture.asset(
+  static Widget get refreshSettings => const _IxIconWidget(
     'assets/svg/refresh-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: refresh.svg
-  static Widget get refresh => SvgPicture.asset(
+  static Widget get refresh => const _IxIconWidget(
     'assets/svg/refresh.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reload.svg
-  static Widget get reload => SvgPicture.asset(
+  static Widget get reload => const _IxIconWidget(
     'assets/svg/reload.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: remote-access.svg
-  static Widget get remoteAccess => SvgPicture.asset(
+  static Widget get remoteAccess => const _IxIconWidget(
     'assets/svg/remote-access.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: remove-application.svg
-  static Widget get removeApplication => SvgPicture.asset(
+  static Widget get removeApplication => const _IxIconWidget(
     'assets/svg/remove-application.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: remove-circle-filled.svg
-  static Widget get removeCircleFilled => SvgPicture.asset(
+  static Widget get removeCircleFilled => const _IxIconWidget(
     'assets/svg/remove-circle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: remove-circle.svg
-  static Widget get removeCircle => SvgPicture.asset(
+  static Widget get removeCircle => const _IxIconWidget(
     'assets/svg/remove-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: remove-eye-filled.svg
-  static Widget get removeEyeFilled => SvgPicture.asset(
+  static Widget get removeEyeFilled => const _IxIconWidget(
     'assets/svg/remove-eye-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: remove-eye.svg
-  static Widget get removeEye => SvgPicture.asset(
+  static Widget get removeEye => const _IxIconWidget(
     'assets/svg/remove-eye.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rename.svg
-  static Widget get rename => SvgPicture.asset(
+  static Widget get rename => const _IxIconWidget(
     'assets/svg/rename.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reorder.svg
-  static Widget get reorder => SvgPicture.asset(
+  static Widget get reorder => const _IxIconWidget(
     'assets/svg/reorder.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: replace.svg
-  static Widget get replace => SvgPicture.asset(
+  static Widget get replace => const _IxIconWidget(
     'assets/svg/replace.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: report-barchart.svg
-  static Widget get reportBarchart => SvgPicture.asset(
+  static Widget get reportBarchart => const _IxIconWidget(
     'assets/svg/report-barchart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: report-general.svg
-  static Widget get reportGeneral => SvgPicture.asset(
+  static Widget get reportGeneral => const _IxIconWidget(
     'assets/svg/report-general.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: report-linechart.svg
-  static Widget get reportLinechart => SvgPicture.asset(
+  static Widget get reportLinechart => const _IxIconWidget(
     'assets/svg/report-linechart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: report-text.svg
-  static Widget get reportText => SvgPicture.asset(
+  static Widget get reportText => const _IxIconWidget(
     'assets/svg/report-text.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: reset.svg
-  static Widget get reset => SvgPicture.asset(
+  static Widget get reset => const _IxIconWidget(
     'assets/svg/reset.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: restart.svg
-  static Widget get restart => SvgPicture.asset(
+  static Widget get restart => const _IxIconWidget(
     'assets/svg/restart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: restore-backup-filled.svg
-  static Widget get restoreBackupFilled => SvgPicture.asset(
+  static Widget get restoreBackupFilled => const _IxIconWidget(
     'assets/svg/restore-backup-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: restore-backup-pc.svg
-  static Widget get restoreBackupPc => SvgPicture.asset(
+  static Widget get restoreBackupPc => const _IxIconWidget(
     'assets/svg/restore-backup-pc.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: restore-backup.svg
-  static Widget get restoreBackup => SvgPicture.asset(
+  static Widget get restoreBackup => const _IxIconWidget(
     'assets/svg/restore-backup.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: restore.svg
-  static Widget get restore => SvgPicture.asset(
+  static Widget get restore => const _IxIconWidget(
     'assets/svg/restore.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rewind-filled.svg
-  static Widget get rewindFilled => SvgPicture.asset(
+  static Widget get rewindFilled => const _IxIconWidget(
     'assets/svg/rewind-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rewind.svg
-  static Widget get rewind => SvgPicture.asset(
+  static Widget get rewind => const _IxIconWidget(
     'assets/svg/rewind.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rhomb-filled.svg
-  static Widget get rhombFilled => SvgPicture.asset(
+  static Widget get rhombFilled => const _IxIconWidget(
     'assets/svg/rhomb-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rhomb.svg
-  static Widget get rhomb => SvgPicture.asset(
+  static Widget get rhomb => const _IxIconWidget(
     'assets/svg/rhomb.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: road-filled.svg
-  static Widget get roadFilled => SvgPicture.asset(
+  static Widget get roadFilled => const _IxIconWidget(
     'assets/svg/road-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: road.svg
-  static Widget get road => SvgPicture.asset(
+  static Widget get road => const _IxIconWidget(
     'assets/svg/road.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: robotic-arm.svg
-  static Widget get roboticArm => SvgPicture.asset(
+  static Widget get roboticArm => const _IxIconWidget(
     'assets/svg/robotic-arm.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: robotic-gripper.svg
-  static Widget get roboticGripper => SvgPicture.asset(
+  static Widget get roboticGripper => const _IxIconWidget(
     'assets/svg/robotic-gripper.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rocket-circle-filled.svg
-  static Widget get rocketCircleFilled => SvgPicture.asset(
+  static Widget get rocketCircleFilled => const _IxIconWidget(
     'assets/svg/rocket-circle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rocket-circle.svg
-  static Widget get rocketCircle => SvgPicture.asset(
+  static Widget get rocketCircle => const _IxIconWidget(
     'assets/svg/rocket-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rocket-filled.svg
-  static Widget get rocketFilled => SvgPicture.asset(
+  static Widget get rocketFilled => const _IxIconWidget(
     'assets/svg/rocket-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rocket.svg
-  static Widget get rocket => SvgPicture.asset(
+  static Widget get rocket => const _IxIconWidget(
     'assets/svg/rocket.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: roles-filled.svg
-  static Widget get rolesFilled => SvgPicture.asset(
+  static Widget get rolesFilled => const _IxIconWidget(
     'assets/svg/roles-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: roles.svg
-  static Widget get roles => SvgPicture.asset(
+  static Widget get roles => const _IxIconWidget(
     'assets/svg/roles.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rotate-180.svg
-  static Widget get rotate180 => SvgPicture.asset(
+  static Widget get rotate180 => const _IxIconWidget(
     'assets/svg/rotate-180.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rotate-90-left.svg
-  static Widget get rotate90Left => SvgPicture.asset(
+  static Widget get rotate90Left => const _IxIconWidget(
     'assets/svg/rotate-90-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rotate-90-right.svg
-  static Widget get rotate90Right => SvgPicture.asset(
+  static Widget get rotate90Right => const _IxIconWidget(
     'assets/svg/rotate-90-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rotate.svg
-  static Widget get rotate => SvgPicture.asset(
+  static Widget get rotate => const _IxIconWidget(
     'assets/svg/rotate.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: route-target.svg
-  static Widget get routeTarget => SvgPicture.asset(
+  static Widget get routeTarget => const _IxIconWidget(
     'assets/svg/route-target.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: route.svg
-  static Widget get route => SvgPicture.asset(
+  static Widget get route => const _IxIconWidget(
     'assets/svg/route.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ruler-diagonal.svg
-  static Widget get rulerDiagonal => SvgPicture.asset(
+  static Widget get rulerDiagonal => const _IxIconWidget(
     'assets/svg/ruler-diagonal.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ruler-horizontal.svg
-  static Widget get rulerHorizontal => SvgPicture.asset(
+  static Widget get rulerHorizontal => const _IxIconWidget(
     'assets/svg/ruler-horizontal.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ruler-vertical.svg
-  static Widget get rulerVertical => SvgPicture.asset(
+  static Widget get rulerVertical => const _IxIconWidget(
     'assets/svg/ruler-vertical.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rules-filled.svg
-  static Widget get rulesFilled => SvgPicture.asset(
+  static Widget get rulesFilled => const _IxIconWidget(
     'assets/svg/rules-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: rules.svg
-  static Widget get rules => SvgPicture.asset(
+  static Widget get rules => const _IxIconWidget(
     'assets/svg/rules.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: runtime-play.svg
-  static Widget get runtimePlay => SvgPicture.asset(
+  static Widget get runtimePlay => const _IxIconWidget(
     'assets/svg/runtime-play.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: runtime-settings.svg
-  static Widget get runtimeSettings => SvgPicture.asset(
+  static Widget get runtimeSettings => const _IxIconWidget(
     'assets/svg/runtime-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: runtime-stop.svg
-  static Widget get runtimeStop => SvgPicture.asset(
+  static Widget get runtimeStop => const _IxIconWidget(
     'assets/svg/runtime-stop.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: safety-settings.svg
-  static Widget get safetySettings => SvgPicture.asset(
+  static Widget get safetySettings => const _IxIconWidget(
     'assets/svg/safety-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sankeychart.svg
-  static Widget get sankeychart => SvgPicture.asset(
+  static Widget get sankeychart => const _IxIconWidget(
     'assets/svg/sankeychart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: save-all.svg
-  static Widget get saveAll => SvgPicture.asset(
+  static Widget get saveAll => const _IxIconWidget(
     'assets/svg/save-all.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: scale.svg
-  static Widget get scale => SvgPicture.asset(
+  static Widget get scale => const _IxIconWidget(
     'assets/svg/scale.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: scatterplot.svg
-  static Widget get scatterplot => SvgPicture.asset(
+  static Widget get scatterplot => const _IxIconWidget(
     'assets/svg/scatterplot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: scheduler-filled.svg
-  static Widget get schedulerFilled => SvgPicture.asset(
+  static Widget get schedulerFilled => const _IxIconWidget(
     'assets/svg/scheduler-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: scheduler.svg
-  static Widget get scheduler => SvgPicture.asset(
+  static Widget get scheduler => const _IxIconWidget(
     'assets/svg/scheduler.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-duplicate-filled.svg
-  static Widget get screenDuplicateFilled => SvgPicture.asset(
+  static Widget get screenDuplicateFilled => const _IxIconWidget(
     'assets/svg/screen-duplicate-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-duplicate.svg
-  static Widget get screenDuplicate => SvgPicture.asset(
+  static Widget get screenDuplicate => const _IxIconWidget(
     'assets/svg/screen-duplicate.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-filled.svg
-  static Widget get screenFilled => SvgPicture.asset(
+  static Widget get screenFilled => const _IxIconWidget(
     'assets/svg/screen-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-pc-tower-filled.svg
-  static Widget get screenPcTowerFilled => SvgPicture.asset(
+  static Widget get screenPcTowerFilled => const _IxIconWidget(
     'assets/svg/screen-pc-tower-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-pc-tower-settings-filled.svg
-  static Widget get screenPcTowerSettingsFilled => SvgPicture.asset(
+  static Widget get screenPcTowerSettingsFilled => const _IxIconWidget(
     'assets/svg/screen-pc-tower-settings-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-pc-tower-settings.svg
-  static Widget get screenPcTowerSettings => SvgPicture.asset(
+  static Widget get screenPcTowerSettings => const _IxIconWidget(
     'assets/svg/screen-pc-tower-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-pc-tower.svg
-  static Widget get screenPcTower => SvgPicture.asset(
+  static Widget get screenPcTower => const _IxIconWidget(
     'assets/svg/screen-pc-tower.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-settings-filled.svg
-  static Widget get screenSettingsFilled => SvgPicture.asset(
+  static Widget get screenSettingsFilled => const _IxIconWidget(
     'assets/svg/screen-settings-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen-settings.svg
-  static Widget get screenSettings => SvgPicture.asset(
+  static Widget get screenSettings => const _IxIconWidget(
     'assets/svg/screen-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screen.svg
-  static Widget get screen => SvgPicture.asset(
+  static Widget get screen => const _IxIconWidget(
     'assets/svg/screen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screens-filled.svg
-  static Widget get screensFilled => SvgPicture.asset(
+  static Widget get screensFilled => const _IxIconWidget(
     'assets/svg/screens-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screens.svg
-  static Widget get screens => SvgPicture.asset(
+  static Widget get screens => const _IxIconWidget(
     'assets/svg/screens.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screenshot-filled.svg
-  static Widget get screenshotFilled => SvgPicture.asset(
+  static Widget get screenshotFilled => const _IxIconWidget(
     'assets/svg/screenshot-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: screenshot.svg
-  static Widget get screenshot => SvgPicture.asset(
+  static Widget get screenshot => const _IxIconWidget(
     'assets/svg/screenshot.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: script-add.svg
-  static Widget get scriptAdd => SvgPicture.asset(
+  static Widget get scriptAdd => const _IxIconWidget(
     'assets/svg/script-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: script.svg
-  static Widget get script => SvgPicture.asset(
+  static Widget get script => const _IxIconWidget(
     'assets/svg/script.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: scripts.svg
-  static Widget get scripts => SvgPicture.asset(
+  static Widget get scripts => const _IxIconWidget(
     'assets/svg/scripts.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sd-card-filled.svg
-  static Widget get sdCardFilled => SvgPicture.asset(
+  static Widget get sdCardFilled => const _IxIconWidget(
     'assets/svg/sd-card-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sd-card-micro-filled.svg
-  static Widget get sdCardMicroFilled => SvgPicture.asset(
+  static Widget get sdCardMicroFilled => const _IxIconWidget(
     'assets/svg/sd-card-micro-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sd-card-micro.svg
-  static Widget get sdCardMicro => SvgPicture.asset(
+  static Widget get sdCardMicro => const _IxIconWidget(
     'assets/svg/sd-card-micro.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sd-card.svg
-  static Widget get sdCard => SvgPicture.asset(
+  static Widget get sdCard => const _IxIconWidget(
     'assets/svg/sd-card.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: search.svg
-  static Widget get search => SvgPicture.asset(
+  static Widget get search => const _IxIconWidget(
     'assets/svg/search.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: select-alt-filled.svg
-  static Widget get selectAltFilled => SvgPicture.asset(
+  static Widget get selectAltFilled => const _IxIconWidget(
     'assets/svg/select-alt-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: select-alt.svg
-  static Widget get selectAlt => SvgPicture.asset(
+  static Widget get selectAlt => const _IxIconWidget(
     'assets/svg/select-alt.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: send-backward.svg
-  static Widget get sendBackward => SvgPicture.asset(
+  static Widget get sendBackward => const _IxIconWidget(
     'assets/svg/send-backward.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: send-right-filled.svg
-  static Widget get sendRightFilled => SvgPicture.asset(
+  static Widget get sendRightFilled => const _IxIconWidget(
     'assets/svg/send-right-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: send-right.svg
-  static Widget get sendRight => SvgPicture.asset(
+  static Widget get sendRight => const _IxIconWidget(
     'assets/svg/send-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: send-to-back.svg
-  static Widget get sendToBack => SvgPicture.asset(
+  static Widget get sendToBack => const _IxIconWidget(
     'assets/svg/send-to-back.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: send-top-right-filled.svg
-  static Widget get sendTopRightFilled => SvgPicture.asset(
+  static Widget get sendTopRightFilled => const _IxIconWidget(
     'assets/svg/send-top-right-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: send-top-right.svg
-  static Widget get sendTopRight => SvgPicture.asset(
+  static Widget get sendTopRight => const _IxIconWidget(
     'assets/svg/send-top-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sensor.svg
-  static Widget get sensor => SvgPicture.asset(
+  static Widget get sensor => const _IxIconWidget(
     'assets/svg/sensor.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: separator-line.svg
-  static Widget get separatorLine => SvgPicture.asset(
+  static Widget get separatorLine => const _IxIconWidget(
     'assets/svg/separator-line.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: server-interface.svg
-  static Widget get serverInterface => SvgPicture.asset(
+  static Widget get serverInterface => const _IxIconWidget(
     'assets/svg/server-interface.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shapes-filled.svg
-  static Widget get shapesFilled => SvgPicture.asset(
+  static Widget get shapesFilled => const _IxIconWidget(
     'assets/svg/shapes-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shapes.svg
-  static Widget get shapes => SvgPicture.asset(
+  static Widget get shapes => const _IxIconWidget(
     'assets/svg/shapes.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: share-alt-filled.svg
-  static Widget get shareAltFilled => SvgPicture.asset(
+  static Widget get shareAltFilled => const _IxIconWidget(
     'assets/svg/share-alt-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: share-alt.svg
-  static Widget get shareAlt => SvgPicture.asset(
+  static Widget get shareAlt => const _IxIconWidget(
     'assets/svg/share-alt.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: share-filled.svg
-  static Widget get shareFilled => SvgPicture.asset(
+  static Widget get shareFilled => const _IxIconWidget(
     'assets/svg/share-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: share.svg
-  static Widget get share => SvgPicture.asset(
+  static Widget get share => const _IxIconWidget(
     'assets/svg/share.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shield-broken-filled.svg
-  static Widget get shieldBrokenFilled => SvgPicture.asset(
+  static Widget get shieldBrokenFilled => const _IxIconWidget(
     'assets/svg/shield-broken-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shield-broken.svg
-  static Widget get shieldBroken => SvgPicture.asset(
+  static Widget get shieldBroken => const _IxIconWidget(
     'assets/svg/shield-broken.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shield-check-filled.svg
-  static Widget get shieldCheckFilled => SvgPicture.asset(
+  static Widget get shieldCheckFilled => const _IxIconWidget(
     'assets/svg/shield-check-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shield-check.svg
-  static Widget get shieldCheck => SvgPicture.asset(
+  static Widget get shieldCheck => const _IxIconWidget(
     'assets/svg/shield-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shield-filled.svg
-  static Widget get shieldFilled => SvgPicture.asset(
+  static Widget get shieldFilled => const _IxIconWidget(
     'assets/svg/shield-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shield-half.svg
-  static Widget get shieldHalf => SvgPicture.asset(
+  static Widget get shieldHalf => const _IxIconWidget(
     'assets/svg/shield-half.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shield.svg
-  static Widget get shield => SvgPicture.asset(
+  static Widget get shield => const _IxIconWidget(
     'assets/svg/shield.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shift-filled.svg
-  static Widget get shiftFilled => SvgPicture.asset(
+  static Widget get shiftFilled => const _IxIconWidget(
     'assets/svg/shift-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shift.svg
-  static Widget get shift => SvgPicture.asset(
+  static Widget get shift => const _IxIconWidget(
     'assets/svg/shift.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shopping-cart-filled.svg
-  static Widget get shoppingCartFilled => SvgPicture.asset(
+  static Widget get shoppingCartFilled => const _IxIconWidget(
     'assets/svg/shopping-cart-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shopping-cart.svg
-  static Widget get shoppingCart => SvgPicture.asset(
+  static Widget get shoppingCart => const _IxIconWidget(
     'assets/svg/shopping-cart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shorter.svg
-  static Widget get shorter => SvgPicture.asset(
+  static Widget get shorter => const _IxIconWidget(
     'assets/svg/shorter.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shout-filled.svg
-  static Widget get shoutFilled => SvgPicture.asset(
+  static Widget get shoutFilled => const _IxIconWidget(
     'assets/svg/shout-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shout.svg
-  static Widget get shout => SvgPicture.asset(
+  static Widget get shout => const _IxIconWidget(
     'assets/svg/shout.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: shutdown.svg
-  static Widget get shutdown => SvgPicture.asset(
+  static Widget get shutdown => const _IxIconWidget(
     'assets/svg/shutdown.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sign-language.svg
-  static Widget get signLanguage => SvgPicture.asset(
+  static Widget get signLanguage => const _IxIconWidget(
     'assets/svg/sign-language.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-0.svg
-  static Widget get signalStrength0 => SvgPicture.asset(
+  static Widget get signalStrength0 => const _IxIconWidget(
     'assets/svg/signal-strength-0.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-1.svg
-  static Widget get signalStrength1 => SvgPicture.asset(
+  static Widget get signalStrength1 => const _IxIconWidget(
     'assets/svg/signal-strength-1.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-2.svg
-  static Widget get signalStrength2 => SvgPicture.asset(
+  static Widget get signalStrength2 => const _IxIconWidget(
     'assets/svg/signal-strength-2.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-3.svg
-  static Widget get signalStrength3 => SvgPicture.asset(
+  static Widget get signalStrength3 => const _IxIconWidget(
     'assets/svg/signal-strength-3.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-4.svg
-  static Widget get signalStrength4 => SvgPicture.asset(
+  static Widget get signalStrength4 => const _IxIconWidget(
     'assets/svg/signal-strength-4.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-5.svg
-  static Widget get signalStrength5 => SvgPicture.asset(
+  static Widget get signalStrength5 => const _IxIconWidget(
     'assets/svg/signal-strength-5.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-6.svg
-  static Widget get signalStrength6 => SvgPicture.asset(
+  static Widget get signalStrength6 => const _IxIconWidget(
     'assets/svg/signal-strength-6.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-7.svg
-  static Widget get signalStrength7 => SvgPicture.asset(
+  static Widget get signalStrength7 => const _IxIconWidget(
     'assets/svg/signal-strength-7.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: signal-strength-8.svg
-  static Widget get signalStrength8 => SvgPicture.asset(
+  static Widget get signalStrength8 => const _IxIconWidget(
     'assets/svg/signal-strength-8.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: simit-component.svg
-  static Widget get simitComponent => SvgPicture.asset(
+  static Widget get simitComponent => const _IxIconWidget(
     'assets/svg/simit-component.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: simit-macro-component-editor.svg
-  static Widget get simitMacroComponentEditor => SvgPicture.asset(
+  static Widget get simitMacroComponentEditor => const _IxIconWidget(
     'assets/svg/simit-macro-component-editor.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: simit-macro.svg
-  static Widget get simitMacro => SvgPicture.asset(
+  static Widget get simitMacro => const _IxIconWidget(
     'assets/svg/simit-macro.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: simulation-table.svg
-  static Widget get simulationTable => SvgPicture.asset(
+  static Widget get simulationTable => const _IxIconWidget(
     'assets/svg/simulation-table.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: single-check.svg
-  static Widget get singleCheck => SvgPicture.asset(
+  static Widget get singleCheck => const _IxIconWidget(
     'assets/svg/single-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: skip-back-filled.svg
-  static Widget get skipBackFilled => SvgPicture.asset(
+  static Widget get skipBackFilled => const _IxIconWidget(
     'assets/svg/skip-back-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: skip-back.svg
-  static Widget get skipBack => SvgPicture.asset(
+  static Widget get skipBack => const _IxIconWidget(
     'assets/svg/skip-back.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: skip-filled.svg
-  static Widget get skipFilled => SvgPicture.asset(
+  static Widget get skipFilled => const _IxIconWidget(
     'assets/svg/skip-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: skip.svg
-  static Widget get skip => SvgPicture.asset(
+  static Widget get skip => const _IxIconWidget(
     'assets/svg/skip.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sms.svg
-  static Widget get sms => SvgPicture.asset(
+  static Widget get sms => const _IxIconWidget(
     'assets/svg/sms.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: snowflake.svg
-  static Widget get snowflake => SvgPicture.asset(
+  static Widget get snowflake => const _IxIconWidget(
     'assets/svg/snowflake.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: solid-state-drive.svg
-  static Widget get solidStateDrive => SvgPicture.asset(
+  static Widget get solidStateDrive => const _IxIconWidget(
     'assets/svg/solid-state-drive.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sort-alt.svg
-  static Widget get sortAlt => SvgPicture.asset(
+  static Widget get sortAlt => const _IxIconWidget(
     'assets/svg/sort-alt.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sort-ascending.svg
-  static Widget get sortAscending => SvgPicture.asset(
+  static Widget get sortAscending => const _IxIconWidget(
     'assets/svg/sort-ascending.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sort-descending.svg
-  static Widget get sortDescending => SvgPicture.asset(
+  static Widget get sortDescending => const _IxIconWidget(
     'assets/svg/sort-descending.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sort.svg
-  static Widget get sort => SvgPicture.asset(
+  static Widget get sort => const _IxIconWidget(
     'assets/svg/sort.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sound-loud-filled.svg
-  static Widget get soundLoudFilled => SvgPicture.asset(
+  static Widget get soundLoudFilled => const _IxIconWidget(
     'assets/svg/sound-loud-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sound-loud.svg
-  static Widget get soundLoud => SvgPicture.asset(
+  static Widget get soundLoud => const _IxIconWidget(
     'assets/svg/sound-loud.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sound-mute-filled.svg
-  static Widget get soundMuteFilled => SvgPicture.asset(
+  static Widget get soundMuteFilled => const _IxIconWidget(
     'assets/svg/sound-mute-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sound-mute.svg
-  static Widget get soundMute => SvgPicture.asset(
+  static Widget get soundMute => const _IxIconWidget(
     'assets/svg/sound-mute.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sound-off-filled.svg
-  static Widget get soundOffFilled => SvgPicture.asset(
+  static Widget get soundOffFilled => const _IxIconWidget(
     'assets/svg/sound-off-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sound-off.svg
-  static Widget get soundOff => SvgPicture.asset(
+  static Widget get soundOff => const _IxIconWidget(
     'assets/svg/sound-off.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sound-quiet-filled.svg
-  static Widget get soundQuietFilled => SvgPicture.asset(
+  static Widget get soundQuietFilled => const _IxIconWidget(
     'assets/svg/sound-quiet-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sound-quiet.svg
-  static Widget get soundQuiet => SvgPicture.asset(
+  static Widget get soundQuiet => const _IxIconWidget(
     'assets/svg/sound-quiet.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: spatial.svg
-  static Widget get spatial => SvgPicture.asset(
+  static Widget get spatial => const _IxIconWidget(
     'assets/svg/spatial.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: spiderchart-filled.svg
-  static Widget get spiderchartFilled => SvgPicture.asset(
+  static Widget get spiderchartFilled => const _IxIconWidget(
     'assets/svg/spiderchart-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: spiderchart.svg
-  static Widget get spiderchart => SvgPicture.asset(
+  static Widget get spiderchart => const _IxIconWidget(
     'assets/svg/spiderchart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: split-horizontally.svg
-  static Widget get splitHorizontally => SvgPicture.asset(
+  static Widget get splitHorizontally => const _IxIconWidget(
     'assets/svg/split-horizontally.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: split-vertically.svg
-  static Widget get splitVertically => SvgPicture.asset(
+  static Widget get splitVertically => const _IxIconWidget(
     'assets/svg/split-vertically.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: split.svg
-  static Widget get split => SvgPicture.asset(
+  static Widget get split => const _IxIconWidget(
     'assets/svg/split.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: stacked-barchart.svg
-  static Widget get stackedBarchart => SvgPicture.asset(
+  static Widget get stackedBarchart => const _IxIconWidget(
     'assets/svg/stacked-barchart.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: stamp-filled.svg
-  static Widget get stampFilled => SvgPicture.asset(
+  static Widget get stampFilled => const _IxIconWidget(
     'assets/svg/stamp-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: stamp.svg
-  static Widget get stamp => SvgPicture.asset(
+  static Widget get stamp => const _IxIconWidget(
     'assets/svg/stamp.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: standby.svg
-  static Widget get standby => SvgPicture.asset(
+  static Widget get standby => const _IxIconWidget(
     'assets/svg/standby.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star-add-filled.svg
-  static Widget get starAddFilled => SvgPicture.asset(
+  static Widget get starAddFilled => const _IxIconWidget(
     'assets/svg/star-add-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star-add.svg
-  static Widget get starAdd => SvgPicture.asset(
+  static Widget get starAdd => const _IxIconWidget(
     'assets/svg/star-add.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star-cancelled-filled.svg
-  static Widget get starCancelledFilled => SvgPicture.asset(
+  static Widget get starCancelledFilled => const _IxIconWidget(
     'assets/svg/star-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star-cancelled.svg
-  static Widget get starCancelled => SvgPicture.asset(
+  static Widget get starCancelled => const _IxIconWidget(
     'assets/svg/star-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star-filled.svg
-  static Widget get starFilled => SvgPicture.asset(
+  static Widget get starFilled => const _IxIconWidget(
     'assets/svg/star-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star-half-filled.svg
-  static Widget get starHalfFilled => SvgPicture.asset(
+  static Widget get starHalfFilled => const _IxIconWidget(
     'assets/svg/star-half-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star-list-filled.svg
-  static Widget get starListFilled => SvgPicture.asset(
+  static Widget get starListFilled => const _IxIconWidget(
     'assets/svg/star-list-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star-list.svg
-  static Widget get starList => SvgPicture.asset(
+  static Widget get starList => const _IxIconWidget(
     'assets/svg/star-list.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: star.svg
-  static Widget get star => SvgPicture.asset(
+  static Widget get star => const _IxIconWidget(
     'assets/svg/star.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: start-data-analysis.svg
-  static Widget get startDataAnalysis => SvgPicture.asset(
+  static Widget get startDataAnalysis => const _IxIconWidget(
     'assets/svg/start-data-analysis.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: steering-user-filled.svg
-  static Widget get steeringUserFilled => SvgPicture.asset(
+  static Widget get steeringUserFilled => const _IxIconWidget(
     'assets/svg/steering-user-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: steering-user.svg
-  static Widget get steeringUser => SvgPicture.asset(
+  static Widget get steeringUser => const _IxIconWidget(
     'assets/svg/steering-user.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: steering.svg
-  static Widget get steering => SvgPicture.asset(
+  static Widget get steering => const _IxIconWidget(
     'assets/svg/steering.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: stethoscope.svg
-  static Widget get stethoscope => SvgPicture.asset(
+  static Widget get stethoscope => const _IxIconWidget(
     'assets/svg/stethoscope.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: stop-filled.svg
-  static Widget get stopFilled => SvgPicture.asset(
+  static Widget get stopFilled => const _IxIconWidget(
     'assets/svg/stop-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: stop.svg
-  static Widget get stop => SvgPicture.asset(
+  static Widget get stop => const _IxIconWidget(
     'assets/svg/stop.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: stopwatch-filled.svg
-  static Widget get stopwatchFilled => SvgPicture.asset(
+  static Widget get stopwatchFilled => const _IxIconWidget(
     'assets/svg/stopwatch-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: stopwatch.svg
-  static Widget get stopwatch => SvgPicture.asset(
+  static Widget get stopwatch => const _IxIconWidget(
     'assets/svg/stopwatch.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: storage-filled.svg
-  static Widget get storageFilled => SvgPicture.asset(
+  static Widget get storageFilled => const _IxIconWidget(
     'assets/svg/storage-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: storage.svg
-  static Widget get storage => SvgPicture.asset(
+  static Widget get storage => const _IxIconWidget(
     'assets/svg/storage.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: subtitle-filled.svg
-  static Widget get subtitleFilled => SvgPicture.asset(
+  static Widget get subtitleFilled => const _IxIconWidget(
     'assets/svg/subtitle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: subtitle.svg
-  static Widget get subtitle => SvgPicture.asset(
+  static Widget get subtitle => const _IxIconWidget(
     'assets/svg/subtitle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: success-filled.svg
-  static Widget get successFilled => SvgPicture.asset(
+  static Widget get successFilled => const _IxIconWidget(
     'assets/svg/success-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: success-multiple-filled.svg
-  static Widget get successMultipleFilled => SvgPicture.asset(
+  static Widget get successMultipleFilled => const _IxIconWidget(
     'assets/svg/success-multiple-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: success-multiple.svg
-  static Widget get successMultiple => SvgPicture.asset(
+  static Widget get successMultiple => const _IxIconWidget(
     'assets/svg/success-multiple.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: success.svg
-  static Widget get success => SvgPicture.asset(
+  static Widget get success => const _IxIconWidget(
     'assets/svg/success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sun-cloud-filled.svg
-  static Widget get sunCloudFilled => SvgPicture.asset(
+  static Widget get sunCloudFilled => const _IxIconWidget(
     'assets/svg/sun-cloud-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sun-cloud.svg
-  static Widget get sunCloud => SvgPicture.asset(
+  static Widget get sunCloud => const _IxIconWidget(
     'assets/svg/sun-cloud.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sun-filled.svg
-  static Widget get sunFilled => SvgPicture.asset(
+  static Widget get sunFilled => const _IxIconWidget(
     'assets/svg/sun-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sun.svg
-  static Widget get sun => SvgPicture.asset(
+  static Widget get sun => const _IxIconWidget(
     'assets/svg/sun.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sunrise-filled.svg
-  static Widget get sunriseFilled => SvgPicture.asset(
+  static Widget get sunriseFilled => const _IxIconWidget(
     'assets/svg/sunrise-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sunrise.svg
-  static Widget get sunrise => SvgPicture.asset(
+  static Widget get sunrise => const _IxIconWidget(
     'assets/svg/sunrise.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sunset-filled.svg
-  static Widget get sunsetFilled => SvgPicture.asset(
+  static Widget get sunsetFilled => const _IxIconWidget(
     'assets/svg/sunset-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sunset.svg
-  static Widget get sunset => SvgPicture.asset(
+  static Widget get sunset => const _IxIconWidget(
     'assets/svg/sunset.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: support.svg
-  static Widget get support => SvgPicture.asset(
+  static Widget get support => const _IxIconWidget(
     'assets/svg/support.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: surveillance-cancelled-filled.svg
-  static Widget get surveillanceCancelledFilled => SvgPicture.asset(
+  static Widget get surveillanceCancelledFilled => const _IxIconWidget(
     'assets/svg/surveillance-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: surveillance-cancelled.svg
-  static Widget get surveillanceCancelled => SvgPicture.asset(
+  static Widget get surveillanceCancelled => const _IxIconWidget(
     'assets/svg/surveillance-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: surveillance-filled.svg
-  static Widget get surveillanceFilled => SvgPicture.asset(
+  static Widget get surveillanceFilled => const _IxIconWidget(
     'assets/svg/surveillance-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: surveillance.svg
-  static Widget get surveillance => SvgPicture.asset(
+  static Widget get surveillance => const _IxIconWidget(
     'assets/svg/surveillance.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: svg-document.svg
-  static Widget get svgDocument => SvgPicture.asset(
+  static Widget get svgDocument => const _IxIconWidget(
     'assets/svg/svg-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: swap-left-right.svg
-  static Widget get swapLeftRight => SvgPicture.asset(
+  static Widget get swapLeftRight => const _IxIconWidget(
     'assets/svg/swap-left-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: switch-slider.svg
-  static Widget get switchSlider => SvgPicture.asset(
+  static Widget get switchSlider => const _IxIconWidget(
     'assets/svg/switch-slider.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: sword-swing.svg
-  static Widget get swordSwing => SvgPicture.asset(
+  static Widget get swordSwing => const _IxIconWidget(
     'assets/svg/sword-swing.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-add-column-right.svg
-  static Widget get tableAddColumnRight => SvgPicture.asset(
+  static Widget get tableAddColumnRight => const _IxIconWidget(
     'assets/svg/table-add-column-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-add-row-below.svg
-  static Widget get tableAddRowBelow => SvgPicture.asset(
+  static Widget get tableAddRowBelow => const _IxIconWidget(
     'assets/svg/table-add-row-below.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-columns.svg
-  static Widget get tableColumns => SvgPicture.asset(
+  static Widget get tableColumns => const _IxIconWidget(
     'assets/svg/table-columns.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-insert-column-left.svg
-  static Widget get tableInsertColumnLeft => SvgPicture.asset(
+  static Widget get tableInsertColumnLeft => const _IxIconWidget(
     'assets/svg/table-insert-column-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-insert-column-right.svg
-  static Widget get tableInsertColumnRight => SvgPicture.asset(
+  static Widget get tableInsertColumnRight => const _IxIconWidget(
     'assets/svg/table-insert-column-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-insert-row-above.svg
-  static Widget get tableInsertRowAbove => SvgPicture.asset(
+  static Widget get tableInsertRowAbove => const _IxIconWidget(
     'assets/svg/table-insert-row-above.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-insert-row-below.svg
-  static Widget get tableInsertRowBelow => SvgPicture.asset(
+  static Widget get tableInsertRowBelow => const _IxIconWidget(
     'assets/svg/table-insert-row-below.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-rows.svg
-  static Widget get tableRows => SvgPicture.asset(
+  static Widget get tableRows => const _IxIconWidget(
     'assets/svg/table-rows.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-settings.svg
-  static Widget get tableSettings => SvgPicture.asset(
+  static Widget get tableSettings => const _IxIconWidget(
     'assets/svg/table-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table-tag.svg
-  static Widget get tableTag => SvgPicture.asset(
+  static Widget get tableTag => const _IxIconWidget(
     'assets/svg/table-tag.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: table.svg
-  static Widget get table => SvgPicture.asset(
+  static Widget get table => const _IxIconWidget(
     'assets/svg/table.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-arrow-left-filled.svg
-  static Widget get tagArrowLeftFilled => SvgPicture.asset(
+  static Widget get tagArrowLeftFilled => const _IxIconWidget(
     'assets/svg/tag-arrow-left-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-arrow-left.svg
-  static Widget get tagArrowLeft => SvgPicture.asset(
+  static Widget get tagArrowLeft => const _IxIconWidget(
     'assets/svg/tag-arrow-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-arrow-right-filled.svg
-  static Widget get tagArrowRightFilled => SvgPicture.asset(
+  static Widget get tagArrowRightFilled => const _IxIconWidget(
     'assets/svg/tag-arrow-right-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-arrow-right.svg
-  static Widget get tagArrowRight => SvgPicture.asset(
+  static Widget get tagArrowRight => const _IxIconWidget(
     'assets/svg/tag-arrow-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-circle-arrow-down-filled.svg
-  static Widget get tagCircleArrowDownFilled => SvgPicture.asset(
+  static Widget get tagCircleArrowDownFilled => const _IxIconWidget(
     'assets/svg/tag-circle-arrow-down-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-circle-arrow-down.svg
-  static Widget get tagCircleArrowDown => SvgPicture.asset(
+  static Widget get tagCircleArrowDown => const _IxIconWidget(
     'assets/svg/tag-circle-arrow-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-connection-filled.svg
-  static Widget get tagConnectionFilled => SvgPicture.asset(
+  static Widget get tagConnectionFilled => const _IxIconWidget(
     'assets/svg/tag-connection-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-connection-view.svg
-  static Widget get tagConnectionView => SvgPicture.asset(
+  static Widget get tagConnectionView => const _IxIconWidget(
     'assets/svg/tag-connection-view.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-connection.svg
-  static Widget get tagConnection => SvgPicture.asset(
+  static Widget get tagConnection => const _IxIconWidget(
     'assets/svg/tag-connection.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-eye-filled.svg
-  static Widget get tagEyeFilled => SvgPicture.asset(
+  static Widget get tagEyeFilled => const _IxIconWidget(
     'assets/svg/tag-eye-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-eye.svg
-  static Widget get tagEye => SvgPicture.asset(
+  static Widget get tagEye => const _IxIconWidget(
     'assets/svg/tag-eye.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-filled.svg
-  static Widget get tagFilled => SvgPicture.asset(
+  static Widget get tagFilled => const _IxIconWidget(
     'assets/svg/tag-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-logging-filled.svg
-  static Widget get tagLoggingFilled => SvgPicture.asset(
+  static Widget get tagLoggingFilled => const _IxIconWidget(
     'assets/svg/tag-logging-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-logging.svg
-  static Widget get tagLogging => SvgPicture.asset(
+  static Widget get tagLogging => const _IxIconWidget(
     'assets/svg/tag-logging.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-plus-filled.svg
-  static Widget get tagPlusFilled => SvgPicture.asset(
+  static Widget get tagPlusFilled => const _IxIconWidget(
     'assets/svg/tag-plus-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-plus.svg
-  static Widget get tagPlus => SvgPicture.asset(
+  static Widget get tagPlus => const _IxIconWidget(
     'assets/svg/tag-plus.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-safety-filled.svg
-  static Widget get tagSafetyFilled => SvgPicture.asset(
+  static Widget get tagSafetyFilled => const _IxIconWidget(
     'assets/svg/tag-safety-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag-safety.svg
-  static Widget get tagSafety => SvgPicture.asset(
+  static Widget get tagSafety => const _IxIconWidget(
     'assets/svg/tag-safety.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tag.svg
-  static Widget get tag => SvgPicture.asset(
+  static Widget get tag => const _IxIconWidget(
     'assets/svg/tag.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tasks-all.svg
-  static Widget get tasksAll => SvgPicture.asset(
+  static Widget get tasksAll => const _IxIconWidget(
     'assets/svg/tasks-all.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tasks-done.svg
-  static Widget get tasksDone => SvgPicture.asset(
+  static Widget get tasksDone => const _IxIconWidget(
     'assets/svg/tasks-done.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tasks-open.svg
-  static Widget get tasksOpen => SvgPicture.asset(
+  static Widget get tasksOpen => const _IxIconWidget(
     'assets/svg/tasks-open.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: telegram-logo.svg
-  static Widget get telegramLogo => SvgPicture.asset(
+  static Widget get telegramLogo => const _IxIconWidget(
     'assets/svg/telegram-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-alginment-center.svg
-  static Widget get textAlginmentCenter => SvgPicture.asset(
+  static Widget get textAlginmentCenter => const _IxIconWidget(
     'assets/svg/text-alginment-center.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-alginment-justified.svg
-  static Widget get textAlginmentJustified => SvgPicture.asset(
+  static Widget get textAlginmentJustified => const _IxIconWidget(
     'assets/svg/text-alginment-justified.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-alginment-left.svg
-  static Widget get textAlginmentLeft => SvgPicture.asset(
+  static Widget get textAlginmentLeft => const _IxIconWidget(
     'assets/svg/text-alginment-left.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-alginment-right.svg
-  static Widget get textAlginmentRight => SvgPicture.asset(
+  static Widget get textAlginmentRight => const _IxIconWidget(
     'assets/svg/text-alginment-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-bold.svg
-  static Widget get textBold => SvgPicture.asset(
+  static Widget get textBold => const _IxIconWidget(
     'assets/svg/text-bold.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-circle-rectangle-filled.svg
-  static Widget get textCircleRectangleFilled => SvgPicture.asset(
+  static Widget get textCircleRectangleFilled => const _IxIconWidget(
     'assets/svg/text-circle-rectangle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-circle-rectangle.svg
-  static Widget get textCircleRectangle => SvgPicture.asset(
+  static Widget get textCircleRectangle => const _IxIconWidget(
     'assets/svg/text-circle-rectangle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-document.svg
-  static Widget get textDocument => SvgPicture.asset(
+  static Widget get textDocument => const _IxIconWidget(
     'assets/svg/text-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-italic.svg
-  static Widget get textItalic => SvgPicture.asset(
+  static Widget get textItalic => const _IxIconWidget(
     'assets/svg/text-italic.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-strike-through.svg
-  static Widget get textStrikeThrough => SvgPicture.asset(
+  static Widget get textStrikeThrough => const _IxIconWidget(
     'assets/svg/text-strike-through.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text-underline.svg
-  static Widget get textUnderline => SvgPicture.asset(
+  static Widget get textUnderline => const _IxIconWidget(
     'assets/svg/text-underline.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: text.svg
-  static Widget get text => SvgPicture.asset(
+  static Widget get text => const _IxIconWidget(
     'assets/svg/text.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: thermometer-filled.svg
-  static Widget get thermometerFilled => SvgPicture.asset(
+  static Widget get thermometerFilled => const _IxIconWidget(
     'assets/svg/thermometer-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: thermometer.svg
-  static Widget get thermometer => SvgPicture.asset(
+  static Widget get thermometer => const _IxIconWidget(
     'assets/svg/thermometer.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: threads-logo.svg
-  static Widget get threadsLogo => SvgPicture.asset(
+  static Widget get threadsLogo => const _IxIconWidget(
     'assets/svg/threads-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: threshold-cancelled.svg
-  static Widget get thresholdCancelled => SvgPicture.asset(
+  static Widget get thresholdCancelled => const _IxIconWidget(
     'assets/svg/threshold-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: threshold-off.svg
-  static Widget get thresholdOff => SvgPicture.asset(
+  static Widget get thresholdOff => const _IxIconWidget(
     'assets/svg/threshold-off.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: threshold-on.svg
-  static Widget get thresholdOn => SvgPicture.asset(
+  static Widget get thresholdOn => const _IxIconWidget(
     'assets/svg/threshold-on.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: thumb-down-filled.svg
-  static Widget get thumbDownFilled => SvgPicture.asset(
+  static Widget get thumbDownFilled => const _IxIconWidget(
     'assets/svg/thumb-down-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: thumb-down.svg
-  static Widget get thumbDown => SvgPicture.asset(
+  static Widget get thumbDown => const _IxIconWidget(
     'assets/svg/thumb-down.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: thumb-up-filled.svg
-  static Widget get thumbUpFilled => SvgPicture.asset(
+  static Widget get thumbUpFilled => const _IxIconWidget(
     'assets/svg/thumb-up-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: thumb-up.svg
-  static Widget get thumbUp => SvgPicture.asset(
+  static Widget get thumbUp => const _IxIconWidget(
     'assets/svg/thumb-up.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ticket-filled.svg
-  static Widget get ticketFilled => SvgPicture.asset(
+  static Widget get ticketFilled => const _IxIconWidget(
     'assets/svg/ticket-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ticket.svg
-  static Widget get ticket => SvgPicture.asset(
+  static Widget get ticket => const _IxIconWidget(
     'assets/svg/ticket.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tiktok-logo.svg
-  static Widget get tiktokLogo => SvgPicture.asset(
+  static Widget get tiktokLogo => const _IxIconWidget(
     'assets/svg/tiktok-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tiles-filled.svg
-  static Widget get tilesFilled => SvgPicture.asset(
+  static Widget get tilesFilled => const _IxIconWidget(
     'assets/svg/tiles-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tiles.svg
-  static Widget get tiles => SvgPicture.asset(
+  static Widget get tiles => const _IxIconWidget(
     'assets/svg/tiles.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: time-zone-filled.svg
-  static Widget get timeZoneFilled => SvgPicture.asset(
+  static Widget get timeZoneFilled => const _IxIconWidget(
     'assets/svg/time-zone-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: time-zone.svg
-  static Widget get timeZone => SvgPicture.asset(
+  static Widget get timeZone => const _IxIconWidget(
     'assets/svg/time-zone.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: to-be-published.svg
-  static Widget get toBePublished => SvgPicture.asset(
+  static Widget get toBePublished => const _IxIconWidget(
     'assets/svg/to-be-published.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: to-search.svg
-  static Widget get toSearch => SvgPicture.asset(
+  static Widget get toSearch => const _IxIconWidget(
     'assets/svg/to-search.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: topic-filled.svg
-  static Widget get topicFilled => SvgPicture.asset(
+  static Widget get topicFilled => const _IxIconWidget(
     'assets/svg/topic-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: topic.svg
-  static Widget get topic => SvgPicture.asset(
+  static Widget get topic => const _IxIconWidget(
     'assets/svg/topic.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: touch-filled.svg
-  static Widget get touchFilled => SvgPicture.asset(
+  static Widget get touchFilled => const _IxIconWidget(
     'assets/svg/touch-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: touch.svg
-  static Widget get touch => SvgPicture.asset(
+  static Widget get touch => const _IxIconWidget(
     'assets/svg/touch.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trace-eye.svg
-  static Widget get traceEye => SvgPicture.asset(
+  static Widget get traceEye => const _IxIconWidget(
     'assets/svg/trace-eye.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: traffic-left-right.svg
-  static Widget get trafficLeftRight => SvgPicture.asset(
+  static Widget get trafficLeftRight => const _IxIconWidget(
     'assets/svg/traffic-left-right.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: train-filled.svg
-  static Widget get trainFilled => SvgPicture.asset(
+  static Widget get trainFilled => const _IxIconWidget(
     'assets/svg/train-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: train.svg
-  static Widget get train => SvgPicture.asset(
+  static Widget get train => const _IxIconWidget(
     'assets/svg/train.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trashcan-filled.svg
-  static Widget get trashcanFilled => SvgPicture.asset(
+  static Widget get trashcanFilled => const _IxIconWidget(
     'assets/svg/trashcan-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trashcan.svg
-  static Widget get trashcan => SvgPicture.asset(
+  static Widget get trashcan => const _IxIconWidget(
     'assets/svg/trashcan.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tree-two-level.svg
-  static Widget get treeTwoLevel => SvgPicture.asset(
+  static Widget get treeTwoLevel => const _IxIconWidget(
     'assets/svg/tree-two-level.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tree.svg
-  static Widget get tree => SvgPicture.asset(
+  static Widget get tree => const _IxIconWidget(
     'assets/svg/tree.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-companion.svg
-  static Widget get trendCompanion => SvgPicture.asset(
+  static Widget get trendCompanion => const _IxIconWidget(
     'assets/svg/trend-companion.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-downward-circle.svg
-  static Widget get trendDownwardCircle => SvgPicture.asset(
+  static Widget get trendDownwardCircle => const _IxIconWidget(
     'assets/svg/trend-downward-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-downward-filled.svg
-  static Widget get trendDownwardFilled => SvgPicture.asset(
+  static Widget get trendDownwardFilled => const _IxIconWidget(
     'assets/svg/trend-downward-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-downward.svg
-  static Widget get trendDownward => SvgPicture.asset(
+  static Widget get trendDownward => const _IxIconWidget(
     'assets/svg/trend-downward.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-flat-curve.svg
-  static Widget get trendFlatCurve => SvgPicture.asset(
+  static Widget get trendFlatCurve => const _IxIconWidget(
     'assets/svg/trend-flat-curve.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-sideways-circle.svg
-  static Widget get trendSidewaysCircle => SvgPicture.asset(
+  static Widget get trendSidewaysCircle => const _IxIconWidget(
     'assets/svg/trend-sideways-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-sideways-filled.svg
-  static Widget get trendSidewaysFilled => SvgPicture.asset(
+  static Widget get trendSidewaysFilled => const _IxIconWidget(
     'assets/svg/trend-sideways-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-sideways.svg
-  static Widget get trendSideways => SvgPicture.asset(
+  static Widget get trendSideways => const _IxIconWidget(
     'assets/svg/trend-sideways.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-upward-circle.svg
-  static Widget get trendUpwardCircle => SvgPicture.asset(
+  static Widget get trendUpwardCircle => const _IxIconWidget(
     'assets/svg/trend-upward-circle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-upward-filled.svg
-  static Widget get trendUpwardFilled => SvgPicture.asset(
+  static Widget get trendUpwardFilled => const _IxIconWidget(
     'assets/svg/trend-upward-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend-upward.svg
-  static Widget get trendUpward => SvgPicture.asset(
+  static Widget get trendUpward => const _IxIconWidget(
     'assets/svg/trend-upward.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trend.svg
-  static Widget get trend => SvgPicture.asset(
+  static Widget get trend => const _IxIconWidget(
     'assets/svg/trend.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: triangle-filled.svg
-  static Widget get triangleFilled => SvgPicture.asset(
+  static Widget get triangleFilled => const _IxIconWidget(
     'assets/svg/triangle-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: triangle.svg
-  static Widget get triangle => SvgPicture.asset(
+  static Widget get triangle => const _IxIconWidget(
     'assets/svg/triangle.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trophy-filled.svg
-  static Widget get trophyFilled => SvgPicture.asset(
+  static Widget get trophyFilled => const _IxIconWidget(
     'assets/svg/trophy-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: trophy.svg
-  static Widget get trophy => SvgPicture.asset(
+  static Widget get trophy => const _IxIconWidget(
     'assets/svg/trophy.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: truck-filled.svg
-  static Widget get truckFilled => SvgPicture.asset(
+  static Widget get truckFilled => const _IxIconWidget(
     'assets/svg/truck-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: truck.svg
-  static Widget get truck => SvgPicture.asset(
+  static Widget get truck => const _IxIconWidget(
     'assets/svg/truck.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tulip-filled.svg
-  static Widget get tulipFilled => SvgPicture.asset(
+  static Widget get tulipFilled => const _IxIconWidget(
     'assets/svg/tulip-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: tulip.svg
-  static Widget get tulip => SvgPicture.asset(
+  static Widget get tulip => const _IxIconWidget(
     'assets/svg/tulip.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: txt-document-filled.svg
-  static Widget get txtDocumentFilled => SvgPicture.asset(
+  static Widget get txtDocumentFilled => const _IxIconWidget(
     'assets/svg/txt-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: txt-document.svg
-  static Widget get txtDocument => SvgPicture.asset(
+  static Widget get txtDocument => const _IxIconWidget(
     'assets/svg/txt-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: undo.svg
-  static Widget get undo => SvgPicture.asset(
+  static Widget get undo => const _IxIconWidget(
     'assets/svg/undo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ungroup-objects.svg
-  static Widget get ungroupObjects => SvgPicture.asset(
+  static Widget get ungroupObjects => const _IxIconWidget(
     'assets/svg/ungroup-objects.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: ungroup.svg
-  static Widget get ungroup => SvgPicture.asset(
+  static Widget get ungroup => const _IxIconWidget(
     'assets/svg/ungroup.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: unlock-filled.svg
-  static Widget get unlockFilled => SvgPicture.asset(
+  static Widget get unlockFilled => const _IxIconWidget(
     'assets/svg/unlock-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: unlock-plant-filled.svg
-  static Widget get unlockPlantFilled => SvgPicture.asset(
+  static Widget get unlockPlantFilled => const _IxIconWidget(
     'assets/svg/unlock-plant-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: unlock-plant.svg
-  static Widget get unlockPlant => SvgPicture.asset(
+  static Widget get unlockPlant => const _IxIconWidget(
     'assets/svg/unlock-plant.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: unlock.svg
-  static Widget get unlock => SvgPicture.asset(
+  static Widget get unlock => const _IxIconWidget(
     'assets/svg/unlock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: update-application.svg
-  static Widget get updateApplication => SvgPicture.asset(
+  static Widget get updateApplication => const _IxIconWidget(
     'assets/svg/update-application.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: upload-document-note.svg
-  static Widget get uploadDocumentNote => SvgPicture.asset(
+  static Widget get uploadDocumentNote => const _IxIconWidget(
     'assets/svg/upload-document-note.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: upload-fail.svg
-  static Widget get uploadFail => SvgPicture.asset(
+  static Widget get uploadFail => const _IxIconWidget(
     'assets/svg/upload-fail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: upload-success.svg
-  static Widget get uploadSuccess => SvgPicture.asset(
+  static Widget get uploadSuccess => const _IxIconWidget(
     'assets/svg/upload-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: upload.svg
-  static Widget get upload => SvgPicture.asset(
+  static Widget get upload => const _IxIconWidget(
     'assets/svg/upload.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: upper-limit.svg
-  static Widget get upperLimit => SvgPicture.asset(
+  static Widget get upperLimit => const _IxIconWidget(
     'assets/svg/upper-limit.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: usb-drive.svg
-  static Widget get usbDrive => SvgPicture.asset(
+  static Widget get usbDrive => const _IxIconWidget(
     'assets/svg/usb-drive.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-check-filled.svg
-  static Widget get userCheckFilled => SvgPicture.asset(
+  static Widget get userCheckFilled => const _IxIconWidget(
     'assets/svg/user-check-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-check.svg
-  static Widget get userCheck => SvgPicture.asset(
+  static Widget get userCheck => const _IxIconWidget(
     'assets/svg/user-check.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-data-types.svg
-  static Widget get userDataTypes => SvgPicture.asset(
+  static Widget get userDataTypes => const _IxIconWidget(
     'assets/svg/user-data-types.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-fail-filled.svg
-  static Widget get userFailFilled => SvgPicture.asset(
+  static Widget get userFailFilled => const _IxIconWidget(
     'assets/svg/user-fail-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-fail.svg
-  static Widget get userFail => SvgPicture.asset(
+  static Widget get userFail => const _IxIconWidget(
     'assets/svg/user-fail.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-filled.svg
-  static Widget get userFilled => SvgPicture.asset(
+  static Widget get userFilled => const _IxIconWidget(
     'assets/svg/user-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-group.svg
-  static Widget get userGroup => SvgPicture.asset(
+  static Widget get userGroup => const _IxIconWidget(
     'assets/svg/user-group.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-key.svg
-  static Widget get userKey => SvgPicture.asset(
+  static Widget get userKey => const _IxIconWidget(
     'assets/svg/user-key.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-lock-filled.svg
-  static Widget get userLockFilled => SvgPicture.asset(
+  static Widget get userLockFilled => const _IxIconWidget(
     'assets/svg/user-lock-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-lock.svg
-  static Widget get userLock => SvgPicture.asset(
+  static Widget get userLock => const _IxIconWidget(
     'assets/svg/user-lock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-management-filled.svg
-  static Widget get userManagementFilled => SvgPicture.asset(
+  static Widget get userManagementFilled => const _IxIconWidget(
     'assets/svg/user-management-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-management-settings-filled.svg
-  static Widget get userManagementSettingsFilled => SvgPicture.asset(
+  static Widget get userManagementSettingsFilled => const _IxIconWidget(
     'assets/svg/user-management-settings-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-management-settings.svg
-  static Widget get userManagementSettings => SvgPicture.asset(
+  static Widget get userManagementSettings => const _IxIconWidget(
     'assets/svg/user-management-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-management.svg
-  static Widget get userManagement => SvgPicture.asset(
+  static Widget get userManagement => const _IxIconWidget(
     'assets/svg/user-management.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-manual-filled.svg
-  static Widget get userManualFilled => SvgPicture.asset(
+  static Widget get userManualFilled => const _IxIconWidget(
     'assets/svg/user-manual-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-manual.svg
-  static Widget get userManual => SvgPicture.asset(
+  static Widget get userManual => const _IxIconWidget(
     'assets/svg/user-manual.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-pen.svg
-  static Widget get userPen => SvgPicture.asset(
+  static Widget get userPen => const _IxIconWidget(
     'assets/svg/user-pen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-profile-filled.svg
-  static Widget get userProfileFilled => SvgPicture.asset(
+  static Widget get userProfileFilled => const _IxIconWidget(
     'assets/svg/user-profile-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-profile.svg
-  static Widget get userProfile => SvgPicture.asset(
+  static Widget get userProfile => const _IxIconWidget(
     'assets/svg/user-profile.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-reading-filled.svg
-  static Widget get userReadingFilled => SvgPicture.asset(
+  static Widget get userReadingFilled => const _IxIconWidget(
     'assets/svg/user-reading-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-reading.svg
-  static Widget get userReading => SvgPicture.asset(
+  static Widget get userReading => const _IxIconWidget(
     'assets/svg/user-reading.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-settings-filled.svg
-  static Widget get userSettingsFilled => SvgPicture.asset(
+  static Widget get userSettingsFilled => const _IxIconWidget(
     'assets/svg/user-settings-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-settings.svg
-  static Widget get userSettings => SvgPicture.asset(
+  static Widget get userSettings => const _IxIconWidget(
     'assets/svg/user-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-success-filled.svg
-  static Widget get userSuccessFilled => SvgPicture.asset(
+  static Widget get userSuccessFilled => const _IxIconWidget(
     'assets/svg/user-success-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user-success.svg
-  static Widget get userSuccess => SvgPicture.asset(
+  static Widget get userSuccess => const _IxIconWidget(
     'assets/svg/user-success.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: user.svg
-  static Widget get user => SvgPicture.asset(
+  static Widget get user => const _IxIconWidget(
     'assets/svg/user.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: variable.svg
-  static Widget get variable => SvgPicture.asset(
+  static Widget get variable => const _IxIconWidget(
     'assets/svg/variable.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: vdi-folder.svg
-  static Widget get vdiFolder => SvgPicture.asset(
+  static Widget get vdiFolder => const _IxIconWidget(
     'assets/svg/vdi-folder.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: version-history.svg
-  static Widget get versionHistory => SvgPicture.asset(
+  static Widget get versionHistory => const _IxIconWidget(
     'assets/svg/version-history.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: video-camera-filled.svg
-  static Widget get videoCameraFilled => SvgPicture.asset(
+  static Widget get videoCameraFilled => const _IxIconWidget(
     'assets/svg/video-camera-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: video-camera-record-filled.svg
-  static Widget get videoCameraRecordFilled => SvgPicture.asset(
+  static Widget get videoCameraRecordFilled => const _IxIconWidget(
     'assets/svg/video-camera-record-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: video-camera-record.svg
-  static Widget get videoCameraRecord => SvgPicture.asset(
+  static Widget get videoCameraRecord => const _IxIconWidget(
     'assets/svg/video-camera-record.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: video-camera.svg
-  static Widget get videoCamera => SvgPicture.asset(
+  static Widget get videoCamera => const _IxIconWidget(
     'assets/svg/video-camera.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: video-file-filled.svg
-  static Widget get videoFileFilled => SvgPicture.asset(
+  static Widget get videoFileFilled => const _IxIconWidget(
     'assets/svg/video-file-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: video-file.svg
-  static Widget get videoFile => SvgPicture.asset(
+  static Widget get videoFile => const _IxIconWidget(
     'assets/svg/video-file.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: viva-engage-logo.svg
-  static Widget get vivaEngageLogo => SvgPicture.asset(
+  static Widget get vivaEngageLogo => const _IxIconWidget(
     'assets/svg/viva-engage-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: voltage-filled.svg
-  static Widget get voltageFilled => SvgPicture.asset(
+  static Widget get voltageFilled => const _IxIconWidget(
     'assets/svg/voltage-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: voltage.svg
-  static Widget get voltage => SvgPicture.asset(
+  static Widget get voltage => const _IxIconWidget(
     'assets/svg/voltage.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-filled.svg
-  static Widget get warningFilled => SvgPicture.asset(
+  static Widget get warningFilled => const _IxIconWidget(
     'assets/svg/warning-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-hexagon-filled.svg
-  static Widget get warningHexagonFilled => SvgPicture.asset(
+  static Widget get warningHexagonFilled => const _IxIconWidget(
     'assets/svg/warning-hexagon-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-hexagon.svg
-  static Widget get warningHexagon => SvgPicture.asset(
+  static Widget get warningHexagon => const _IxIconWidget(
     'assets/svg/warning-hexagon.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-multiple-filled.svg
-  static Widget get warningMultipleFilled => SvgPicture.asset(
+  static Widget get warningMultipleFilled => const _IxIconWidget(
     'assets/svg/warning-multiple-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-multiple.svg
-  static Widget get warningMultiple => SvgPicture.asset(
+  static Widget get warningMultiple => const _IxIconWidget(
     'assets/svg/warning-multiple.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-octagon-filled.svg
-  static Widget get warningOctagonFilled => SvgPicture.asset(
+  static Widget get warningOctagonFilled => const _IxIconWidget(
     'assets/svg/warning-octagon-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-octagon.svg
-  static Widget get warningOctagon => SvgPicture.asset(
+  static Widget get warningOctagon => const _IxIconWidget(
     'assets/svg/warning-octagon.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-rhomb-filled.svg
-  static Widget get warningRhombFilled => SvgPicture.asset(
+  static Widget get warningRhombFilled => const _IxIconWidget(
     'assets/svg/warning-rhomb-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-rhomb-multiple-filled.svg
-  static Widget get warningRhombMultipleFilled => SvgPicture.asset(
+  static Widget get warningRhombMultipleFilled => const _IxIconWidget(
     'assets/svg/warning-rhomb-multiple-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-rhomb-multiple.svg
-  static Widget get warningRhombMultiple => SvgPicture.asset(
+  static Widget get warningRhombMultiple => const _IxIconWidget(
     'assets/svg/warning-rhomb-multiple.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-rhomb.svg
-  static Widget get warningRhomb => SvgPicture.asset(
+  static Widget get warningRhomb => const _IxIconWidget(
     'assets/svg/warning-rhomb.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-square-filled.svg
-  static Widget get warningSquareFilled => SvgPicture.asset(
+  static Widget get warningSquareFilled => const _IxIconWidget(
     'assets/svg/warning-square-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning-square.svg
-  static Widget get warningSquare => SvgPicture.asset(
+  static Widget get warningSquare => const _IxIconWidget(
     'assets/svg/warning-square.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: warning.svg
-  static Widget get warning => SvgPicture.asset(
+  static Widget get warning => const _IxIconWidget(
     'assets/svg/warning.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: watch-table.svg
-  static Widget get watchTable => SvgPicture.asset(
+  static Widget get watchTable => const _IxIconWidget(
     'assets/svg/watch-table.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: water-bathing.svg
-  static Widget get waterBathing => SvgPicture.asset(
+  static Widget get waterBathing => const _IxIconWidget(
     'assets/svg/water-bathing.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: water-fish.svg
-  static Widget get waterFish => SvgPicture.asset(
+  static Widget get waterFish => const _IxIconWidget(
     'assets/svg/water-fish.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: water-plant.svg
-  static Widget get waterPlant => SvgPicture.asset(
+  static Widget get waterPlant => const _IxIconWidget(
     'assets/svg/water-plant.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: water-sunbathing.svg
-  static Widget get waterSunbathing => SvgPicture.asset(
+  static Widget get waterSunbathing => const _IxIconWidget(
     'assets/svg/water-sunbathing.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: waveform.svg
-  static Widget get waveform => SvgPicture.asset(
+  static Widget get waveform => const _IxIconWidget(
     'assets/svg/waveform.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: web-browser-screen.svg
-  static Widget get webBrowserScreen => SvgPicture.asset(
+  static Widget get webBrowserScreen => const _IxIconWidget(
     'assets/svg/web-browser-screen.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: webcam-cancelled-filled.svg
-  static Widget get webcamCancelledFilled => SvgPicture.asset(
+  static Widget get webcamCancelledFilled => const _IxIconWidget(
     'assets/svg/webcam-cancelled-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: webcam-cancelled.svg
-  static Widget get webcamCancelled => SvgPicture.asset(
+  static Widget get webcamCancelled => const _IxIconWidget(
     'assets/svg/webcam-cancelled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: webcam-filled.svg
-  static Widget get webcamFilled => SvgPicture.asset(
+  static Widget get webcamFilled => const _IxIconWidget(
     'assets/svg/webcam-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: webcam.svg
-  static Widget get webcam => SvgPicture.asset(
+  static Widget get webcam => const _IxIconWidget(
     'assets/svg/webcam.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wechat-logo.svg
-  static Widget get wechatLogo => SvgPicture.asset(
+  static Widget get wechatLogo => const _IxIconWidget(
     'assets/svg/wechat-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: weibo-logo.svg
-  static Widget get weiboLogo => SvgPicture.asset(
+  static Widget get weiboLogo => const _IxIconWidget(
     'assets/svg/weibo-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: width.svg
-  static Widget get width => SvgPicture.asset(
+  static Widget get width => const _IxIconWidget(
     'assets/svg/width.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-off.svg
-  static Widget get wlanOff => SvgPicture.asset(
+  static Widget get wlanOff => const _IxIconWidget(
     'assets/svg/wlan-off.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-strength-0.svg
-  static Widget get wlanStrength0 => SvgPicture.asset(
+  static Widget get wlanStrength0 => const _IxIconWidget(
     'assets/svg/wlan-strength-0.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-strength-1-lock.svg
-  static Widget get wlanStrength1Lock => SvgPicture.asset(
+  static Widget get wlanStrength1Lock => const _IxIconWidget(
     'assets/svg/wlan-strength-1-lock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-strength-1.svg
-  static Widget get wlanStrength1 => SvgPicture.asset(
+  static Widget get wlanStrength1 => const _IxIconWidget(
     'assets/svg/wlan-strength-1.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-strength-2-lock.svg
-  static Widget get wlanStrength2Lock => SvgPicture.asset(
+  static Widget get wlanStrength2Lock => const _IxIconWidget(
     'assets/svg/wlan-strength-2-lock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-strength-2.svg
-  static Widget get wlanStrength2 => SvgPicture.asset(
+  static Widget get wlanStrength2 => const _IxIconWidget(
     'assets/svg/wlan-strength-2.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-strength-3-lock.svg
-  static Widget get wlanStrength3Lock => SvgPicture.asset(
+  static Widget get wlanStrength3Lock => const _IxIconWidget(
     'assets/svg/wlan-strength-3-lock.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-strength-3.svg
-  static Widget get wlanStrength3 => SvgPicture.asset(
+  static Widget get wlanStrength3 => const _IxIconWidget(
     'assets/svg/wlan-strength-3.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: wlan-warning.svg
-  static Widget get wlanWarning => SvgPicture.asset(
+  static Widget get wlanWarning => const _IxIconWidget(
     'assets/svg/wlan-warning.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: work-case-filled.svg
-  static Widget get workCaseFilled => SvgPicture.asset(
+  static Widget get workCaseFilled => const _IxIconWidget(
     'assets/svg/work-case-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: work-case.svg
-  static Widget get workCase => SvgPicture.asset(
+  static Widget get workCase => const _IxIconWidget(
     'assets/svg/work-case.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: workspace.svg
-  static Widget get workspace => SvgPicture.asset(
+  static Widget get workspace => const _IxIconWidget(
     'assets/svg/workspace.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: workspaces.svg
-  static Widget get workspaces => SvgPicture.asset(
+  static Widget get workspaces => const _IxIconWidget(
     'assets/svg/workspaces.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: x-axis-settings.svg
-  static Widget get xAxisSettings => SvgPicture.asset(
+  static Widget get xAxisSettings => const _IxIconWidget(
     'assets/svg/x-axis-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: x-logo.svg
-  static Widget get xLogo => SvgPicture.asset(
+  static Widget get xLogo => const _IxIconWidget(
     'assets/svg/x-logo.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: xls-document-filled.svg
-  static Widget get xlsDocumentFilled => SvgPicture.asset(
+  static Widget get xlsDocumentFilled => const _IxIconWidget(
     'assets/svg/xls-document-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: xls-document.svg
-  static Widget get xlsDocument => SvgPicture.asset(
+  static Widget get xlsDocument => const _IxIconWidget(
     'assets/svg/xls-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: xml-document.svg
-  static Widget get xmlDocument => SvgPicture.asset(
+  static Widget get xmlDocument => const _IxIconWidget(
     'assets/svg/xml-document.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: y-axis-settings.svg
-  static Widget get yAxisSettings => SvgPicture.asset(
+  static Widget get yAxisSettings => const _IxIconWidget(
     'assets/svg/y-axis-settings.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: youtube-filled.svg
-  static Widget get youtubeFilled => SvgPicture.asset(
+  static Widget get youtubeFilled => const _IxIconWidget(
     'assets/svg/youtube-filled.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: youtube.svg
-  static Widget get youtube => SvgPicture.asset(
+  static Widget get youtube => const _IxIconWidget(
     'assets/svg/youtube.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: zone.svg
-  static Widget get zone => SvgPicture.asset(
+  static Widget get zone => const _IxIconWidget(
     'assets/svg/zone.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: zoom-in.svg
-  static Widget get zoomIn => SvgPicture.asset(
+  static Widget get zoomIn => const _IxIconWidget(
     'assets/svg/zoom-in.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: zoom-out.svg
-  static Widget get zoomOut => SvgPicture.asset(
+  static Widget get zoomOut => const _IxIconWidget(
     'assets/svg/zoom-out.svg',
-    width: 24,
-    height: 24,
   );
 
   /// Icon: zoom-selection.svg
-  static Widget get zoomSelection => SvgPicture.asset(
+  static Widget get zoomSelection => const _IxIconWidget(
     'assets/svg/zoom-selection.svg',
-    width: 24,
-    height: 24,
   );
 
+}
+
+class _IxIconWidget extends StatelessWidget {
+  const _IxIconWidget(this.assetPath, {this.size, this.color});
+
+  final String assetPath;
+  final double? size;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final iconTheme = IconTheme.of(context);
+    final resolvedSize = size ?? iconTheme.size ?? 24;
+    final resolvedColor = color ?? iconTheme.color;
+
+    return SvgPicture.asset(
+      assetPath,
+      width: resolvedSize,
+      height: resolvedSize,
+      package: IxIcons._assetPackage,
+      colorFilter: resolvedColor == null
+          ? null
+          : ColorFilter.mode(resolvedColor, BlendMode.srcIn),
+    );
+  }
 }

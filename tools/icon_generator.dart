@@ -9,6 +9,7 @@ class IconGenerator {
   static const _packageName = '@siemens/ix-icons';
   static const _packageVersion = '3.2.0';
   static const _npmRegistryUrl = 'https://registry.npmjs.org';
+  static const _flutterPackageName = 'siemens_ix_flutter';
 
   static Future<void> generateIcons({
     required String outputDir,
@@ -43,10 +44,6 @@ class IconGenerator {
         // Process all SVG files
         final iconClassBuffer = StringBuffer();
         iconClassBuffer.writeln('// GENERATED FILE - DO NOT EDIT');
-        iconClassBuffer.writeln(
-          '// Generated from $_packageName@$_packageVersion',
-        );
-        iconClassBuffer.writeln('');
         iconClassBuffer.writeln("import 'package:flutter/widgets.dart';");
         iconClassBuffer.writeln(
           "import 'package:flutter_svg/flutter_svg.dart';",
@@ -55,6 +52,10 @@ class IconGenerator {
         iconClassBuffer.writeln('/// Siemens iX Design System Icons');
         iconClassBuffer.writeln('class IxIcons {');
         iconClassBuffer.writeln('  IxIcons._();');
+        iconClassBuffer.writeln('');
+        iconClassBuffer.writeln(
+          "  static const _assetPackage = '$_flutterPackageName';",
+        );
         iconClassBuffer.writeln('');
 
         var generatedCount = 0;
@@ -84,12 +85,10 @@ class IconGenerator {
           ).camelCase;
           iconClassBuffer.writeln("  /// Icon: $fileName");
           iconClassBuffer.writeln(
-            "  static Widget get $iconName => SvgPicture.asset(",
+            "  static Widget get $iconName => const _IxIconWidget(",
           );
           iconClassBuffer.writeln("    'assets/svg/$fileName',");
-          iconClassBuffer.writeln("    width: 24,");
-          iconClassBuffer.writeln("    height: 24,");
-          iconClassBuffer.writeln("  );");
+          iconClassBuffer.writeln('  );');
           iconClassBuffer.writeln('');
           generatedCount++;
         }
@@ -99,7 +98,41 @@ class IconGenerator {
         }
 
         iconClassBuffer.writeln('}');
-
+        iconClassBuffer.writeln('');
+        iconClassBuffer.writeln(
+          'class _IxIconWidget extends StatelessWidget {',
+        );
+        iconClassBuffer.writeln(
+          '  const _IxIconWidget(this.assetPath, {this.size, this.color});',
+        );
+        iconClassBuffer.writeln('');
+        iconClassBuffer.writeln('  final String assetPath;');
+        iconClassBuffer.writeln('  final double? size;');
+        iconClassBuffer.writeln('  final Color? color;');
+        iconClassBuffer.writeln('');
+        iconClassBuffer.writeln('  @override');
+        iconClassBuffer.writeln('  Widget build(BuildContext context) {');
+        iconClassBuffer.writeln('    final iconTheme = IconTheme.of(context);');
+        iconClassBuffer.writeln(
+          '    final resolvedSize = size ?? iconTheme.size ?? 24;',
+        );
+        iconClassBuffer.writeln(
+          '    final resolvedColor = color ?? iconTheme.color;',
+        );
+        iconClassBuffer.writeln('');
+        iconClassBuffer.writeln('    return SvgPicture.asset(');
+        iconClassBuffer.writeln('      assetPath,');
+        iconClassBuffer.writeln('      width: resolvedSize,');
+        iconClassBuffer.writeln('      height: resolvedSize,');
+        iconClassBuffer.writeln('      package: IxIcons._assetPackage,');
+        iconClassBuffer.writeln('      colorFilter: resolvedColor == null');
+        iconClassBuffer.writeln('          ? null');
+        iconClassBuffer.writeln(
+          '          : ColorFilter.mode(resolvedColor, BlendMode.srcIn),',
+        );
+        iconClassBuffer.writeln('    );');
+        iconClassBuffer.writeln('  }');
+        iconClassBuffer.writeln('}');
         final outputFile = File(path.join(outputDir, 'ix_icons.dart'));
         await outputFile.writeAsString(iconClassBuffer.toString());
 
