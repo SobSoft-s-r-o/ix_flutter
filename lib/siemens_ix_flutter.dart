@@ -12,6 +12,7 @@ export 'src/ix_theme/components/ix_label_theme.dart';
 export 'src/ix_theme/components/ix_toggle_theme.dart';
 export 'src/ix_theme/components/ix_radio_theme.dart';
 export 'src/ix_theme/components/ix_slider_theme.dart';
+export 'src/ix_theme/components/ix_upload_theme.dart';
 export 'src/ix_theme/components/ix_form_field_theme.dart';
 export 'src/ix_theme/components/ix_sidebar_theme.dart';
 export 'src/ix_theme/components/ix_tabs_theme.dart';

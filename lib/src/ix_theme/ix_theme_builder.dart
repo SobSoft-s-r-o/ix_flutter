@@ -15,6 +15,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_slider_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_toggle_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_upload_theme.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
 /// scale guidance.
@@ -80,6 +81,7 @@ class IxThemeBuilder {
     final radioTheme = IxRadioTheme.fromPalette(palette: palette);
     final sliderTheme = IxSliderTheme.fromPalette(palette: palette);
     final toggleTheme = IxToggleTheme.fromPalette(palette: palette);
+    final uploadTheme = IxUploadTheme.fromPalette(palette: palette);
     final labelTheme = IxLabelTheme.fromPalette(
       palette: palette,
       typography: typeScale,
@@ -162,6 +164,7 @@ class IxThemeBuilder {
         radioTheme,
         sliderTheme,
         toggleTheme,
+        uploadTheme,
         labelTheme,
       ],
     );

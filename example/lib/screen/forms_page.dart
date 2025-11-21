@@ -92,6 +92,7 @@ class _FormsPageState extends State<FormsPage> {
     final theme = Theme.of(context);
     final ixFields = theme.extension<IxFormFieldTheme>();
     final ixToggles = theme.extension<IxToggleTheme>();
+    final ixUpload = theme.extension<IxUploadTheme>();
 
     return ListView(
       padding: const EdgeInsets.all(24),
@@ -353,6 +354,15 @@ class _FormsPageState extends State<FormsPage> {
             ),
           ],
         ),
+        if (ixUpload != null) ...[
+          const SizedBox(height: 24),
+          _FormSection(
+            title: 'File uploads',
+            description:
+                'IxUploadTheme exposes dropzone padding, dashed outlines, and semantic colors for drag states.',
+            children: [_UploadDropzoneGallery(theme: ixUpload)],
+          ),
+        ],
         const SizedBox(height: 24),
         _FormSection(
           title: 'Aleo deployment radios',
@@ -577,5 +587,233 @@ class _SemanticBanner extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+class _UploadDropzoneGallery extends StatelessWidget {
+  const _UploadDropzoneGallery({required this.theme});
+
+  final IxUploadTheme theme;
+
+  @override
+  Widget build(BuildContext context) {
+    final states = IxUploadSurfaceState.values;
+    return Column(
+      children: [
+        for (var index = 0; index < states.length; index++) ...[
+          _UploadDropzoneTile(theme: theme, state: states[index]),
+          if (index != states.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+}
+
+class _UploadDropzoneTile extends StatelessWidget {
+  const _UploadDropzoneTile({required this.theme, required this.state});
+
+  final IxUploadTheme theme;
+  final IxUploadSurfaceState state;
+
+  bool get _isDisabled => state == IxUploadSurfaceState.disabled;
+  bool get _isBusy => state == IxUploadSurfaceState.checking;
+
+  @override
+  Widget build(BuildContext context) {
+    final surface = theme.style(state);
+    final textTheme = Theme.of(context).textTheme;
+    final titleStyle = textTheme.titleSmall?.copyWith(
+      color: surface.textColor,
+      fontWeight: FontWeight.w600,
+    );
+    final bodyStyle = textTheme.bodyMedium?.copyWith(color: surface.textColor);
+    final borderRadius = BorderRadius.circular(theme.borderRadius);
+    final leading = _buildLeading(context, surface.textColor);
+    final messageRowChildren = <Widget>[
+      if (leading != null) ...[leading, const SizedBox(width: 8)],
+      Expanded(child: Text(_uploadMessage(state), style: bodyStyle)),
+    ];
+    final buttonEnabled = !(_isDisabled || _isBusy);
+
+    Widget container = AnimatedContainer(
+      duration: const Duration(milliseconds: 250),
+      curve: Curves.easeInOut,
+      constraints: BoxConstraints(minHeight: theme.minHeight),
+      padding: theme.padding,
+      decoration: BoxDecoration(
+        color: surface.background,
+        borderRadius: borderRadius,
+        border: surface.borderStyle == IxUploadBorderStyle.dashed
+            ? null
+            : Border.all(color: surface.borderColor, width: theme.borderWidth),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(_uploadTitle(state), style: titleStyle),
+                const SizedBox(height: 6),
+                Row(children: messageRowChildren),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          FilledButton.tonal(
+            onPressed: buttonEnabled ? () {} : null,
+            child: const Text('Upload file…'),
+          ),
+        ],
+      ),
+    );
+
+    if (surface.borderStyle == IxUploadBorderStyle.dashed) {
+      container = _DashedBorder(
+        color: surface.borderColor,
+        strokeWidth: theme.borderWidth,
+        borderRadius: borderRadius,
+        child: container,
+      );
+    }
+
+    return container;
+  }
+
+  Widget? _buildLeading(BuildContext context, Color textColor) {
+    switch (state) {
+      case IxUploadSurfaceState.checking:
+        return SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator.adaptive(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(textColor),
+          ),
+        );
+      case IxUploadSurfaceState.dragOver:
+        return IconTheme(
+          data: IconTheme.of(context).copyWith(color: textColor, size: 20),
+          child: IxIcons.cloudUpload,
+        );
+      case IxUploadSurfaceState.disabled:
+        return Icon(Icons.block, size: 20, color: textColor);
+      case IxUploadSurfaceState.idle:
+        return IconTheme(
+          data: IconTheme.of(context).copyWith(color: textColor, size: 20),
+          child: IxIcons.upload,
+        );
+    }
+  }
+}
+
+class _DashedBorder extends StatelessWidget {
+  const _DashedBorder({
+    required this.child,
+    required this.color,
+    required this.strokeWidth,
+    required this.borderRadius,
+  });
+
+  final Widget child;
+  final Color color;
+  final double strokeWidth;
+  final BorderRadius borderRadius;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: _DashedBorderPainter(
+        color: color,
+        strokeWidth: strokeWidth,
+        borderRadius: borderRadius,
+        dashLength: 8,
+        gapLength: 4,
+      ),
+      child: child,
+    );
+  }
+}
+
+class _DashedBorderPainter extends CustomPainter {
+  const _DashedBorderPainter({
+    required this.color,
+    required this.strokeWidth,
+    required this.borderRadius,
+    required this.dashLength,
+    required this.gapLength,
+  });
+
+  final Color color;
+  final double strokeWidth;
+  final BorderRadius borderRadius;
+  final double dashLength;
+  final double gapLength;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    final rect = Offset.zero & size;
+    final safeWidth = rect.width - strokeWidth;
+    final safeHeight = rect.height - strokeWidth;
+    final deflated = Rect.fromLTWH(
+      strokeWidth / 2,
+      strokeWidth / 2,
+      safeWidth > 0 ? safeWidth : 0,
+      safeHeight > 0 ? safeHeight : 0,
+    );
+    final rrect = borderRadius.toRRect(deflated);
+    final path = Path()..addRRect(rrect);
+
+    for (final metric in path.computeMetrics()) {
+      double distance = 0;
+      while (distance < metric.length) {
+        final double end = (distance + dashLength) < metric.length
+            ? distance + dashLength
+            : metric.length;
+        final segment = metric.extractPath(distance, end);
+        canvas.drawPath(segment, paint);
+        distance = end + gapLength;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _DashedBorderPainter oldDelegate) {
+    return oldDelegate.color != color ||
+        oldDelegate.strokeWidth != strokeWidth ||
+        oldDelegate.borderRadius != borderRadius ||
+        oldDelegate.dashLength != dashLength ||
+        oldDelegate.gapLength != gapLength;
+  }
+}
+
+String _uploadTitle(IxUploadSurfaceState state) {
+  switch (state) {
+    case IxUploadSurfaceState.idle:
+      return 'Select files';
+    case IxUploadSurfaceState.dragOver:
+      return 'Drop to upload';
+    case IxUploadSurfaceState.checking:
+      return 'Validating files';
+    case IxUploadSurfaceState.disabled:
+      return 'Upload unavailable';
+  }
+}
+
+String _uploadMessage(IxUploadSurfaceState state) {
+  switch (state) {
+    case IxUploadSurfaceState.idle:
+      return '+ Drag files here or browse your system.';
+    case IxUploadSurfaceState.dragOver:
+      return 'Release to upload aleo-diagnostic.zip';
+    case IxUploadSurfaceState.checking:
+      return 'Checking files…';
+    case IxUploadSurfaceState.disabled:
+      return 'File upload currently not possible.';
   }
 }
