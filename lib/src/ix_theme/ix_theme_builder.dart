@@ -14,6 +14,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_modal_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_radio_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_slider_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_spinner_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_toggle_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_upload_theme.dart';
@@ -81,6 +82,7 @@ class IxThemeBuilder {
     final checkboxTheme = IxCheckboxTheme.fromPalette(palette: palette);
     final radioTheme = IxRadioTheme.fromPalette(palette: palette);
     final sliderTheme = IxSliderTheme.fromPalette(palette: palette);
+    final spinnerTheme = IxSpinnerTheme.fromPalette(palette: palette);
     final toggleTheme = IxToggleTheme.fromPalette(palette: palette);
     final modalTheme = IxModalTheme.fromPalette(
       palette: palette,
@@ -149,6 +151,12 @@ class IxThemeBuilder {
       checkboxTheme: checkboxTheme.materialCheckboxTheme,
       radioTheme: radioTheme.materialRadioTheme,
       sliderTheme: sliderTheme.materialSliderTheme,
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: spinnerTheme.style(IxSpinnerVariant.standard).indicatorColor,
+        circularTrackColor: spinnerTheme
+            .style(IxSpinnerVariant.standard)
+            .trackColor,
+      ),
       switchTheme: toggleTheme.materialSwitchTheme,
       filledButtonTheme: FilledButtonThemeData(style: buttonTheme.primary),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -185,6 +193,7 @@ class IxThemeBuilder {
         checkboxTheme,
         radioTheme,
         sliderTheme,
+        spinnerTheme,
         toggleTheme,
         uploadTheme,
         modalTheme,

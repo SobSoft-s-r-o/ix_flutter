@@ -7,6 +7,7 @@ import 'screen/cards_page.dart';
 import 'screen/forms_page.dart';
 import 'screen/home_page.dart';
 import 'screen/modals_page.dart';
+import 'screen/spinner_page.dart';
 import 'screen/slider_page.dart';
 import 'screen/tabs_page.dart';
 import 'theme_controller.dart';
@@ -67,6 +68,14 @@ class _SiemensIxDemoAppState extends State<SiemensIxDemoApp> {
               pageBuilder: (context, state) => NoTransitionPage(
                 key: state.pageKey,
                 child: const SliderPage(),
+              ),
+            ),
+            GoRoute(
+              path: SpinnerPage.routePath,
+              name: SpinnerPage.routeName,
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: const SpinnerPage(),
               ),
             ),
             GoRoute(
@@ -317,6 +326,12 @@ final List<_NavDestination> _navDestinations = [
     label: 'Sliders',
     iconBuilder: () => IxIcons.controlSlider,
     selectedIconBuilder: () => IxIcons.switchSlider,
+  ),
+  _NavDestination(
+    path: SpinnerPage.routePath,
+    label: 'Spinners',
+    iconBuilder: () => IxIcons.controlSpinner,
+    selectedIconBuilder: () => IxIcons.controlSpinner,
   ),
   _NavDestination(
     path: FormsPage.routePath,
