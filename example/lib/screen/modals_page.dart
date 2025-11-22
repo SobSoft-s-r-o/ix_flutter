@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
+import '../edge_to_edge.dart';
+
 class ModalsPage extends StatelessWidget {
   const ModalsPage({super.key});
 
@@ -56,7 +58,7 @@ class ModalsPage extends StatelessWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeToEdge.scrollPadding(context),
       children: [
         Text('Modal dialogs', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 12),

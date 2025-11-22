@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
@@ -10,6 +11,7 @@ import 'screen/modals_page.dart';
 import 'screen/spinner_page.dart';
 import 'screen/slider_page.dart';
 import 'screen/tabs_page.dart';
+import 'edge_to_edge.dart';
 import 'theme_controller.dart';
 
 class SiemensIxDemoApp extends StatefulWidget {
@@ -122,6 +124,16 @@ class _SiemensIxDemoAppState extends State<SiemensIxDemoApp> {
             darkTheme: _controller.buildTheme(ThemeMode.dark),
             themeMode: _controller.mode,
             debugShowCheckedModeBanner: false,
+            builder: (context, child) {
+              final overlayStyle = EdgeToEdge.overlayStyleFor(
+                Theme.of(context),
+              );
+              SystemChrome.setSystemUIOverlayStyle(overlayStyle);
+              return AnnotatedRegion<SystemUiOverlayStyle>(
+                value: overlayStyle,
+                child: child ?? const SizedBox.shrink(),
+              );
+            },
           ),
         );
       },
@@ -155,38 +167,43 @@ class _DemoShellState extends State<DemoShell> {
       (dest) => dest.matches(location),
     );
     final currentIndex = selectedIndex >= 0 ? selectedIndex : 0;
+    final overlayStyle = EdgeToEdge.overlayStyleFor(Theme.of(context));
 
-    return Scaffold(
-      key: _scaffoldKey,
-      appBar: AppBar(
-        leading: isLargeScreen
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: overlayStyle,
+      child: Scaffold(
+        key: _scaffoldKey,
+        extendBody: true,
+        appBar: AppBar(
+          leading: isLargeScreen
+              ? null
+              : IconButton(
+                  onPressed: () => _scaffoldKey.currentState?.openDrawer(),
+                  icon: IxIcons.appMenu,
+                ),
+          title: const Text('Siemens IX Flutter Demo'),
+        ),
+        drawer: isLargeScreen
             ? null
-            : IconButton(
-                onPressed: () => _scaffoldKey.currentState?.openDrawer(),
-                icon: IxIcons.appMenu,
+            : _NavigationDrawer(
+                currentIndex: currentIndex,
+                onSelect: (index) {
+                  Navigator.of(context).pop();
+                  _goTo(index);
+                },
               ),
-        title: const Text('Siemens IX Flutter Demo'),
-      ),
-      drawer: isLargeScreen
-          ? null
-          : _NavigationDrawer(
-              currentIndex: currentIndex,
-              onSelect: (index) {
-                Navigator.of(context).pop();
-                _goTo(index);
-              },
+        body: Row(
+          children: [
+            if (isLargeScreen)
+              _NavigationRail(currentIndex: currentIndex, onSelect: _goTo),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                child: widget.child,
+              ),
             ),
-      body: Row(
-        children: [
-          if (isLargeScreen)
-            _NavigationRail(currentIndex: currentIndex, onSelect: _goTo),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: widget.child,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
+import '../edge_to_edge.dart';
+
 class SpinnerPage extends StatelessWidget {
   const SpinnerPage({super.key});
 
@@ -19,7 +21,7 @@ class SpinnerPage extends StatelessWidget {
     }
 
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeToEdge.scrollPadding(context),
       children: [
         Text('Spinners', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 12),

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
+import '../edge_to_edge.dart';
+
 class ButtonsPage extends StatelessWidget {
   const ButtonsPage({super.key});
 
@@ -22,7 +24,7 @@ class ButtonsPage extends StatelessWidget {
     const statusVariants = IxChipStatus.values;
 
     return ListView.separated(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeToEdge.scrollPadding(context),
       itemBuilder: (context, index) {
         if (index < variants.length) {
           final variant = variants[index];

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
+import '../edge_to_edge.dart';
+
 class TabsPage extends StatefulWidget {
   const TabsPage({super.key});
 
@@ -57,11 +59,17 @@ class _TabsPageState extends State<TabsPage> {
             child: TabBarView(
               children: [
                 ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeToEdge.scrollPadding(
+                    context,
+                    base: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                  ),
                   children: [_TextTabsDemo(ixTabs: ixTabs)],
                 ),
                 ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  padding: EdgeToEdge.scrollPadding(
+                    context,
+                    base: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                  ),
                   children: [
                     _CircleTabsDemo(
                       ixTabs: ixTabs,

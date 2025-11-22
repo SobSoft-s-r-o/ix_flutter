@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
+import '../edge_to_edge.dart';
+
 class SliderPage extends StatefulWidget {
   const SliderPage({super.key});
 
@@ -26,7 +28,7 @@ class _SliderPageState extends State<SliderPage> {
     final theme = Theme.of(context);
 
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeToEdge.scrollPadding(context),
       children: [
         Text('Slider controls', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 12),

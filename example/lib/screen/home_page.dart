@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
+import '../edge_to_edge.dart';
 import '../theme_controller.dart';
 
 class HomePage extends StatelessWidget {
@@ -18,7 +19,7 @@ class HomePage extends StatelessWidget {
     final sidebarTheme = theme.extension<IxSidebarTheme>();
 
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeToEdge.scrollPadding(context),
       children: [
         Text('Siemens IX Theme Overview', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 12),
