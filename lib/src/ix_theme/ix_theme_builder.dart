@@ -82,7 +82,10 @@ class IxThemeBuilder {
     final radioTheme = IxRadioTheme.fromPalette(palette: palette);
     final sliderTheme = IxSliderTheme.fromPalette(palette: palette);
     final toggleTheme = IxToggleTheme.fromPalette(palette: palette);
-    final modalTheme = IxModalTheme.fromPalette(palette: palette);
+    final modalTheme = IxModalTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
     final uploadTheme = IxUploadTheme.fromPalette(palette: palette);
     final labelTheme = IxLabelTheme.fromPalette(
       palette: palette,
@@ -113,6 +116,8 @@ class IxThemeBuilder {
       canvasColor: palette[IxThemeColorToken.color1],
       dialogTheme: DialogThemeData(
         backgroundColor: modalTheme.backgroundColor,
+        elevation: modalTheme.elevation,
+        shadowColor: palette[IxThemeColorToken.shadow2],
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(modalTheme.borderRadius),
@@ -121,7 +126,13 @@ class IxThemeBuilder {
             width: modalTheme.borderWidth,
           ),
         ),
-        insetPadding: EdgeInsets.all(modalTheme.dialogPadding),
+        alignment: modalTheme.alignment,
+        iconColor: modalTheme.iconColor,
+        titleTextStyle: modalTheme.titleTextStyle,
+        contentTextStyle: modalTheme.contentTextStyle,
+        barrierColor: modalTheme.barrierColor,
+        insetPadding: modalTheme.insetPadding,
+        constraints: modalTheme.constraints,
       ),
       cardColor: palette[IxThemeColorToken.color3],
       dividerColor: palette[IxThemeColorToken.softBdr],
