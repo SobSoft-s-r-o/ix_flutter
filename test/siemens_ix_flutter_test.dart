@@ -303,4 +303,56 @@ void main() {
     expect(ixModal.size(IxModalSize.md).width, 600);
     expect(ixModal.shadow.length, greaterThanOrEqualTo(1));
   });
+
+  test('wires Siemens IX scrollbar theme', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    );
+
+    final theme = builder.build();
+    final ixTheme = theme.extension<IxTheme>()!;
+    final ixScrollbar = theme.extension<IxScrollbarTheme>();
+
+    expect(ixScrollbar, isNotNull);
+    expect(theme.scrollbarTheme, same(ixScrollbar!.materialScrollbarTheme));
+
+    final thumb = theme.scrollbarTheme.thumbColor!;
+    expect(
+      thumb.resolve(<WidgetState>{}),
+      ixTheme.color(IxThemeColorToken.component4),
+    );
+    expect(
+      thumb.resolve(<WidgetState>{WidgetState.hovered}),
+      ixTheme.color(IxThemeColorToken.component5),
+    );
+    expect(
+      thumb.resolve(<WidgetState>{WidgetState.pressed}),
+      ixTheme.color(IxThemeColorToken.component6),
+    );
+
+    final trackBorder = theme.scrollbarTheme.trackBorderColor!;
+    expect(
+      trackBorder.resolve(<WidgetState>{WidgetState.hovered}),
+      ixTheme.color(IxThemeColorToken.softBdr),
+    );
+    expect(
+      trackBorder.resolve(<WidgetState>{WidgetState.pressed}),
+      ixTheme.color(IxThemeColorToken.stdBdr),
+    );
+
+    final thickness = theme.scrollbarTheme.thickness!;
+    expect(
+      thickness.resolve(<WidgetState>{}),
+      closeTo(ixScrollbar.baseThickness, 0.001),
+    );
+    expect(
+      thickness.resolve(<WidgetState>{WidgetState.hovered}),
+      closeTo(ixScrollbar.hoverThickness, 0.001),
+    );
+    expect(
+      thickness.resolve(<WidgetState>{WidgetState.pressed}),
+      closeTo(ixScrollbar.activeThickness, 0.001),
+    );
+  });
 }

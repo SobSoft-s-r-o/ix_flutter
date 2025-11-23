@@ -12,6 +12,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_form_field_theme.d
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_label_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_modal_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_radio_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_scrollbar_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_slider_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_spinner_theme.dart';
@@ -102,6 +103,7 @@ class IxThemeBuilder {
       typography: typeScale,
       labelTheme: labelTheme,
     );
+    final scrollbarTheme = IxScrollbarTheme.fromPalette(palette: palette);
     final ixThemeExtension = IxTheme(
       family: family,
       mode: mode,
@@ -180,6 +182,7 @@ class IxThemeBuilder {
       fontFamily: typeScale.fontFamily,
       visualDensity: VisualDensity.standard,
       applyElevationOverlayColor: brightness == Brightness.dark,
+      scrollbarTheme: scrollbarTheme.materialScrollbarTheme,
       extensions: [
         ixThemeExtension,
         buttonTheme,
@@ -198,6 +201,7 @@ class IxThemeBuilder {
         uploadTheme,
         modalTheme,
         labelTheme,
+        scrollbarTheme,
       ],
     );
   }
