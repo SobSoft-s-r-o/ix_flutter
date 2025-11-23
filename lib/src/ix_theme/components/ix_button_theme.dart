@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
-
-const _defaultCssFontSizePx = 16.0; // Browser default for 1rem.
-const _smallBorderRadiusRem = 0.125; // --theme-small-border-radius token.
-const _smallBorderRadiusPx = _defaultCssFontSizePx * _smallBorderRadiusRem;
 
 /// Enumerates the Siemens IX button variants.
 enum IxButtonVariant {
@@ -58,9 +55,14 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
   }) {
     Color color(IxThemeColorToken token) => palette[token]!;
 
-    const basePadding = EdgeInsets.symmetric(horizontal: 16, vertical: 12);
+    final basePadding = EdgeInsets.symmetric(
+      horizontal: IxCommonGeometry.space(3),
+      vertical: IxCommonGeometry.space(2),
+    );
     const baseShape = RoundedRectangleBorder(
-      borderRadius: BorderRadius.all(Radius.circular(_smallBorderRadiusPx)),
+      borderRadius: BorderRadius.all(
+        Radius.circular(IxCommonGeometry.smallBorderRadius),
+      ),
     );
     final labelStyle = typography.label;
 
@@ -73,8 +75,10 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
     }) {
       return ButtonStyle(
         textStyle: WidgetStatePropertyAll<TextStyle?>(labelStyle),
-        padding: const WidgetStatePropertyAll<EdgeInsetsGeometry?>(basePadding),
-        minimumSize: const WidgetStatePropertyAll<Size?>(Size(64, 40)),
+        padding: WidgetStatePropertyAll<EdgeInsetsGeometry?>(basePadding),
+        minimumSize: const WidgetStatePropertyAll<Size?>(
+          Size(64, IxCommonGeometry.controlHeightLarge),
+        ),
         shape: const WidgetStatePropertyAll<OutlinedBorder?>(baseShape),
         backgroundColor: background,
         foregroundColor: foreground,
@@ -165,8 +169,10 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
 
     BorderSide transparentSide() => const BorderSide(color: Colors.transparent);
 
-    BorderSide border(Color value, {double width = 1}) =>
-        BorderSide(color: value, width: width);
+    BorderSide border(
+      Color value, {
+      double width = IxCommonGeometry.borderWidthDefault,
+    }) => BorderSide(color: value, width: width);
 
     final hoverOverlay = overlayStates(
       hovered: color(IxThemeColorToken.component1Hover),

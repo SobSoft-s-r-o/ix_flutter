@@ -2,15 +2,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-
-const _defaultCssFontSizePx = 16.0; // Browser default for 1rem.
-const _cardBorderRadiusRem = 0.25; // --theme-default-border-radius
-const _cardBorderWidthRem = 0.0625; // --theme-border-width-default
-const _cardFocusOffsetRem = 0.125; // --theme-focus-outline-offset
-
-const _cardBorderRadiusPx = _defaultCssFontSizePx * _cardBorderRadiusRem;
-const _cardBorderWidthPx = _defaultCssFontSizePx * _cardBorderWidthRem;
-const _cardFocusOffsetPx = _defaultCssFontSizePx * _cardFocusOffsetRem;
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 /// Enumerates Siemens IX card variants surfaced by the theme extension.
 enum IxCardVariant {
@@ -249,16 +241,21 @@ class IxCardTheme extends ThemeExtension<IxCardTheme> {
       shadowColor: resolve(IxThemeColorToken.shadow1),
       surfaceTintColor: Colors.transparent,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(_cardBorderRadiusPx),
-        side: BorderSide(color: Colors.transparent, width: _cardBorderWidthPx),
+        borderRadius: BorderRadius.circular(
+          IxCommonGeometry.defaultBorderRadius,
+        ),
+        side: BorderSide(
+          color: Colors.transparent,
+          width: IxCommonGeometry.borderWidthDefault,
+        ),
       ),
     );
 
     return IxCardTheme(
       materialCardTheme: materialCardTheme,
-      borderRadius: _cardBorderRadiusPx,
-      borderWidth: _cardBorderWidthPx,
-      focusOutlineOffset: _cardFocusOffsetPx,
+      borderRadius: IxCommonGeometry.defaultBorderRadius,
+      borderWidth: IxCommonGeometry.borderWidthDefault,
+      focusOutlineOffset: IxCommonGeometry.focusOutlineOffset,
       variants: Map.unmodifiable(variants),
     );
   }

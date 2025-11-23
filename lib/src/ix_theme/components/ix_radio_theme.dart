@@ -2,13 +2,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-
-const _defaultCssFontSizePx = 16.0; // Browser default for 1rem.
-const _radioBorderWidthRem = 0.0625; // --theme-border-width-default token.
-const _radioFocusOffsetRem = 0.125; // --theme-focus-outline-offset token.
-
-const _radioBorderWidthPx = _defaultCssFontSizePx * _radioBorderWidthRem;
-const _radioFocusOffsetPx = _defaultCssFontSizePx * _radioFocusOffsetRem;
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 /// Enumerates Siemens IX radio semantic treatments.
 enum IxRadioStatus { standard, info, warning, invalid }
@@ -339,8 +333,8 @@ class IxRadioTheme extends ThemeExtension<IxRadioTheme> {
 
     return IxRadioTheme(
       materialRadioTheme: radioTheme,
-      borderWidth: _radioBorderWidthPx,
-      focusOutlineOffset: _radioFocusOffsetPx,
+      borderWidth: IxCommonGeometry.borderWidthDefault,
+      focusOutlineOffset: IxCommonGeometry.focusOutlineOffset,
       labelColor: color(IxThemeColorToken.stdText),
       disabledLabelColor: color(IxThemeColorToken.weakText),
       styles: styles,

@@ -2,35 +2,20 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
 
-const double _defaultCssFontSizePx = 16.0;
-const double _defaultBorderRadiusRem = 0.25;
-const double _defaultBorderWidthRem = 0.0625;
-const double _headerPaddingLeftRem = 0.5;
-const double _headerPaddingTopBottomRem = 0.5;
-const double _headerGapRem = 1.0;
-const double _contentPaddingLeftRem = 0.5;
-const double _contentPaddingTopRem = 0.5;
-const double _contentPaddingRightRem = 0.5;
-const double _contentPaddingBottomRem = 0.5;
-const double _footerPaddingRem = 0.5;
-const double _footerGapRem = 0.5;
-const double _dialogPaddingRem = 1.0;
-const double _closeIconBorderRadiusPx = 4;
 const double _closeIconHoverBackgroundOpacity = 0.85;
 const double _defaultMaxHeightFraction = 0.8;
-
-double _rem(double value) => value * _defaultCssFontSizePx;
 
 enum IxModalSize { xs, sm, md, lg, xl, fullWidth, fullScreen }
 
 const Map<IxModalSize, double> _modalFixedWidths = <IxModalSize, double>{
-  IxModalSize.xs: 360,
-  IxModalSize.sm: 480,
-  IxModalSize.md: 600,
-  IxModalSize.lg: 720,
-  IxModalSize.xl: 840,
+  IxModalSize.xs: IxCommonGeometry.container2,
+  IxModalSize.sm: IxCommonGeometry.container3,
+  IxModalSize.md: IxCommonGeometry.container4,
+  IxModalSize.lg: IxCommonGeometry.container5,
+  IxModalSize.xl: IxCommonGeometry.container6,
 };
 
 /// Captures layout hints for a concrete modal dialog size.
@@ -113,19 +98,19 @@ class IxModalTheme extends ThemeExtension<IxModalTheme> {
     Color pick(IxThemeColorToken token) => palette[token]!;
 
     final headerPadding = EdgeInsets.fromLTRB(
-      _rem(_headerPaddingLeftRem),
-      _rem(_headerPaddingTopBottomRem),
+      IxCommonGeometry.space1,
+      IxCommonGeometry.space1,
       0,
-      _rem(_headerPaddingTopBottomRem),
+      IxCommonGeometry.space1,
     );
     final contentPadding = EdgeInsets.fromLTRB(
-      _rem(_contentPaddingLeftRem),
-      _rem(_contentPaddingTopRem),
-      _rem(_contentPaddingRightRem),
-      _rem(_contentPaddingBottomRem),
+      IxCommonGeometry.space1,
+      IxCommonGeometry.space1,
+      IxCommonGeometry.space1,
+      IxCommonGeometry.space1,
     );
-    final footerPadding = EdgeInsets.all(_rem(_footerPaddingRem));
-    final dialogPadding = _rem(_dialogPaddingRem);
+    final footerPadding = EdgeInsets.all(IxCommonGeometry.space1);
+    final dialogPadding = IxCommonGeometry.space3;
     final insetPadding = EdgeInsets.symmetric(
       horizontal: dialogPadding,
       vertical: dialogPadding,
@@ -177,17 +162,17 @@ class IxModalTheme extends ThemeExtension<IxModalTheme> {
     return IxModalTheme(
       backgroundColor: pick(IxThemeColorToken.color2),
       borderColor: pick(IxThemeColorToken.color0),
-      borderWidth: _rem(_defaultBorderWidthRem),
-      borderRadius: _rem(_defaultBorderRadiusRem),
+      borderWidth: IxCommonGeometry.borderWidthDefault,
+      borderRadius: IxCommonGeometry.defaultBorderRadius,
       shadow: boxShadows,
       backdropColor: pick(IxThemeColorToken.lightbox),
       dialogPadding: dialogPadding,
       insetPadding: insetPadding,
       headerPadding: headerPadding,
-      headerGap: _rem(_headerGapRem),
+      headerGap: IxCommonGeometry.space3,
       contentPadding: contentPadding,
       footerPadding: footerPadding,
-      footerGap: _rem(_footerGapRem),
+      footerGap: IxCommonGeometry.space1,
       maxHeightFraction: _defaultMaxHeightFraction,
       sizes: Map<IxModalSize, IxModalSizeSpec>.unmodifiable(sizes),
       elevation: 24,
@@ -195,7 +180,7 @@ class IxModalTheme extends ThemeExtension<IxModalTheme> {
       iconColor: pick(IxThemeColorToken.stdText),
       iconBackgroundColor: closeIconBackground,
       iconBackgroundColorHover: closeIconBackgroundHover,
-      closeIconBorderRadius: _closeIconBorderRadiusPx,
+      closeIconBorderRadius: IxCommonGeometry.defaultBorderRadius,
       titleTextStyle: titleTextStyle,
       contentTextStyle: contentTextStyle,
       barrierColor: pick(IxThemeColorToken.lightbox),

@@ -2,16 +2,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-
-const _defaultCssFontSizePx = 16.0; // Browser default for 1rem.
-const _checkboxBorderRadiusRem = 0.125; // --theme-small-border-radius token.
-const _checkboxBorderWidthRem = 0.0625; // --theme-border-width-default token.
-const _checkboxFocusOffsetRem = 0.125; // --theme-focus-outline-offset token.
-
-const _checkboxBorderRadiusPx =
-    _defaultCssFontSizePx * _checkboxBorderRadiusRem;
-const _checkboxBorderWidthPx = _defaultCssFontSizePx * _checkboxBorderWidthRem;
-const _checkboxFocusOffsetPx = _defaultCssFontSizePx * _checkboxFocusOffsetRem;
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 /// Enumerates Siemens IX checkbox semantic treatments.
 enum IxCheckboxStatus { standard, info, warning, invalid }
@@ -387,15 +378,15 @@ class IxCheckboxTheme extends ThemeExtension<IxCheckboxTheme> {
 
     final checkboxTheme = CheckboxThemeData(
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(_checkboxBorderRadiusPx),
+        borderRadius: BorderRadius.circular(IxCommonGeometry.smallBorderRadius),
         side: BorderSide(
           color: standard.unchecked.borderColor,
-          width: _checkboxBorderWidthPx,
+          width: IxCommonGeometry.borderWidthDefault,
         ),
       ),
       side: BorderSide(
         color: standard.unchecked.borderColor,
-        width: _checkboxBorderWidthPx,
+        width: IxCommonGeometry.borderWidthDefault,
       ),
       fillColor: WidgetStateProperty.resolveWith(resolveBackground),
       checkColor: WidgetStateProperty.resolveWith(resolveIcon),
@@ -407,9 +398,9 @@ class IxCheckboxTheme extends ThemeExtension<IxCheckboxTheme> {
 
     return IxCheckboxTheme(
       materialCheckboxTheme: checkboxTheme,
-      borderRadius: _checkboxBorderRadiusPx,
-      borderWidth: _checkboxBorderWidthPx,
-      focusOutlineOffset: _checkboxFocusOffsetPx,
+      borderRadius: IxCommonGeometry.smallBorderRadius,
+      borderWidth: IxCommonGeometry.borderWidthDefault,
+      focusOutlineOffset: IxCommonGeometry.focusOutlineOffset,
       labelColor: color(IxThemeColorToken.stdText),
       disabledLabelColor: color(IxThemeColorToken.weakText),
       styles: styles,

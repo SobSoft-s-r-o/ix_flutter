@@ -2,16 +2,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-
-const _defaultCssFontSizePx = 16.0; // Browser default for 1rem.
-const _sliderTrackHeightRem = 0.25; // --theme-border-radius token proxy.
-const _sliderThumbDiameterRem = 0.75; // Matches IX thumb size.
-const _sliderOverlayRadiusRem = 1.25; // Hover/press halo radius.
-
-const _sliderTrackHeightPx = _defaultCssFontSizePx * _sliderTrackHeightRem;
-const _sliderThumbRadiusPx =
-    (_defaultCssFontSizePx * _sliderThumbDiameterRem) / 2;
-const _sliderOverlayRadiusPx = _defaultCssFontSizePx * _sliderOverlayRadiusRem;
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 /// Enumerates Siemens IX slider semantic variants.
 enum IxSliderStatus { standard, info, warning, invalid }
@@ -99,6 +90,9 @@ class IxSliderTheme extends ThemeExtension<IxSliderTheme> {
     required Map<IxThemeColorToken, Color> palette,
   }) {
     Color color(IxThemeColorToken token) => palette[token]!;
+    final trackHeight = IxCommonGeometry.spaceNeg1;
+    final thumbRadius = IxCommonGeometry.space2 / 2;
+    final overlayRadius = IxCommonGeometry.modularScale2;
 
     IxSliderColors style({
       required IxThemeColorToken thumb,
@@ -190,7 +184,7 @@ class IxSliderTheme extends ThemeExtension<IxSliderTheme> {
     ).withOpacity(0.25);
 
     final sliderTheme = SliderThemeData(
-      trackHeight: _sliderTrackHeightPx,
+      trackHeight: trackHeight,
       activeTrackColor: standard.trace,
       inactiveTrackColor: standard.track,
       disabledActiveTrackColor: standard.traceDisabled,
@@ -203,12 +197,10 @@ class IxSliderTheme extends ThemeExtension<IxSliderTheme> {
       disabledInactiveTickMarkColor: standard.markerDisabled,
       overlayColor: overlayColor,
       thumbShape: RoundSliderThumbShape(
-        enabledThumbRadius: _sliderThumbRadiusPx,
-        disabledThumbRadius: _sliderThumbRadiusPx,
+        enabledThumbRadius: thumbRadius,
+        disabledThumbRadius: thumbRadius,
       ),
-      overlayShape: RoundSliderOverlayShape(
-        overlayRadius: _sliderOverlayRadiusPx,
-      ),
+      overlayShape: RoundSliderOverlayShape(overlayRadius: overlayRadius),
       valueIndicatorTextStyle: TextStyle(
         color: color(IxThemeColorToken.primaryContrast),
       ),
@@ -216,9 +208,9 @@ class IxSliderTheme extends ThemeExtension<IxSliderTheme> {
 
     return IxSliderTheme(
       materialSliderTheme: sliderTheme,
-      trackHeight: _sliderTrackHeightPx,
-      thumbRadius: _sliderThumbRadiusPx,
-      overlayRadius: _sliderOverlayRadiusPx,
+      trackHeight: trackHeight,
+      thumbRadius: thumbRadius,
+      overlayRadius: overlayRadius,
       styles: styles,
     );
   }

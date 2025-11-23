@@ -2,23 +2,16 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 
-const double _defaultCssFontSizePx = 16.0;
-const double _xxSmallSizeRem = 0.75;
-const double _xSmallSizeRem = 1.25;
-const double _smallSizeRem = 1.5;
-const double _mediumSizeRem = 2.0;
-const double _largeSizeRem = 6.0;
-const double _xxSmallTrackPx = 1;
-const double _xSmallTrackPx = 2;
-const double _smallTrackPx = 2;
-const double _mediumTrackPx = 2;
-const double _largeTrackPx = 4;
+const double _xxSmallDiameter = IxCommonGeometry.space2;
+const double _xSmallDiameter = IxCommonGeometry.modularScale2;
+const double _smallDiameter = IxCommonGeometry.space4;
+const double _mediumDiameter = IxCommonGeometry.space5;
+const double _largeDiameter = IxCommonGeometry.space8;
 const double _ringInsetFraction = 0.0833; // 8.33% inset from SCSS.
 const Duration _rotationDuration = Duration(seconds: 2);
 const Duration _maskDuration = Duration(seconds: 3);
-
-double _rem(double value) => value * _defaultCssFontSizePx;
 
 /// Available Siemens IX spinner sizes.
 enum IxSpinnerSize { xxSmall, xSmall, small, medium, large }
@@ -105,24 +98,24 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
 
     final sizes = Map<IxSpinnerSize, IxSpinnerSizeSpec>.unmodifiable({
       IxSpinnerSize.xxSmall: IxSpinnerSizeSpec(
-        diameter: _rem(_xxSmallSizeRem),
-        trackWidth: _xxSmallTrackPx,
+        diameter: _xxSmallDiameter,
+        trackWidth: IxCommonGeometry.borderWidthDefault,
       ),
       IxSpinnerSize.xSmall: IxSpinnerSizeSpec(
-        diameter: _rem(_xSmallSizeRem),
-        trackWidth: _xSmallTrackPx,
+        diameter: _xSmallDiameter,
+        trackWidth: IxCommonGeometry.borderWidthThick,
       ),
       IxSpinnerSize.small: IxSpinnerSizeSpec(
-        diameter: _rem(_smallSizeRem),
-        trackWidth: _smallTrackPx,
+        diameter: _smallDiameter,
+        trackWidth: IxCommonGeometry.borderWidthThick,
       ),
       IxSpinnerSize.medium: IxSpinnerSizeSpec(
-        diameter: _rem(_mediumSizeRem),
-        trackWidth: _mediumTrackPx,
+        diameter: _mediumDiameter,
+        trackWidth: IxCommonGeometry.borderWidthThick,
       ),
       IxSpinnerSize.large: IxSpinnerSizeSpec(
-        diameter: _rem(_largeSizeRem),
-        trackWidth: _largeTrackPx,
+        diameter: _largeDiameter,
+        trackWidth: IxCommonGeometry.spaceNeg1,
       ),
     });
 

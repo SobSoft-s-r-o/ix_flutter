@@ -1,26 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_label_theme.dart';
-
-const _defaultCssFontSizePx = 16.0;
-const _smallBorderRadiusRem = 0.125;
-const _inputVerticalPaddingRem = 0.75;
-const _inputHorizontalPaddingRem = 1.0;
-const _iconSlotRem = 2.5;
-
-const double _borderRadiusPx = _defaultCssFontSizePx * _smallBorderRadiusRem;
-const double _verticalPaddingPx =
-    _defaultCssFontSizePx * _inputVerticalPaddingRem;
-const double _horizontalPaddingPx =
-    _defaultCssFontSizePx * _inputHorizontalPaddingRem;
-const double _inputMinHeight = 40.0;
-const double _iconSlotPx = _defaultCssFontSizePx * _iconSlotRem;
-
-const BoxConstraints _iconConstraints = BoxConstraints.tightFor(
-  width: _iconSlotPx,
-  height: _iconSlotPx,
-);
 
 WidgetStateColor _stateColor({
   required Color base,
@@ -49,7 +31,7 @@ WidgetStateColor _stateColor({
 OutlineInputBorder _outline({
   required BorderRadius borderRadius,
   required Color color,
-  double width = 1,
+  double width = IxCommonGeometry.borderWidthDefault,
 }) {
   return OutlineInputBorder(
     borderRadius: borderRadius,
@@ -132,8 +114,19 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
       );
     }
 
-    final borderRadius = BorderRadius.circular(_borderRadiusPx);
+    final borderRadius = BorderRadius.circular(
+      IxCommonGeometry.smallBorderRadius,
+    );
     final fieldShape = RoundedRectangleBorder(borderRadius: borderRadius);
+    final contentPadding = EdgeInsets.symmetric(
+      horizontal: IxCommonGeometry.space3,
+      vertical: IxCommonGeometry.space2,
+    );
+    const iconSlot = IxCommonGeometry.formFieldIconSlot;
+    final iconConstraints = BoxConstraints.tightFor(
+      width: iconSlot,
+      height: iconSlot,
+    );
 
     final fillBase = pick(IxThemeColorToken.component8);
     final fillHover = pick(IxThemeColorToken.component8Hover);
@@ -174,11 +167,10 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
       ),
       focusColor: fillFocus,
       hoverColor: fillHover,
-      contentPadding: const EdgeInsets.symmetric(
-        horizontal: _horizontalPaddingPx,
-        vertical: _verticalPaddingPx,
+      contentPadding: contentPadding,
+      constraints: const BoxConstraints(
+        minHeight: IxCommonGeometry.controlHeightLarge,
       ),
-      constraints: const BoxConstraints(minHeight: _inputMinHeight),
       labelStyle: labelStyle,
       floatingLabelStyle: floatingLabelStyle,
       hintStyle: hintStyle,
@@ -196,8 +188,8 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
       iconColor: iconColor,
       prefixIconColor: iconColor,
       suffixIconColor: iconColor,
-      prefixIconConstraints: _iconConstraints,
-      suffixIconConstraints: _iconConstraints,
+      prefixIconConstraints: iconConstraints,
+      suffixIconConstraints: iconConstraints,
       border: _outline(
         borderRadius: borderRadius,
         color: pick(IxThemeColorToken.stdBdr),
@@ -209,7 +201,7 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
       focusedBorder: _outline(
         borderRadius: borderRadius,
         color: pick(IxThemeColorToken.dynamic),
-        width: 2,
+        width: IxCommonGeometry.borderWidthThick,
       ),
       disabledBorder: _outline(
         borderRadius: borderRadius,
@@ -222,7 +214,7 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
       focusedErrorBorder: _outline(
         borderRadius: borderRadius,
         color: pick(IxThemeColorToken.alarmBdr),
-        width: 2,
+        width: IxCommonGeometry.borderWidthThick,
       ),
     );
 
@@ -240,8 +232,8 @@ class IxFormFieldTheme extends ThemeExtension<IxFormFieldTheme> {
           BorderSide(color: pick(IxThemeColorToken.softBdr)),
         ),
         shape: WidgetStatePropertyAll(fieldShape),
-        padding: const WidgetStatePropertyAll(
-          EdgeInsets.symmetric(vertical: 8),
+        padding: WidgetStatePropertyAll(
+          EdgeInsets.symmetric(vertical: IxCommonGeometry.space(1)),
         ),
         alignment: AlignmentDirectional.bottomStart,
       ),

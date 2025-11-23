@@ -1,14 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-
-const _defaultCssFontSizePx = 16.0;
-const double _thumbDiameterPx =
-    _defaultCssFontSizePx * 1.125; // 1.125rem = 18px.
-const double _borderWidthPx = _defaultCssFontSizePx * 0.0625; // 1px outline.
-const double _verticalPaddingPx =
-    _defaultCssFontSizePx * 0.125; // Half of 0.25rem margin.
-const double _horizontalPaddingPx = 2.0; // Keeps overall width close to 3rem.
-const double _splashRadius = _thumbDiameterPx;
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 /// Siemens IX toggle semantic variants.
 enum IxToggleStatus { standard, info, warning, invalid }
@@ -357,6 +349,9 @@ SwitchThemeData _buildSwitchTheme(
   Color overlayActive,
   Color focusOutline,
 ) {
+  final borderWidth = IxCommonGeometry.borderWidthDefault;
+  const paddingValue = IxCommonGeometry.spaceNeg3;
+  const thumbDiameter = IxCommonGeometry.toggleThumbDiameter;
   Color resolveTrack(Set<WidgetState> states) {
     final visuals = _visualsFor(bundle, states);
     if (states.contains(WidgetState.disabled)) {
@@ -422,14 +417,14 @@ SwitchThemeData _buildSwitchTheme(
   return SwitchThemeData(
     trackColor: WidgetStateProperty.resolveWith(resolveTrack),
     trackOutlineColor: WidgetStateProperty.resolveWith(resolveOutline),
-    trackOutlineWidth: const WidgetStatePropertyAll(_borderWidthPx),
+    trackOutlineWidth: WidgetStatePropertyAll(borderWidth),
     thumbColor: WidgetStateProperty.resolveWith(resolveThumb),
     overlayColor: overlay,
-    splashRadius: _splashRadius,
+    splashRadius: thumbDiameter,
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    padding: const EdgeInsets.symmetric(
-      horizontal: _horizontalPaddingPx,
-      vertical: _verticalPaddingPx,
+    padding: EdgeInsets.symmetric(
+      horizontal: paddingValue,
+      vertical: paddingValue,
     ),
   );
 }

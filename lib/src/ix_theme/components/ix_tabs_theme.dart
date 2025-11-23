@@ -2,26 +2,8 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
-
-const _defaultCssFontSizePx = 16.0;
-const _indicatorHeightRem = 0.125;
-const _circleDiameterRem = 3.0;
-const _largeSpaceRem = 1.5;
-const _smallSpaceRem = 0.5;
-const _defaultSpaceRem = 1.0;
-const _tinySpaceRem = 0.25;
-const _defaultVerticalPaddingPx = 10.0;
-const _circleBorderWidthPx = 2.0;
-
-const double _indicatorHeightPx = _indicatorHeightRem * _defaultCssFontSizePx;
-const double _circleDiameterPx = _circleDiameterRem * _defaultCssFontSizePx;
-const double _tabHorizontalPaddingPx = _largeSpaceRem * _defaultCssFontSizePx;
-const double _iconVerticalPaddingPx = _largeSpaceRem * _defaultCssFontSizePx;
-const double _iconHorizontalPaddingPx = _smallSpaceRem * _defaultCssFontSizePx;
-const double _smallPaddingPx = _defaultSpaceRem * _defaultCssFontSizePx;
-const double _smallIconHorizontalPaddingPx =
-    _tinySpaceRem * _defaultCssFontSizePx;
 
 /// Captures Siemens IX tab states for foreground/background colors.
 class IxTabStateColors {
@@ -279,6 +261,21 @@ class IxTabsTheme extends ThemeExtension<IxTabsTheme> {
       fontWeight: FontWeight.w700,
     );
     final indicatorColor = tabStyle.indicator.selected;
+    final indicatorHeight = IxCommonGeometry.spaceNeg3;
+    final circleDiameter = IxCommonGeometry.space6;
+    final tabPadding = EdgeInsets.symmetric(
+      horizontal: IxCommonGeometry.space4,
+      vertical: IxCommonGeometry.modularScaleNeg2,
+    );
+    final iconPadding = EdgeInsets.symmetric(
+      horizontal: IxCommonGeometry.space1,
+      vertical: IxCommonGeometry.space4,
+    );
+    final smallPadding = EdgeInsets.all(IxCommonGeometry.space3);
+    final smallIconPadding = EdgeInsets.symmetric(
+      horizontal: IxCommonGeometry.spaceNeg1,
+      vertical: IxCommonGeometry.space3,
+    );
 
     Color? overlayResolver(Set<WidgetState> states) {
       if (states.contains(WidgetState.disabled)) {
@@ -303,19 +300,13 @@ class IxTabsTheme extends ThemeExtension<IxTabsTheme> {
       labelStyle: tabLabelStyle,
       unselectedLabelStyle: tabLabelStyle,
       indicator: UnderlineTabIndicator(
-        borderSide: BorderSide(
-          color: indicatorColor,
-          width: _indicatorHeightPx,
-        ),
+        borderSide: BorderSide(color: indicatorColor, width: indicatorHeight),
       ),
       indicatorColor: indicatorColor,
       indicatorSize: TabBarIndicatorSize.tab,
       overlayColor: WidgetStateProperty.resolveWith(overlayResolver),
       dividerColor: tabStyle.indicator.base,
-      labelPadding: const EdgeInsets.symmetric(
-        horizontal: _tabHorizontalPaddingPx,
-        vertical: _defaultVerticalPaddingPx,
-      ),
+      labelPadding: tabPadding,
       splashFactory: NoSplash.splashFactory,
     );
 
@@ -324,22 +315,13 @@ class IxTabsTheme extends ThemeExtension<IxTabsTheme> {
       tab: tabStyle,
       circle: circleStyle,
       pill: pillStyle,
-      tabPadding: const EdgeInsets.symmetric(
-        horizontal: _tabHorizontalPaddingPx,
-        vertical: _defaultVerticalPaddingPx,
-      ),
-      iconPadding: const EdgeInsets.symmetric(
-        horizontal: _iconHorizontalPaddingPx,
-        vertical: _iconVerticalPaddingPx,
-      ),
-      smallPadding: const EdgeInsets.all(_smallPaddingPx),
-      smallIconPadding: const EdgeInsets.symmetric(
-        horizontal: _smallIconHorizontalPaddingPx,
-        vertical: _smallPaddingPx,
-      ),
-      circleDiameter: _circleDiameterPx,
-      circleBorderWidth: _circleBorderWidthPx,
-      indicatorHeight: _indicatorHeightPx,
+      tabPadding: tabPadding,
+      iconPadding: iconPadding,
+      smallPadding: smallPadding,
+      smallIconPadding: smallIconPadding,
+      circleDiameter: circleDiameter,
+      circleBorderWidth: IxCommonGeometry.borderWidthThick,
+      indicatorHeight: indicatorHeight,
     );
   }
 

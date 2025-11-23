@@ -2,14 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-
-const _defaultCssFontSizePx = 16.0; // Browser baseline for rem calculations.
-const _baseThicknessRem = 0.375; // 6 px base thickness.
-const _hoverThicknessRem = 0.5; // 8 px hover thickness.
-const _activeThicknessRem = 0.625; // 10 px active thickness.
-const _minThumbLengthRem = 2.5; // 40 px minimum thumb length.
-const _scrollbarMarginRem = 0.125; // 2 px margins.
-const _scrollbarRadiusRem = 0.5; // 8 px radius.
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 /// Siemens IX color roles specific to scrollbar states.
 class IxScrollbarColors extends ThemeExtension<IxScrollbarColors> {
@@ -131,12 +124,12 @@ class IxScrollbarTheme extends ThemeExtension<IxScrollbarTheme> {
       trackBorderDisabled: pick(IxThemeColorToken.xWeakBdr),
     );
 
-    final baseThickness = _rem(_baseThicknessRem);
-    final hoverThickness = _rem(_hoverThicknessRem);
-    final activeThickness = _rem(_activeThicknessRem);
-    final minThumbLength = _rem(_minThumbLengthRem);
-    final margin = _rem(_scrollbarMarginRem);
-    final radius = Radius.circular(_rem(_scrollbarRadiusRem));
+    const baseThickness = IxCommonGeometry.scrollbarBaseThickness;
+    const hoverThickness = IxCommonGeometry.scrollbarHoverThickness;
+    const activeThickness = IxCommonGeometry.scrollbarActiveThickness;
+    const minThumbLength = IxCommonGeometry.scrollbarMinThumbLength;
+    const margin = IxCommonGeometry.scrollbarMargin;
+    const radius = Radius.circular(IxCommonGeometry.scrollbarRadius);
 
     ScrollbarThemeData resolveTheme() {
       return ScrollbarThemeData(
@@ -247,8 +240,6 @@ class IxScrollbarTheme extends ThemeExtension<IxScrollbarTheme> {
     );
   }
 }
-
-double _rem(double value) => value * _defaultCssFontSizePx;
 
 bool _isDisabled(Set<WidgetState> states) =>
     states.contains(WidgetState.disabled);

@@ -2,19 +2,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-
-const _defaultCssFontSizePx = 16.0; // Browser default for 1rem.
-const double _uploadMinHeightRem = 4.0; // Dropzone height from ix-upload.
-const double _uploadPaddingRem = 1.0; // vars.$default-space in SCSS.
-const double _defaultBorderRadiusRem = 0.25; // --theme-default-border-radius.
-const double _defaultBorderWidthRem = 0.0625; // --theme-border-width-default.
-
-const double _uploadMinHeightPx = _uploadMinHeightRem * _defaultCssFontSizePx;
-const double _uploadPaddingPx = _uploadPaddingRem * _defaultCssFontSizePx;
-const double _uploadBorderRadiusPx =
-    _defaultBorderRadiusRem * _defaultCssFontSizePx;
-const double _uploadBorderWidthPx =
-    _defaultBorderWidthRem * _defaultCssFontSizePx;
+import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 /// Visual states surfaced by Siemens IX upload dropzones.
 enum IxUploadSurfaceState { idle, dragOver, checking, disabled }
@@ -122,10 +110,10 @@ class IxUploadTheme extends ThemeExtension<IxUploadTheme> {
 
     return IxUploadTheme(
       states: states,
-      minHeight: _uploadMinHeightPx,
-      padding: const EdgeInsets.all(_uploadPaddingPx),
-      borderRadius: _uploadBorderRadiusPx,
-      borderWidth: _uploadBorderWidthPx,
+      minHeight: IxCommonGeometry.uploadMinHeight,
+      padding: EdgeInsets.all(IxCommonGeometry.uploadPadding),
+      borderRadius: IxCommonGeometry.defaultBorderRadius,
+      borderWidth: IxCommonGeometry.borderWidthDefault,
     );
   }
 
