@@ -7,6 +7,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_menu_theme.dar
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_badge_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_button_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_card_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_bottom_sheet_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_checkbox_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_form_field_theme.dart';
@@ -81,6 +82,10 @@ class IxThemeBuilder {
       typography: typeScale,
     );
     final cardTheme = IxCardTheme.fromPalette(palette: palette);
+    final bottomSheetTheme = IxBottomSheetTheme.fromPalette(
+      palette: palette,
+      cardTheme: cardTheme,
+    );
     final checkboxTheme = IxCheckboxTheme.fromPalette(palette: palette);
     final radioTheme = IxRadioTheme.fromPalette(palette: palette);
     final sliderTheme = IxSliderTheme.fromPalette(palette: palette);
@@ -183,6 +188,7 @@ class IxThemeBuilder {
       navigationRailTheme: sidebarTheme.navigationRailTheme,
       chipTheme: chipTheme.materialChipTheme,
       cardTheme: cardTheme.materialCardTheme,
+      bottomSheetTheme: bottomSheetTheme.materialBottomSheetTheme,
       badgeTheme: badgeTheme.materialBadgeTheme,
       textTheme: textTheme,
       fontFamily: typeScale.fontFamily,
@@ -197,6 +203,7 @@ class IxThemeBuilder {
         sidebarTheme,
         chipTheme,
         cardTheme,
+        bottomSheetTheme,
         tabsTheme,
         formFieldTheme,
         checkboxTheme,

@@ -3,7 +3,7 @@ import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
 import '../edge_to_edge.dart';
 
-class ModalsPage extends StatelessWidget {
+class ModalsPage extends StatefulWidget {
   const ModalsPage({super.key});
 
   static const routePath = '/modals';
@@ -47,6 +47,13 @@ class ModalsPage extends StatelessWidget {
   ];
 
   @override
+  State<ModalsPage> createState() => _ModalsPageState();
+}
+
+class _ModalsPageState extends State<ModalsPage> {
+  PersistentBottomSheetController? _bottomSheetController;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final ixModal = theme.extension<IxModalTheme>();
@@ -56,6 +63,8 @@ class ModalsPage extends StatelessWidget {
         child: Text('IxModalTheme was not found on the current Theme.'),
       );
     }
+
+    final sheetIsVisible = _bottomSheetController != null;
 
     return ListView(
       padding: EdgeToEdge.scrollPadding(context),
@@ -70,7 +79,7 @@ class ModalsPage extends StatelessWidget {
         Wrap(
           spacing: 16,
           runSpacing: 16,
-          children: _examples
+          children: ModalsPage._examples
               .map(
                 (example) => _ModalExampleCard(
                   example: example,
@@ -80,9 +89,26 @@ class ModalsPage extends StatelessWidget {
               .toList(),
         ),
         const SizedBox(height: 32),
+        _BottomSheetExampleCard(
+          sheetIsVisible: sheetIsVisible,
+          onPressed: () {
+            if (sheetIsVisible) {
+              _bottomSheetController?.close();
+            } else {
+              _openBottomSheet(context);
+            }
+          },
+        ),
+        const SizedBox(height: 32),
         _ModalTokenCard(ixModal: ixModal),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _bottomSheetController?.close();
+    super.dispose();
   }
 
   Future<void> _openExample(BuildContext context, _ModalExample example) async {
@@ -153,6 +179,79 @@ class ModalsPage extends StatelessWidget {
       },
     );
   }
+
+  void _openBottomSheet(BuildContext context) {
+    final scaffoldState = Scaffold.maybeOf(context);
+    if (scaffoldState == null) {
+      return;
+    }
+
+    _bottomSheetController?.close();
+    _bottomSheetController = scaffoldState.showBottomSheet((sheetContext) {
+      final theme = Theme.of(sheetContext);
+      return SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Release readiness',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Close sheet',
+                    onPressed: () => _bottomSheetController?.close(),
+                    icon: const Icon(Icons.close),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Use bottom sheets for supplemental actions that keep users anchored to the current view.',
+                style: theme.textTheme.bodySmall,
+              ),
+              const SizedBox(height: 16),
+              _BottomSheetChecklist(
+                items: const [
+                  'Aleo diagnostics exported (2 files)',
+                  'KPI regression tests passed',
+                  'Maintainer approvals recorded',
+                ],
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  OutlinedButton(
+                    onPressed: () => _bottomSheetController?.close(),
+                    child: const Text('Not now'),
+                  ),
+                  const SizedBox(width: 12),
+                  FilledButton(
+                    onPressed: () => _bottomSheetController?.close(),
+                    child: const Text('Publish release'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+
+    _bottomSheetController?.closed.whenComplete(() {
+      if (!mounted) return;
+      setState(() {
+        _bottomSheetController = null;
+      });
+    });
+  }
 }
 
 class _ModalExampleCard extends StatelessWidget {
@@ -184,6 +283,94 @@ class _ModalExampleCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _BottomSheetExampleCard extends StatelessWidget {
+  const _BottomSheetExampleCard({
+    required this.sheetIsVisible,
+    required this.onPressed,
+  });
+
+  final bool sheetIsVisible;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(
+                  Icons.expand_circle_down_outlined,
+                  color: theme.colorScheme.primary,
+                ),
+                const SizedBox(width: 12),
+                Text('Bottom sheet', style: theme.textTheme.titleMedium),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Bottom sheets keep people anchored to the current view while exposing contextual actions.',
+              style: theme.textTheme.bodyMedium,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'This example calls ScaffoldState.showBottomSheet and relies on the IxTheme bottomSheetTheme for Siemens colors and rounded corners.',
+              style: theme.textTheme.bodySmall,
+            ),
+            const SizedBox(height: 24),
+            FilledButton.icon(
+              onPressed: onPressed,
+              icon: Icon(sheetIsVisible ? Icons.close : Icons.layers),
+              label: Text(
+                sheetIsVisible ? 'Close bottom sheet' : 'Show bottom sheet',
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BottomSheetChecklist extends StatelessWidget {
+  const _BottomSheetChecklist({required this.items});
+
+  final List<String> items;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Column(
+      children: items
+          .map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.check_circle,
+                    size: 20,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(item, style: theme.textTheme.bodyMedium),
+                  ),
+                ],
+              ),
+            ),
+          )
+          .toList(),
     );
   }
 }

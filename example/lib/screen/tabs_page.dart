@@ -299,8 +299,8 @@ class _TabLabelState extends State<_TabLabel> {
           children: [
             label,
             Positioned(
-              top: -_badgeSize / 1.2,
-              right: -_badgeSize / 0.8,
+              top: -_badgeSize / 2,
+              right: -_badgeSize / 0.7,
               child: _TabBadge(ixTabs: widget.ixTabs, count: widget.count!),
             ),
           ],
@@ -314,10 +314,7 @@ class _TabLabelState extends State<_TabLabel> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         padding: widget.ixTabs.tabPadding,
-        decoration: BoxDecoration(
-          color: _backgroundColor(),
-          borderRadius: BorderRadius.circular(999),
-        ),
+        decoration: BoxDecoration(color: _backgroundColor()),
         child: label,
       ),
     );
