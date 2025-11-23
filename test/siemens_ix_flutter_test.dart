@@ -355,4 +355,42 @@ void main() {
       closeTo(ixScrollbar.activeThickness, 0.001),
     );
   });
+
+  test('wires Siemens IX badge theme', () {
+    const builder = IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    );
+
+    final theme = builder.build();
+    final ixTheme = theme.extension<IxTheme>()!;
+    final ixBadges = theme.extension<IxBadgeTheme>();
+
+    expect(ixBadges, isNotNull);
+    expect(theme.badgeTheme, same(ixBadges!.materialBadgeTheme));
+
+    final successSolid = ixBadges.style(IxBadgeTone.success);
+    expect(successSolid.background, ixTheme.color(IxThemeColorToken.success));
+    expect(
+      successSolid.foreground,
+      ixTheme.color(IxThemeColorToken.successContrast),
+    );
+
+    final warningSubtle = ixBadges.style(IxBadgeTone.warning, subtle: true);
+    expect(
+      warningSubtle.background,
+      ixTheme.color(IxThemeColorToken.warning40),
+    );
+    expect(warningSubtle.foreground, ixTheme.color(IxThemeColorToken.warning));
+
+    final neutralTheme = theme.badgeTheme;
+    expect(
+      neutralTheme.backgroundColor,
+      ixBadges.solid[IxBadgeTone.neutral]!.background,
+    );
+    expect(
+      neutralTheme.textColor,
+      ixBadges.solid[IxBadgeTone.neutral]!.foreground,
+    );
+  });
 }

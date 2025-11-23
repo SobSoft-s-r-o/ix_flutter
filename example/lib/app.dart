@@ -5,6 +5,7 @@ import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
 import 'screen/buttons_page.dart';
 import 'screen/cards_page.dart';
+import 'screen/badges_page.dart';
 import 'screen/forms_page.dart';
 import 'screen/home_page.dart';
 import 'screen/modals_page.dart';
@@ -56,6 +57,14 @@ class _SiemensIxDemoAppState extends State<SiemensIxDemoApp> {
               pageBuilder: (context, state) => NoTransitionPage(
                 key: state.pageKey,
                 child: const CardsPage(),
+              ),
+            ),
+            GoRoute(
+              path: BadgesPage.routePath,
+              name: BadgesPage.routeName,
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: const BadgesPage(),
               ),
             ),
             GoRoute(
@@ -331,6 +340,12 @@ final List<_NavDestination> _navDestinations = [
     label: 'Cards',
     iconBuilder: () => IxIcons.dashboard,
     selectedIconBuilder: () => IxIcons.dashboardFilled,
+  ),
+  _NavDestination(
+    path: BadgesPage.routePath,
+    label: 'Badges',
+    iconBuilder: () => IxIcons.notification,
+    selectedIconBuilder: () => IxIcons.notificationFilled,
   ),
   _NavDestination(
     path: TabsPage.routePath,

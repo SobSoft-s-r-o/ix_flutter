@@ -4,6 +4,7 @@ import 'package:siemens_ix_flutter/src/ix_core/ix_color_palette.dart';
 import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_header_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_badge_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_button_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_card_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_checkbox_theme.dart';
@@ -103,6 +104,10 @@ class IxThemeBuilder {
       typography: typeScale,
       labelTheme: labelTheme,
     );
+    final badgeTheme = IxBadgeTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
     final scrollbarTheme = IxScrollbarTheme.fromPalette(palette: palette);
     final ixThemeExtension = IxTheme(
       family: family,
@@ -178,6 +183,7 @@ class IxThemeBuilder {
       navigationRailTheme: sidebarTheme.navigationRailTheme,
       chipTheme: chipTheme.materialChipTheme,
       cardTheme: cardTheme.materialCardTheme,
+      badgeTheme: badgeTheme.materialBadgeTheme,
       textTheme: textTheme,
       fontFamily: typeScale.fontFamily,
       visualDensity: VisualDensity.standard,
@@ -201,6 +207,7 @@ class IxThemeBuilder {
         uploadTheme,
         modalTheme,
         labelTheme,
+        badgeTheme,
         scrollbarTheme,
       ],
     );
