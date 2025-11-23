@@ -343,7 +343,7 @@ final List<_NavDestination> _navDestinations = [
   ),
   _NavDestination(
     path: BadgesPage.routePath,
-    label: 'Badges',
+    label: 'Badges & banners',
     iconBuilder: () => IxIcons.notification,
     selectedIconBuilder: () => IxIcons.notificationFilled,
   ),
