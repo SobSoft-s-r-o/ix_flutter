@@ -345,6 +345,4 @@ class _ThemeModeSource {
   final bool isLocal;
 
   const _ThemeModeSource.remote(this.location) : isLocal = false;
-
-  const _ThemeModeSource.local(this.location) : isLocal = true;
 }

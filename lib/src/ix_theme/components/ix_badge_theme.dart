@@ -109,7 +109,7 @@ class IxBadgeTheme extends ThemeExtension<IxBadgeTheme> {
             foreground: color(entry.value.solid),
             borderColor: color(
               entry.value.solid,
-            ).withOpacity(_subtleBorderOpacity),
+            ).withValues(alpha: _subtleBorderOpacity),
           ),
       });
     }

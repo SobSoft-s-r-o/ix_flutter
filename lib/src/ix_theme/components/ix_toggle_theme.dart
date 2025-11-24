@@ -406,7 +406,7 @@ SwitchThemeData _buildSwitchTheme(
       return overlayActive;
     }
     if (states.contains(WidgetState.focused)) {
-      return focusOutline.withOpacity(0.15);
+      return focusOutline.withValues(alpha: 0.15);
     }
     if (states.contains(WidgetState.hovered)) {
       return overlayHover;

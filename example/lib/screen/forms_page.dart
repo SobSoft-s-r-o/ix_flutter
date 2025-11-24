@@ -169,8 +169,8 @@ class _FormsPageState extends State<FormsPage> {
                 helperText: 'Validation errors pick up alarm borders.',
                 errorText: 'Please enter a valid email',
                 suffixIcon: _FormIcon(
-                  child: IxIcons.alarm,
                   color: ixFields?.error.icon,
+                  child: IxIcons.alarm,
                 ),
               ),
             ),
@@ -371,47 +371,50 @@ class _FormsPageState extends State<FormsPage> {
           description:
               'RadioListTile controls use IxRadioTheme for hover, press, and semantic colors.',
           children: [
-            RadioListTile<String>(
-              value: 'regional',
+            RadioGroup<String>(
               groupValue: _aleoDeployment,
-              onChanged: (value) =>
-                  setState(() => _aleoDeployment = value ?? _aleoDeployment),
-              controlAffinity: ListTileControlAffinity.leading,
-              title: const Text('Regional redundancy'),
-              subtitle: const Text(
-                'Standard styling keeps the control subtle while still accessible.',
-              ),
-            ),
-            RadioListTile<String>(
-              value: 'global',
-              groupValue: _aleoDeployment,
-              onChanged: (value) =>
-                  setState(() => _aleoDeployment = value ?? _aleoDeployment),
-              controlAffinity: ListTileControlAffinity.leading,
-              title: const Text('Global active-active'),
-              subtitle: const Text(
-                'Info semantics highlight mission critical setups.',
-              ),
-            ),
-            RadioListTile<String>(
-              value: 'maintenance',
-              groupValue: _aleoDeployment,
-              onChanged: (value) =>
-                  setState(() => _aleoDeployment = value ?? _aleoDeployment),
-              controlAffinity: ListTileControlAffinity.leading,
-              title: const Text('Maintenance freeze'),
-              subtitle: const Text(
-                'Warning styling communicates limited capacity windows.',
-              ),
-            ),
-            RadioListTile<String>(
-              value: 'offline',
-              groupValue: _aleoDeployment,
-              onChanged: null,
-              controlAffinity: ListTileControlAffinity.leading,
-              title: const Text('Offline (disabled)'),
-              subtitle: const Text(
-                'Disabled sample inherits IxRadioTheme label colors.',
+              onChanged: (value) {
+                if (value == null) {
+                  return;
+                }
+                setState(() => _aleoDeployment = value);
+              },
+              child: Column(
+                children: [
+                  RadioListTile<String>(
+                    value: 'regional',
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: const Text('Regional redundancy'),
+                    subtitle: const Text(
+                      'Standard styling keeps the control subtle while still accessible.',
+                    ),
+                  ),
+                  RadioListTile<String>(
+                    value: 'global',
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: const Text('Global active-active'),
+                    subtitle: const Text(
+                      'Info semantics highlight mission critical setups.',
+                    ),
+                  ),
+                  RadioListTile<String>(
+                    value: 'maintenance',
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: const Text('Maintenance freeze'),
+                    subtitle: const Text(
+                      'Warning styling communicates limited capacity windows.',
+                    ),
+                  ),
+                  RadioListTile<String>(
+                    value: 'offline',
+                    enabled: false,
+                    controlAffinity: ListTileControlAffinity.leading,
+                    title: const Text('Offline (disabled)'),
+                    subtitle: const Text(
+                      'Disabled sample inherits IxRadioTheme label colors.',
+                    ),
+                  ),
+                ],
               ),
             ),
           ],

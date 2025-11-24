@@ -17,11 +17,11 @@ class _SliderPageState extends State<SliderPage> {
   double _standardValue = 48;
   double _steppedValue = 4;
   double _indicatorValue = 72;
-  double _disabledValue = 24;
+  final double _disabledValue = 24;
   RangeValues _rangeValues = const RangeValues(25, 75);
   double _infoValue = 36;
   double _warningValue = 60;
-  double _invalidValue = 12;
+  final double _invalidValue = 12;
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +104,7 @@ class _SliderPageState extends State<SliderPage> {
                   'Useful for exact tuning while preserving Siemens type.',
               slider: SliderTheme(
                 data: theme.sliderTheme.copyWith(
-                  showValueIndicator: ShowValueIndicator.always,
+                  showValueIndicator: ShowValueIndicator.onDrag,
                 ),
                 child: Slider(
                   value: _indicatorValue,
@@ -199,7 +199,7 @@ class _SliderPageState extends State<SliderPage> {
       disabledInactiveTrackColor: colors.trackDisabled,
       thumbColor: colors.thumb,
       disabledThumbColor: colors.thumbDisabled,
-      overlayColor: colors.thumbHover.withOpacity(0.3),
+      overlayColor: colors.thumbHover.withValues(alpha: 0.3),
       activeTickMarkColor: colors.marker,
       inactiveTickMarkColor: colors.marker,
       disabledActiveTickMarkColor: colors.markerDisabled,
@@ -208,7 +208,7 @@ class _SliderPageState extends State<SliderPage> {
       valueIndicatorTextStyle: Theme.of(
         context,
       ).textTheme.labelSmall?.copyWith(color: Colors.white),
-      showValueIndicator: ShowValueIndicator.always,
+      showValueIndicator: ShowValueIndicator.onDrag,
     );
   }
 }

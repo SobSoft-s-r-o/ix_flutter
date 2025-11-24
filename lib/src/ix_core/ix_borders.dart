@@ -27,7 +27,7 @@ class IxBorderColors {
   /// `IxClassicLightColors.stdBdr`) to keep the palette decoupled from any
   /// specific Ix theme version.
   factory IxBorderColors.fromMap(Map<IxBorderColorToken, Color> tokens) {
-    Color _resolve(IxBorderColorToken token) {
+    Color resolveToken(IxBorderColorToken token) {
       final value = tokens[token];
       if (value == null) {
         throw ArgumentError('Missing color for border token "$token"');
@@ -36,21 +36,21 @@ class IxBorderColors {
     }
 
     return IxBorderColors(
-      std: _resolve(IxBorderColorToken.std),
-      soft: _resolve(IxBorderColorToken.soft),
-      weak: _resolve(IxBorderColorToken.weak),
-      xWeak: _resolve(IxBorderColorToken.xWeak),
-      hard: _resolve(IxBorderColorToken.hard),
-      contrast: _resolve(IxBorderColorToken.contrast),
-      focus: _resolve(IxBorderColorToken.focus),
-      primary: _resolve(IxBorderColorToken.primary),
-      dynamic: _resolve(IxBorderColorToken.dynamic),
-      alarm: _resolve(IxBorderColorToken.alarm),
-      critical: _resolve(IxBorderColorToken.critical),
-      warning: _resolve(IxBorderColorToken.warning),
-      success: _resolve(IxBorderColorToken.success),
-      info: _resolve(IxBorderColorToken.info),
-      neutral: _resolve(IxBorderColorToken.neutral),
+      std: resolveToken(IxBorderColorToken.std),
+      soft: resolveToken(IxBorderColorToken.soft),
+      weak: resolveToken(IxBorderColorToken.weak),
+      xWeak: resolveToken(IxBorderColorToken.xWeak),
+      hard: resolveToken(IxBorderColorToken.hard),
+      contrast: resolveToken(IxBorderColorToken.contrast),
+      focus: resolveToken(IxBorderColorToken.focus),
+      primary: resolveToken(IxBorderColorToken.primary),
+      dynamic: resolveToken(IxBorderColorToken.dynamic),
+      alarm: resolveToken(IxBorderColorToken.alarm),
+      critical: resolveToken(IxBorderColorToken.critical),
+      warning: resolveToken(IxBorderColorToken.warning),
+      success: resolveToken(IxBorderColorToken.success),
+      info: resolveToken(IxBorderColorToken.info),
+      neutral: resolveToken(IxBorderColorToken.neutral),
     );
   }
 

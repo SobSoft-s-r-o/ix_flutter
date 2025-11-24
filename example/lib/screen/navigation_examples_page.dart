@@ -120,7 +120,7 @@ class _BottomAppBarItem extends StatelessWidget {
     final foreground = selected ? colorScheme.onPrimary : colorScheme.onSurface;
     final background = selected
         ? colorScheme.primary
-        : colorScheme.surfaceVariant;
+        : colorScheme.surfaceContainerHighest;
 
     return InkWell(
       customBorder: RoundedRectangleBorder(
@@ -348,7 +348,7 @@ class _DialogExamples extends StatelessWidget {
           ],
         );
       },
-      barrierColor: theme.colorScheme.scrim.withOpacity(0.5),
+      barrierColor: theme.colorScheme.scrim.withValues(alpha: 0.5),
     );
   }
 
@@ -390,7 +390,7 @@ class _DialogExamples extends StatelessWidget {
           ],
         );
       },
-      barrierColor: theme.colorScheme.scrim.withOpacity(0.5),
+      barrierColor: theme.colorScheme.scrim.withValues(alpha: 0.5),
     );
   }
 }

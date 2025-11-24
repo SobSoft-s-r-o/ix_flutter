@@ -342,7 +342,7 @@ class IxChipTheme extends ThemeExtension<IxChipTheme> {
           ChipThemeData.lerp(materialChipTheme, other.materialChipTheme, t) ??
           materialChipTheme,
       standard: IxChipStyle.lerp(standard, other.standard, t),
-      outline: IxChipStyle.lerp(this.outline, other.outline, t),
+      outline: IxChipStyle.lerp(outline, other.outline, t),
       primary: IxChipStyle.lerp(primary, other.primary, t),
       primaryOutline: IxChipStyle.lerp(primaryOutline, other.primaryOutline, t),
       status: lerpMap(status, other.status),

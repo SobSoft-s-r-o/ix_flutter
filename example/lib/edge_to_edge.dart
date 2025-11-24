@@ -48,7 +48,7 @@ class EdgeToEdge {
   static Color _statusBarColor(ThemeData theme) {
     final scheme = theme.colorScheme;
     final double opacity = theme.brightness == Brightness.dark ? 0.0 : 0.08;
-    return scheme.surface.withOpacity(opacity);
+    return scheme.surface.withValues(alpha: opacity);
   }
 
   static Color _navigationBarColor(ThemeData theme) {
@@ -56,10 +56,10 @@ class EdgeToEdge {
     final bool isDark = theme.brightness == Brightness.dark;
     final Color base = scheme.surface;
     final Color overlay = isDark
-        ? Colors.white.withOpacity(0.08)
-        : Colors.black.withOpacity(0.06);
+        ? Colors.white.withValues(alpha: 0.08)
+        : Colors.black.withValues(alpha: 0.06);
     final Color blended = Color.alphaBlend(overlay, base);
     final double opacity = isDark ? 0.9 : 0.96;
-    return blended.withOpacity(opacity);
+    return blended.withValues(alpha: opacity);
   }
 }

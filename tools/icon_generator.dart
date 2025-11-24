@@ -102,23 +102,17 @@ class IconGenerator {
         iconClassBuffer.writeln(
           'class _IxIconWidget extends StatelessWidget {',
         );
-        iconClassBuffer.writeln(
-          '  const _IxIconWidget(this.assetPath, {this.size, this.color});',
-        );
+        iconClassBuffer.writeln('  const _IxIconWidget(this.assetPath);');
         iconClassBuffer.writeln('');
         iconClassBuffer.writeln('  final String assetPath;');
-        iconClassBuffer.writeln('  final double? size;');
-        iconClassBuffer.writeln('  final Color? color;');
         iconClassBuffer.writeln('');
         iconClassBuffer.writeln('  @override');
         iconClassBuffer.writeln('  Widget build(BuildContext context) {');
         iconClassBuffer.writeln('    final iconTheme = IconTheme.of(context);');
         iconClassBuffer.writeln(
-          '    final resolvedSize = size ?? iconTheme.size ?? 24;',
+          '    final resolvedSize = iconTheme.size ?? 24;',
         );
-        iconClassBuffer.writeln(
-          '    final resolvedColor = color ?? iconTheme.color;',
-        );
+        iconClassBuffer.writeln('    final resolvedColor = iconTheme.color;');
         iconClassBuffer.writeln('');
         iconClassBuffer.writeln('    return SvgPicture.asset(');
         iconClassBuffer.writeln('      assetPath,');

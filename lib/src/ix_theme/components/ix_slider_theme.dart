@@ -181,7 +181,7 @@ class IxSliderTheme extends ThemeExtension<IxSliderTheme> {
 
     final overlayColor = color(
       IxThemeColorToken.component1Hover,
-    ).withOpacity(0.25);
+    ).withValues(alpha: 0.25);
 
     final sliderTheme = SliderThemeData(
       trackHeight: trackHeight,

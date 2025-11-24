@@ -367,7 +367,7 @@ MaterialBanner _buildMaterialBanner({
 
   return MaterialBanner(
     elevation: 0,
-    backgroundColor: colorScheme.surfaceVariant,
+    backgroundColor: colorScheme.surfaceContainerHighest,
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     leadingPadding: const EdgeInsets.only(right: 12),
     content: Column(
