@@ -22,5 +22,6 @@ export 'src/ix_theme/components/ix_form_field_theme.dart';
 export 'src/ix_theme/components/ix_sidebar_theme.dart';
 export 'src/ix_theme/components/ix_tabs_theme.dart';
 export 'src/ix_theme/ix_theme_builder.dart';
+export 'src/ix_theme/ix_custom_palette.dart';
 export 'src/ix_icons/ix_icons.dart';
 export 'src/widgets/ix_spinner.dart';

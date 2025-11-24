@@ -2,8 +2,8 @@
 class IxFonts {
   IxFonts._();
 
-  static const String siemensSans = 'Siemens Sans';
-  static const List<String> siemensSansFallback = ['Arial', 'Helvetica'];
+  static const String robotoMono = 'Roboto Mono';
+  static const List<String> robotoMonoFallback = ['Arial', 'Helvetica'];
 
   static const String jetBrainsMono = 'JetBrains Mono';
   static const List<String> jetBrainsMonoFallback = [

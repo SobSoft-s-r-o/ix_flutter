@@ -21,6 +21,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_spinner_theme.dart
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_toggle_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_upload_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/ix_custom_palette.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
 /// scale guidance.
@@ -29,13 +30,14 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_upload_theme.dart'
 /// etc.). Component-specific theming will be layered on top later.
 class IxThemeBuilder {
   const IxThemeBuilder({
-    this.family = IxThemeFamily.brand,
+    this.family = IxThemeFamily.classic,
     this.mode = ThemeMode.system,
     this.systemBrightness = Brightness.light,
     this.typography,
+    this.customPalette,
   });
 
-  /// Siemens IX visual family (classic vs. brand).
+  /// Siemens IX visual family (classic vs. custom overrides).
   final IxThemeFamily family;
 
   /// Material theme mode to resolve light/dark variants.
@@ -47,17 +49,21 @@ class IxThemeBuilder {
   /// Optional override for the Siemens IX type scale.
   final IxTypography? typography;
 
+  /// Optional custom palette that replaces the built-in family colors.
+  final IxCustomPalette? customPalette;
+
   /// Returns [ThemeData] configured with Siemens IX global colors and fonts.
   ThemeData build() {
+    final brightness = _resolveBrightness(mode, systemBrightness);
     final Map<IxThemeColorToken, Color> palette = Map.unmodifiable(
-      IxColorPalette.resolve(
-        family: family,
-        mode: mode,
-        systemBrightness: systemBrightness,
-      ),
+      customPalette?.resolve(brightness) ??
+          IxColorPalette.resolve(
+            family: family,
+            mode: mode,
+            systemBrightness: systemBrightness,
+          ),
     );
 
-    final brightness = _resolveBrightness(mode, systemBrightness);
     final typeScale = typography ?? IxTypography();
     final colorScheme = _buildColorScheme(palette, brightness);
     final textTheme = _buildTextTheme(typeScale, palette);
@@ -226,12 +232,14 @@ class IxThemeBuilder {
     ThemeMode? mode,
     Brightness? systemBrightness,
     IxTypography? typography,
+    IxCustomPalette? customPalette,
   }) {
     return IxThemeBuilder(
       family: family ?? this.family,
       mode: mode ?? this.mode,
       systemBrightness: systemBrightness ?? this.systemBrightness,
       typography: typography ?? this.typography,
+      customPalette: customPalette ?? this.customPalette,
     );
   }
 

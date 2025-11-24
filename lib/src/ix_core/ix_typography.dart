@@ -40,9 +40,9 @@ class IxTypography {
     String? monospaceFontFamily,
     List<String>? monospaceFontFamilyFallback,
   }) {
-    final resolvedFontFamily = fontFamily ?? IxFonts.siemensSans;
+    final resolvedFontFamily = fontFamily ?? IxFonts.robotoMono;
     final resolvedSansFallback =
-        fontFamilyFallback ?? IxFonts.siemensSansFallback;
+        fontFamilyFallback ?? IxFonts.robotoMonoFallback;
     final resolvedMonospaceFontFamily =
         monospaceFontFamily ?? IxFonts.jetBrainsMono;
     final resolvedMonospaceFallback =

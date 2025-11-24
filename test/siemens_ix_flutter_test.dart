@@ -19,8 +19,37 @@ void main() {
     );
 
     final textStyle = ixTheme.textStyle(IxTypographyVariant.body);
-    expect(textStyle.fontFamily, IxFonts.siemensSans);
+    expect(textStyle.fontFamily, IxFonts.robotoMono);
     expect(textStyle.color, ixTheme.textColor(IxThemeTextTone.standard));
+  });
+
+  test('renders with developer-provided custom palette', () {
+    final customPalette = IxCustomPalette.override(
+      lightOverrides: {
+        IxThemeColorToken.primary: const Color(0xFFFF5A36),
+        IxThemeColorToken.dynamic: const Color(0xFF00B59B),
+      },
+      darkOverrides: {IxThemeColorToken.primary: const Color(0xFF9F7BFF)},
+    );
+
+    final lightTheme = IxThemeBuilder(
+      family: IxThemeFamily.classic,
+      mode: ThemeMode.light,
+      customPalette: customPalette,
+    ).build();
+
+    final darkTheme = IxThemeBuilder(
+      family: IxThemeFamily.classic,
+      mode: ThemeMode.dark,
+      customPalette: customPalette,
+    ).build();
+
+    final lightIx = lightTheme.extension<IxTheme>()!;
+    final darkIx = darkTheme.extension<IxTheme>()!;
+
+    expect(lightIx.color(IxThemeColorToken.primary), const Color(0xFFFF5A36));
+    expect(lightIx.color(IxThemeColorToken.dynamic), const Color(0xFF00B59B));
+    expect(darkIx.color(IxThemeColorToken.primary), const Color(0xFF9F7BFF));
   });
 
   test('provides Siemens IX button styles', () {

@@ -1,1 +1,1 @@
-enum IxThemeFamily { classic, brand }
+enum IxThemeFamily { classic, brand, custom }

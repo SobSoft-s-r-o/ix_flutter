@@ -12,14 +12,6 @@ class ColorGenerator {
       'dark': _ThemeModeSource.remote('classic/dark/_variables.scss'),
       'light': _ThemeModeSource.remote('classic/light/_variables.scss'),
     },
-    'brand': {
-      'dark': _ThemeModeSource.local(
-        'brand_theme_source/brand/dark/_variables.scss',
-      ),
-      'light': _ThemeModeSource.local(
-        'brand_theme_source/brand/light/_variables.scss',
-      ),
-    },
   };
 
   static Set<String>? _cachedIxThemeTokens;

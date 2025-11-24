@@ -9,6 +9,7 @@ import 'screen/badges_page.dart';
 import 'screen/forms_page.dart';
 import 'screen/home_page.dart';
 import 'screen/modals_page.dart';
+import 'screen/navigation_examples_page.dart';
 import 'screen/spinner_page.dart';
 import 'screen/slider_page.dart';
 import 'screen/tabs_page.dart';
@@ -72,6 +73,14 @@ class _SiemensIxDemoAppState extends State<SiemensIxDemoApp> {
               name: TabsPage.routeName,
               pageBuilder: (context, state) =>
                   NoTransitionPage(key: state.pageKey, child: const TabsPage()),
+            ),
+            GoRoute(
+              path: NavigationExamplesPage.routePath,
+              name: NavigationExamplesPage.routeName,
+              pageBuilder: (context, state) => NoTransitionPage(
+                key: state.pageKey,
+                child: const NavigationExamplesPage(),
+              ),
             ),
             GoRoute(
               path: SliderPage.routePath,
@@ -352,6 +361,12 @@ final List<_NavDestination> _navDestinations = [
     label: 'Tabs',
     iconBuilder: () => IxIcons.layers,
     selectedIconBuilder: () => IxIcons.layersFilled,
+  ),
+  _NavDestination(
+    path: NavigationExamplesPage.routePath,
+    label: 'Navigation',
+    iconBuilder: () => IxIcons.moreMenu,
+    selectedIconBuilder: () => IxIcons.moreMenu,
   ),
   _NavDestination(
     path: SliderPage.routePath,

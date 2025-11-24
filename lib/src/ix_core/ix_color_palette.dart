@@ -18,7 +18,13 @@ class IxColorPalette {
       case IxThemeFamily.classic:
         return _classicPalette(variant);
       case IxThemeFamily.brand:
-        return _brandPalette(variant);
+        // Brand palettes are proprietary and not bundled with the OSS build.
+        // Consumers can supply a custom palette via IxThemeBuilder instead.
+        return _classicPalette(variant);
+      case IxThemeFamily.custom:
+        // Custom relies on user-supplied palettes; fall back to classic when
+        // none is provided.
+        return _classicPalette(variant);
     }
   }
 
@@ -26,33 +32,6 @@ class IxColorPalette {
     return variant == _ThemeVariant.dark
         ? IxClassicDarkColors.palette
         : IxClassicLightColors.palette;
-  }
-
-  static final Map<_ThemeVariant, Map<IxThemeColorToken, Color>>
-  _brandPaletteCache = {
-    _ThemeVariant.light: _buildBrandPalette(_ThemeVariant.light),
-    _ThemeVariant.dark: _buildBrandPalette(_ThemeVariant.dark),
-  };
-
-  static Map<IxThemeColorToken, Color> _brandPalette(_ThemeVariant variant) {
-    return _brandPaletteCache[variant]!;
-  }
-
-  static Map<IxThemeColorToken, Color> _buildBrandPalette(
-    _ThemeVariant variant,
-  ) {
-    final brand = variant == _ThemeVariant.dark
-        ? IxBrandDarkColors.palette
-        : IxBrandLightColors.palette;
-
-    if (brand.length == IxThemeColorToken.values.length) {
-      return brand;
-    }
-
-    // Fill missing brand tokens from their classic counterparts.
-    final fallback = _classicPalette(variant);
-    final merged = Map<IxThemeColorToken, Color>.from(fallback)..addAll(brand);
-    return Map.unmodifiable(merged);
   }
 
   static _ThemeVariant _variantFromMode(
