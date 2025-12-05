@@ -7,7 +7,7 @@ import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
 const double _xxSmallDiameter = IxCommonGeometry.space2;
 const double _xSmallDiameter = IxCommonGeometry.modularScale2;
 const double _smallDiameter = IxCommonGeometry.space4;
-const double _mediumDiameter = IxCommonGeometry.space5;
+const double _mediumDiameter = IxCommonGeometry.space6;
 const double _largeDiameter = IxCommonGeometry.space8;
 const double _ringInsetFraction = 0.0833; // 8.33% inset from SCSS.
 const Duration _rotationDuration = Duration(seconds: 2);

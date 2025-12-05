@@ -27,7 +27,24 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_upload_theme.dart'
 /// scale guidance.
 ///
 /// The builder only wires up global colors (color scheme, surfaces, text,
-/// etc.). Component-specific theming will be layered on top later.
+/// etc.). Component-specific theming will be layered on top later. Most apps
+/// place the builder inside `main()` so the resulting theme can be passed to a
+/// `MaterialApp` (or `WidgetsApp`).
+///
+/// ```dart
+/// void main() {
+///   final lightTheme = const IxThemeBuilder().build();
+///   final darkTheme = const IxThemeBuilder(mode: ThemeMode.dark).build();
+///
+///   runApp(
+///     MaterialApp(
+///       theme: lightTheme,
+///       darkTheme: darkTheme,
+///       home: const MyDashboard(),
+///     ),
+///   );
+/// }
+/// ```
 class IxThemeBuilder {
   const IxThemeBuilder({
     this.family = IxThemeFamily.brand,
@@ -49,6 +66,10 @@ class IxThemeBuilder {
   final IxTypography? typography;
 
   /// Returns [ThemeData] configured with Siemens IX global colors and fonts.
+  ///
+  /// The resulting theme exports both Material defaults (color scheme,
+  /// typographic scale, component theme data) and custom Siemens IX extensions
+  /// such as [IxTheme], [IxButtonTheme], and component-specific tokens.
   ThemeData build() {
     final Map<IxThemeColorToken, Color> palette = Map.unmodifiable(
       IxColorPalette.resolve(
@@ -226,7 +247,10 @@ class IxThemeBuilder {
     );
   }
 
-  /// Copies the builder with new parameters.
+  /// Copies the builder with selective overrides.
+  ///
+  /// Useful when you want to flip between light/dark or supply a custom
+  /// [IxTypography] while reusing the remaining configuration.
   IxThemeBuilder copyWith({
     IxThemeFamily? family,
     ThemeMode? mode,
@@ -241,6 +265,7 @@ class IxThemeBuilder {
     );
   }
 
+  /// Resolves the effective [Brightness] that should drive palette selection.
   static Brightness _resolveBrightness(
     ThemeMode mode,
     Brightness systemBrightness,
@@ -256,12 +281,15 @@ class IxThemeBuilder {
   }
 }
 
+/// Builds a Material [ColorScheme] from the resolved Siemens IX palette.
 ColorScheme _buildColorScheme(
   Map<IxThemeColorToken, Color> palette,
   Brightness brightness,
 ) {
   Color pick(IxThemeColorToken token) => palette[token]!;
 
+  /// Translates the Siemens IX palette into Flutter's [ColorScheme] so
+  /// downstream Material widgets can share the same ink and surface values.
   return ColorScheme(
     brightness: brightness,
     primary: pick(IxThemeColorToken.primary),
@@ -301,6 +329,8 @@ ColorScheme _buildColorScheme(
   );
 }
 
+/// Generates a Material [TextTheme] using the Siemens IX typography scale and
+/// palette tones.
 TextTheme _buildTextTheme(
   IxTypography typography,
   Map<IxThemeColorToken, Color> palette,
@@ -397,6 +427,7 @@ class IxTheme extends ThemeExtension<IxTheme> {
     );
   }
 
+  /// Maps a semantic [IxThemeTextTone] to its backing palette token.
   IxThemeColorToken _toneToToken(IxThemeTextTone tone) {
     switch (tone) {
       case IxThemeTextTone.standard:
