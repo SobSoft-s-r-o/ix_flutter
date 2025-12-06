@@ -25,5 +25,7 @@ export 'src/ix_theme/components/ix_tabs_theme.dart';
 export 'src/ix_theme/ix_theme_builder.dart';
 export 'src/ix_icons/ix_icons.dart';
 export 'src/widgets/ix_breadcrumb.dart';
+export 'src/widgets/ix_blind.dart';
+export 'src/ix_theme/components/ix_blind_theme.dart';
 export 'src/widgets/ix_spinner.dart';
-export 'src/widgets/ix_application_menu_scaffold.dart';
+export 'src/widgets/ix_application_scaffold.dart';

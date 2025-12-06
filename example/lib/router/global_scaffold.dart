@@ -3,9 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 import '../theme_controller.dart';
 
-import '../screen/application_menu_page.dart';
+import '../screen/application_page.dart';
 import '../screen/buttons_page.dart';
 import '../screen/cards_page.dart';
+import '../screen/blind_page.dart';
 import '../screen/badges_page.dart';
 import '../screen/forms_page.dart';
 import '../screen/home_page.dart';
@@ -36,7 +37,7 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
 
     String selectedId = _getIdFromLocation(location);
 
-    return IxApplicationMenuScaffold(
+    return IxApplicationScaffold(
       appTitle: 'Siemens IX Flutter Demo',
       entries: _buildEntries(selectedId),
       onNavigate: (id) => _onNavigate(context, id),
@@ -54,10 +55,11 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
     if (location == HomePage.routePath) return 'home';
     if (location == ButtonsPage.routePath) return 'buttons';
     if (location == CardsPage.routePath) return 'cards';
+    if (location == BlindPage.routePath) return 'blind';
     if (location == BadgesPage.routePath) return 'badges';
     if (location == TabsPage.routePath) return 'tabs';
     if (location == NavigationExamplesPage.routePath) return 'navigation';
-    if (location == ApplicationMenuPage.routePath) return 'app_menu';
+    if (location == ApplicationPage.routePath) return 'app_menu';
     if (location == SliderPage.routePath) return 'sliders';
     if (location == SpinnerPage.routePath) return 'spinners';
     if (location == FormsPage.routePath) return 'forms';
@@ -76,6 +78,9 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
       case 'cards':
         context.go(CardsPage.routePath);
         break;
+      case 'blind':
+        context.go(BlindPage.routePath);
+        break;
       case 'badges':
         context.go(BadgesPage.routePath);
         break;
@@ -86,7 +91,7 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         context.go(NavigationExamplesPage.routePath);
         break;
       case 'app_menu':
-        context.go(ApplicationMenuPage.routePath);
+        context.go(ApplicationPage.routePath);
         break;
       case 'sliders':
         context.go(SliderPage.routePath);
@@ -125,6 +130,13 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         label: 'Cards',
         iconWidget: IxIcons.dashboard,
         selected: selectedId == 'cards',
+      ),
+      IxMenuEntry(
+        id: 'blind',
+        type: IxMenuEntryType.item,
+        label: 'Blind',
+        iconWidget: IxIcons.chevronDown,
+        selected: selectedId == 'blind',
       ),
       IxMenuEntry(
         id: 'badges',

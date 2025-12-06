@@ -3,17 +3,17 @@ import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
 import '../theme_controller.dart';
 
-class ApplicationMenuPage extends StatefulWidget {
-  const ApplicationMenuPage({super.key});
+class ApplicationPage extends StatefulWidget {
+  const ApplicationPage({super.key});
 
   static const routePath = '/application-menu';
   static const routeName = 'application-menu';
 
   @override
-  State<ApplicationMenuPage> createState() => _ApplicationMenuPageState();
+  State<ApplicationPage> createState() => _ApplicationPageState();
 }
 
-class _ApplicationMenuPageState extends State<ApplicationMenuPage> {
+class _ApplicationPageState extends State<ApplicationPage> {
   String _activeEntryId = 'dashboard';
   ThemeMode? _themeMode;
 
@@ -28,7 +28,7 @@ class _ApplicationMenuPageState extends State<ApplicationMenuPage> {
     final entries = _buildEntries();
     final themeMode = _themeMode ?? ThemeControllerScope.of(context).mode;
 
-    return IxApplicationMenuScaffold(
+    return IxApplicationScaffold(
       appTitle: 'Operations hub',
       appBar: AppBar(title: const Text('Application menu demo')),
       entries: entries,

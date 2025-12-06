@@ -1,8 +1,9 @@
 import 'package:go_router/go_router.dart';
 
-import '../screen/application_menu_page.dart';
+import '../screen/application_page.dart';
 import '../screen/buttons_page.dart';
 import '../screen/cards_page.dart';
+import '../screen/blind_page.dart';
 import '../screen/badges_page.dart';
 import '../screen/forms_page.dart';
 import '../screen/home_page.dart';
@@ -39,6 +40,12 @@ final GoRouter router = GoRouter(
               NoTransitionPage(key: state.pageKey, child: const CardsPage()),
         ),
         GoRoute(
+          path: BlindPage.routePath,
+          name: BlindPage.routeName,
+          pageBuilder: (context, state) =>
+              NoTransitionPage(key: state.pageKey, child: const BlindPage()),
+        ),
+        GoRoute(
           path: BadgesPage.routePath,
           name: BadgesPage.routeName,
           pageBuilder: (context, state) =>
@@ -59,11 +66,11 @@ final GoRouter router = GoRouter(
           ),
         ),
         GoRoute(
-          path: ApplicationMenuPage.routePath,
-          name: ApplicationMenuPage.routeName,
+          path: ApplicationPage.routePath,
+          name: ApplicationPage.routeName,
           pageBuilder: (context, state) => NoTransitionPage(
             key: state.pageKey,
-            child: const ApplicationMenuPage(),
+            child: const ApplicationPage(),
           ),
         ),
         GoRoute(

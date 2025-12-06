@@ -10,7 +10,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart
 /// menu scaffold.
 enum IxMenuEntryType { item, category, custom }
 
-/// Data model describing items rendered inside [IxApplicationMenuScaffold].
+/// Data model describing items rendered inside [IxApplicationScaffold].
 @immutable
 class IxMenuEntry {
   const IxMenuEntry({
@@ -68,8 +68,8 @@ class IxMenuEntry {
 
 /// Scaffold that mirrors the Siemens IX application menu (AppBar + Drawer /
 /// permanent side navigation) while remaining idiomatic for Flutter layouts.
-class IxApplicationMenuScaffold extends StatefulWidget {
-  const IxApplicationMenuScaffold({
+class IxApplicationScaffold extends StatefulWidget {
+  const IxApplicationScaffold({
     super.key,
     required this.appTitle,
     required this.entries,
@@ -110,11 +110,10 @@ class IxApplicationMenuScaffold extends StatefulWidget {
   final VoidCallback? onOpenAboutLegal;
 
   @override
-  State<IxApplicationMenuScaffold> createState() =>
-      _IxApplicationMenuScaffoldState();
+  State<IxApplicationScaffold> createState() => _IxApplicationScaffoldState();
 }
 
-class _IxApplicationMenuScaffoldState extends State<IxApplicationMenuScaffold> {
+class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
   static const double _mobileBreakpoint = 1024;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -129,7 +128,7 @@ class _IxApplicationMenuScaffoldState extends State<IxApplicationMenuScaffold> {
   }
 
   @override
-  void didUpdateWidget(covariant IxApplicationMenuScaffold oldWidget) {
+  void didUpdateWidget(covariant IxApplicationScaffold oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initiallyExpanded != oldWidget.initiallyExpanded &&
         widget.initiallyExpanded != _isExpanded) {
