@@ -29,3 +29,4 @@ export 'src/widgets/ix_blind.dart';
 export 'src/ix_theme/components/ix_blind_theme.dart';
 export 'src/widgets/ix_spinner.dart';
 export 'src/widgets/ix_application_scaffold.dart';
+export 'src/widgets/ix_dropdown_button.dart';

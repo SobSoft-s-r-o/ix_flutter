@@ -8,6 +8,7 @@ import '../screen/buttons_page.dart';
 import '../screen/cards_page.dart';
 import '../screen/blind_page.dart';
 import '../screen/badges_page.dart';
+import '../screen/dropdown_button_page.dart';
 import '../screen/forms_page.dart';
 import '../screen/home_page.dart';
 import '../screen/modals_page.dart';
@@ -54,6 +55,7 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
   String _getIdFromLocation(String location) {
     if (location == HomePage.routePath) return 'home';
     if (location == ButtonsPage.routePath) return 'buttons';
+    if (location == DropdownButtonPage.routePath) return 'dropdown_button';
     if (location == CardsPage.routePath) return 'cards';
     if (location == BlindPage.routePath) return 'blind';
     if (location == BadgesPage.routePath) return 'badges';
@@ -74,6 +76,9 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         break;
       case 'buttons':
         context.go(ButtonsPage.routePath);
+        break;
+      case 'dropdown_button':
+        context.go(DropdownButtonPage.routePath);
         break;
       case 'cards':
         context.go(CardsPage.routePath);
@@ -123,6 +128,13 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         label: 'Buttons',
         iconWidget: IxIcons.controlButton,
         selected: selectedId == 'buttons',
+      ),
+      IxMenuEntry(
+        id: 'dropdown_button',
+        type: IxMenuEntryType.item,
+        label: 'Dropdown Button',
+        iconWidget: IxIcons.chevronDown,
+        selected: selectedId == 'dropdown_button',
       ),
       IxMenuEntry(
         id: 'cards',
