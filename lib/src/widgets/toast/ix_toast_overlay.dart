@@ -92,12 +92,15 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
       bottom: widget.position.y == 1.0 ? 16 : null,
       left: widget.position.x == -1.0 ? 16 : null,
       right: widget.position.x == 1.0 ? 16 : null,
-      child: SizedBox(
-        width: 360, // Slightly wider than toast to allow padding
-        height: MediaQuery.of(
-          context,
-        ).size.height, // Full height to allow stacking
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxWidth: 360, // Slightly wider than toast to allow padding
+          maxHeight: MediaQuery.of(
+            context,
+          ).size.height, // Limit height to screen
+        ),
         child: AnimatedList(
+          shrinkWrap: true,
           key: _listKey,
           initialItemCount: _displayedToasts.length,
           itemBuilder: (context, index, animation) {
