@@ -16,6 +16,7 @@ import '../screen/navigation_examples_page.dart';
 import '../screen/spinner_page.dart';
 import '../screen/slider_page.dart';
 import '../screen/tabs_page.dart';
+import '../screen/toast_page.dart';
 
 class GlobalScaffold extends StatefulWidget {
   const GlobalScaffold({
@@ -66,6 +67,7 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
     if (location == SpinnerPage.routePath) return 'spinners';
     if (location == FormsPage.routePath) return 'forms';
     if (location == ModalsPage.routePath) return 'modals';
+    if (location == ToastPage.routePath) return 'toast';
     return 'home';
   }
 
@@ -109,6 +111,9 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         break;
       case 'modals':
         context.go(ModalsPage.routePath);
+        break;
+      case 'toast':
+        context.go(ToastPage.routePath);
         break;
     }
   }
@@ -205,6 +210,13 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         label: 'Modals',
         iconWidget: IxIcons.info,
         selected: selectedId == 'modals',
+      ),
+      IxMenuEntry(
+        id: 'toast',
+        type: IxMenuEntryType.item,
+        label: 'Toast',
+        iconWidget: IxIcons.bulb,
+        selected: selectedId == 'toast',
       ),
       IxMenuEntry(
         id: 'theme-toggle',

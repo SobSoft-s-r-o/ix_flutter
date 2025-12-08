@@ -13,6 +13,7 @@ import '../screen/navigation_examples_page.dart';
 import '../screen/spinner_page.dart';
 import '../screen/slider_page.dart';
 import '../screen/tabs_page.dart';
+import '../screen/toast_page.dart';
 import 'global_scaffold.dart';
 
 final GoRouter router = GoRouter(
@@ -27,6 +28,12 @@ final GoRouter router = GoRouter(
           name: HomePage.routeName,
           pageBuilder: (context, state) =>
               NoTransitionPage(key: state.pageKey, child: const HomePage()),
+        ),
+        GoRoute(
+          path: ToastPage.routePath,
+          name: ToastPage.routeName,
+          pageBuilder: (context, state) =>
+              NoTransitionPage(key: state.pageKey, child: const ToastPage()),
         ),
         GoRoute(
           path: ButtonsPage.routePath,
