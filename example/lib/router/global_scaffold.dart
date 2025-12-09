@@ -9,6 +9,7 @@ import '../screen/cards_page.dart';
 import '../screen/blind_page.dart';
 import '../screen/badges_page.dart';
 import '../screen/dropdown_button_page.dart';
+import '../screen/empty_state_page.dart';
 import '../screen/forms_page.dart';
 import '../screen/home_page.dart';
 import '../screen/modals_page.dart';
@@ -57,6 +58,7 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
     if (location == HomePage.routePath) return 'home';
     if (location == ButtonsPage.routePath) return 'buttons';
     if (location == DropdownButtonPage.routePath) return 'dropdown_button';
+    if (location == EmptyStatePage.routePath) return 'empty_state';
     if (location == CardsPage.routePath) return 'cards';
     if (location == BlindPage.routePath) return 'blind';
     if (location == BadgesPage.routePath) return 'badges';
@@ -81,6 +83,9 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         break;
       case 'dropdown_button':
         context.go(DropdownButtonPage.routePath);
+        break;
+      case 'empty_state':
+        context.go(EmptyStatePage.routePath);
         break;
       case 'cards':
         context.go(CardsPage.routePath);
@@ -140,6 +145,13 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         label: 'Dropdown Button',
         iconWidget: IxIcons.chevronDown,
         selected: selectedId == 'dropdown_button',
+      ),
+      IxMenuEntry(
+        id: 'empty_state',
+        type: IxMenuEntryType.item,
+        label: 'Empty State',
+        iconWidget: IxIcons.info,
+        selected: selectedId == 'empty_state',
       ),
       IxMenuEntry(
         id: 'cards',

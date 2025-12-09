@@ -6,6 +6,7 @@ import '../screen/cards_page.dart';
 import '../screen/blind_page.dart';
 import '../screen/badges_page.dart';
 import '../screen/dropdown_button_page.dart';
+import '../screen/empty_state_page.dart';
 import '../screen/forms_page.dart';
 import '../screen/home_page.dart';
 import '../screen/modals_page.dart';
@@ -99,6 +100,14 @@ final GoRouter router = GoRouter(
           pageBuilder: (context, state) => NoTransitionPage(
             key: state.pageKey,
             child: const DropdownButtonPage(),
+          ),
+        ),
+        GoRoute(
+          path: EmptyStatePage.routePath,
+          name: EmptyStatePage.routeName,
+          pageBuilder: (context, state) => NoTransitionPage(
+            key: state.pageKey,
+            child: const EmptyStatePage(),
           ),
         ),
         GoRoute(
