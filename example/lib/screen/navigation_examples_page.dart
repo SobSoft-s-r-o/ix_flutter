@@ -120,7 +120,7 @@ class _BottomAppBarItem extends StatelessWidget {
     final foreground = selected ? colorScheme.onPrimary : colorScheme.onSurface;
     final background = selected
         ? colorScheme.primary
-        : colorScheme.surfaceContainerHighest;
+        : colorScheme.surfaceVariant;
 
     return InkWell(
       customBorder: RoundedRectangleBorder(
@@ -192,6 +192,15 @@ final List<_NavigationSpec> _navigationSpecs = [
     icon: IxIcons.warning,
     selectedIcon: IxIcons.warningFilled,
     builder: (context) => const _DialogExamples(),
+  ),
+  _NavigationSpec(
+    label: 'Breadcrumbs',
+    title: 'Breadcrumb navigation',
+    description:
+        'Breadcrumbs expose deep information architecture and offer shortcuts back to previous levels.',
+    icon: IxIcons.folder,
+    selectedIcon: IxIcons.folderFilled,
+    builder: (context) => const _BreadcrumbExamples(),
   ),
 ];
 
@@ -348,7 +357,7 @@ class _DialogExamples extends StatelessWidget {
           ],
         );
       },
-      barrierColor: theme.colorScheme.scrim.withValues(alpha: 0.5),
+      barrierColor: theme.colorScheme.scrim.withOpacity(0.5),
     );
   }
 
@@ -390,7 +399,113 @@ class _DialogExamples extends StatelessWidget {
           ],
         );
       },
-      barrierColor: theme.colorScheme.scrim.withValues(alpha: 0.5),
+      barrierColor: theme.colorScheme.scrim.withOpacity(0.5),
     );
+  }
+}
+
+class _BreadcrumbExamples extends StatefulWidget {
+  const _BreadcrumbExamples();
+
+  @override
+  State<_BreadcrumbExamples> createState() => _BreadcrumbExamplesState();
+}
+
+class _BreadcrumbExamplesState extends State<_BreadcrumbExamples> {
+  int _visibleCount = 4;
+  bool _useSubtlePrimary = false;
+  bool _showHomeLabel = false;
+
+  List<IxBreadcrumbItemData> get _demoItems => [
+    IxBreadcrumbItemData(label: 'Home', icon: IxIcons.home),
+    const IxBreadcrumbItemData(label: 'Manufacturing'),
+    const IxBreadcrumbItemData(label: 'Lines'),
+    const IxBreadcrumbItemData(label: 'Line 04'),
+    const IxBreadcrumbItemData(label: 'Inspection'),
+  ];
+
+  List<IxBreadcrumbMenuItem> get _childLinks => const [
+    IxBreadcrumbMenuItem(label: 'Anomalies overview'),
+    IxBreadcrumbMenuItem(label: 'Downtime summary'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SwitchListTile.adaptive(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Use subtle primary buttons'),
+          value: _useSubtlePrimary,
+          onChanged: (value) => setState(() => _useSubtlePrimary = value),
+        ),
+        SwitchListTile.adaptive(
+          contentPadding: EdgeInsets.zero,
+          title: const Text('Show home label'),
+          value: _showHomeLabel,
+          onChanged: (value) => setState(() => _showHomeLabel = value),
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: Slider(
+                value: _visibleCount.toDouble(),
+                min: 2,
+                max: _demoItems.length.toDouble(),
+                divisions: _demoItems.length - 2,
+                label: 'Visible: $_visibleCount',
+                onChanged: (value) => setState(() {
+                  _visibleCount = value.round();
+                }),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: IxBreadcrumb(
+              items: _demoItems,
+              buttonAppearance: _useSubtlePrimary
+                  ? IxBreadcrumbButtonAppearance.subtlePrimary
+                  : IxBreadcrumbButtonAppearance.tertiary,
+              visibleItemCount: _visibleCount,
+              nextItems: _childLinks,
+              showHomeLabel: _showHomeLabel,
+              onItemPressed: (item) =>
+                  _showToast(context, 'Navigated to ${item.label}'),
+              onNextItemPressed: (item) =>
+                  _showToast(context, 'Shortcut to ${item.label}'),
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Text('Compact path', style: theme.textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: IxBreadcrumb(
+              items: _demoItems.take(3).toList(),
+              visibleItemCount: 3,
+              buttonAppearance: _useSubtlePrimary
+                  ? IxBreadcrumbButtonAppearance.subtlePrimary
+                  : IxBreadcrumbButtonAppearance.tertiary,
+              showHomeLabel: _showHomeLabel,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showToast(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 }

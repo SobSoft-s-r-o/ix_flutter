@@ -10,6 +10,7 @@ import 'package:siemens_ix_flutter/src/ix_theme/components/ix_card_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_bottom_sheet_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_checkbox_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
+import 'package:siemens_ix_flutter/src/ix_theme/components/ix_breadcrumb_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_form_field_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_label_theme.dart';
 import 'package:siemens_ix_flutter/src/ix_theme/components/ix_modal_theme.dart';
@@ -27,7 +28,24 @@ import 'package:siemens_ix_flutter/src/ix_theme/ix_custom_palette.dart';
 /// scale guidance.
 ///
 /// The builder only wires up global colors (color scheme, surfaces, text,
-/// etc.). Component-specific theming will be layered on top later.
+/// etc.). Component-specific theming will be layered on top later. Most apps
+/// place the builder inside `main()` so the resulting theme can be passed to a
+/// `MaterialApp` (or `WidgetsApp`).
+///
+/// ```dart
+/// void main() {
+///   final lightTheme = const IxThemeBuilder().build();
+///   final darkTheme = const IxThemeBuilder(mode: ThemeMode.dark).build();
+///
+///   runApp(
+///     MaterialApp(
+///       theme: lightTheme,
+///       darkTheme: darkTheme,
+///       home: const MyDashboard(),
+///     ),
+///   );
+/// }
+/// ```
 class IxThemeBuilder {
   const IxThemeBuilder({
     this.family = IxThemeFamily.classic,
@@ -53,6 +71,10 @@ class IxThemeBuilder {
   final IxCustomPalette? customPalette;
 
   /// Returns [ThemeData] configured with Siemens IX global colors and fonts.
+  ///
+  /// The resulting theme exports both Material defaults (color scheme,
+  /// typographic scale, component theme data) and custom Siemens IX extensions
+  /// such as [IxTheme], [IxButtonTheme], and component-specific tokens.
   ThemeData build() {
     final brightness = _resolveBrightness(mode, systemBrightness);
     final Map<IxThemeColorToken, Color> palette = Map.unmodifiable(
@@ -107,6 +129,10 @@ class IxThemeBuilder {
       typography: typeScale,
     );
     final tabsTheme = IxTabsTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
+    final breadcrumbTheme = IxBreadcrumbTheme.fromPalette(
       palette: palette,
       typography: typeScale,
     );
@@ -222,11 +248,15 @@ class IxThemeBuilder {
         labelTheme,
         badgeTheme,
         scrollbarTheme,
+        breadcrumbTheme,
       ],
     );
   }
 
-  /// Copies the builder with new parameters.
+  /// Copies the builder with selective overrides.
+  ///
+  /// Useful when you want to flip between light/dark or supply a custom
+  /// [IxTypography] while reusing the remaining configuration.
   IxThemeBuilder copyWith({
     IxThemeFamily? family,
     ThemeMode? mode,
@@ -243,6 +273,7 @@ class IxThemeBuilder {
     );
   }
 
+  /// Resolves the effective [Brightness] that should drive palette selection.
   static Brightness _resolveBrightness(
     ThemeMode mode,
     Brightness systemBrightness,
@@ -258,12 +289,15 @@ class IxThemeBuilder {
   }
 }
 
+/// Builds a Material [ColorScheme] from the resolved Siemens IX palette.
 ColorScheme _buildColorScheme(
   Map<IxThemeColorToken, Color> palette,
   Brightness brightness,
 ) {
   Color pick(IxThemeColorToken token) => palette[token]!;
 
+  /// Translates the Siemens IX palette into Flutter's [ColorScheme] so
+  /// downstream Material widgets can share the same ink and surface values.
   return ColorScheme(
     brightness: brightness,
     primary: pick(IxThemeColorToken.primary),
@@ -303,6 +337,8 @@ ColorScheme _buildColorScheme(
   );
 }
 
+/// Generates a Material [TextTheme] using the Siemens IX typography scale and
+/// palette tones.
 TextTheme _buildTextTheme(
   IxTypography typography,
   Map<IxThemeColorToken, Color> palette,
@@ -399,6 +435,7 @@ class IxTheme extends ThemeExtension<IxTheme> {
     );
   }
 
+  /// Maps a semantic [IxThemeTextTone] to its backing palette token.
   IxThemeColorToken _toneToToken(IxThemeTextTone tone) {
     switch (tone) {
       case IxThemeTextTone.standard:
