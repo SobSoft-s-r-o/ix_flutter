@@ -3,10 +3,18 @@ import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
 
 /// A widget that displays a single toast notification.
 class IxToast extends StatefulWidget {
-  const IxToast({super.key, required this.data, required this.onDismiss});
+  const IxToast({
+    super.key,
+    required this.data,
+    required this.onDismiss,
+    this.onEnter,
+    this.onExit,
+  });
 
   final IxToastData data;
   final VoidCallback onDismiss;
+  final VoidCallback? onEnter;
+  final VoidCallback? onExit;
 
   @override
   State<IxToast> createState() => _IxToastState();
@@ -108,11 +116,18 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
       onEnter: (_) {
         if (widget.data.autoClose && widget.data.duration != null) {
           _progressController.stop();
+          widget.onEnter?.call();
         }
       },
       onExit: (_) {
         if (widget.data.autoClose && widget.data.duration != null) {
+          // Only resume if we haven't completed yet.
+          // If we stopped at 1.0 (completed), we shouldn't restart unless we reset.
+          // But usually we stop *before* completion.
+          // However, if the user hovers, we want to keep it open.
+          // When they leave, we resume the countdown.
           _progressController.forward();
+          widget.onExit?.call();
         }
       },
       child: Material(

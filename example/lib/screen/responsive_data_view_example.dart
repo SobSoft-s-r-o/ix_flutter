@@ -34,6 +34,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
   bool _hasMore = true;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  IxSortSpec? _currentSort;
 
   @override
   void initState() {
@@ -63,7 +64,13 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
           item.category.toLowerCase().contains(_searchQuery.toLowerCase());
     }).toList();
 
-    if (_paginationMode == IxPaginationMode.standard) {
+    if (_paginationMode == IxPaginationMode.none) {
+      setState(() {
+        _displayedItems = filteredItems;
+        _isLoading = false;
+        _isPageLoading = false;
+      });
+    } else if (_paginationMode == IxPaginationMode.standard) {
       final start = (_page - 1) * _pageSize;
       final end = (start + _pageSize).clamp(0, filteredItems.length);
       setState(() {
@@ -89,6 +96,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
 
   void _handleSort(IxSortSpec sortSpec) {
     setState(() {
+      _currentSort = sortSpec;
       _allItems.sort((a, b) {
         int cmp;
         switch (sortSpec.key) {
@@ -191,6 +199,8 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
               items: _displayedItems,
               enableSorting: true,
               onSortChanged: _handleSort,
+              initialSortKey: _currentSort?.key,
+              initialSortAscending: _currentSort?.ascending ?? true,
               isLoading: _isLoading,
               isPageLoading: _isPageLoading,
               searchQuery: _searchQuery,

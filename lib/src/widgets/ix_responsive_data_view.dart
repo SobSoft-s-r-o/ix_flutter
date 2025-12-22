@@ -103,6 +103,8 @@ class IxResponsiveDataView<T> extends StatelessWidget {
     this.onRowTapDesktop,
     this.enableSorting = false,
     this.onSortChanged,
+    this.initialSortKey,
+    this.initialSortAscending = true,
     this.isLoading = false,
     this.pagination,
     this.onLoadNextPage,
@@ -129,6 +131,8 @@ class IxResponsiveDataView<T> extends StatelessWidget {
   final void Function(T item)? onRowTapDesktop;
   final bool enableSorting;
   final void Function(IxSortSpec sortSpec)? onSortChanged;
+  final String? initialSortKey;
+  final bool initialSortAscending;
   final bool isLoading;
 
   final IxPaginationConfig? pagination;
@@ -217,6 +221,8 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             onRowTap: onRowTapDesktop,
             enableSorting: enableSorting,
             onSortChanged: onSortChanged,
+            initialSortKey: initialSortKey,
+            initialSortAscending: initialSortAscending,
             pagination: pagination,
             onLoadNextPage: onLoadNextPage,
             onPageChanged: onPageChanged,
@@ -246,6 +252,8 @@ class _DesktopView<T> extends StatefulWidget {
     this.onRowTap,
     required this.enableSorting,
     this.onSortChanged,
+    this.initialSortKey,
+    this.initialSortAscending = true,
     this.pagination,
     this.onLoadNextPage,
     this.onPageChanged,
@@ -267,6 +275,8 @@ class _DesktopView<T> extends StatefulWidget {
   final void Function(T item)? onRowTap;
   final bool enableSorting;
   final void Function(IxSortSpec sortSpec)? onSortChanged;
+  final String? initialSortKey;
+  final bool initialSortAscending;
   final IxPaginationConfig? pagination;
   final Future<void> Function()? onLoadNextPage;
   final void Function(int newPage)? onPageChanged;
@@ -297,6 +307,8 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   @override
   void initState() {
     super.initState();
+    _sortKey = widget.initialSortKey;
+    _sortAscending = widget.initialSortAscending;
     _scrollController.addListener(_onScroll);
     _previousSearchQuery = widget.searchQuery;
   }
@@ -308,6 +320,10 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
         !widget.isPageLoading) {
       _loadTriggeredForCurrentExtent = false;
     }
+
+    // If the parent reloads data (e.g. due to sort change), we want to keep our sort state.
+    // However, if the parent *resets* the view completely (e.g. new instance), state is lost.
+    // Since we are in State object, state persists across rebuilds.
 
     if (widget.searchAffectsPagination &&
         widget.searchQuery != _previousSearchQuery) {
@@ -341,18 +357,14 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   void _handleSort(String key) {
     if (!widget.enableSorting) return;
 
+    final newAscending = _sortKey == key ? !_sortAscending : true;
+
     setState(() {
-      if (_sortKey == key) {
-        _sortAscending = !_sortAscending;
-      } else {
-        _sortKey = key;
-        _sortAscending = true;
-      }
+      _sortKey = key;
+      _sortAscending = newAscending;
     });
 
-    widget.onSortChanged?.call(
-      IxSortSpec(key: _sortKey!, ascending: _sortAscending),
-    );
+    widget.onSortChanged?.call(IxSortSpec(key: key, ascending: newAscending));
   }
 
   @override
@@ -368,91 +380,105 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
             widget.searchQuery!.isNotEmpty)
           _SearchStatusHeader(
             query: widget.searchQuery!,
-            count: widget.resultsCountOverride ?? widget.items.length,
+            count:
+                widget.resultsCountOverride ??
+                widget.pagination?.totalItems ??
+                widget.items.length,
             onClear: widget.showSearchClearAction ? widget.onClearSearch : null,
             resultsLabelBuilder: widget.resultsLabelBuilder,
           ),
         // Header
-        Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: color1,
-            border: Border(
-              bottom: BorderSide(
-                color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
+        Padding(
+          padding: const EdgeInsets.only(
+            right: 16.0,
+          ), // Reserve space for scrollbar
+          child: Container(
+            height: 48,
+            decoration: BoxDecoration(
+              color: color1,
+              border: Border(
+                bottom: BorderSide(
+                  color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
+                ),
               ),
             ),
-          ),
-          child: Row(
-            children: [
-              ...widget.columns.map((col) {
-                return Expanded(
-                  flex: col.flex,
-                  child: GestureDetector(
-                    onTap: (widget.enableSorting && col.sortKey != null)
-                        ? () => _handleSort(col.sortKey!)
-                        : null,
-                    child: MouseRegion(
-                      cursor: (widget.enableSorting && col.sortKey != null)
-                          ? SystemMouseCursors.click
-                          : SystemMouseCursors.basic,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        alignment: col.alignment,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              col.label,
-                              style: theme?.textStyle(
-                                IxTypographyVariant.label,
+            child: Row(
+              children: [
+                ...widget.columns.map((col) {
+                  return Expanded(
+                    flex: col.flex,
+                    child: GestureDetector(
+                      onTap: (widget.enableSorting && col.sortKey != null)
+                          ? () => _handleSort(col.sortKey!)
+                          : null,
+                      child: MouseRegion(
+                        cursor: (widget.enableSorting && col.sortKey != null)
+                            ? SystemMouseCursors.click
+                            : SystemMouseCursors.basic,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          alignment: col.alignment,
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                col.label,
+                                style: theme?.textStyle(
+                                  IxTypographyVariant.label,
+                                ),
                               ),
-                            ),
-                            if (widget.enableSorting &&
-                                col.sortKey != null &&
-                                _sortKey == col.sortKey) ...[
-                              const SizedBox(width: 4),
-                              Icon(
-                                _sortAscending
-                                    ? Icons.arrow_upward
-                                    : Icons.arrow_downward,
-                                size: 14,
-                                color: stdText,
-                              ),
+                              if (widget.enableSorting &&
+                                  col.sortKey != null &&
+                                  _sortKey == col.sortKey) ...[
+                                const SizedBox(width: 4),
+                                IconTheme(
+                                  data: IconThemeData(size: 16, color: stdText),
+                                  child: _sortAscending
+                                      ? IxIcons.chevronUp
+                                      : IxIcons.chevronDown,
+                                ),
+                              ],
                             ],
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              }),
-              // Tools column header
-              const SizedBox(width: 48), // Fixed width for tools
-            ],
+                  );
+                }),
+                // Tools column header
+                const SizedBox(width: 48), // Fixed width for tools
+              ],
+            ),
           ),
         ),
         // Rows
         Expanded(
-          child: ListView.builder(
+          child: Scrollbar(
             controller: _scrollController,
-            itemCount: widget.items.length + (widget.isPageLoading ? 1 : 0),
-            itemBuilder: (context, index) {
-              if (index == widget.items.length) {
-                return const Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: Center(child: IxSpinner()),
+            thumbVisibility: true,
+            child: ListView.builder(
+              controller: _scrollController,
+              padding: const EdgeInsets.only(
+                right: 16.0,
+              ), // Reserve space for scrollbar
+              itemCount: widget.items.length + (widget.isPageLoading ? 1 : 0),
+              itemBuilder: (context, index) {
+                if (index == widget.items.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Center(child: IxSpinner()),
+                  );
+                }
+                final item = widget.items[index];
+                return _DesktopRow<T>(
+                  item: item,
+                  columns: widget.columns,
+                  actions: widget.actions,
+                  onTap: widget.onRowTap,
+                  theme: theme,
                 );
-              }
-              final item = widget.items[index];
-              return _DesktopRow<T>(
-                item: item,
-                columns: widget.columns,
-                actions: widget.actions,
-                onTap: widget.onRowTap,
-                theme: theme,
-              );
-            },
+              },
+            ),
           ),
         ),
         if (widget.pagination?.mode == IxPaginationMode.standard &&
@@ -701,7 +727,10 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
             widget.searchQuery!.isNotEmpty)
           _SearchStatusHeader(
             query: widget.searchQuery!,
-            count: widget.resultsCountOverride ?? widget.items.length,
+            count:
+                widget.resultsCountOverride ??
+                widget.pagination?.totalItems ??
+                widget.items.length,
             onClear: widget.showSearchClearAction ? widget.onClearSearch : null,
             resultsLabelBuilder: widget.resultsLabelBuilder,
           ),

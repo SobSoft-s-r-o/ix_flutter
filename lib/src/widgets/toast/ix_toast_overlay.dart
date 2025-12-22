@@ -79,6 +79,8 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
           child: IxToast(
             data: toast,
             onDismiss: () => widget.service.dismiss(toast.id),
+            onEnter: () => widget.service.pauseTimer(toast.id),
+            onExit: () => widget.service.resumeTimer(toast.id),
           ),
         ),
       ),
