@@ -421,10 +421,13 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Text(
-                                col.label,
-                                style: theme?.textStyle(
-                                  IxTypographyVariant.label,
+                              Flexible(
+                                child: Text(
+                                  col.label,
+                                  style: theme?.textStyle(
+                                    IxTypographyVariant.label,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                               if (widget.enableSorting &&
