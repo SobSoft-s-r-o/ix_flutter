@@ -109,6 +109,16 @@ class IxResponsiveDataView<T> extends StatelessWidget {
     this.onPageChanged,
     this.onPageSizeChanged,
     this.isPageLoading = false,
+    this.searchQuery,
+    this.onClearSearch,
+    this.searchHintText,
+    this.showSearchStatusBar = true,
+    this.showSearchClearAction = true,
+    this.searchAffectsPagination = true,
+    this.onSearchChangedRequestResetPagination,
+    this.resultsCountOverride,
+    this.resultsLabelBuilder,
+    this.noResultsTextBuilder,
   });
 
   final List<T> items;
@@ -127,6 +137,18 @@ class IxResponsiveDataView<T> extends StatelessWidget {
   final void Function(int newPageSize)? onPageSizeChanged;
   final bool isPageLoading;
 
+  // Search / Filtering
+  final String? searchQuery;
+  final VoidCallback? onClearSearch;
+  final String? searchHintText;
+  final bool showSearchStatusBar;
+  final bool showSearchClearAction;
+  final bool searchAffectsPagination;
+  final VoidCallback? onSearchChangedRequestResetPagination;
+  final int? resultsCountOverride;
+  final String Function(int count)? resultsLabelBuilder;
+  final String Function(String query)? noResultsTextBuilder;
+
   @override
   Widget build(BuildContext context) {
     if (isLoading) {
@@ -134,6 +156,29 @@ class IxResponsiveDataView<T> extends StatelessWidget {
     }
 
     if (items.isEmpty) {
+      if (searchQuery != null && searchQuery!.isNotEmpty) {
+        return IxEmptyState(
+          icon: IxIcons.search,
+          title:
+              noResultsTextBuilder?.call(searchQuery!) ??
+              'No results for "$searchQuery"',
+          subtitle: 'Try a different search term',
+          primaryAction: onClearSearch != null
+              ? Builder(
+                  builder: (context) {
+                    final ixButtons = Theme.of(
+                      context,
+                    ).extension<IxButtonTheme>();
+                    return OutlinedButton(
+                      style: ixButtons?.style(IxButtonVariant.secondary),
+                      onPressed: onClearSearch,
+                      child: const Text('Clear search'),
+                    );
+                  },
+                )
+              : null,
+        );
+      }
       return IxEmptyState(
         icon: IxIcons.info,
         title: 'No data available',
@@ -154,6 +199,15 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             onLoadNextPage: onLoadNextPage,
             onPageChanged: onPageChanged,
             isPageLoading: isPageLoading,
+            searchQuery: searchQuery,
+            onClearSearch: onClearSearch,
+            showSearchStatusBar: showSearchStatusBar,
+            showSearchClearAction: showSearchClearAction,
+            searchAffectsPagination: searchAffectsPagination,
+            onSearchChangedRequestResetPagination:
+                onSearchChangedRequestResetPagination,
+            resultsCountOverride: resultsCountOverride,
+            resultsLabelBuilder: resultsLabelBuilder,
           );
         } else {
           return _DesktopView<T>(
@@ -168,6 +222,15 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             onPageChanged: onPageChanged,
             onPageSizeChanged: onPageSizeChanged,
             isPageLoading: isPageLoading,
+            searchQuery: searchQuery,
+            onClearSearch: onClearSearch,
+            showSearchStatusBar: showSearchStatusBar,
+            showSearchClearAction: showSearchClearAction,
+            searchAffectsPagination: searchAffectsPagination,
+            onSearchChangedRequestResetPagination:
+                onSearchChangedRequestResetPagination,
+            resultsCountOverride: resultsCountOverride,
+            resultsLabelBuilder: resultsLabelBuilder,
           );
         }
       },
@@ -188,6 +251,14 @@ class _DesktopView<T> extends StatefulWidget {
     this.onPageChanged,
     this.onPageSizeChanged,
     required this.isPageLoading,
+    this.searchQuery,
+    this.onClearSearch,
+    required this.showSearchStatusBar,
+    required this.showSearchClearAction,
+    required this.searchAffectsPagination,
+    this.onSearchChangedRequestResetPagination,
+    this.resultsCountOverride,
+    this.resultsLabelBuilder,
   });
 
   final List<T> items;
@@ -202,6 +273,16 @@ class _DesktopView<T> extends StatefulWidget {
   final void Function(int newPageSize)? onPageSizeChanged;
   final bool isPageLoading;
 
+  // Search
+  final String? searchQuery;
+  final VoidCallback? onClearSearch;
+  final bool showSearchStatusBar;
+  final bool showSearchClearAction;
+  final bool searchAffectsPagination;
+  final VoidCallback? onSearchChangedRequestResetPagination;
+  final int? resultsCountOverride;
+  final String Function(int count)? resultsLabelBuilder;
+
   @override
   State<_DesktopView<T>> createState() => _DesktopViewState<T>();
 }
@@ -211,11 +292,13 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   bool _sortAscending = true;
   final ScrollController _scrollController = ScrollController();
   bool _loadTriggeredForCurrentExtent = false;
+  String? _previousSearchQuery;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _previousSearchQuery = widget.searchQuery;
   }
 
   @override
@@ -224,6 +307,14 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
     if (widget.items.length != oldWidget.items.length ||
         !widget.isPageLoading) {
       _loadTriggeredForCurrentExtent = false;
+    }
+
+    if (widget.searchAffectsPagination &&
+        widget.searchQuery != _previousSearchQuery) {
+      _previousSearchQuery = widget.searchQuery;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onSearchChangedRequestResetPagination?.call();
+      });
     }
   }
 
@@ -272,6 +363,15 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
 
     return Column(
       children: [
+        if (widget.showSearchStatusBar &&
+            widget.searchQuery != null &&
+            widget.searchQuery!.isNotEmpty)
+          _SearchStatusHeader(
+            query: widget.searchQuery!,
+            count: widget.resultsCountOverride ?? widget.items.length,
+            onClear: widget.showSearchClearAction ? widget.onClearSearch : null,
+            resultsLabelBuilder: widget.resultsLabelBuilder,
+          ),
         // Header
         Container(
           height: 48,
@@ -288,33 +388,40 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
               ...widget.columns.map((col) {
                 return Expanded(
                   flex: col.flex,
-                  child: InkWell(
+                  child: GestureDetector(
                     onTap: (widget.enableSorting && col.sortKey != null)
                         ? () => _handleSort(col.sortKey!)
                         : null,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      alignment: col.alignment,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            col.label,
-                            style: theme?.textStyle(IxTypographyVariant.label),
-                          ),
-                          if (widget.enableSorting &&
-                              col.sortKey != null &&
-                              _sortKey == col.sortKey) ...[
-                            const SizedBox(width: 4),
-                            Icon(
-                              _sortAscending
-                                  ? Icons.arrow_upward
-                                  : Icons.arrow_downward,
-                              size: 14,
-                              color: stdText,
+                    child: MouseRegion(
+                      cursor: (widget.enableSorting && col.sortKey != null)
+                          ? SystemMouseCursors.click
+                          : SystemMouseCursors.basic,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        alignment: col.alignment,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              col.label,
+                              style: theme?.textStyle(
+                                IxTypographyVariant.label,
+                              ),
                             ),
+                            if (widget.enableSorting &&
+                                col.sortKey != null &&
+                                _sortKey == col.sortKey) ...[
+                              const SizedBox(width: 4),
+                              Icon(
+                                _sortAscending
+                                    ? Icons.arrow_upward
+                                    : Icons.arrow_downward,
+                                size: 14,
+                                color: stdText,
+                              ),
+                            ],
                           ],
-                        ],
+                        ),
                       ),
                     ),
                   ),
@@ -399,7 +506,10 @@ class _DesktopRowState<T> extends State<_DesktopRow<T>> {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      child: InkWell(
+      cursor: widget.onTap != null
+          ? SystemMouseCursors.click
+          : SystemMouseCursors.basic,
+      child: GestureDetector(
         onTap: widget.onTap != null ? () => widget.onTap!(widget.item) : null,
         child: Container(
           height: 56, // Standard row height
@@ -488,6 +598,14 @@ class _MobileView<T> extends StatefulWidget {
     this.onLoadNextPage,
     this.onPageChanged,
     required this.isPageLoading,
+    this.searchQuery,
+    this.onClearSearch,
+    required this.showSearchStatusBar,
+    required this.showSearchClearAction,
+    required this.searchAffectsPagination,
+    this.onSearchChangedRequestResetPagination,
+    this.resultsCountOverride,
+    this.resultsLabelBuilder,
   });
 
   final List<T> items;
@@ -498,6 +616,16 @@ class _MobileView<T> extends StatefulWidget {
   final void Function(int newPage)? onPageChanged;
   final bool isPageLoading;
 
+  // Search
+  final String? searchQuery;
+  final VoidCallback? onClearSearch;
+  final bool showSearchStatusBar;
+  final bool showSearchClearAction;
+  final bool searchAffectsPagination;
+  final VoidCallback? onSearchChangedRequestResetPagination;
+  final int? resultsCountOverride;
+  final String Function(int count)? resultsLabelBuilder;
+
   @override
   State<_MobileView<T>> createState() => _MobileViewState<T>();
 }
@@ -505,11 +633,13 @@ class _MobileView<T> extends StatefulWidget {
 class _MobileViewState<T> extends State<_MobileView<T>> {
   final ScrollController _scrollController = ScrollController();
   bool _loadTriggeredForCurrentExtent = false;
+  String? _previousSearchQuery;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
+    _previousSearchQuery = widget.searchQuery;
   }
 
   @override
@@ -518,6 +648,14 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
     if (widget.items.length != oldWidget.items.length ||
         !widget.isPageLoading) {
       _loadTriggeredForCurrentExtent = false;
+    }
+
+    if (widget.searchAffectsPagination &&
+        widget.searchQuery != _previousSearchQuery) {
+      _previousSearchQuery = widget.searchQuery;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onSearchChangedRequestResetPagination?.call();
+      });
     }
   }
 
@@ -558,6 +696,15 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        if (widget.showSearchStatusBar &&
+            widget.searchQuery != null &&
+            widget.searchQuery!.isNotEmpty)
+          _SearchStatusHeader(
+            query: widget.searchQuery!,
+            count: widget.resultsCountOverride ?? widget.items.length,
+            onClear: widget.showSearchClearAction ? widget.onClearSearch : null,
+            resultsLabelBuilder: widget.resultsLabelBuilder,
+          ),
         Expanded(
           child: ListView.separated(
             controller: _scrollController,
@@ -609,8 +756,17 @@ class _MobileCard<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
-    final cardColor = theme?.color(IxThemeColorToken.color0) ?? Colors.white;
-    final borderColor = theme?.color(IxThemeColorToken.color4) ?? Colors.grey;
+    final cardTheme = Theme.of(context).extension<IxCardTheme>();
+    final cardStyle = cardTheme?.style(IxCardVariant.filled);
+
+    final cardColor =
+        cardStyle?.background ??
+        theme?.color(IxThemeColorToken.color0) ??
+        Colors.white;
+    final borderColor =
+        cardStyle?.borderColor ??
+        theme?.color(IxThemeColorToken.color4) ??
+        Colors.grey;
 
     return GestureDetector(
       onTap: onTap,
@@ -733,6 +889,83 @@ class _MobileDetailView<T> extends StatelessWidget {
             ).toList(),
           ),
           const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+}
+
+class _SearchStatusHeader extends StatelessWidget {
+  const _SearchStatusHeader({
+    required this.query,
+    required this.count,
+    this.onClear,
+    this.resultsLabelBuilder,
+  });
+
+  final String query;
+  final int count;
+  final VoidCallback? onClear;
+  final String Function(int count)? resultsLabelBuilder;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context).extension<IxTheme>();
+    final color1 = theme?.color(IxThemeColorToken.color1) ?? Colors.grey[100]!;
+    final stdText = theme?.color(IxThemeColorToken.stdText) ?? Colors.black;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: color1,
+        border: Border(
+          bottom: BorderSide(
+            color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
+          ),
+        ),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: theme?.color(IxThemeColorToken.component1),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Filtered by: "$query"',
+                  style: theme?.textStyle(IxTypographyVariant.label),
+                ),
+                if (onClear != null) ...[
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: onClear,
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: IconTheme(
+                        data: IconThemeData(size: 16, color: stdText),
+                        child: IxIcons.closeSmall,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const Spacer(),
+          Text(
+            resultsLabelBuilder?.call(count) ?? 'Results: $count',
+            style: theme?.textStyle(
+              IxTypographyVariant.label,
+              tone: IxThemeTextTone.soft,
+            ),
+          ),
         ],
       ),
     );

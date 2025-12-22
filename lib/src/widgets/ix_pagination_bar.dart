@@ -63,20 +63,18 @@ class IxPaginationBar extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            DropdownButton<int>(
-              value: pageSize,
-              underline: const SizedBox(),
-              items: pageSizeOptions!.map((size) {
-                return DropdownMenuItem(
-                  value: size,
-                  child: Text(size.toString()),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  onPageSizeChanged!(value);
-                }
-              },
+            IxDropdownButton<int>(
+              label: pageSize.toString(),
+              variant: IxDropdownButtonVariant.subtleTertiary,
+              items: pageSizeOptions!
+                  .map(
+                    (size) => IxDropdownMenuItem<int>(
+                      label: size.toString(),
+                      value: size,
+                    ),
+                  )
+                  .toList(),
+              onItemSelected: onPageSizeChanged,
             ),
             const SizedBox(width: 24),
           ],

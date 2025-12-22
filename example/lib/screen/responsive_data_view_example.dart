@@ -29,8 +29,11 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
   IxPaginationMode _paginationMode = IxPaginationMode.standard;
   int _page = 1;
   int _pageSize = 20;
+  bool _isLoading = true;
   bool _isPageLoading = false;
   bool _hasMore = true;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -38,24 +41,47 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
     _loadData();
   }
 
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _loadData() async {
-    setState(() => _isPageLoading = true);
+    if (_displayedItems.isEmpty && _page == 1) {
+      setState(() => _isLoading = true);
+    } else {
+      setState(() => _isPageLoading = true);
+    }
+
     await Future.delayed(const Duration(milliseconds: 500)); // Simulate network
+
+    // Filter by search query
+    final filteredItems = _allItems.where((item) {
+      if (_searchQuery.isEmpty) return true;
+      return item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+          item.category.toLowerCase().contains(_searchQuery.toLowerCase());
+    }).toList();
 
     if (_paginationMode == IxPaginationMode.standard) {
       final start = (_page - 1) * _pageSize;
-      final end = (start + _pageSize).clamp(0, _allItems.length);
+      final end = (start + _pageSize).clamp(0, filteredItems.length);
       setState(() {
-        _displayedItems = _allItems.sublist(start, end);
+        _displayedItems = filteredItems.sublist(start, end);
+        _isLoading = false;
         _isPageLoading = false;
       });
     } else {
       // Infinite
       final currentCount = _displayedItems.length;
-      final nextCount = (currentCount + _pageSize).clamp(0, _allItems.length);
+      final nextCount = (currentCount + _pageSize).clamp(
+        0,
+        filteredItems.length,
+      );
       setState(() {
-        _displayedItems.addAll(_allItems.sublist(currentCount, nextCount));
-        _hasMore = _displayedItems.length < _allItems.length;
+        _displayedItems.addAll(filteredItems.sublist(currentCount, nextCount));
+        _hasMore = _displayedItems.length < filteredItems.length;
+        _isLoading = false;
         _isPageLoading = false;
       });
     }
@@ -90,6 +116,24 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
     _loadData();
   }
 
+  void _handleSearch(String query) {
+    setState(() {
+      _searchQuery = query;
+      // Reset pagination on search
+      _page = 1;
+      if (_paginationMode == IxPaginationMode.infinite) {
+        _displayedItems = [];
+        _hasMore = true;
+      }
+    });
+    _loadData();
+  }
+
+  void _clearSearch() {
+    _searchController.clear();
+    _handleSearch('');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -99,25 +143,43 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
           child: Row(
             children: [
               const Text('Pagination Mode: '),
-              DropdownButton<IxPaginationMode>(
-                value: _paginationMode,
-                items: IxPaginationMode.values.map((mode) {
-                  return DropdownMenuItem(
-                    value: mode,
-                    child: Text(mode.name.toUpperCase()),
-                  );
-                }).toList(),
-                onChanged: (mode) {
-                  if (mode != null) {
-                    setState(() {
-                      _paginationMode = mode;
-                      _page = 1;
-                      _displayedItems = [];
-                      _hasMore = true;
-                    });
-                    _loadData();
-                  }
+              const SizedBox(width: 8),
+              IxDropdownButton<IxPaginationMode>(
+                label: _paginationMode.name.toUpperCase(),
+                variant: IxDropdownButtonVariant.subtleSecondary,
+                items: IxPaginationMode.values
+                    .map(
+                      (mode) => IxDropdownMenuItem<IxPaginationMode>(
+                        label: mode.name.toUpperCase(),
+                        value: mode,
+                      ),
+                    )
+                    .toList(),
+                onItemSelected: (mode) {
+                  setState(() {
+                    _paginationMode = mode;
+                    _page = 1;
+                    _displayedItems = [];
+                    _hasMore = true;
+                  });
+                  _loadData();
                 },
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    hintText: 'Search items...',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                  onSubmitted: _handleSearch,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: () => _handleSearch(_searchController.text),
               ),
             ],
           ),
@@ -129,13 +191,59 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
               items: _displayedItems,
               enableSorting: true,
               onSortChanged: _handleSort,
+              isLoading: _isLoading,
               isPageLoading: _isPageLoading,
+              searchQuery: _searchQuery,
+              onClearSearch: _clearSearch,
+              onSearchChangedRequestResetPagination: () {
+                // This callback is triggered if searchAffectsPagination is true
+                // and searchQuery changes.
+                // In this example, we handle reset in _handleSearch, but this
+                // is useful if the query came from a stream or parent prop update.
+                setState(() {
+                  _page = 1;
+                  if (_paginationMode == IxPaginationMode.infinite) {
+                    _displayedItems = [];
+                    _hasMore = true;
+                  }
+                });
+                _loadData();
+              },
               pagination: IxPaginationConfig(
                 mode: _paginationMode,
                 page: _page,
                 pageSize: _pageSize,
-                totalItems: _allItems.length,
-                totalPages: (_allItems.length / _pageSize).ceil(),
+                totalItems: _searchQuery.isEmpty
+                    ? _allItems.length
+                    : _allItems
+                          .where(
+                            (item) =>
+                                item.name.toLowerCase().contains(
+                                  _searchQuery.toLowerCase(),
+                                ) ||
+                                item.category.toLowerCase().contains(
+                                  _searchQuery.toLowerCase(),
+                                ),
+                          )
+                          .length,
+                totalPages:
+                    ((_searchQuery.isEmpty
+                                ? _allItems.length
+                                : _allItems
+                                      .where(
+                                        (item) =>
+                                            item.name.toLowerCase().contains(
+                                              _searchQuery.toLowerCase(),
+                                            ) ||
+                                            item.category
+                                                .toLowerCase()
+                                                .contains(
+                                                  _searchQuery.toLowerCase(),
+                                                ),
+                                      )
+                                      .length) /
+                            _pageSize)
+                        .ceil(),
                 pageSizeOptions: [10, 20, 50],
                 hasMore: _hasMore,
                 showPaginationOnMobile: true,
