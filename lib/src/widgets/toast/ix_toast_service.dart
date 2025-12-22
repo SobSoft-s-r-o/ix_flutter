@@ -1,8 +1,5 @@
 import 'dart:async';
 
-import 'dart:math';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'ix_toast_data.dart';

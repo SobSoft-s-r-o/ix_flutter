@@ -15,6 +15,7 @@ import '../screen/spinner_page.dart';
 import '../screen/slider_page.dart';
 import '../screen/tabs_page.dart';
 import '../screen/toast_page.dart';
+import '../screen/responsive_data_view_example.dart';
 import 'global_scaffold.dart';
 
 final GoRouter router = GoRouter(
@@ -121,6 +122,14 @@ final GoRouter router = GoRouter(
           name: ModalsPage.routeName,
           pageBuilder: (context, state) =>
               NoTransitionPage(key: state.pageKey, child: const ModalsPage()),
+        ),
+        GoRoute(
+          path: ResponsiveDataViewExample.routePath,
+          name: ResponsiveDataViewExample.routeName,
+          pageBuilder: (context, state) => NoTransitionPage(
+            key: state.pageKey,
+            child: const ResponsiveDataViewExample(),
+          ),
         ),
       ],
     ),

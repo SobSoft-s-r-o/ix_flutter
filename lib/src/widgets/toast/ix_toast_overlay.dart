@@ -104,8 +104,9 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
           key: _listKey,
           initialItemCount: _displayedToasts.length,
           itemBuilder: (context, index, animation) {
-            if (index >= _displayedToasts.length)
+            if (index >= _displayedToasts.length) {
               return const SizedBox.shrink();
+            }
             return _buildItem(_displayedToasts[index], animation);
           },
         ),

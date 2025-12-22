@@ -120,7 +120,7 @@ class _BottomAppBarItem extends StatelessWidget {
     final foreground = selected ? colorScheme.onPrimary : colorScheme.onSurface;
     final background = selected
         ? colorScheme.primary
-        : colorScheme.surfaceVariant;
+        : colorScheme.surfaceContainerHighest;
 
     return InkWell(
       customBorder: RoundedRectangleBorder(

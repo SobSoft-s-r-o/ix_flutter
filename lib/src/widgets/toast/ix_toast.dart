@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/ix_theme_builder.dart';
-
-import 'ix_toast_data.dart';
 
 /// A widget that displays a single toast notification.
 class IxToast extends StatefulWidget {

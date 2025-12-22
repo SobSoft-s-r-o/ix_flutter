@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/ix_theme_builder.dart';
 
 /// The layout variant of the [IxEmptyState].
 enum IxEmptyStateLayout {

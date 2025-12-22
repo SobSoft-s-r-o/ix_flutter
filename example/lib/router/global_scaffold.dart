@@ -18,6 +18,7 @@ import '../screen/spinner_page.dart';
 import '../screen/slider_page.dart';
 import '../screen/tabs_page.dart';
 import '../screen/toast_page.dart';
+import '../screen/responsive_data_view_example.dart';
 
 class GlobalScaffold extends StatefulWidget {
   const GlobalScaffold({
@@ -70,6 +71,8 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
     if (location == FormsPage.routePath) return 'forms';
     if (location == ModalsPage.routePath) return 'modals';
     if (location == ToastPage.routePath) return 'toast';
+    if (location == ResponsiveDataViewExample.routePath)
+      return 'responsive_data_view';
     return 'home';
   }
 
@@ -98,6 +101,9 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         break;
       case 'tabs':
         context.go(TabsPage.routePath);
+        break;
+      case 'responsive_data_view':
+        context.go(ResponsiveDataViewExample.routePath);
         break;
       case 'navigation':
         context.go(NavigationExamplesPage.routePath);
@@ -229,6 +235,13 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         label: 'Toast',
         iconWidget: IxIcons.bulb,
         selected: selectedId == 'toast',
+      ),
+      IxMenuEntry(
+        id: 'responsive_data_view',
+        type: IxMenuEntryType.item,
+        label: 'Responsive Data View',
+        iconWidget: IxIcons.list,
+        selected: selectedId == 'responsive_data_view',
       ),
       IxMenuEntry(
         id: 'theme-toggle',

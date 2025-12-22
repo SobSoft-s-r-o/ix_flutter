@@ -666,9 +666,6 @@ Future<T?> _showIxMenu<T>({
   }
 
   final overlay = Overlay.of(triggerContext);
-  if (overlay == null) {
-    return null;
-  }
 
   final overlayBox = overlay.context.findRenderObject() as RenderBox?;
   final box = triggerContext.findRenderObject() as RenderBox?;

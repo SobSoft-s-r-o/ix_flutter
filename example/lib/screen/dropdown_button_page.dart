@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
-import 'package:siemens_ix_flutter/src/widgets/ix_dropdown_button.dart';
-import 'package:siemens_ix_flutter/src/ix_icons/ix_icons.dart';
 
 import '../edge_to_edge.dart';
 
