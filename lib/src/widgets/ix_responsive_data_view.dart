@@ -121,6 +121,9 @@ class IxResponsiveDataView<T> extends StatelessWidget {
     this.resultsCountOverride,
     this.resultsLabelBuilder,
     this.noResultsTextBuilder,
+    this.mobileItemBuilder,
+    this.strings,
+    this.stringsResolver,
   });
 
   final List<T> items;
@@ -153,8 +156,24 @@ class IxResponsiveDataView<T> extends StatelessWidget {
   final String Function(int count)? resultsLabelBuilder;
   final String Function(String query)? noResultsTextBuilder;
 
+  /// Optional builder to provide a custom widget for each item in mobile view.
+  /// If provided, this overrides the default card layout generated from [mobileFields].
+  final Widget Function(BuildContext context, T item)? mobileItemBuilder;
+
+  /// Optional strings override for this widget instance.
+  final IxResponsiveDataViewStrings? strings;
+
+  /// Optional resolver to fetch strings from context (e.g. AppLocalizations).
+  final IxResponsiveDataViewStrings Function(BuildContext context)?
+  stringsResolver;
+
   @override
   Widget build(BuildContext context) {
+    final effectiveStrings =
+        strings ??
+        stringsResolver?.call(context) ??
+        IxResponsiveDataViewStrings.defaultsEn();
+
     if (isLoading) {
       return const Center(child: IxSpinner());
     }
@@ -165,8 +184,8 @@ class IxResponsiveDataView<T> extends StatelessWidget {
           icon: IxIcons.search,
           title:
               noResultsTextBuilder?.call(searchQuery!) ??
-              'No results for "$searchQuery"',
-          subtitle: 'Try a different search term',
+              effectiveStrings.noResultsTitle(searchQuery!),
+          subtitle: effectiveStrings.noResultsBody,
           primaryAction: onClearSearch != null
               ? Builder(
                   builder: (context) {
@@ -176,7 +195,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
                     return OutlinedButton(
                       style: ixButtons?.style(IxButtonVariant.secondary),
                       onPressed: onClearSearch,
-                      child: const Text('Clear search'),
+                      child: Text(effectiveStrings.clearSearchLabel),
                     );
                   },
                 )
@@ -185,8 +204,8 @@ class IxResponsiveDataView<T> extends StatelessWidget {
       }
       return IxEmptyState(
         icon: IxIcons.info,
-        title: 'No data available',
-        subtitle: 'There are no items to display.',
+        title: effectiveStrings.emptyTitle,
+        subtitle: effectiveStrings.emptyBody,
       );
     }
 
@@ -212,6 +231,8 @@ class IxResponsiveDataView<T> extends StatelessWidget {
                 onSearchChangedRequestResetPagination,
             resultsCountOverride: resultsCountOverride,
             resultsLabelBuilder: resultsLabelBuilder,
+            itemBuilder: mobileItemBuilder,
+            strings: effectiveStrings,
           );
         } else {
           return _DesktopView<T>(
@@ -237,6 +258,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
                 onSearchChangedRequestResetPagination,
             resultsCountOverride: resultsCountOverride,
             resultsLabelBuilder: resultsLabelBuilder,
+            strings: effectiveStrings,
           );
         }
       },
@@ -267,6 +289,7 @@ class _DesktopView<T> extends StatefulWidget {
     this.onSearchChangedRequestResetPagination,
     this.resultsCountOverride,
     this.resultsLabelBuilder,
+    required this.strings,
   });
 
   final List<T> items;
@@ -292,6 +315,7 @@ class _DesktopView<T> extends StatefulWidget {
   final VoidCallback? onSearchChangedRequestResetPagination;
   final int? resultsCountOverride;
   final String Function(int count)? resultsLabelBuilder;
+  final IxResponsiveDataViewStrings strings;
 
   @override
   State<_DesktopView<T>> createState() => _DesktopViewState<T>();
@@ -386,6 +410,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                 widget.items.length,
             onClear: widget.showSearchClearAction ? widget.onClearSearch : null,
             resultsLabelBuilder: widget.resultsLabelBuilder,
+            strings: widget.strings,
           ),
         // Header
         Padding(
@@ -449,7 +474,15 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                   );
                 }),
                 // Tools column header
-                const SizedBox(width: 48), // Fixed width for tools
+                SizedBox(
+                  width: 48,
+                  child: Center(
+                    child: Text(
+                      widget.strings.toolsColumnHeader,
+                      style: theme?.textStyle(IxTypographyVariant.label),
+                    ),
+                  ),
+                ), // Fixed width for tools
               ],
             ),
           ),
@@ -479,6 +512,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                   actions: widget.actions,
                   onTap: widget.onRowTap,
                   theme: theme,
+                  strings: widget.strings,
                 );
               },
             ),
@@ -495,6 +529,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
             pageSizeOptions: widget.pagination!.pageSizeOptions,
             onPageChanged: widget.onPageChanged!,
             onPageSizeChanged: widget.onPageSizeChanged,
+            strings: widget.strings,
           ),
       ],
     );
@@ -508,6 +543,7 @@ class _DesktopRow<T> extends StatefulWidget {
     required this.actions,
     this.onTap,
     required this.theme,
+    required this.strings,
   });
 
   final T item;
@@ -515,6 +551,7 @@ class _DesktopRow<T> extends StatefulWidget {
   final List<IxRowAction<T>> actions;
   final void Function(T item)? onTap;
   final IxTheme? theme;
+  final IxResponsiveDataViewStrings strings;
 
   @override
   State<_DesktopRow<T>> createState() => _DesktopRowState<T>();
@@ -564,7 +601,7 @@ class _DesktopRowState<T> extends State<_DesktopRow<T>> {
                 child: Center(
                   child: PopupMenuButton<IxRowAction<T>>(
                     icon: IxIcons.moreMenu,
-                    tooltip: 'Actions',
+                    tooltip: widget.strings.rowActionsTooltip,
                     onSelected: (action) => action.onSelected(widget.item),
                     itemBuilder: (context) {
                       return widget.actions
@@ -635,6 +672,8 @@ class _MobileView<T> extends StatefulWidget {
     this.onSearchChangedRequestResetPagination,
     this.resultsCountOverride,
     this.resultsLabelBuilder,
+    this.itemBuilder,
+    required this.strings,
   });
 
   final List<T> items;
@@ -654,6 +693,8 @@ class _MobileView<T> extends StatefulWidget {
   final VoidCallback? onSearchChangedRequestResetPagination;
   final int? resultsCountOverride;
   final String Function(int count)? resultsLabelBuilder;
+  final Widget Function(BuildContext context, T item)? itemBuilder;
+  final IxResponsiveDataViewStrings strings;
 
   @override
   State<_MobileView<T>> createState() => _MobileViewState<T>();
@@ -717,6 +758,7 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
         item: item,
         fields: widget.fields,
         actions: widget.actions,
+        strings: widget.strings,
       ),
     );
   }
@@ -736,6 +778,7 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
                 widget.items.length,
             onClear: widget.showSearchClearAction ? widget.onClearSearch : null,
             resultsLabelBuilder: widget.resultsLabelBuilder,
+            strings: widget.strings,
           ),
         Expanded(
           child: ListView.separated(
@@ -751,6 +794,11 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
                 );
               }
               final item = widget.items[index];
+
+              if (widget.itemBuilder != null) {
+                return widget.itemBuilder!(context, item);
+              }
+
               return _MobileCard<T>(
                 item: item,
                 fields: widget.fields,
@@ -768,6 +816,7 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
             totalPages: widget.pagination!.totalPages,
             // Minimal mobile pagination usually doesn't show page size options
             onPageChanged: widget.onPageChanged!,
+            strings: widget.strings,
           ),
       ],
     );
@@ -843,11 +892,13 @@ class _MobileDetailView<T> extends StatelessWidget {
     required this.item,
     required this.fields,
     required this.actions,
+    required this.strings,
   });
 
   final T item;
   final List<IxMobileFieldDef<T>> fields;
   final List<IxRowAction<T>> actions;
+  final IxResponsiveDataViewStrings strings;
 
   @override
   Widget build(BuildContext context) {
@@ -859,7 +910,10 @@ class _MobileDetailView<T> extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Details', style: theme?.textStyle(IxTypographyVariant.h4)),
+          Text(
+            strings.detailsTitle,
+            style: theme?.textStyle(IxTypographyVariant.h4),
+          ),
           const SizedBox(height: 24),
           ...fields.map((field) {
             return Padding(
@@ -883,7 +937,10 @@ class _MobileDetailView<T> extends StatelessWidget {
           const SizedBox(height: 24),
           const Divider(),
           const SizedBox(height: 16),
-          Text('Actions', style: theme?.textStyle(IxTypographyVariant.h5)),
+          Text(
+            strings.actionsTitle,
+            style: theme?.textStyle(IxTypographyVariant.h5),
+          ),
           const SizedBox(height: 16),
           Wrap(
             spacing: 16,
@@ -933,12 +990,14 @@ class _SearchStatusHeader extends StatelessWidget {
     required this.count,
     this.onClear,
     this.resultsLabelBuilder,
+    required this.strings,
   });
 
   final String query;
   final int count;
   final VoidCallback? onClear;
   final String Function(int count)? resultsLabelBuilder;
+  final IxResponsiveDataViewStrings strings;
 
   @override
   Widget build(BuildContext context) {
@@ -971,7 +1030,7 @@ class _SearchStatusHeader extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Filtered by: "$query"',
+                  '${strings.searchChipLabel}: "$query"',
                   style: theme?.textStyle(IxTypographyVariant.label),
                 ),
                 if (onClear != null) ...[
@@ -980,9 +1039,12 @@ class _SearchStatusHeader extends StatelessWidget {
                     onTap: onClear,
                     child: MouseRegion(
                       cursor: SystemMouseCursors.click,
-                      child: IconTheme(
-                        data: IconThemeData(size: 16, color: stdText),
-                        child: IxIcons.closeSmall,
+                      child: Tooltip(
+                        message: strings.clearSearchTooltip,
+                        child: IconTheme(
+                          data: IconThemeData(size: 16, color: stdText),
+                          child: IxIcons.closeSmall,
+                        ),
                       ),
                     ),
                   ),
@@ -992,7 +1054,7 @@ class _SearchStatusHeader extends StatelessWidget {
           ),
           const Spacer(),
           Text(
-            resultsLabelBuilder?.call(count) ?? 'Results: $count',
+            resultsLabelBuilder?.call(count) ?? strings.resultsCount(count),
             style: theme?.textStyle(
               IxTypographyVariant.label,
               tone: IxThemeTextTone.soft,

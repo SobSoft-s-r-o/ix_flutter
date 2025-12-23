@@ -12,6 +12,7 @@ class IxPaginationBar extends StatelessWidget {
     this.pageSize,
     this.onPageSizeChanged,
     this.pageSizeOptions,
+    this.strings,
   });
 
   final int page;
@@ -21,12 +22,15 @@ class IxPaginationBar extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
   final ValueChanged<int>? onPageSizeChanged;
   final List<int>? pageSizeOptions;
+  final IxResponsiveDataViewStrings? strings;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
     final stdText = theme?.color(IxThemeColorToken.stdText) ?? Colors.black;
     final weakText = theme?.color(IxThemeColorToken.weakText) ?? Colors.grey;
+    final effectiveStrings =
+        strings ?? IxResponsiveDataViewStrings.defaultsEn();
 
     final canGoBack = page > 1;
     final canGoForward = totalPages == null || page < totalPages!;
@@ -45,7 +49,7 @@ class IxPaginationBar extends StatelessWidget {
         children: [
           if (totalItems != null)
             Text(
-              '$totalItems items',
+              effectiveStrings.totalItems(totalItems!),
               style: theme?.textStyle(
                 IxTypographyVariant.label,
                 tone: IxThemeTextTone.soft,
@@ -56,7 +60,7 @@ class IxPaginationBar extends StatelessWidget {
               onPageSizeChanged != null &&
               pageSize != null) ...[
             Text(
-              'Items per page:',
+              effectiveStrings.rowsPerPageLabel,
               style: theme?.textStyle(
                 IxTypographyVariant.label,
                 tone: IxThemeTextTone.soft,
@@ -79,7 +83,9 @@ class IxPaginationBar extends StatelessWidget {
             const SizedBox(width: 24),
           ],
           Text(
-            totalPages != null ? 'Page $page of $totalPages' : 'Page $page',
+            totalPages != null
+                ? effectiveStrings.pageOf(page, totalPages!)
+                : effectiveStrings.page(page),
             style: theme?.textStyle(IxTypographyVariant.label),
           ),
           const SizedBox(width: 16),
@@ -87,13 +93,13 @@ class IxPaginationBar extends StatelessWidget {
             icon: IxIcons.chevronLeft,
             onPressed: canGoBack ? () => onPageChanged(page - 1) : null,
             color: canGoBack ? stdText : weakText,
-            tooltip: 'Previous page',
+            tooltip: effectiveStrings.paginationPrevTooltip,
           ),
           IconButton(
             icon: IxIcons.chevronRight,
             onPressed: canGoForward ? () => onPageChanged(page + 1) : null,
             color: canGoForward ? stdText : weakText,
-            tooltip: 'Next page',
+            tooltip: effectiveStrings.paginationNextTooltip,
           ),
         ],
       ),

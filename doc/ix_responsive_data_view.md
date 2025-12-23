@@ -127,12 +127,14 @@ IxResponsiveDataView<MyItem>(
 
 ### Sorting
 
-Enable sorting by setting `enableSorting: true` and providing `sortKey` in `IxColumnDef`.
+Enable sorting by setting `enableSorting: true` and providing `sortKey` in `IxColumnDef`. You can also set the initial sort state using `initialSortKey` and `initialSortAscending`.
 
 ```dart
 IxResponsiveDataView<MyItem>(
   items: items,
   enableSorting: true,
+  initialSortKey: 'name', // Initial sort column
+  initialSortAscending: true, // Initial sort direction
   onSortChanged: (IxSortSpec sortSpec) {
     // Perform sorting logic here based on sortSpec.key and sortSpec.ascending
     // e.g. items.sort(...) or fetchSortedData(...)
@@ -149,6 +151,94 @@ IxResponsiveDataView<MyItem>(
 )
 ```
 
+### Search / Filtering
+
+The widget provides a built-in search status bar and empty state handling for search results.
+
+```dart
+IxResponsiveDataView<MyItem>(
+  items: filteredItems,
+  searchQuery: currentSearchQuery, // The current search string
+  onClearSearch: () {
+    // Clear the search query in your state
+    setState(() => currentSearchQuery = '');
+  },
+  // Optional: Customize the "No results" text
+  noResultsTextBuilder: (query) => 'No items found for "$query"',
+  // Optional: Reset pagination when search changes (if handled internally)
+  searchAffectsPagination: true,
+  onSearchChangedRequestResetPagination: () {
+     // Reset to page 1
+  },
+  // ...
+)
+```
+
+### Custom Mobile Card
+
+By default, `IxResponsiveDataView` generates a card layout for mobile using `mobileFields`. You can override this by providing a `mobileItemBuilder`.
+
+```dart
+IxResponsiveDataView<MyItem>(
+  items: items,
+  desktopColumns: [...],
+  mobileFields: [], // Can be empty if mobileItemBuilder is used
+  mobileItemBuilder: (context, item) {
+    return Card(
+      child: ListTile(
+        title: Text(item.name),
+        subtitle: Text(item.status),
+        trailing: IconButton(
+          icon: Icon(Icons.more_vert),
+          onPressed: () {
+            // Show actions
+          },
+        ),
+      ),
+    );
+  },
+  // ...
+)
+```
+
+### Localization
+
+All user-visible strings in the widget can be localized. You can provide a `IxResponsiveDataViewStrings` object directly or use a resolver function to fetch strings from your app's localization layer.
+
+#### 1. Per-widget Override
+
+```dart
+IxResponsiveDataView<MyItem>(
+  items: items,
+  strings: IxResponsiveDataViewStrings(
+    emptyTitle: 'No data found',
+    toolsColumnHeader: 'Actions',
+    // ... other strings
+  ),
+  // ...
+)
+```
+
+#### 2. Context-based Resolver (Recommended)
+
+This approach allows you to integrate with `AppLocalizations` or any other localization solution.
+
+```dart
+IxResponsiveDataView<MyItem>(
+  items: items,
+  stringsResolver: (context) {
+    // Example: Fetch from AppLocalizations
+    // final l10n = AppLocalizations.of(context);
+    return IxResponsiveDataViewStrings(
+      emptyTitle: 'Localized Empty Title', // l10n.emptyTitle
+      pageOfBuilder: (page, total) => 'Page $page / $total',
+      // ... map other strings
+    );
+  },
+  // ...
+)
+```
+
 ## API Reference
 
 ### IxResponsiveDataView
@@ -158,6 +248,7 @@ IxResponsiveDataView<MyItem>(
 | `items` | `List<T>` | The list of data items to display. |
 | `desktopColumns` | `List<IxColumnDef<T>>` | Configuration for table columns (Desktop/Tablet). |
 | `mobileFields` | `List<IxMobileFieldDef<T>>` | Configuration for card fields (Mobile). |
+| `mobileItemBuilder` | `Widget Function(BuildContext, T)?` | Optional custom builder for mobile items, overriding `mobileFields`. |
 | `rowActions` | `List<IxRowAction<T>>` | List of actions available for each item. |
 | `isLoading` | `bool` | Whether the initial data is loading (shows full spinner). |
 | `isPageLoading` | `bool` | Whether the next page is loading (shows bottom spinner). |
@@ -167,6 +258,20 @@ IxResponsiveDataView<MyItem>(
 | `onPageSizeChanged` | `ValueChanged<int>?` | Callback for standard pagination page size change. |
 | `enableSorting` | `bool` | Enables sorting UI on column headers. |
 | `onSortChanged` | `ValueChanged<IxSortSpec>?` | Callback when a sortable header is clicked. |
+| `initialSortKey` | `String?` | The initial sort key to display as active. |
+| `initialSortAscending` | `bool` | The initial sort direction (default true). |
+| `searchQuery` | `String?` | The current search query to display in the status bar. |
+| `onClearSearch` | `VoidCallback?` | Callback when the "Clear search" button is clicked. |
+| `searchHintText` | `String?` | Hint text for the search field (if integrated). |
+| `showSearchStatusBar` | `bool` | Whether to show the search status bar (default true). |
+| `showSearchClearAction` | `bool` | Whether to show the clear action in the status bar (default true). |
+| `searchAffectsPagination` | `bool` | Whether search changes should trigger pagination reset callbacks (default true). |
+| `onSearchChangedRequestResetPagination` | `VoidCallback?` | Callback to reset pagination when search changes. |
+| `resultsCountOverride` | `int?` | Override the displayed result count (defaults to `items.length` or `pagination.totalItems`). |
+| `resultsLabelBuilder` | `String Function(int)?` | Custom builder for the results count label. |
+| `noResultsTextBuilder` | `String Function(String)?` | Custom builder for the "No results" empty state title. |
+| `strings` | `IxResponsiveDataViewStrings?` | Optional strings override for this widget instance. |
+| `stringsResolver` | `IxResponsiveDataViewStrings Function(BuildContext)?` | Optional resolver to fetch strings from context. |
 
 ### IxPaginationConfig
 

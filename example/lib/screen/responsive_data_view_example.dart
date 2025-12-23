@@ -35,6 +35,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   IxSortSpec? _currentSort;
+  bool _useSlovak = false;
 
   @override
   void initState() {
@@ -189,6 +190,21 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                 icon: const Icon(Icons.search),
                 onPressed: () => _handleSearch(_searchController.text),
               ),
+              const SizedBox(width: 16),
+              Row(
+                children: [
+                  const Text('Language: '),
+                  Switch(
+                    value: _useSlovak,
+                    onChanged: (value) {
+                      setState(() {
+                        _useSlovak = value;
+                      });
+                    },
+                  ),
+                  Text(_useSlovak ? 'SK' : 'EN'),
+                ],
+              ),
             ],
           ),
         ),
@@ -197,6 +213,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
             padding: const EdgeInsets.all(16.0),
             child: IxResponsiveDataView<_ExampleItem>(
               items: _displayedItems,
+              strings: _useSlovak ? _slovakStrings : null,
               enableSorting: true,
               onSortChanged: _handleSort,
               initialSortKey: _currentSort?.key,
@@ -305,6 +322,16 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                   ),
                 ),
               ],
+              // mobileItemBuilder: (context, item) {
+              //   // Example of custom mobile card builder
+              //   // If not provided, it uses mobileFields to build a default card
+              //   return Card(
+              //     child: ListTile(
+              //       title: Text(item.name),
+              //       subtitle: Text(item.status),
+              //     ),
+              //   );
+              // },
               mobileFields: [
                 IxMobileFieldDef(
                   label: 'Name',
@@ -397,6 +424,27 @@ class _ExampleItem {
   final DateTime date;
   final String category;
 }
+
+final _slovakStrings = IxResponsiveDataViewStrings(
+  toolsColumnHeader: 'Nástroje',
+  emptyTitle: 'Žiadne dáta',
+  emptyBody: 'Nie sú k dispozícii žiadne položky na zobrazenie.',
+  noResultsTitleBuilder: (query) => 'Žiadne výsledky pre "$query"',
+  noResultsBody: 'Skúste iný hľadaný výraz',
+  searchChipLabel: 'Filtrované podľa',
+  clearSearchLabel: 'Vymazať hľadanie',
+  clearSearchTooltip: 'Vymazať hľadanie',
+  paginationPrevTooltip: 'Predchádzajúca strana',
+  paginationNextTooltip: 'Nasledujúca strana',
+  pageOfBuilder: (page, total) => 'Strana $page z $total',
+  pageBuilder: (page) => 'Strana $page',
+  rowsPerPageLabel: 'Položiek na stranu:',
+  totalItemsBuilder: (count) => '$count položiek',
+  resultsCountBuilder: (count) => 'Výsledky: $count',
+  detailsTitle: 'Detaily',
+  actionsTitle: 'Akcie',
+  rowActionsTooltip: 'Akcie',
+);
 
 class _StatusChip extends StatelessWidget {
   const _StatusChip({required this.label, required this.isSuccess});
