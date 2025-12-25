@@ -180,32 +180,36 @@ class IxResponsiveDataView<T> extends StatelessWidget {
 
     if (items.isEmpty) {
       if (searchQuery != null && searchQuery!.isNotEmpty) {
-        return IxEmptyState(
-          icon: IxIcons.search,
-          title:
-              noResultsTextBuilder?.call(searchQuery!) ??
-              effectiveStrings.noResultsTitle(searchQuery!),
-          subtitle: effectiveStrings.noResultsBody,
-          primaryAction: onClearSearch != null
-              ? Builder(
-                  builder: (context) {
-                    final ixButtons = Theme.of(
-                      context,
-                    ).extension<IxButtonTheme>();
-                    return OutlinedButton(
-                      style: ixButtons?.style(IxButtonVariant.secondary),
-                      onPressed: onClearSearch,
-                      child: Text(effectiveStrings.clearSearchLabel),
-                    );
-                  },
-                )
-              : null,
+        return Center(
+          child: IxEmptyState(
+            icon: IxIcons.search,
+            title:
+                noResultsTextBuilder?.call(searchQuery!) ??
+                effectiveStrings.noResultsTitle(searchQuery!),
+            subtitle: effectiveStrings.noResultsBody,
+            primaryAction: onClearSearch != null
+                ? Builder(
+                    builder: (context) {
+                      final ixButtons = Theme.of(
+                        context,
+                      ).extension<IxButtonTheme>();
+                      return OutlinedButton(
+                        style: ixButtons?.style(IxButtonVariant.secondary),
+                        onPressed: onClearSearch,
+                        child: Text(effectiveStrings.clearSearchLabel),
+                      );
+                    },
+                  )
+                : null,
+          ),
         );
       }
-      return IxEmptyState(
-        icon: IxIcons.info,
-        title: effectiveStrings.emptyTitle,
-        subtitle: effectiveStrings.emptyBody,
+      return Center(
+        child: IxEmptyState(
+          icon: IxIcons.info,
+          title: effectiveStrings.emptyTitle,
+          subtitle: effectiveStrings.emptyBody,
+        ),
       );
     }
 
