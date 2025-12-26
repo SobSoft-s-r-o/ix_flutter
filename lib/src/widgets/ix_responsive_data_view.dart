@@ -174,11 +174,11 @@ class IxResponsiveDataView<T> extends StatelessWidget {
         stringsResolver?.call(context) ??
         IxResponsiveDataViewStrings.defaultsEn();
 
-    if (isLoading) {
+    if (isLoading && items.isEmpty) {
       return const Center(child: IxSpinner());
     }
 
-    if (items.isEmpty) {
+    if (items.isEmpty && !isLoading && !isPageLoading) {
       if (searchQuery != null && searchQuery!.isNotEmpty) {
         return Center(
           child: IxEmptyState(
@@ -213,7 +213,14 @@ class IxResponsiveDataView<T> extends StatelessWidget {
       );
     }
 
-    return LayoutBuilder(
+    final showOverlay =
+        isLoading ||
+        (isPageLoading && pagination?.mode != IxPaginationMode.infinite);
+
+    final showBottomSpinner =
+        isPageLoading && pagination?.mode == IxPaginationMode.infinite;
+
+    final content = LayoutBuilder(
       builder: (context, constraints) {
         // Siemens IX breakpoint for mobile is typically < 600 or similar.
         // Using 600 as requested.
@@ -225,7 +232,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             pagination: pagination,
             onLoadNextPage: onLoadNextPage,
             onPageChanged: onPageChanged,
-            isPageLoading: isPageLoading,
+            isPageLoading: showBottomSpinner,
             searchQuery: searchQuery,
             onClearSearch: onClearSearch,
             showSearchStatusBar: showSearchStatusBar,
@@ -252,7 +259,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             onLoadNextPage: onLoadNextPage,
             onPageChanged: onPageChanged,
             onPageSizeChanged: onPageSizeChanged,
-            isPageLoading: isPageLoading,
+            isPageLoading: showBottomSpinner,
             searchQuery: searchQuery,
             onClearSearch: onClearSearch,
             showSearchStatusBar: showSearchStatusBar,
@@ -267,6 +274,22 @@ class IxResponsiveDataView<T> extends StatelessWidget {
         }
       },
     );
+
+    if (showOverlay) {
+      return Stack(
+        children: [
+          content,
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withValues(alpha: 0.1),
+              child: const Center(child: IxSpinner()),
+            ),
+          ),
+        ],
+      );
+    }
+
+    return content;
   }
 }
 
