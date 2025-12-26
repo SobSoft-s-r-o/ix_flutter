@@ -344,6 +344,13 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   @override
   void didUpdateWidget(_DesktopView<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (widget.initialSortKey != oldWidget.initialSortKey ||
+        widget.initialSortAscending != oldWidget.initialSortAscending) {
+      _sortKey = widget.initialSortKey;
+      _sortAscending = widget.initialSortAscending;
+    }
+
     if (widget.items.length != oldWidget.items.length ||
         !widget.isPageLoading) {
       _loadTriggeredForCurrentExtent = false;

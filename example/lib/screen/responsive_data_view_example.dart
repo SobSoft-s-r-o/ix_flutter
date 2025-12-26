@@ -34,13 +34,16 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
   bool _hasMore = true;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
-  IxSortSpec? _currentSort;
+  IxSortSpec? _currentSort = const IxSortSpec(key: 'name', ascending: true);
   bool _useSlovak = false;
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _sortItems(_currentSort!);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadData();
+    });
   }
 
   @override
@@ -56,7 +59,9 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
       setState(() => _isPageLoading = true);
     }
 
-    await Future.delayed(const Duration(milliseconds: 500)); // Simulate network
+    await Future.delayed(
+      const Duration(milliseconds: 1500),
+    ); // Simulate network
 
     // Filter by search query
     final filteredItems = _allItems.where((item) {
@@ -95,26 +100,30 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
     }
   }
 
+  void _sortItems(IxSortSpec sortSpec) {
+    _allItems.sort((a, b) {
+      int cmp;
+      switch (sortSpec.key) {
+        case 'name':
+          cmp = a.name.compareTo(b.name);
+          break;
+        case 'amount':
+          cmp = a.amount.compareTo(b.amount);
+          break;
+        case 'date':
+          cmp = a.date.compareTo(b.date);
+          break;
+        default:
+          cmp = 0;
+      }
+      return sortSpec.ascending ? cmp : -cmp;
+    });
+  }
+
   void _handleSort(IxSortSpec sortSpec) {
     setState(() {
       _currentSort = sortSpec;
-      _allItems.sort((a, b) {
-        int cmp;
-        switch (sortSpec.key) {
-          case 'name':
-            cmp = a.name.compareTo(b.name);
-            break;
-          case 'amount':
-            cmp = a.amount.compareTo(b.amount);
-            break;
-          case 'date':
-            cmp = a.date.compareTo(b.date);
-            break;
-          default:
-            cmp = 0;
-        }
-        return sortSpec.ascending ? cmp : -cmp;
-      });
+      _sortItems(sortSpec);
       // Reset pagination on sort
       _page = 1;
       if (_paginationMode == IxPaginationMode.infinite) {
@@ -189,6 +198,15 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
               IconButton(
                 icon: const Icon(Icons.search),
                 onPressed: () => _handleSearch(_searchController.text),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.sort_by_alpha),
+                tooltip: 'Toggle Sort (Name)',
+                onPressed: () {
+                  final newAscending = !(_currentSort?.ascending ?? true);
+                  _handleSort(IxSortSpec(key: 'name', ascending: newAscending));
+                },
               ),
               const SizedBox(width: 16),
               Row(
