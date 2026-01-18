@@ -229,6 +229,6 @@ flutter run
 ---
 
 **Last Updated**: January 2026
-**Package Version**: 0.0.1
+**Package Version**: 1.0.0
 
 📍 **Pro Tip**: Use this index as a navigation hub. Click links to dive into specific documentation!

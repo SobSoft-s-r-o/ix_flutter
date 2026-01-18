@@ -22,7 +22,7 @@ Add `ix_flutter` to your `pubspec.yaml`:
 dependencies:
   flutter:
     sdk: flutter
-  ix_flutter: ^0.0.1  # Latest version
+  ix_flutter: ^1.0.0  # Latest version
 ```
 
 ### Step 2: Get Dependencies
@@ -471,4 +471,4 @@ class LoadingExample extends StatelessWidget {
 **Happy coding with ix_flutter!** 🚀
 
 **Last Updated**: January 2026
-**Version**: 0.0.1
+**Version**: 1.0.0

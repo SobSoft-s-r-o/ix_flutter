@@ -45,7 +45,7 @@ To use Siemens iX icons in your Flutter application, you **MUST** run the icon g
 
 ```yaml
 dev_dependencies:
-  ix_flutter: ^0.0.1
+  ix_flutter: ^1.0.0
 ```
 
 **Step 2:** Run `flutter pub get`:
@@ -94,7 +94,7 @@ The generator is automatically available when you add `ix_flutter` to your dev d
 
 ```yaml
 dev_dependencies:
-  ix_flutter: ^0.0.1
+  ix_flutter: ^1.0.0
 ```
 
 ### Usage
@@ -521,5 +521,5 @@ Due to patent and distribution licensing restrictions, we cannot include Siemens
 ---
 
 **Last Updated:** January 2026  
-**Package Version:** 0.0.1  
+**Package Version:** 1.0.0  
 **Icons Version:** @siemens/ix-icons 3.2.0

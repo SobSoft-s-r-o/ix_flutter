@@ -43,7 +43,7 @@ Update your `pubspec.yaml` - just add the library (generator is included):
 
 ```yaml
 dev_dependencies:
-  ix_flutter: ^0.0.1
+   ix_flutter: ^1.0.0
 ```
 
 ### Step 2: Get Dependencies

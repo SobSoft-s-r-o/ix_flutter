@@ -331,6 +331,6 @@ This is a community package with ongoing development. While we aim for stability
 ---
 
 **Last Updated**: January 2026
-**Package Version**: 0.0.1
+**Package Version**: 1.0.0
 **Flutter**: >=3.10.0
 **Dart**: >=3.10.0

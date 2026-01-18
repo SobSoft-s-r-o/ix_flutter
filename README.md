@@ -43,7 +43,7 @@ To use Siemens iX icons, you **MUST** run the icon generator tool to download ic
 
 ```yaml
 dev_dependencies:
-  ix_flutter: ^0.0.1
+  ix_flutter: ^1.0.0
 ```
 
 2. Get dependencies:
@@ -76,7 +76,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  ix_flutter: ^0.0.1
+  ix_flutter: ^1.0.0
 ```
 
 Then run:
@@ -406,6 +406,6 @@ This package is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 **Community Project Notice**: This package is maintained by the community and is not affiliated with Siemens. For official Siemens iX resources, visit https://ix.siemens.io
 
-**Version**: 0.0.1 | **Dart**: >=3.10.0 | **Flutter**: >=3.10.0
+**Version**: 1.0.0 | **Dart**: >=3.10.0 | **Flutter**: >=3.10.0
 
 **Disclaimer**: This is not an official Siemens product. This library is developed independently and provides Flutter implementations of Siemens iX Design System patterns. Always ensure compliance with Siemens licensing terms when using iX design assets.

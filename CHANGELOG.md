@@ -26,6 +26,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.0.0] - 2026-01-18
+
+### Changed
+- First stable release graduating from the 0.0.1 preview.
+- Documentation updated to reference 1.0.0.
+- Publish package excludes repo-only GitHub metadata and wiki setup notes.
+
+### Fixed
+- Resolved pub.dev publish warnings related to metadata.
+
+### Known Limitations
+- Icons still require manual generation from the official Siemens source.
+- Flutter/Dart versions must be 3.10.0 or higher.
+
+---
+
 ## [0.0.1] - 2026-01-18
 
 ### Added
@@ -76,6 +92,7 @@ We follow [Semantic Versioning](https://semver.org/):
 
 | Version | Flutter | Dart |
 | ------- | ------- | ---- |
+| 1.0.0   | >=3.10.0 | >=3.10.0 |
 | 0.0.1   | >=3.10.0 | >=3.10.0 |
 
 ### Supported Platforms
@@ -89,8 +106,11 @@ We follow [Semantic Versioning](https://semver.org/):
 
 ## Breaking Changes
 
+### v1.0.0
+- First stable release, no breaking changes from 0.0.1
+
 ### v0.0.1
-- Initial release, no breaking changes
+- Initial preview release, no breaking changes
 
 ## Migration Guides
 

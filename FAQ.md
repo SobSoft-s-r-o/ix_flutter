@@ -10,7 +10,7 @@ Common questions about ix_flutter and how to use it.
 
 ```yaml
 dependencies:
-  ix_flutter: ^0.0.1
+   ix_flutter: ^1.0.0
 ```
 
 Then run `flutter pub get`.
@@ -447,6 +447,6 @@ flutter run
 ---
 
 **Last Updated**: January 2026
-**Package Version**: 0.0.1
+**Package Version**: 1.0.0
 
 Thank you for using ix_flutter! 🎉

@@ -4,8 +4,8 @@
 
 | Version | Supported          | Notes                                    |
 | ------- | ------------------ | ---------------------------------------- |
-| 0.0.1   | ✅ Yes             | Current stable release                   |
-| < 0.0.1 | ❌ No              | Not officially released                  |
+| 1.0.0   | ✅ Yes             | Current stable release                   |
+| < 1.0.0 | ❌ No              | Legacy preview builds                    |
 
 ## Reporting a Vulnerability
 
