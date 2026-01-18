@@ -1,0 +1,8 @@
+# Sponsorship configuration for ix_flutter
+# This adds a "Sponsor" button to the GitHub repository
+
+# GitHub Sponsors (will activate once approved)
+github: [SobSoft-s-r-o]
+
+# Custom sponsorship links
+custom: ['https://sobsoft.sk/en/contact']
