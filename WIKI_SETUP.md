@@ -24,9 +24,11 @@ The wiki includes the following sections:
 A dedicated Components section with individual pages for each UI component:
 - IxApplicationScaffold - Main application container and layout
 - IxBlind - Sliding drawer/panel component
+- IxBreadcrumb - Hierarchical navigation breadcrumb component
 - IxDropdownButton - Dropdown selection component
 - IxEmptyState - Empty state display component
 - IxResponsiveDataView - Responsive data table component
+- IxSpinner - Animated loading spinner component
 - IxToast - Toast notification component
 - IxIcons - Icon integration and management
 - Copilot Colors - Color system reference

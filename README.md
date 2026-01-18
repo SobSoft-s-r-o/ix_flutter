@@ -160,9 +160,11 @@ class HomeScreen extends StatelessWidget {
 - **[Icons Documentation](doc/ix_icons.md)** - Complete guide for using Siemens iX icons
 - **[Application Scaffold](doc/ix_application_scaffold.md)** - App structure and navigation
 - **[Blind/Drawer](doc/ix_blind.md)** - Sliding panel documentation
+- **[Breadcrumb](doc/ix_breadcrumb.md)** - Hierarchical navigation breadcrumb
 - **[Dropdown Button](doc/ix_dropdown_button.md)** - Dropdown component guide
 - **[Empty State](doc/ix_empty_state.md)** - Empty state placeholder docs
 - **[Responsive Data View](doc/ix_responsive_data_view.md)** - Data table documentation
+- **[Spinner](doc/ix_spinner.md)** - Animated loading spinner component
 - **[Toast](doc/ix_toast.md)** - Notification system docs
 - **[Colors](doc/copilot_colors.md)** - Color token reference
 
