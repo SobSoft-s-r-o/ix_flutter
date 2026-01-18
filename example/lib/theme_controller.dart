@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-/// Drives Siemens IX theme configuration for the demo application.
+/// Drives IX Flutter theme configuration for the demo application.
 class ThemeController extends ChangeNotifier {
   IxThemeFamily _family = IxThemeFamily.classic;
   ThemeMode _mode = ThemeMode.light;

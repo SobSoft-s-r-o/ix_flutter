@@ -33,7 +33,7 @@ class _SliderPageState extends State<SliderPage> {
         Text('Slider controls', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 12),
         Text(
-          'Sliders inherit IxSliderTheme so their thumb, trace, and track colors stay aligned with Siemens IX tokens across states.',
+          'Sliders inherit IxSliderTheme so their thumb, trace, and track colors stay aligned with IX Flutter tokens across states.',
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 24),

@@ -39,7 +39,7 @@ class _TabsPageState extends State<TabsPage> {
                 Text('Tabs', style: theme.textTheme.headlineSmall),
                 const SizedBox(height: 8),
                 Text(
-                  'The Siemens IX tabs theme exposes spacing, indicator height, and stateful colors for both text and icon treatments. '
+                  'The IX Flutter tabs theme exposes spacing, indicator height, and stateful colors for both text and icon treatments. '
                   'Use the categories below to toggle between the text navigation preview and circle icon tabs.',
                   style: theme.textTheme.bodyMedium,
                 ),
@@ -532,7 +532,7 @@ final List<_TextTabSpec> _textTabs = [
     panelTitle: 'Incident triage',
     panelBody:
         'Use a badge to highlight open alerts. '
-        'Indicator height stays at 0.125rem per Siemens IX tokens.',
+        'Indicator height stays at 0.125rem per IX Flutter tokens.',
     icon: IxIcons.warning,
     count: 8,
     leading: IxIcons.warning,

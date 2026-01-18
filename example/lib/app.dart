@@ -42,7 +42,7 @@ class _IxDemoAppState extends State<IxDemoApp> {
           return ThemeControllerScope(
             controller: _controller,
             child: MaterialApp.router(
-              title: 'Siemens IX Flutter Demo',
+              title: 'ix_flutter Demo',
               routerConfig: router,
               theme: _controller.buildTheme(ThemeMode.light),
               darkTheme: _controller.buildTheme(ThemeMode.dark),

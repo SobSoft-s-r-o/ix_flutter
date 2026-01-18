@@ -18,7 +18,6 @@ The wiki includes the following sections:
 ### Documentation
 - **API Reference** - Complete API documentation for all components
 - **FAQ** - Frequently asked questions
-- **Icon Migration Guide** - Guide for migrating from other icon sources
 - **Icon Licensing** - Icon licensing and compliance information
 
 ### Components

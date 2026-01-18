@@ -16,7 +16,7 @@ class FormsPage extends StatefulWidget {
 
 class _FormsPageState extends State<FormsPage> {
   final TextEditingController _nameController = TextEditingController(
-    text: 'Siemens Energy Gateway',
+    text: 'IX Energy Gateway',
   );
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _unitController = TextEditingController();
@@ -148,8 +148,7 @@ class _FormsPageState extends State<FormsPage> {
               decoration: const InputDecoration(
                 prefixText: '±',
                 suffixText: 'ms',
-                helperText:
-                    'Suffix and prefix text share the Siemens body style.',
+                helperText: 'Suffix and prefix text share the IX body style.',
               ),
               keyboardType: TextInputType.number,
             ),

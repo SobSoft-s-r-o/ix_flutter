@@ -157,7 +157,7 @@ class _ApplicationPageState extends State<ApplicationPage> {
       context: context,
       applicationName: 'Operations hub',
       applicationVersion: '1.0.0',
-      children: const [Text('Siemens IX design language demo for Flutter.')],
+      children: const [Text('IX Flutter design language demo for Flutter.')],
     );
   }
 }

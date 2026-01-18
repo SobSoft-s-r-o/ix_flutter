@@ -43,7 +43,7 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
     String selectedId = _getIdFromLocation(location);
 
     return IxApplicationScaffold(
-      appTitle: 'Siemens IX Flutter Demo',
+      appTitle: 'IX Flutter Demo',
       entries: _buildEntries(selectedId),
       onNavigate: (id) => _onNavigate(context, id),
       body: widget.child,

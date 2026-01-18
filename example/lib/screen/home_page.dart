@@ -21,7 +21,7 @@ class HomePage extends StatelessWidget {
     return ListView(
       padding: EdgeToEdge.scrollPadding(context),
       children: [
-        Text('Siemens IX Theme Overview', style: theme.textTheme.headlineSmall),
+        Text('IX Flutter Theme Overview', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 12),
         Text(
           'Toggle between theme families and brightness modes to see the IX tokens update in real time.',

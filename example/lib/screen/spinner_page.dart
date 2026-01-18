@@ -26,7 +26,7 @@ class SpinnerPage extends StatelessWidget {
         Text('Spinners', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 12),
         Text(
-          'These examples solely rely on the IxSpinnerTheme extension, so every spinner automatically inherits Siemens IX sizes and colors.',
+          'These examples solely rely on the IxSpinnerTheme extension, so every spinner automatically inherits IX Flutter sizes and colors.',
           style: theme.textTheme.bodyMedium,
         ),
         const SizedBox(height: 24),

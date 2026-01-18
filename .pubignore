@@ -28,3 +28,7 @@ migrate_working_dir/
 
 # Exclude example app from published package
 /example/
+
+# Exclude documentation images and screenshots from package
+/screenshots/
+/doc/images/

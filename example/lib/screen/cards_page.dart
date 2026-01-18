@@ -85,7 +85,7 @@ class CardsPage extends StatelessWidget {
         Text('Cards', style: theme.textTheme.headlineSmall),
         const SizedBox(height: 8),
         Text(
-          'Siemens IX cards reuse palette tokens for backgrounds, borders, and focus states. '
+          'IX Flutter cards reuse palette tokens for backgrounds, borders, and focus states. '
           'These demos render static surfaces only — interactions are handled by host widgets.',
           style: theme.textTheme.bodyMedium,
         ),

@@ -1,11 +1,11 @@
 {
-    "name": "example",
-    "short_name": "example",
+    "name": "IX Flutter Demo",
+    "short_name": "IX Flutter",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "IX Flutter - Component library demo based on the iX Design System",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

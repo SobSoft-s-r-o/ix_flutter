@@ -11,6 +11,12 @@ A comprehensive Flutter component library based on the Siemens iX Design System.
 
 > ⚠️ **Important Disclaimer**: This is an **independent, community-maintained** adaptation of the Siemens iX Design System for Flutter. It is **NOT** developed, maintained, or endorsed by Siemens AG. See [LICENSE](LICENSE), [ICON_LICENSING.md](ICON_LICENSING.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for complete legal information.
 
+## Screenshots
+
+![IX Flutter Demo - Dark Theme](screenshots/main_page_example_dark.jpeg)
+
+*IX Flutter demo application showcasing components in dark theme*
+
 ## Overview
 
 `ix_flutter` provides Flutter widgets and components that implement the Siemens iX Design System, enabling developers to build consistent, professional applications that follow Siemens design guidelines.

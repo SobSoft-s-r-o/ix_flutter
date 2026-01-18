@@ -16,7 +16,7 @@ class ModalsPage extends StatefulWidget {
           'Relies on DialogTheme so padding, radius, and shadows match IX.',
       dialogHeading: 'Workflow confirmation',
       body: [
-        'This modal uses the DialogTheme created from IxModalTheme tokens, so the spacing and colors stay aligned with the Siemens IX Stencil implementation.',
+        'This modal uses the DialogTheme created from IxModalTheme tokens, so the spacing and colors stay aligned with the IX Flutter Stencil implementation.',
         'Use the stock AlertDialog APIs whenever possible to inherit the same rules in your product code.',
       ],
       primaryActionLabel: 'Approve',
