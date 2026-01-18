@@ -1,6 +1,7 @@
 name: ix_flutter
 description: "Flutter widgets and components based on the Siemens iX Design System. This is an independent adaptation not developed or maintained by Siemens."
 version: 0.0.1
+publisher: sobsoft.sk
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
 repository: https://github.com/SobSoft-s-r-o/ix_flutter
 issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
