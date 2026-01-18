@@ -1,3 +1,9 @@
+/// Main entry point for the ix_flutter package.
+///
+/// Exposes Siemens iX-themed widgets, theming utilities, and token definitions
+/// for building Flutter apps that follow the Siemens iX design system.
+library ix_flutter;
+
 export 'src/ix_colors/ix_theme_color_tokens.dart';
 export 'src/ix_colors/ix_theme_family.dart';
 export 'src/ix_core/ix_fonts.dart';

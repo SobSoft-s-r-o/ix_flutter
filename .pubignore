@@ -26,9 +26,6 @@ migrate_working_dir/
 /build/
 /coverage/
 
-# Exclude example app from published package
-/example/
-
 # Exclude wiki submodule from published package
 /wiki/
 
