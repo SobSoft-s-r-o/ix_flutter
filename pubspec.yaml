@@ -1,5 +1,5 @@
 name: ix_flutter
-description: "Flutter widgets and components based on the Siemens iX Design System. This is an independent adaptation not developed or maintained by Siemens."
+description: "Professional Flutter UI component library implementing Siemens iX Design System. Build beautiful, responsive, accessible apps with 1400+ icons, themes, widgets, breadcrumbs, spinners, toast notifications, dropdowns, and more. Complete design system for Android, iOS, Web, Linux, macOS, and Windows. Dark/light mode support with customizable theming."
 version: 0.0.1
 publisher: sobsoft.sk
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
