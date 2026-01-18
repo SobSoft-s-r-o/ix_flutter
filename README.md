@@ -365,7 +365,7 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 - **Documentation**: Check [doc/](doc/) folder for detailed component guides
 - **Issues**: [Report a bug](https://github.com/SobSoft-s-r-o/ix_flutter/issues)
 - **Discussions**: [Ask a question](https://github.com/SobSoft-s-r-o/ix_flutter/discussions)
-- **Maintainer**: SobSoft (https://sobsoft.sk/)
+- **Maintainer**: SobSoft (https://sobsoft.sk)
 
 ## License
 
