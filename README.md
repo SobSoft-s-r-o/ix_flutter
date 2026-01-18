@@ -158,7 +158,6 @@ class HomeScreen extends StatelessWidget {
 ## Documentation
 
 - **[Icons Documentation](doc/ix_icons.md)** - Complete guide for using Siemens iX icons
-- **[Icon Migration Guide](ICON_MIGRATION.md)** - Important information about icon licensing
 - **[Application Scaffold](doc/ix_application_scaffold.md)** - App structure and navigation
 - **[Blind/Drawer](doc/ix_blind.md)** - Sliding panel documentation
 - **[Dropdown Button](doc/ix_dropdown_button.md)** - Dropdown component guide
