@@ -1,5 +1,3 @@
-import 'package:flutter/widgets.dart';
-
 /// Holds all localizable strings for [IxResponsiveDataView] and its sub-components.
 class IxResponsiveDataViewStrings {
   const IxResponsiveDataViewStrings({
