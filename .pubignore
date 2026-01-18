@@ -32,6 +32,12 @@ migrate_working_dir/
 # Exclude wiki submodule from published package
 /wiki/
 
+# Exclude GitHub metadata
+/.github/
+
+# Exclude repo-only wiki setup guide
+/WIKI_SETUP.md
+
 # Exclude documentation images and screenshots from package
 /screenshots/
 /doc/images/
