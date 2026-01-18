@@ -374,6 +374,18 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 - **Discussions**: [Ask a question](https://github.com/SobSoft-s-r-o/ix_flutter/discussions)
 - **Maintainer**: SobSoft (https://sobsoft.sk)
 
+### Commercial Support
+
+For paid support, consulting, or custom development services, contact SobSoft:
+
+📧 **[Contact Form](https://sobsoft.sk/en/contact)**
+
+We offer professional services including:
+- Custom component development
+- Migration assistance
+- Integration support
+- Training and consulting
+
 ## License
 
 This package is licensed under the MIT License. See [LICENSE](LICENSE) for details.
