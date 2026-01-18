@@ -7,22 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Documentation site and guides
-- Complete API reference
-- Getting started guide
-- Contributing guidelines
-- Security policy
-- FAQ documentation
+---
+
+## [1.0.1] - 2026-01-18
 
 ### Changed
-- Renamed package from `siemens_ix_flutter` to `ix_flutter`
-- Updated licensing and copyright
-- Enhanced documentation structure
+- Cleaned LICENSE file to standard MIT format for proper pub.dev recognition
+- Included example app in published package for improved pub.dev scoring
+- Excluded GitHub-specific files (.github/, WIKI_SETUP.md) from package distribution
 
 ### Fixed
-- Icon import references
-- Package configuration
+- Removed unnecessary library declaration to satisfy static analysis
+- Improved pub.dev package scoring compliance
 
 ---
 
@@ -92,6 +88,7 @@ We follow [Semantic Versioning](https://semver.org/):
 
 | Version | Flutter | Dart |
 | ------- | ------- | ---- |
+| 1.0.1   | >=3.10.0 | >=3.10.0 |
 | 1.0.0   | >=3.10.0 | >=3.10.0 |
 | 0.0.1   | >=3.10.0 | >=3.10.0 |
 
@@ -105,6 +102,9 @@ We follow [Semantic Versioning](https://semver.org/):
 - ✅ Windows (desktop)
 
 ## Breaking Changes
+
+### v1.0.1
+- No breaking changes, patch release
 
 ### v1.0.0
 - First stable release, no breaking changes from 0.0.1
