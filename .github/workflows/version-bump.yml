@@ -1,0 +1,86 @@
+name: Version Bump (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Semver bump (patch/minor/major)
+        required: true
+        default: patch
+        type: choice
+        options: [patch, minor, major]
+      preid:
+        description: Optional prerelease identifier (e.g., rc1)
+        required: false
+        default: ""
+        type: string
+
+env:
+  FLUTTER_VERSION: stable
+  PUB_CACHE: ~/.pub-cache
+
+jobs:
+  bump:
+    name: Bump version
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_VERSION }}
+
+      - name: Cache pub
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.yaml', 'example/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Activate cider
+        run: dart pub global activate cider
+
+      - name: Bump pubspec version
+        run: |
+          if [ -n "${{ inputs.preid }}" ]; then
+            dart pub global run cider version ${{ inputs.bump }} --preid ${{ inputs.preid }}
+          else
+            dart pub global run cider version ${{ inputs.bump }}
+          fi
+
+      - name: Capture new version
+        id: version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/release-${{ steps.version.outputs.version }}
+          title: "chore: release ${{ steps.version.outputs.version }}"
+          commit-message: "chore: bump to ${{ steps.version.outputs.version }}"
+          body: |
+            Automated version bump.
+            - bump: ${{ inputs.bump }}
+            - preid: ${{ inputs.preid }}
+          add-paths: |
+            pubspec.yaml
+          labels: release

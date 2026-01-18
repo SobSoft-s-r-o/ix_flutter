@@ -1,5 +1,7 @@
 # ix_flutter
 
+[![CI](https://github.com/SobSoft-s-r-o/ix_flutter/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SobSoft-s-r-o/ix_flutter/actions/workflows/ci.yml)
+[![Version Bump](https://github.com/SobSoft-s-r-o/ix_flutter/actions/workflows/version-bump.yml/badge.svg?branch=main)](https://github.com/SobSoft-s-r-o/ix_flutter/actions/workflows/version-bump.yml)
 [![Pub Version](https://img.shields.io/pub/v/ix_flutter.svg)](https://pub.dev/packages/ix_flutter)
 [![Flutter](https://img.shields.io/badge/Flutter-3.10.0+-blue.svg)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.10.0+-blue.svg)](https://dart.dev)
