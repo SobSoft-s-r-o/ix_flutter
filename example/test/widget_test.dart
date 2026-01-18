@@ -10,8 +10,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:example/app.dart';
 
 void main() {
-  testWidgets('renders Siemens IX overview', (WidgetTester tester) async {
-    await tester.pumpWidget(const SiemensIxDemoApp());
+  testWidgets('renders iX design system overview', (WidgetTester tester) async {
+    await tester.pumpWidget(const IxDemoApp());
     await tester.pumpAndSettle();
 
     expect(find.text('Siemens IX Theme Overview'), findsOneWidget);

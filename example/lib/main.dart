@@ -8,5 +8,5 @@ Future<void> main() async {
   final brightness =
       WidgetsBinding.instance.platformDispatcher.platformBrightness;
   await EdgeToEdge.configureSystemUi(brightness: brightness);
-  runApp(const SiemensIxDemoApp());
+  runApp(const IxDemoApp());
 }

@@ -7,14 +7,14 @@ import 'router/router.dart';
 import 'theme_controller.dart';
 import 'toast_provider.dart';
 
-class SiemensIxDemoApp extends StatefulWidget {
-  const SiemensIxDemoApp({super.key});
+class IxDemoApp extends StatefulWidget {
+  const IxDemoApp({super.key});
 
   @override
-  State<SiemensIxDemoApp> createState() => _SiemensIxDemoAppState();
+  State<IxDemoApp> createState() => _IxDemoAppState();
 }
 
-class _SiemensIxDemoAppState extends State<SiemensIxDemoApp> {
+class _IxDemoAppState extends State<IxDemoApp> {
   late final ThemeController _controller;
   late final IxToastService _toastService;
 
