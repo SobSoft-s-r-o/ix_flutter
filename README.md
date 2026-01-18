@@ -374,6 +374,14 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 - **Discussions**: [Ask a question](https://github.com/SobSoft-s-r-o/ix_flutter/discussions)
 - **Maintainer**: SobSoft (https://sobsoft.sk)
 
+### Sponsorship
+
+Support the development of this package! ❤️
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-red?style=for-the-badge&logo=github)](https://github.com/sponsors/SobSoft-s-r-o)
+
+Your sponsorship helps maintain and improve ix_flutter. [Become a sponsor](https://github.com/sponsors/SobSoft-s-r-o) or use the **Sponsor** button at the top of the repository.
+
 ### Commercial Support
 
 For paid support, consulting, or custom development services, contact SobSoft:
