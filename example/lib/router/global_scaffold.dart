@@ -57,23 +57,54 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
   }
 
   String _getIdFromLocation(String location) {
-    if (location == HomePage.routePath) return 'home';
-    if (location == ButtonsPage.routePath) return 'buttons';
-    if (location == DropdownButtonPage.routePath) return 'dropdown_button';
-    if (location == EmptyStatePage.routePath) return 'empty_state';
-    if (location == CardsPage.routePath) return 'cards';
-    if (location == BlindPage.routePath) return 'blind';
-    if (location == BadgesPage.routePath) return 'badges';
-    if (location == TabsPage.routePath) return 'tabs';
-    if (location == NavigationExamplesPage.routePath) return 'navigation';
-    if (location == ApplicationPage.routePath) return 'app_menu';
-    if (location == SliderPage.routePath) return 'sliders';
-    if (location == SpinnerPage.routePath) return 'spinners';
-    if (location == FormsPage.routePath) return 'forms';
-    if (location == ModalsPage.routePath) return 'modals';
-    if (location == ToastPage.routePath) return 'toast';
-    if (location == ResponsiveDataViewExample.routePath)
+    if (location == HomePage.routePath) {
+      return 'home';
+    }
+    if (location == ButtonsPage.routePath) {
+      return 'buttons';
+    }
+    if (location == DropdownButtonPage.routePath) {
+      return 'dropdown_button';
+    }
+    if (location == EmptyStatePage.routePath) {
+      return 'empty_state';
+    }
+    if (location == CardsPage.routePath) {
+      return 'cards';
+    }
+    if (location == BlindPage.routePath) {
+      return 'blind';
+    }
+    if (location == BadgesPage.routePath) {
+      return 'badges';
+    }
+    if (location == TabsPage.routePath) {
+      return 'tabs';
+    }
+    if (location == NavigationExamplesPage.routePath) {
+      return 'navigation';
+    }
+    if (location == ApplicationPage.routePath) {
+      return 'app_menu';
+    }
+    if (location == SliderPage.routePath) {
+      return 'sliders';
+    }
+    if (location == SpinnerPage.routePath) {
+      return 'spinners';
+    }
+    if (location == FormsPage.routePath) {
+      return 'forms';
+    }
+    if (location == ModalsPage.routePath) {
+      return 'modals';
+    }
+    if (location == ToastPage.routePath) {
+      return 'toast';
+    }
+    if (location == ResponsiveDataViewExample.routePath) {
       return 'responsive_data_view';
+    }
     return 'home';
   }
 

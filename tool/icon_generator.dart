@@ -24,7 +24,6 @@ class IconGenerator {
       await _ensureDirectoryExists(assetsDir);
 
       // Calculate the relative asset path - always use forward slashes for Flutter assets
-      final normalizedOutputDir = path.normalize(outputDir);
       final normalizedAssetsDir = path.normalize(assetsDir);
 
       // Find common ancestor and calculate relative path from root

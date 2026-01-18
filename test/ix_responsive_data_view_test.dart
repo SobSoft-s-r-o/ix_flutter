@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 import 'package:ix_flutter/src/widgets/ix_pagination_bar.dart';
-import 'package:ix_flutter/src/widgets/ix_responsive_data_view.dart';
 
 class TestItem {
   final int id;
@@ -171,8 +170,11 @@ void main() {
       // However, IxResponsiveDataView's infinite scroll logic depends on ScrollController listeners
       // which might need a frame or two.
 
-      // Let's try to verify the structure for now.
+      // Let the scroll controller process and ensure load more is requested.
+      await tester.pumpAndSettle();
+
       expect(find.byType(ListView), findsOneWidget);
+      expect(loadMoreCalled, isTrue);
     });
 
     testWidgets('renders with search query', (WidgetTester tester) async {
@@ -194,6 +196,7 @@ void main() {
 
       expect(find.text('Filtered by: "Item"'), findsOneWidget);
       expect(find.text('Results: 20'), findsOneWidget);
+      expect(clearSearchCalled, isFalse);
     });
 
     testWidgets('renders empty state with search', (WidgetTester tester) async {

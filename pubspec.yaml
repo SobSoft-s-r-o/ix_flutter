@@ -7,13 +7,13 @@ issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
 documentation: https://github.com/SobSoft-s-r-o/ix_flutter/wiki
 
 environment:
-  sdk: ^3.10.0
-  flutter: ">=1.17.0"
+  sdk: ">=3.10.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_svg: ^2.0.10+1
+  flutter_svg: ^2.2.3
 
 dev_dependencies:
   flutter_test:
@@ -26,6 +26,13 @@ dev_dependencies:
   recase: ^4.1.0
   meta: ^1.17.0
   archive: ^4.0.7
+
+topics:
+  - flutter
+  - ui-kit
+  - widgets
+  - design-system
+  - icons
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
