@@ -1,8 +1,8 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
+import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 /// Enumerates Siemens IX blind variants surfaced by the theme extension.
 enum IxBlindVariant {
@@ -251,8 +251,8 @@ class IxBlindTheme extends ThemeExtension<IxBlindTheme> {
     }) {
       return IxBlindStyle(
         background: background,
-        hoverBackground: background.withOpacity(0.9),
-        activeBackground: background.withOpacity(0.8),
+        hoverBackground: background.withValues(alpha: background.a * 0.9),
+        activeBackground: background.withValues(alpha: background.a * 0.8),
         selectedBackground: background,
         borderColor: border ?? Colors.transparent,
         hoverBorderColor: border ?? Colors.transparent,

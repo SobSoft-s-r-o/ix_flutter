@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
+import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 
 const _badgeSmallSize = 16.0;
 const _badgeLargeSize = 22.0;

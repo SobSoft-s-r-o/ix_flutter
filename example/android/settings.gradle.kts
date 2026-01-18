@@ -25,5 +25,5 @@ plugins {
 
 include(":app")
 
-rootProject.name = "siemens_ix_flutter_example_android"
+rootProject.name = "ix_flutter_example_android"
 

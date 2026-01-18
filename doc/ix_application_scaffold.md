@@ -17,7 +17,7 @@ To use the `IxApplicationScaffold`, wrap your main application content with it. 
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});

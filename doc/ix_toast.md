@@ -23,7 +23,7 @@ It is recommended to use an `InheritedWidget` or a state management solution (li
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
 
 // Simple InheritedWidget to provide the service
 class ToastProvider extends InheritedWidget {

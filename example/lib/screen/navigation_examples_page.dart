@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:example/ix_icons.dart';
 
 import '../edge_to_edge.dart';
 
@@ -357,7 +358,9 @@ class _DialogExamples extends StatelessWidget {
           ],
         );
       },
-      barrierColor: theme.colorScheme.scrim.withOpacity(0.5),
+      barrierColor: theme.colorScheme.scrim.withValues(
+        alpha: theme.colorScheme.scrim.a * 0.5,
+      ),
     );
   }
 
@@ -399,7 +402,9 @@ class _DialogExamples extends StatelessWidget {
           ],
         );
       },
-      barrierColor: theme.colorScheme.scrim.withOpacity(0.5),
+      barrierColor: theme.colorScheme.scrim.withValues(
+        alpha: theme.colorScheme.scrim.a * 0.5,
+      ),
     );
   }
 }

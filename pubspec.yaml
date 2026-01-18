@@ -1,5 +1,5 @@
-name: siemens_ix_flutter
-description: "Siemens iX Design System experience package for Flutter. This library is not developed by the Siemens Industrial Experience team itself."
+name: ix_flutter
+description: "Flutter widgets and components based on the Siemens iX Design System. This is an independent adaptation not developed or maintained by Siemens."
 version: 0.0.1
 homepage: empty
 
@@ -22,7 +22,7 @@ dev_dependencies:
   args: ^2.7.0
   recase: ^4.1.0
   meta: ^1.17.0
-  archive: ^3.6.1
+  archive: ^4.0.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -78,5 +78,3 @@ flutter:
         - asset: assets/fonts/Roboto_Mono/static/RobotoMono-BoldItalic.ttf
           weight: 700
           style: italic
-  assets:
-    - assets/svg/

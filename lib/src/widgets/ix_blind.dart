@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
-import 'package:siemens_ix_flutter/src/ix_icons/ix_icons.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/components/ix_blind_theme.dart';
+import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
+import 'package:ix_flutter/src/ix_core/ix_typography.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart';
 
-export 'package:siemens_ix_flutter/src/ix_theme/components/ix_blind_theme.dart'
+export 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart'
     show IxBlindVariant;
 
 /// A collapsible container that mirrors the Siemens iX `<ix-blind>` component.
@@ -159,8 +159,8 @@ class _IxBlindHeaderState extends State<_IxBlindHeader> {
       color: Colors.transparent, // Container handles background
       child: InkWell(
         onTap: widget.onTap,
-        hoverColor: widget.style.hoverBackground.withOpacity(
-          0.1,
+        hoverColor: widget.style.hoverBackground.withValues(
+          alpha: widget.style.hoverBackground.a * 0.1,
         ), // Use a subtle overlay
 
         child: Container(
@@ -209,8 +209,8 @@ class _IxBlindHeaderState extends State<_IxBlindHeader> {
                       Text(
                         widget.subtitle!,
                         style: ixTypography.bodySm.copyWith(
-                          color: foregroundColor.withOpacity(
-                            0.8,
+                          color: foregroundColor.withValues(
+                            alpha: foregroundColor.a * 0.8,
                           ), // Slightly lighter
                         ),
                         maxLines: 1,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
-import 'package:siemens_ix_flutter/src/widgets/ix_pagination_bar.dart';
-import 'package:siemens_ix_flutter/src/widgets/ix_responsive_data_view.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:ix_flutter/src/widgets/ix_pagination_bar.dart';
+import 'package:ix_flutter/src/widgets/ix_responsive_data_view.dart';
 
 class TestItem {
   final int id;

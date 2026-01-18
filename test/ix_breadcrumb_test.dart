@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
 
 void main() {
   testWidgets('breadcrumbs render and trigger callbacks', (tester) async {

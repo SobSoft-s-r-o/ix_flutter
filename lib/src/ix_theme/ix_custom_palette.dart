@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_family.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_color_palette.dart';
+import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:ix_flutter/src/ix_colors/ix_theme_family.dart';
+import 'package:ix_flutter/src/ix_core/ix_color_palette.dart';
 
 /// Declarative palette that can override Siemens IX brand/classic colors.
 ///

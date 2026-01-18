@@ -1,8 +1,8 @@
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/components/ix_card_theme.dart';
+import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_card_theme.dart';
 
 /// Theme extension that exposes Siemens IX styling for bottom sheets.
 class IxBottomSheetTheme extends ThemeExtension<IxBottomSheetTheme> {

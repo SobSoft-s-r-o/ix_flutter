@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/theme/ix_classic_dark_colors.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/theme/ix_classic_light_colors.dart';
+import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:ix_flutter/src/ix_colors/theme/ix_classic_dark_colors.dart';
+import 'package:ix_flutter/src/ix_colors/theme/ix_classic_light_colors.dart';
 
 void main() {
   group('IxThemeColorToken consistency', () {

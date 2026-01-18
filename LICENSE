@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2025 Lubomir Sob.
+Copyright (c) 2026 SobSoft
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +19,62 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+## IMPORTANT NOTICE
+
+This package is an independent Flutter adaptation of the Siemens iX Design System.
+It is NOT developed, maintained, or endorsed by Siemens AG or the Siemens Industrial 
+Experience team.
+
+### Siemens iX Design System Attribution
+
+The design patterns, guidelines, and visual language this package implements are based
+on the Siemens iX Design System (https://ix.siemens.io), which is owned and maintained
+by Siemens AG.
+
+Siemens iX is a registered trademark of Siemens AG. This package uses Siemens iX as a 
+reference for design consistency but is not an official Siemens product.
+
+### Icon Attribution
+
+Icons in this package are sourced from the official `@siemens/ix-icons` npm package 
+(https://www.npmjs.com/package/@siemens/ix-icons). The icon generator downloads 
+icons from the official Siemens source to ensure licensing compliance.
+
+Users of this package are responsible for ensuring compliance with Siemens iX 
+Design System licensing terms when using the downloaded icons.
+
+### License Compliance
+
+When using this package:
+
+1. **Widget Components**: Licensed under MIT (see above)
+
+2. **Icon Files**: Downloaded from official Siemens source. Users must comply with 
+   Siemens iX Design System terms for icon usage.
+
+3. **Design System References**: The design patterns implemented are based on the 
+   Siemens iX Design System. Refer to https://ix.siemens.io for official guidelines 
+   and terms.
+
+### Disclaimer
+
+This package is provided AS-IS without any warranty or guarantee of compatibility
+with official Siemens products. Users are solely responsible for:
+
+- Ensuring compliance with Siemens licensing terms
+- Proper attribution to Siemens iX Design System
+- Legal review before commercial use
+- Icon licensing compliance
+
+For official Siemens iX implementation guidance, please refer to:
+https://ix.siemens.io
+
+---
+
+**Siemens** and the Siemens logo are registered trademarks of Siemens AG.
+**Siemens iX** is a trademark/design system owned by Siemens AG.
+
+This package is an independent community project and is not affiliated with Siemens.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:example/ix_icons.dart';
 
 class BlindPage extends StatefulWidget {
   const BlindPage({super.key});

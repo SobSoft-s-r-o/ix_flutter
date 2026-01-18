@@ -9,11 +9,11 @@ class IconGenerator {
   static const _packageName = '@siemens/ix-icons';
   static const _packageVersion = '3.2.0';
   static const _npmRegistryUrl = 'https://registry.npmjs.org';
-  static const _flutterPackageName = 'siemens_ix_flutter';
 
   static Future<void> generateIcons({
     required String outputDir,
     required String assetsDir,
+    String? flutterPackageName,
     http.Client? client,
   }) async {
     final httpClient = client ?? http.Client();
@@ -22,6 +22,27 @@ class IconGenerator {
       print('Starting icon generation...');
       await _ensureDirectoryExists(outputDir);
       await _ensureDirectoryExists(assetsDir);
+
+      // Calculate the relative asset path - always use forward slashes for Flutter assets
+      final normalizedOutputDir = path.normalize(outputDir);
+      final normalizedAssetsDir = path.normalize(assetsDir);
+
+      // Find common ancestor and calculate relative path from root
+      String relativeAssetsPath;
+      if (path.isAbsolute(normalizedAssetsDir)) {
+        // Get the parts after the project root
+        final parts = path.split(normalizedAssetsDir);
+        final assetsIndex = parts.indexOf('assets');
+        if (assetsIndex >= 0) {
+          relativeAssetsPath = parts.sublist(assetsIndex).join('/');
+        } else {
+          // Fallback: use basename
+          relativeAssetsPath = 'assets/${path.basename(normalizedAssetsDir)}';
+        }
+      } else {
+        // Already relative
+        relativeAssetsPath = normalizedAssetsDir.replaceAll('\\', '/');
+      }
 
       // Download and extract the npm package
       print('Downloading package $_packageName@$_packageVersion...');
@@ -53,9 +74,15 @@ class IconGenerator {
         iconClassBuffer.writeln('class IxIcons {');
         iconClassBuffer.writeln('  IxIcons._();');
         iconClassBuffer.writeln('');
-        iconClassBuffer.writeln(
-          "  static const _assetPackage = '$_flutterPackageName';",
-        );
+        if (flutterPackageName != null) {
+          iconClassBuffer.writeln(
+            "  static const _assetPackage = '$flutterPackageName';",
+          );
+        } else {
+          iconClassBuffer.writeln(
+            "  static const String? _assetPackage = null;",
+          );
+        }
         iconClassBuffer.writeln('');
 
         var generatedCount = 0;
@@ -87,7 +114,7 @@ class IconGenerator {
           iconClassBuffer.writeln(
             "  static Widget get $iconName => const _IxIconWidget(",
           );
-          iconClassBuffer.writeln("    'assets/svg/$fileName',");
+          iconClassBuffer.writeln("    '$relativeAssetsPath/$fileName',");
           iconClassBuffer.writeln('  );');
           iconClassBuffer.writeln('');
           generatedCount++;
@@ -132,8 +159,6 @@ class IconGenerator {
 
         print('Generated $generatedCount icons');
         print('Output file: ${outputFile.path}');
-
-        await _updatePubspec(assetsDir);
       } finally {
         // Clean up temporary directory
         await tempDir.delete(recursive: true);
@@ -282,28 +307,6 @@ class IconGenerator {
     final directory = Directory(pathToEnsure);
     if (!await directory.exists()) {
       await directory.create(recursive: true);
-    }
-  }
-
-  static Future<void> _updatePubspec(String assetsDir) async {
-    final pubspecPath = path.join(assetsDir, '..', '..', 'pubspec.yaml');
-    if (!File(pubspecPath).existsSync()) {
-      return;
-    }
-    final pubspecFile = File(pubspecPath);
-    final pubspecContent = await pubspecFile.readAsString();
-
-    // Check if assets section exists and contains our path
-    if (!pubspecContent.contains('assets:')) {
-      final newPubspecContent =
-          '$pubspecContent\n\nflutter:\n  assets:\n    - assets/svg/\n';
-      await pubspecFile.writeAsString(newPubspecContent);
-    } else if (!pubspecContent.contains('assets/svg/')) {
-      final newPubspecContent = pubspecContent.replaceFirst(
-        'assets:',
-        'assets:\n    - assets/svg/',
-      );
-      await pubspecFile.writeAsString(newPubspecContent);
     }
   }
 }

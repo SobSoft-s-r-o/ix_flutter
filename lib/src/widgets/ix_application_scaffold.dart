@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
-import 'package:siemens_ix_flutter/src/ix_icons/ix_icons.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
+import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
 
 /// Describes the type of entry that can appear inside the Siemens IX application
 /// menu scaffold.

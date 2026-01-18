@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:example/ix_icons.dart';
 
 class ResponsiveDataViewExample extends StatefulWidget {
   static const routePath = '/responsive-data-view';
@@ -488,7 +489,7 @@ class _StatusChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: bgColor.withOpacity(0.1),
+        color: bgColor.withValues(alpha: bgColor.a * 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: bgColor),
       ),

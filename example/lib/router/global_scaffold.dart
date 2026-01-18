@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:example/ix_icons.dart';
 import '../theme_controller.dart';
 
 import '../screen/application_page.dart';

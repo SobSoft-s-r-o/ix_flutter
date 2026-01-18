@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_typography.dart';
+import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 
 /// Theme definition for the Siemens IX application menu overlay.
 class IxAppMenuTheme extends ThemeExtension<IxAppMenuTheme> {

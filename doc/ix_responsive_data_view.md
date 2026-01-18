@@ -18,7 +18,7 @@ The `IxResponsiveDataView<T>` widget is a powerful, responsive data presentation
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
 
 class MyDataView extends StatelessWidget {
   final List<MyItem> items;

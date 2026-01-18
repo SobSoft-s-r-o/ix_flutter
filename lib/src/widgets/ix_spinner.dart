@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/components/ix_spinner_theme.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_spinner_theme.dart';
 
 /// Animated Siemens IX spinner that pulls its colors and sizing from
 /// [IxSpinnerTheme].

@@ -1,10 +1,10 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_core/ix_common_geometry.dart';
-import 'package:siemens_ix_flutter/src/ix_icons/ix_icons.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/components/ix_breadcrumb_theme.dart';
-import 'package:siemens_ix_flutter/src/ix_theme/components/ix_button_theme.dart';
+import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_breadcrumb_theme.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_button_theme.dart';
 
 /// Available visual treatments for breadcrumb buttons.
 enum IxBreadcrumbButtonAppearance { tertiary, subtlePrimary }

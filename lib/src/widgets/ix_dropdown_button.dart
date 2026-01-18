@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
 
 enum IxDropdownButtonVariant {
   primary,
@@ -339,7 +340,9 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
                                 item.label,
                                 style: TextStyle(
                                   color: item.disabled
-                                      ? textColor.withOpacity(0.5)
+                                      ? textColor.withValues(
+                                          alpha: textColor.a * 0.5,
+                                        )
                                       : textColor,
                                 ),
                               ),

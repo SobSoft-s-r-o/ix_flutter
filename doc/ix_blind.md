@@ -16,7 +16,7 @@ The `IxBlind` widget is a collapsible container that mirrors the Siemens iX `<ix
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
 
 class MyBlindExample extends StatefulWidget {
   const MyBlindExample({super.key});

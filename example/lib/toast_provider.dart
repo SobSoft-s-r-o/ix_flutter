@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
 
 class ToastProvider extends InheritedWidget {
   const ToastProvider({super.key, required this.service, required super.child});

@@ -16,7 +16,7 @@ The `IxDropdownButton` widget is a button that reveals a dropdown menu of action
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
 
 class MyDropdownExample extends StatelessWidget {
   const MyDropdownExample({super.key});

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
-import 'package:siemens_ix_flutter/src/widgets/ix_pagination_bar.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+import 'package:ix_flutter/src/widgets/ix_pagination_bar.dart';
 
 /// Pagination modes supported by [IxResponsiveDataView].
 enum IxPaginationMode { none, standard, infinite }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/src/ix_colors/ix_colors.dart';
+import 'package:ix_flutter/src/ix_colors/ix_colors.dart';
 
 /// Resolves theme color palettes keyed by [IxThemeColorToken].
 class IxColorPalette {

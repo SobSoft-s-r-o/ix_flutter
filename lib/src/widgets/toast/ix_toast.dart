@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:siemens_ix_flutter/siemens_ix_flutter.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
 
 /// A widget that displays a single toast notification.
 class IxToast extends StatefulWidget {
@@ -140,7 +141,9 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
             borderRadius: BorderRadius.circular(4), // Standard radius
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.16), // shadow-2 approximation
+                color: Colors.black.withValues(
+                  alpha: 0.16,
+                ), // shadow-2 approximation
                 blurRadius: 8,
                 offset: const Offset(0, 4),
               ),
