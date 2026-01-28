@@ -1,6 +1,6 @@
 name: ix_flutter
 description: "Flutter UI library implementing Siemens iX Design System with 1400+ icons, themes, and widgets for all platforms."
-version: 1.0.2
+version: 1.0.3
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
 repository: https://github.com/SobSoft-s-r-o/ix_flutter
 issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
@@ -41,6 +41,9 @@ topics:
   - widgets
   - design-system
   - icons
+
+executables:
+  generate_icons: generate_icons
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
