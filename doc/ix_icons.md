@@ -41,11 +41,14 @@ To use Siemens iX icons in your Flutter application, you **MUST** run the icon g
 
 ### Generate Icons in Your Project (Required)
 
-**Step 1:** Add `ix_flutter` to your `pubspec.yaml` as a dev dependency (it includes the icon generator):
+**Step 1:** Add `ix_flutter` and `ix_icons_generator` to your `pubspec.yaml`:
 
 ```yaml
+dependencies:
+  ix_flutter: ^1.0.4
+
 dev_dependencies:
-  ix_flutter: ^1.0.0
+  ix_icons_generator: ^1.0.0
 ```
 
 **Step 2:** Run `flutter pub get`:
@@ -57,7 +60,7 @@ flutter pub get
 **Step 3:** Generate icons by running the generator tool:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 This command will:
@@ -86,15 +89,15 @@ class MyWidget extends StatelessWidget {
 
 ## Icon Generator Tool
 
-The icon generator is included with the `ix_flutter` package as a build tool.
+The icon generator is available as a separate package `ix_icons_generator`.
 
 ### Installation
 
-The generator is automatically available when you add `ix_flutter` to your dev dependencies:
+Add the generator to your dev dependencies:
 
 ```yaml
 dev_dependencies:
-  ix_flutter: ^1.0.0
+  ix_icons_generator: ^1.0.0
 ```
 
 ### Usage
@@ -102,7 +105,7 @@ dev_dependencies:
 **Basic usage (recommended):**
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 This uses default settings:
@@ -113,7 +116,7 @@ This uses default settings:
 **Custom output directory:**
 
 ```bash
-dart run ix_flutter:generate_icons \
+dart run ix_icons_generator:generate_icons \
   --output lib/icons \
   --assets assets/ix_icons
 ```
@@ -123,7 +126,7 @@ dart run ix_flutter:generate_icons \
 If you're building a library that will be used by other packages:
 
 ```bash
-dart run ix_flutter:generate_icons \
+dart run ix_icons_generator:generate_icons \
   --package my_library_name
 ```
 
@@ -143,20 +146,20 @@ This makes icons reference your library's assets.
 
 ```bash
 # Generate in specific directories
-dart run ix_flutter:generate_icons \
+dart run ix_icons_generator:generate_icons \
   --output lib/generated \
   --assets assets/icons/ix
 
 # Generate for a library package
-dart run ix_flutter:generate_icons \
+dart run ix_icons_generator:generate_icons \
   --package my_ui_library
 
 # Generate in a specific project
-dart run ix_flutter:generate_icons \
+dart run ix_icons_generator:generate_icons \
   --project-root /path/to/my/project
 
 # Show help
-dart run ix_flutter:generate_icons --help
+dart run ix_icons_generator:generate_icons --help
 ```
 
 ## Using Icons in Your Code
@@ -356,7 +359,7 @@ AppBar(
 1. **Did you run the generator?** Icons are NOT included in the library. You must run:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 2. **Check asset configuration** - Make sure `pubspec.yaml` includes assets:
@@ -421,7 +424,7 @@ IconTheme(
 
 ```bash
 rm lib/ix_icons.dart
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 2. Check for manual edits - the file is auto-generated and shouldn't be modified
@@ -451,7 +454,7 @@ flutter pub upgrade ix_flutter
 The generator is included with the library, so just run:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 ### How do I update icons to the latest version?
@@ -459,7 +462,7 @@ dart run ix_flutter:generate_icons
 Run the generator again to download the latest icons from the official Siemens package:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 ### Can I customize specific icons?
@@ -485,7 +488,7 @@ Icons are maintained by the Siemens iX Design System team. To request new icons:
 3. Run the generator again to download the latest icons:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 ### Do icons work on all platforms?

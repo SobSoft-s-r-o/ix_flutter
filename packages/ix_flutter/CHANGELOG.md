@@ -9,19 +9,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.0.3] - 2026-01-28
-
-### Fixed
-- Fixed icon generator command `dart run ix_flutter:generate_icons` not working
-- Added missing `bin/generate_icons.dart` executable entry point
-- Added `executables` section to pubspec.yaml for proper `dart run` support
-
----
-
-## [1.0.2] - 2026-01-18
+## [1.0.2] - 2026-01-28
 
 ### Changed
-- Shortened package description to comply with pub.dev 60-180 character requirement
+- Icon generator moved to separate package `ix_icons_generator` for cleaner dependencies
+- Removed generator-related dev_dependencies (http, args, recase, archive, path, yaml, meta)
+- Package size reduced by removing unused dependencies
+- Shortened package description to comply with pub.dev requirements
+
+### Migration
+Replace:
+```bash
+dart run ix_flutter:generate_icons
+```
+With:
+```yaml
+dev_dependencies:
+  ix_icons_generator: ^1.0.0
+```
+```bash
+dart run ix_icons_generator:generate_icons
+```
 
 ---
 
@@ -104,7 +112,6 @@ We follow [Semantic Versioning](https://semver.org/):
 
 | Version | Flutter | Dart |
 | ------- | ------- | ---- |
-| 1.0.3   | >=3.10.0 | >=3.10.0 |
 | 1.0.2   | >=3.10.0 | >=3.10.0 |
 | 1.0.1   | >=3.10.0 | >=3.10.0 |
 | 1.0.0   | >=3.10.0 | >=3.10.0 |
@@ -121,11 +128,9 @@ We follow [Semantic Versioning](https://semver.org/):
 
 ## Breaking Changes
 
-### v1.0.3
-- No breaking changes, patch release
-
 ### v1.0.2
-- No breaking changes, patch release
+- Icon generator command changed from `dart run ix_flutter:generate_icons` to `dart run ix_icons_generator:generate_icons`
+- Users must now add `ix_icons_generator` as a dev_dependency
 
 ### v1.0.1
 - No breaking changes, patch release

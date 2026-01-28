@@ -3,6 +3,12 @@ name: Version Bump (Manual)
 on:
   workflow_dispatch:
     inputs:
+      package:
+        description: Package to bump
+        required: true
+        default: ix_flutter
+        type: choice
+        options: [ix_flutter, ix_icons_generator, both]
       bump:
         description: Semver bump (patch/minor/major)
         required: true
@@ -37,27 +43,50 @@ jobs:
         with:
           channel: ${{ env.FLUTTER_VERSION }}
 
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
       - name: Cache pub
         uses: actions/cache@v4
         with:
           path: ${{ env.PUB_CACHE }}
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.yaml', 'example/pubspec.yaml') }}
+          key: ${{ runner.os }}-pub-all-${{ hashFiles('packages/*/pubspec.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pub-
+            ${{ runner.os }}-pub-all-
 
-      - name: Install dependencies
+      - name: Install ix_flutter dependencies
+        if: inputs.package == 'ix_flutter' || inputs.package == 'both'
+        working-directory: packages/ix_flutter
         run: flutter pub get
 
-      - name: Analyze
+      - name: Install ix_icons_generator dependencies
+        if: inputs.package == 'ix_icons_generator' || inputs.package == 'both'
+        working-directory: packages/ix_icons_generator
+        run: dart pub get
+
+      - name: Analyze ix_flutter
+        if: inputs.package == 'ix_flutter' || inputs.package == 'both'
+        working-directory: packages/ix_flutter
         run: flutter analyze
 
-      - name: Test
+      - name: Analyze ix_icons_generator
+        if: inputs.package == 'ix_icons_generator' || inputs.package == 'both'
+        working-directory: packages/ix_icons_generator
+        run: dart analyze
+
+      - name: Test ix_flutter
+        if: inputs.package == 'ix_flutter' || inputs.package == 'both'
+        working-directory: packages/ix_flutter
         run: flutter test
 
       - name: Activate cider
         run: dart pub global activate cider
 
-      - name: Bump pubspec version
+      - name: Bump ix_flutter version
+        if: inputs.package == 'ix_flutter' || inputs.package == 'both'
+        working-directory: packages/ix_flutter
         run: |
           if [ -n "${{ inputs.preid }}" ]; then
             dart pub global run cider version ${{ inputs.bump }} --preid ${{ inputs.preid }}
@@ -65,22 +94,45 @@ jobs:
             dart pub global run cider version ${{ inputs.bump }}
           fi
 
-      - name: Capture new version
-        id: version
+      - name: Bump ix_icons_generator version
+        if: inputs.package == 'ix_icons_generator' || inputs.package == 'both'
+        working-directory: packages/ix_icons_generator
         run: |
-          VERSION=$(grep '^version:' pubspec.yaml | awk '{print $2}')
+          if [ -n "${{ inputs.preid }}" ]; then
+            dart pub global run cider version ${{ inputs.bump }} --preid ${{ inputs.preid }}
+          else
+            dart pub global run cider version ${{ inputs.bump }}
+          fi
+
+      - name: Capture ix_flutter version
+        if: inputs.package == 'ix_flutter' || inputs.package == 'both'
+        id: ix_flutter_version
+        run: |
+          VERSION=$(grep '^version:' packages/ix_flutter/pubspec.yaml | awk '{print $2}')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Capture ix_icons_generator version
+        if: inputs.package == 'ix_icons_generator' || inputs.package == 'both'
+        id: ix_icons_generator_version
+        run: |
+          VERSION=$(grep '^version:' packages/ix_icons_generator/pubspec.yaml | awk '{print $2}')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Create pull request
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: chore/release-${{ steps.version.outputs.version }}
-          title: "chore: release ${{ steps.version.outputs.version }}"
-          commit-message: "chore: bump to ${{ steps.version.outputs.version }}"
+          branch: chore/release-${{ inputs.package }}-${{ steps.ix_flutter_version.outputs.version || steps.ix_icons_generator_version.outputs.version }}
+          title: "chore: release ${{ inputs.package }} ${{ steps.ix_flutter_version.outputs.version || steps.ix_icons_generator_version.outputs.version }}"
+          commit-message: "chore: bump ${{ inputs.package }} to ${{ steps.ix_flutter_version.outputs.version || steps.ix_icons_generator_version.outputs.version }}"
           body: |
             Automated version bump.
+            - package: ${{ inputs.package }}
             - bump: ${{ inputs.bump }}
             - preid: ${{ inputs.preid }}
+
+            **ix_flutter**: ${{ steps.ix_flutter_version.outputs.version || 'not bumped' }}
+            **ix_icons_generator**: ${{ steps.ix_icons_generator_version.outputs.version || 'not bumped' }}
           add-paths: |
-            pubspec.yaml
+            packages/ix_flutter/pubspec.yaml
+            packages/ix_icons_generator/pubspec.yaml
           labels: release

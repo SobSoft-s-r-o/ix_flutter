@@ -13,7 +13,7 @@ A comprehensive Flutter component library based on the Siemens iX Design System.
 
 ## Screenshots
 
-![IX Flutter Demo - Dark Theme](screenshots/main_page_example_dark.jpeg)
+![IX Flutter Demo - Dark Theme](screenshots/main_page_example_dark.jpg)
 
 *IX Flutter demo application showcasing components in dark theme*
 
@@ -39,11 +39,14 @@ To use Siemens iX icons, you **MUST** run the icon generator tool to download ic
 
 ### Quick Icon Setup
 
-1. Add the library to your `pubspec.yaml`:
+1. Add the packages to your `pubspec.yaml`:
 
 ```yaml
+dependencies:
+  ix_flutter: ^1.0.2
+
 dev_dependencies:
-  ix_flutter: ^1.0.0
+  ix_icons_generator: ^1.0.0
 ```
 
 2. Get dependencies:
@@ -55,7 +58,7 @@ flutter pub get
 3. Generate icons:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 4. Use icons in your code:
@@ -76,7 +79,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  ix_flutter: ^1.0.0
+  ix_flutter: ^1.0.2
 ```
 
 Then run:
@@ -179,7 +182,7 @@ cd example
 flutter pub get
 
 # Generate icons (required first time)
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 
 flutter run
 ```
@@ -201,19 +204,19 @@ Due to licensing and distribution restrictions on Siemens iX Design System icons
 
 ```bash
 # Basic usage
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 
 # Custom paths
-dart run ix_flutter:generate_icons \
+dart run ix_icons_generator:generate_icons \
   --output lib/generated \
   --assets assets/icons
 
 # For library packages
-dart run ix_flutter:generate_icons \
+dart run ix_icons_generator:generate_icons \
   --package my_library_name
 
 # Show help
-dart run ix_flutter:generate_icons --help
+dart run ix_icons_generator:generate_icons --help
 ```
 
 See [tool/README.md](tool/README.md) for complete generator documentation.
@@ -345,7 +348,7 @@ flutter pub get
 flutter test
 
 # Generate icons for development
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 
 # Run example app
 cd example

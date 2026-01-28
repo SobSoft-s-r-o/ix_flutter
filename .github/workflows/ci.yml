@@ -12,9 +12,12 @@ env:
   PUB_CACHE: ~/.pub-cache
 
 jobs:
-  lint_and_test:
-    name: Flutter ${{ matrix.task }}
+  lint_and_test_ix_flutter:
+    name: ix_flutter ${{ matrix.task }}
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ix_flutter
     strategy:
       matrix:
         task: [analyze, test]
@@ -31,9 +34,9 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.PUB_CACHE }}
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.yaml', 'example/pubspec.yaml') }}
+          key: ${{ runner.os }}-pub-ix_flutter-${{ hashFiles('packages/ix_flutter/pubspec.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pub-
+            ${{ runner.os }}-pub-ix_flutter-
 
       - name: Install dependencies
         run: flutter pub get
@@ -50,13 +53,42 @@ jobs:
         if: matrix.task == 'test'
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-lcov
-          path: coverage/lcov.info
+          name: coverage-lcov-ix_flutter
+          path: packages/ix_flutter/coverage/lcov.info
           if-no-files-found: ignore
+
+  lint_ix_icons_generator:
+    name: ix_icons_generator analyze
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ix_icons_generator
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
+      - name: Cache pub
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PUB_CACHE }}
+          key: ${{ runner.os }}-pub-ix_icons_generator-${{ hashFiles('packages/ix_icons_generator/pubspec.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pub-ix_icons_generator-
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Run analyzer
+        run: dart analyze
 
   example_web_build:
     name: Example web build
-    needs: lint_and_test
+    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -71,11 +103,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ env.PUB_CACHE }}
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.yaml', 'example/pubspec.yaml') }}
+          key: ${{ runner.os }}-pub-example-${{ hashFiles('example/pubspec.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pub-
+            ${{ runner.os }}-pub-example-
 
       - name: Install dependencies
+        working-directory: example
         run: |
           flutter pub get
           flutter config --enable-web
@@ -93,7 +126,7 @@ jobs:
 
   publish_dry_run:
     name: Publish dry run
-    needs: [lint_and_test, example_web_build]
+    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator, example_web_build]
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
@@ -105,16 +138,31 @@ jobs:
         with:
           channel: ${{ env.FLUTTER_VERSION }}
 
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+
       - name: Cache pub
         uses: actions/cache@v4
         with:
           path: ${{ env.PUB_CACHE }}
-          key: ${{ runner.os }}-pub-${{ hashFiles('pubspec.yaml', 'example/pubspec.yaml') }}
+          key: ${{ runner.os }}-pub-all-${{ hashFiles('packages/*/pubspec.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-pub-
+            ${{ runner.os }}-pub-all-
 
-      - name: Install dependencies
+      - name: Install ix_flutter dependencies
+        working-directory: packages/ix_flutter
         run: flutter pub get
 
-      - name: Validate package contents
+      - name: Install ix_icons_generator dependencies
+        working-directory: packages/ix_icons_generator
+        run: dart pub get
+
+      - name: Validate ix_flutter package
+        working-directory: packages/ix_flutter
+        run: dart pub publish --dry-run
+
+      - name: Validate ix_icons_generator package
+        working-directory: packages/ix_icons_generator
         run: dart pub publish --dry-run

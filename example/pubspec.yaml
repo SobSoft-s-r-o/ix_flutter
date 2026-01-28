@@ -33,7 +33,7 @@ dependencies:
   flutter_svg: ^2.0.10+1
   go_router: ^14.1.4
   ix_flutter:
-    path: ..
+    path: ../packages/ix_flutter
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -42,6 +42,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  ix_icons_generator:
+    path: ../packages/ix_icons_generator
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

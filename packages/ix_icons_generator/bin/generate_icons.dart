@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:path/path.dart' as path;
 import 'package:args/args.dart';
 
-import '../icon_generator.dart';
+import 'package:ix_icons_generator/ix_icons_generator.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
@@ -43,7 +43,7 @@ Future<void> main(List<String> arguments) async {
     if (results['help'] as bool) {
       print('Siemens iX Icons Generator');
       print('');
-      print('Usage: dart run ix_flutter:generate_icons [options]');
+      print('Usage: dart run ix_icons_generator:generate_icons [options]');
       print('');
       print('Options:');
       print(parser.usage);

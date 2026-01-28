@@ -5,11 +5,21 @@ import 'package:path/path.dart' as path;
 import 'package:recase/recase.dart';
 import 'package:archive/archive.dart';
 
+/// Icon generator for Siemens iX Design System icons.
+///
+/// Downloads icons from the official npm package and generates
+/// Flutter-compatible icon widgets.
 class IconGenerator {
   static const _packageName = '@siemens/ix-icons';
   static const _packageVersion = '3.2.0';
   static const _npmRegistryUrl = 'https://registry.npmjs.org';
 
+  /// Generates icon assets and Dart code from the Siemens iX icons npm package.
+  ///
+  /// [outputDir] - Directory where the generated Dart file will be written
+  /// [assetsDir] - Directory where SVG assets will be copied
+  /// [flutterPackageName] - Optional package name for cross-package asset loading
+  /// [client] - Optional HTTP client for testing
   static Future<void> generateIcons({
     required String outputDir,
     required String assetsDir,
