@@ -3,6 +3,8 @@ description: "Icon generator tool for Siemens iX Design System Flutter icons. Do
 version: 1.0.0
 repository: https://github.com/SobSoft-s-r-o/ix_flutter
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
+issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
+documentation: https://github.com/SobSoft-s-r-o/ix_flutter/wiki/ix_icons
 
 environment:
   sdk: ">=3.10.0 <4.0.0"
