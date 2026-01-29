@@ -90,25 +90,36 @@ flutter pub get
 
 ## Getting Started
 
-### 1. Wrap Your App with IxTheme
+### 1. Build Your Theme with IxThemeBuilder
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 void main() {
-  runApp(const MyApp());
+  // Build Siemens iX themes
+  final lightTheme = const IxThemeBuilder(mode: ThemeMode.light).build();
+  final darkTheme = const IxThemeBuilder(mode: ThemeMode.dark).build();
+
+  runApp(MyApp(lightTheme: lightTheme, darkTheme: darkTheme));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({
+    super.key,
+    required this.lightTheme,
+    required this.darkTheme,
+  });
+
+  final ThemeData lightTheme;
+  final ThemeData darkTheme;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Siemens iX Demo',
-      theme: IxTheme.lightTheme,
-      darkTheme: IxTheme.darkTheme,
+      theme: lightTheme,
+      darkTheme: darkTheme,
       themeMode: ThemeMode.system,
       home: const HomeScreen(),
     );
@@ -286,18 +297,29 @@ import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 void main() {
-  runApp(const MyApp());
+  // Build Siemens iX themes
+  final lightTheme = const IxThemeBuilder(mode: ThemeMode.light).build();
+  final darkTheme = const IxThemeBuilder(mode: ThemeMode.dark).build();
+
+  runApp(MyApp(lightTheme: lightTheme, darkTheme: darkTheme));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({
+    super.key,
+    required this.lightTheme,
+    required this.darkTheme,
+  });
+
+  final ThemeData lightTheme;
+  final ThemeData darkTheme;
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ix_flutter Demo',
-      theme: IxTheme.lightTheme,
-      darkTheme: IxTheme.darkTheme,
+      theme: lightTheme,
+      darkTheme: darkTheme,
       themeMode: ThemeMode.system,
       home: Scaffold(
         appBar: AppBar(title: const Text('ix_flutter Components')),
