@@ -83,3 +83,7 @@ IconTheme(
 MIT License - See [LICENSE](LICENSE)
 
 Icons are subject to Siemens iX Design System licensing.
+
+---
+
+Developed by [SobSoft](https://sobsoft.sk) – Industrial HMI & Enterprise Software Engineering
