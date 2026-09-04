@@ -3,6 +3,18 @@ import 'package:ix_flutter/ix_flutter.dart';
 
 import '../helpers/upstream.dart';
 
+/// Guards spec finding T-1 (bundled fonts must actually be used by consumer
+/// apps): Flutter registers a package's bundled fonts under
+/// `packages/<package>/<family>`, so `TextStyle` must pass `package:` to
+/// resolve them. The first test below has a real upstream source
+/// (`scss/mixins/_fonts.scss`) and carries its own `@Upstream` tag. The
+/// remaining tests check our own `IxTypography` API surface — that the UI
+/// family keeps its unprefixed 1.x default, that a consumer-supplied family
+/// is never prefixed, and that `package`/`monospacePackage` round-trip
+/// correctly (including through `copyWith`) — none of which has a Siemens
+/// iX upstream counterpart (it is Flutter/Dart font-registration plumbing,
+/// not a mirrored `.ct.ts`/scss/tsx behaviour), so they carry this
+/// doc-comment instead of `@Upstream`.
 void main() {
   // Metadata annotations can only precede a declaration, not a bare `test(...)`
   // statement, so the @Upstream-tagged test is wrapped in a local function
@@ -43,5 +55,29 @@ void main() {
       monospacePackage: null,
     );
     expect(t.code.fontFamily, 'Menlo');
+  });
+
+  test('explicit monospacePackage override survives an unrelated copyWith', () {
+    final custom = IxTypography(monospacePackage: 'my_org_fonts');
+    final tweaked = custom.copyWith(fontFamily: 'Custom UI Sans');
+    expect(tweaked.monospacePackage, 'my_org_fonts');
+    expect(tweaked.code.fontFamily, 'packages/my_org_fonts/JetBrains Mono');
+  });
+
+  test('monospacePackage null opt-out survives an unrelated copyWith', () {
+    final custom = IxTypography(monospacePackage: null);
+    final tweaked = custom.copyWith(fontFamily: 'Custom UI Sans');
+    expect(tweaked.monospacePackage, isNull);
+    expect(tweaked.code.fontFamily, IxFonts.jetBrainsMono);
+  });
+
+  test('changing monospaceFontFamily via copyWith re-derives the package', () {
+    final custom = IxTypography(
+      monospaceFontFamily: 'Menlo',
+      monospacePackage: null,
+    );
+    final tweaked = custom.copyWith(monospaceFontFamily: IxFonts.jetBrainsMono);
+    expect(tweaked.monospacePackage, IxFonts.packageName);
+    expect(tweaked.code.fontFamily, 'packages/ix_flutter/JetBrains Mono');
   });
 }

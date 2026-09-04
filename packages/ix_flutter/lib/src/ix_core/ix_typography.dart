@@ -383,11 +383,18 @@ class IxTypography {
       monospaceFontFamilyFallback:
           monospaceFontFamilyFallback ?? this.monospaceFontFamilyFallback,
       package: package ?? this.package,
-      // Forwarded as-is: when the caller omits `monospacePackage`, this is
-      // still the shared `_defaultMonospacePackage` sentinel, so the factory
-      // re-runs auto-resolution against the (possibly just-changed) effective
-      // `monospaceFontFamily` instead of carrying over a stale prefix.
-      monospacePackage: monospacePackage,
+      // When the caller omits `monospacePackage` (it is still the shared
+      // `_defaultMonospacePackage` sentinel), preserve `this.monospacePackage`
+      // verbatim — UNLESS `monospaceFontFamily` is also changing in this same
+      // call, in which case forward the sentinel through so the factory
+      // re-derives the package from the new effective family. When the
+      // caller passes `monospacePackage` explicitly (including `null`), that
+      // value always wins.
+      monospacePackage: identical(monospacePackage, _defaultMonospacePackage)
+          ? (monospaceFontFamily != null
+                ? _defaultMonospacePackage
+                : this.monospacePackage)
+          : monospacePackage,
     );
   }
 }
