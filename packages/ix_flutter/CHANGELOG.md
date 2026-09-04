@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - `IxBlind` now honours `IxThemeBuilder(typography:)` instead of always falling back to the default typography
 - `neutralHover` (light), `primaryActive`/`secondaryActive`/`secondaryHover` (dark) aligned with iX 5.2.1
+- Code typography now loads the bundled JetBrains Mono (package-prefixed font family)
 
 ---
 

@@ -2,6 +2,9 @@
 class IxFonts {
   IxFonts._();
 
+  /// Názov balíka pre `TextStyle.package` pri fontoch dodaných knižnicou.
+  static const String packageName = 'ix_flutter';
+
   static const String robotoMono = 'Roboto Mono';
   static const List<String> robotoMonoFallback = ['Arial', 'Helvetica'];
 

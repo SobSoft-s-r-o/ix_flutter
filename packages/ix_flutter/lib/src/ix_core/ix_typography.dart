@@ -29,6 +29,12 @@ enum IxTypographyVariant {
   codeLg,
 }
 
+/// Sentinel default for [IxTypography.new]'s and [IxTypography.copyWith]'s
+/// `monospacePackage` parameter, distinguishing "caller didn't pass this
+/// argument" (auto-resolve from the effective monospace font family) from an
+/// explicit `monospacePackage: null` (force-disable the package prefix).
+const Object _defaultMonospacePackage = Object();
+
 /// Precomputed Siemens IX typography scale for Flutter widgets.
 ///
 /// Provide a custom [fontFamily] (and optionally [monospaceFontFamily]) to
@@ -39,6 +45,8 @@ class IxTypography {
     List<String>? fontFamilyFallback,
     String? monospaceFontFamily,
     List<String>? monospaceFontFamilyFallback,
+    String? package,
+    Object? monospacePackage = _defaultMonospacePackage,
   }) {
     final resolvedFontFamily = fontFamily ?? IxFonts.robotoMono;
     final resolvedSansFallback =
@@ -47,12 +55,20 @@ class IxTypography {
         monospaceFontFamily ?? IxFonts.jetBrainsMono;
     final resolvedMonospaceFallback =
         monospaceFontFamilyFallback ?? IxFonts.jetBrainsMonoFallback;
+    final resolvedMonospacePackage =
+        identical(monospacePackage, _defaultMonospacePackage)
+        ? (resolvedMonospaceFontFamily == IxFonts.jetBrainsMono
+              ? IxFonts.packageName
+              : null)
+        : monospacePackage as String?;
 
     return IxTypography._(
       fontFamily: resolvedFontFamily,
       fontFamilyFallback: resolvedSansFallback,
       monospaceFontFamily: resolvedMonospaceFontFamily,
       monospaceFontFamilyFallback: resolvedMonospaceFallback,
+      package: package,
+      monospacePackage: resolvedMonospacePackage,
     );
   }
 
@@ -61,15 +77,19 @@ class IxTypography {
     required this.fontFamilyFallback,
     required this.monospaceFontFamily,
     required this.monospaceFontFamilyFallback,
+    required this.package,
+    required this.monospacePackage,
   }) : label = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms0,
          lineHeight: _lineHeightSm,
        ),
        labelXs = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _msMinus2,
          lineHeight: _lineHeightSm,
          letterSpacingEm: _letterSpacingXxl,
@@ -77,12 +97,14 @@ class IxTypography {
        labelSm = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _msMinus1,
          lineHeight: _lineHeightSm,
        ),
        labelLg = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms1,
          lineHeight: _lineHeightSm,
          letterSpacingEm: _letterSpacingLg,
@@ -90,29 +112,34 @@ class IxTypography {
        body = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms0,
          lineHeight: _lineHeightMd,
        ),
        bodyXs = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _msMinus2,
          letterSpacingEm: _letterSpacingXxl,
        ),
        bodySm = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _msMinus1,
        ),
        bodyLg = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms1,
          letterSpacingEm: _letterSpacingLg,
        ),
        display = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms3,
          lineHeight: _lineHeightXs,
          letterSpacingEm: _letterSpacingMd,
@@ -120,6 +147,7 @@ class IxTypography {
        displayXs = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms1,
          lineHeight: _lineHeightXs,
          letterSpacingEm: _letterSpacingSm,
@@ -127,6 +155,7 @@ class IxTypography {
        displaySm = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms2,
          lineHeight: _lineHeightXs,
          letterSpacingEm: _letterSpacingLg,
@@ -134,6 +163,7 @@ class IxTypography {
        displayLg = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms4,
          lineHeight: _lineHeightXs,
          letterSpacingEm: _letterSpacingMd,
@@ -141,6 +171,7 @@ class IxTypography {
        displayXl = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms5,
          lineHeight: _lineHeightXs,
          letterSpacingEm: _letterSpacingSm,
@@ -149,6 +180,7 @@ class IxTypography {
        displayXxl = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms6,
          lineHeight: _lineHeightXs,
          letterSpacingEm: _letterSpacingSm,
@@ -157,18 +189,21 @@ class IxTypography {
        h6 = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _msMinus1,
          fontWeight: FontWeight.w700,
        ),
        h5 = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms0,
          fontWeight: FontWeight.w700,
        ),
        h4 = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms1,
          letterSpacingEm: _letterSpacingLg,
          fontWeight: FontWeight.w700,
@@ -176,6 +211,7 @@ class IxTypography {
        h3 = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms2,
          letterSpacingEm: _letterSpacingLg,
          fontWeight: FontWeight.w700,
@@ -183,6 +219,7 @@ class IxTypography {
        h2 = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms3,
          lineHeight: _lineHeightMd,
          letterSpacingEm: _letterSpacingMd,
@@ -191,6 +228,7 @@ class IxTypography {
        h1 = _style(
          fontFamily: fontFamily,
          fontFamilyFallback: fontFamilyFallback,
+         package: package,
          fontSize: _ms4,
          lineHeight: _lineHeightSm,
          letterSpacingEm: _letterSpacingMd,
@@ -199,17 +237,20 @@ class IxTypography {
        code = _style(
          fontFamily: monospaceFontFamily,
          fontFamilyFallback: monospaceFontFamilyFallback,
+         package: monospacePackage,
          fontSize: _ms0,
          letterSpacingEm: _letterSpacingMd,
        ),
        codeSm = _style(
          fontFamily: monospaceFontFamily,
          fontFamilyFallback: monospaceFontFamilyFallback,
+         package: monospacePackage,
          fontSize: _msMinus1,
        ),
        codeLg = _style(
          fontFamily: monospaceFontFamily,
          fontFamilyFallback: monospaceFontFamilyFallback,
+         package: monospacePackage,
          fontSize: _ms1,
          letterSpacingEm: _letterSpacingMd,
        );
@@ -218,6 +259,16 @@ class IxTypography {
   final List<String> fontFamilyFallback;
   final String monospaceFontFamily;
   final List<String> monospaceFontFamilyFallback;
+
+  /// Package prefix applied to [fontFamily] via `TextStyle.package`, or
+  /// `null` when [fontFamily] is not shipped as a bundled asset (the 1.x
+  /// default, `IxFonts.robotoMono`, is never prefixed).
+  final String? package;
+
+  /// Package prefix applied to [monospaceFontFamily] via `TextStyle.package`.
+  /// Defaults to [IxFonts.packageName] when [monospaceFontFamily] resolves to
+  /// [IxFonts.jetBrainsMono] (the bundled asset), and to `null` otherwise.
+  final String? monospacePackage;
 
   final TextStyle label;
   final TextStyle labelXs;
@@ -322,6 +373,8 @@ class IxTypography {
     List<String>? fontFamilyFallback,
     String? monospaceFontFamily,
     List<String>? monospaceFontFamilyFallback,
+    String? package,
+    Object? monospacePackage = _defaultMonospacePackage,
   }) {
     return IxTypography(
       fontFamily: fontFamily ?? this.fontFamily,
@@ -329,6 +382,12 @@ class IxTypography {
       monospaceFontFamily: monospaceFontFamily ?? this.monospaceFontFamily,
       monospaceFontFamilyFallback:
           monospaceFontFamilyFallback ?? this.monospaceFontFamilyFallback,
+      package: package ?? this.package,
+      // Forwarded as-is: when the caller omits `monospacePackage`, this is
+      // still the shared `_defaultMonospacePackage` sentinel, so the factory
+      // re-runs auto-resolution against the (possibly just-changed) effective
+      // `monospaceFontFamily` instead of carrying over a stale prefix.
+      monospacePackage: monospacePackage,
     );
   }
 }
@@ -361,10 +420,12 @@ TextStyle _style({
   FontWeight fontWeight = FontWeight.w400,
   required String fontFamily,
   required List<String> fontFamilyFallback,
+  String? package,
 }) {
   return TextStyle(
     fontFamily: fontFamily,
     fontFamilyFallback: fontFamilyFallback,
+    package: package,
     fontSize: fontSize,
     height: lineHeight,
     fontWeight: fontWeight,
