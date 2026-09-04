@@ -513,5 +513,4 @@ class IxClassicDarkColors {
     IxThemeColorToken.weakText: weakText,
     IxThemeColorToken.xWeakBdr: xWeakBdr,
   };
-
 }

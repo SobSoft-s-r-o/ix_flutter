@@ -6,9 +6,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  schedule: [{cron: '0 5 * * 1'}]
 
 env:
-  FLUTTER_VERSION: stable
+  FLUTTER_VERSION: 3.44.6
+  FLUTTER_CHANNEL: stable
   PUB_CACHE: ~/.pub-cache
 
 jobs:
@@ -28,7 +30,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
 
       - name: Cache pub
         uses: actions/cache@v4
@@ -86,9 +90,46 @@ jobs:
       - name: Run analyzer
         run: dart analyze
 
+  format:
+    name: dart format check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Format ix_flutter
+        working-directory: packages/ix_flutter
+        run: dart format --output=none --set-exit-if-changed lib test example
+      - name: Format ix_icons_generator
+        working-directory: packages/ix_icons_generator
+        run: dart format --output=none --set-exit-if-changed lib bin
+      - name: Format example
+        working-directory: example
+        run: dart format --output=none --set-exit-if-changed lib test
+
+  example_analyze_test:
+    name: example analyze + test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: example
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
   example_web_build:
     name: Example web build
-    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator]
+    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator, format, example_analyze_test]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -97,7 +138,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
 
       - name: Cache pub
         uses: actions/cache@v4
@@ -126,9 +169,8 @@ jobs:
 
   publish_dry_run:
     name: Publish dry run
-    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator, example_web_build]
+    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator, format, example_analyze_test]
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -136,7 +178,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
 
       - name: Set up Dart
         uses: dart-lang/setup-dart@v1
@@ -166,3 +210,19 @@ jobs:
       - name: Validate ix_icons_generator package
         working-directory: packages/ix_icons_generator
         run: dart pub publish --dry-run
+
+  latest_stable_smoke:
+    name: latest stable smoke (scheduled)
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ix_flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test

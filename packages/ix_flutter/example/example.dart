@@ -14,11 +14,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-    required this.lightTheme,
-    required this.darkTheme,
-  });
+  const MyApp({super.key, required this.lightTheme, required this.darkTheme});
 
   final ThemeData lightTheme;
   final ThemeData darkTheme;
@@ -41,9 +37,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('ix_flutter Example'),
-      ),
+      appBar: AppBar(title: const Text('ix_flutter Example')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
