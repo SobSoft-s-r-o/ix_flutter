@@ -312,3 +312,10 @@ Thank you for contributing to ix_flutter! 🎉
 
 **Last Updated**: January 2026
 **License**: MIT
+
+## Testing
+
+- `pumpIx()` (`packages/ix_flutter/test/helpers/pump_ix.dart`) je štandardný wrapper: IxTheme, viewport, text scale, `disableAnimations: true`.
+- Každý test cituje upstream test alebo zdroj cez `@Upstream('...')`.
+- Červené matice (`test/a11y`, `test/responsive`, `test/rtl`) používajú `skip: 'IXF-xxx – <plán/úloha>'`; skip sa odstraňuje v úlohe, ktorá nález opravuje.
+- Goldeny: pozri `packages/ix_flutter/test/golden/README.md`.
