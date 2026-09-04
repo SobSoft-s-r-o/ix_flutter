@@ -316,6 +316,6 @@ Thank you for contributing to ix_flutter! 🎉
 ## Testing
 
 - `pumpIx()` (`packages/ix_flutter/test/helpers/pump_ix.dart`) je štandardný wrapper: IxTheme, viewport, text scale, `disableAnimations: true`.
-- Každý test cituje upstream test alebo zdroj cez `@Upstream('...')`.
-- Červené matice (`test/a11y`, `test/responsive`, `test/rtl`) používajú `skip: 'IXF-xxx – <plán/úloha>'`; skip sa odstraňuje v úlohe, ktorá nález opravuje.
+- Testy, ktoré zrkadlia konkrétny upstream `.ct.ts` test alebo scss/tsx zdroj, ho citujú cez `@Upstream('...')` (`test/helpers/upstream.dart`); ak priamy náprotivok neexistuje (napr. matice šírky/text scale a RTL), súbor namiesto toho nesie doc-komentár nad `void main()` s ID nálezu a úlohou, ktorá ho rieši.
+- Červené matice (`test/a11y`, `test/responsive`, `test/rtl`) používajú `skip: true` s trailing komentárom `// IXF-xxx – <plán/úloha>` (`skip` je v `flutter_test` typu `bool?`, nie `String`); skip sa odstraňuje v úlohe, ktorá nález opravuje.
 - Goldeny: pozri `packages/ix_flutter/test/golden/README.md`.

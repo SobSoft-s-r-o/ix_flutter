@@ -6,6 +6,13 @@ import '../helpers/pump_ix.dart';
 
 /// Matica šírok × text scale. Widgety, ktoré dnes pretekajú, sú označené
 /// skip s ID nálezu; po oprave sa skip odstráni.
+///
+/// Traceability: upstream `@siemens/ix` nemá pre túto maticu šírok × text
+/// scale priamy Playwright `.ct.ts` ani scss/tsx náprotivok (CSS breakpointy
+/// vs. Flutter `LayoutBuilder` sa nedajú mapovať 1:1), preto jednotlivé testy
+/// necitujú `@Upstream`. Matica stráži nález IXF-024 (WCAG 1.4.4 Resize
+/// text) pre `IxDropdownButton`; skip sa odstráni v úlohe A-4/A-2, ktorá
+/// spraví jeho label flexibilným.
 void main() {
   const widths = [320.0, 360.0, 600.0, 768.0, 1024.0, 1440.0];
   const scales = [1.0, 1.3, 2.0];
