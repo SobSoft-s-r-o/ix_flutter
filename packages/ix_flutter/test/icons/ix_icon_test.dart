@@ -63,6 +63,7 @@ void main() {
           IxIcon(IxIconData.material(Icons.close), semanticLabel: 'Close'),
           IxIcon(
             IxIconData.material(Icons.info),
+            semanticLabel: 'Info',
             excludeFromSemantics: true,
             key: Key('hidden'),
           ),
@@ -70,6 +71,7 @@ void main() {
       ),
     );
     expect(find.bySemanticsLabel('Close'), findsOneWidget);
+    expect(find.bySemanticsLabel('Info'), findsNothing);
     expect(tester.getSemantics(find.byKey(const Key('hidden'))).label, isEmpty);
     handle.dispose();
   });
