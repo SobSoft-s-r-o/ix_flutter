@@ -3,6 +3,7 @@ import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart';
+import 'package:ix_flutter/src/ix_theme/ix_theme_builder.dart';
 
 export 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart'
     show IxBlindVariant;
@@ -149,8 +150,7 @@ class _IxBlindHeader extends StatefulWidget {
 class _IxBlindHeaderState extends State<_IxBlindHeader> {
   @override
   Widget build(BuildContext context) {
-    final themeData = Theme.of(context);
-    final ixTypography = themeData.extension<IxTypography>() ?? IxTypography();
+    final ixTypography = IxTheme.maybeOf(context)?.typography ?? IxTypography();
 
     // Determine foreground color
     final foregroundColor = widget.style.foreground;

@@ -374,6 +374,27 @@ class IxTheme extends ThemeExtension<IxTheme> {
     required this.typography,
   });
 
+  /// Resolves the [IxTheme] registered on the closest [Theme], or `null` if
+  /// the [ThemeData] wasn't built by [IxThemeBuilder].
+  static IxTheme? maybeOf(BuildContext context) =>
+      Theme.of(context).extension<IxTheme>();
+
+  /// Resolves the [IxTheme] registered on the closest [Theme].
+  ///
+  /// Asserts with guidance if the context's [Theme] was not built by
+  /// [IxThemeBuilder]; wrap the app with
+  /// `MaterialApp(theme: IxThemeBuilder(...).build())`.
+  static IxTheme of(BuildContext context) {
+    final theme = maybeOf(context);
+    assert(
+      theme != null,
+      'IxTheme.of() called with a context whose Theme was not built by '
+      'IxThemeBuilder. Wrap your app with '
+      'MaterialApp(theme: IxThemeBuilder(...).build()).',
+    );
+    return theme!;
+  }
+
   final IxThemeFamily family;
   final ThemeMode mode;
   final Brightness brightness;

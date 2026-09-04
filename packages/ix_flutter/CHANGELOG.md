@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Public exports for `IxPaginationBar` and `IxBottomSheetTheme` from the package barrel
+- `IxTheme.of`/`IxTheme.maybeOf` static accessors for reading the Siemens IX theme extension from a `BuildContext`
+
 ### Fixed
+- `IxBlind` now honours `IxThemeBuilder(typography:)` instead of always falling back to the default typography
 - `neutralHover` (light), `primaryActive`/`secondaryActive`/`secondaryHover` (dark) aligned with iX 5.2.1
 
 ---

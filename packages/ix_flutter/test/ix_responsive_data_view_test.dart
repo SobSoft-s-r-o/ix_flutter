@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
-import 'package:ix_flutter/src/widgets/ix_pagination_bar.dart';
 
 class TestItem {
   final int id;
