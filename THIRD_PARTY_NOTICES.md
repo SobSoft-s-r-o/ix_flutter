@@ -30,10 +30,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-## Fonts (SIL Open Font License)
+## Fonts (SIL Open Font License 1.1)
 
-These fonts are included under the SIL Open Font License; see the accompanying `OFL.txt` files in their folders:
-- JetBrains Mono — assets/fonts/JetBrains_Mono/OFL.txt
-- Roboto Mono — assets/fonts/Roboto_Mono/OFL.txt
-- Play — assets/fonts/Play/OFL.txt
-- Work Sans — assets/fonts/Work_Sans/OFL.txt
+These fonts are bundled and declared in `packages/ix_flutter/pubspec.yaml`; the full license text is in the `OFL.txt` next to each family:
+- Work Sans (Copyright 2019 The Work Sans Project Authors) — `assets/fonts/Work_Sans/OFL.txt`. Used as the OFL substitute for the proprietary Siemens Sans; it is not Siemens Sans and not a pixel-identical replacement.
+- JetBrains Mono — `assets/fonts/JetBrains_Mono/OFL.txt` (code styles).
+- Roboto Mono — `assets/fonts/Roboto_Mono/OFL.txt` (deprecated default UI font, removed in 2.0).
+- Play — `assets/fonts/Play/OFL.txt` (undeclared, removed in 2.0).

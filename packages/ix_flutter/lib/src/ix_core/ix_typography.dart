@@ -27,6 +27,9 @@ enum IxTypographyVariant {
   code,
   codeSm,
   codeLg,
+  buttonLabel,
+  caption,
+  textDefault,
 }
 
 /// Sentinel default for [IxTypography.new]'s and [IxTypography.copyWith]'s
@@ -48,9 +51,12 @@ class IxTypography {
     String? package,
     Object? monospacePackage = _defaultMonospacePackage,
   }) {
+    // ignore: deprecated_member_use_from_same_package
     final resolvedFontFamily = fontFamily ?? IxFonts.robotoMono;
     final resolvedSansFallback =
-        fontFamilyFallback ?? IxFonts.robotoMonoFallback;
+        fontFamilyFallback ??
+        // ignore: deprecated_member_use_from_same_package
+        IxFonts.robotoMonoFallback;
     final resolvedMonospaceFontFamily =
         monospaceFontFamily ?? IxFonts.jetBrainsMono;
     final resolvedMonospaceFallback =
@@ -253,6 +259,29 @@ class IxTypography {
          package: monospacePackage,
          fontSize: _ms1,
          letterSpacingEm: _letterSpacingMd,
+       ),
+       buttonLabel = _style(
+         fontFamily: fontFamily,
+         fontFamilyFallback: fontFamilyFallback,
+         package: package,
+         fontSize: _ms0,
+         lineHeight: _lineHeightLegacyDefault,
+         fontWeight: FontWeight.w700,
+       ),
+       caption = _style(
+         fontFamily: fontFamily,
+         fontFamilyFallback: fontFamilyFallback,
+         package: package,
+         fontSize: _msMinus1,
+         lineHeight: _lineHeightLg,
+         fontWeight: FontWeight.w700,
+       ),
+       textDefault = _style(
+         fontFamily: fontFamily,
+         fontFamilyFallback: fontFamilyFallback,
+         package: package,
+         fontSize: _ms0,
+         lineHeight: _lineHeightLegacyDefault,
        );
 
   final String fontFamily;
@@ -293,6 +322,16 @@ class IxTypography {
   final TextStyle code;
   final TextStyle codeSm;
   final TextStyle codeLg;
+
+  /// Legacy iX `text-default-title` format (14/700/1.429), used for button
+  /// labels.
+  final TextStyle buttonLabel;
+
+  /// Legacy iX caption format (12/700/1.5).
+  final TextStyle caption;
+
+  /// Legacy iX `text-default` format (14/400/1.429).
+  final TextStyle textDefault;
 
   /// Returns the [TextStyle] for a given [variant].
   TextStyle resolve(IxTypographyVariant variant) {
@@ -343,6 +382,12 @@ class IxTypography {
         return codeSm;
       case IxTypographyVariant.codeLg:
         return codeLg;
+      case IxTypographyVariant.buttonLabel:
+        return buttonLabel;
+      case IxTypographyVariant.caption:
+        return caption;
+      case IxTypographyVariant.textDefault:
+        return textDefault;
     }
   }
 
@@ -414,6 +459,10 @@ const double _lineHeightSm = 1.2;
 const double _lineHeightMd = 1.43;
 const double _lineHeightLg = 1.5;
 
+/// Legacy iX `--theme-line-height-default` (`scss/theme/core/_common.scss`),
+/// used by [IxTypography.buttonLabel] and [IxTypography.textDefault].
+const double _lineHeightLegacyDefault = 1.429;
+
 const double _letterSpacingLg = 0.006;
 const double _letterSpacingMd = 0;
 const double _letterSpacingSm = -0.006;
@@ -430,12 +479,24 @@ TextStyle _style({
   String? package,
 }) {
   return TextStyle(
-    fontFamily: fontFamily,
+    // `TextStyle.package` would prefix every entry of [fontFamilyFallback]
+    // with `packages/<package>/` too, which is wrong: the fallback families
+    // (e.g. Arial, Helvetica, Courier New, monospace) are system fonts, not
+    // assets bundled by this package. So the `packages/<package>/` prefix
+    // is applied to [fontFamily] here directly, and `package` is left
+    // unset on the [TextStyle] itself so [fontFamilyFallback] passes
+    // through unprefixed.
+    fontFamily: package == null ? fontFamily : 'packages/$package/$fontFamily',
     fontFamilyFallback: fontFamilyFallback,
-    package: package,
     fontSize: fontSize,
     height: lineHeight,
     fontWeight: fontWeight,
     letterSpacing: letterSpacingEm == 0 ? 0 : letterSpacingEm * fontSize,
+    // Upstream `scss/mixins/_fonts.scss:22` disables ligatures and
+    // contextual ligatures on every Siemens IX typography variant.
+    fontFeatures: const [
+      FontFeature.disable('liga'),
+      FontFeature.disable('clig'),
+    ],
   );
 }

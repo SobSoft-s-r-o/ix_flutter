@@ -5,7 +5,32 @@ class IxFonts {
   /// Názov balíka pre `TextStyle.package` pri fontoch dodaných knižnicou.
   static const String packageName = 'ix_flutter';
 
+  /// Work Sans, the SIL Open Font License substitute for the proprietary
+  /// Siemens Sans. Bundled as a static asset; pass
+  /// `package: IxFonts.packageName` to `IxTypography`'s `package`
+  /// parameter to resolve it via the package-prefixed family name. It is
+  /// opt-in in 1.x and becomes the 2.0 default UI font.
+  static const String workSans = 'Work Sans';
+
+  /// Fallback chain for UI typefaces, used once a family such as
+  /// [workSans] or the (separately licensed) Siemens Sans is in use.
+  static const List<String> uiFontFamilyFallback = [
+    'Siemens Sans',
+    'Arial',
+    'Helvetica',
+    'sans-serif',
+  ];
+
+  @Deprecated(
+    'Roboto Mono stops being the default UI font in 2.0; use '
+    'IxFonts.workSans or IxTypography(fontFamily:)',
+  )
   static const String robotoMono = 'Roboto Mono';
+
+  @Deprecated(
+    'Roboto Mono stops being the default UI font in 2.0; use '
+    'IxFonts.workSans or IxTypography(fontFamily:)',
+  )
   static const List<String> robotoMonoFallback = ['Arial', 'Helvetica'];
 
   static const String jetBrainsMono = 'JetBrains Mono';

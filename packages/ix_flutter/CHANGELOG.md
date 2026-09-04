@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Public exports for `IxPaginationBar` and `IxBottomSheetTheme` from the package barrel
 - `IxTheme.of`/`IxTheme.maybeOf` static accessors for reading the Siemens IX theme extension from a `BuildContext`
+- Work Sans (OFL) declared as an opt-in bundled UI font, `IxFonts.workSans`, `buttonLabel`/`caption`/`textDefault` styles, `liga`/`clig` disabled on every typography variant
+
+### Deprecated
+- `IxFonts.robotoMono` as the default UI font (2.0 switches to Work Sans)
 
 ### Fixed
 - `IxBlind` now honours `IxThemeBuilder(typography:)` instead of always falling back to the default typography

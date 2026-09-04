@@ -93,3 +93,15 @@ flutter:
         - asset: assets/fonts/Roboto_Mono/static/RobotoMono-BoldItalic.ttf
           weight: 700
           style: italic
+    - family: Work Sans
+      fonts:
+        - asset: assets/fonts/Work_Sans/static/WorkSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Work_Sans/static/WorkSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Work_Sans/static/WorkSans-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Work_Sans/static/WorkSans-BoldItalic.ttf
+          weight: 700
+          style: italic
