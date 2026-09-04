@@ -10,7 +10,7 @@ This Flutter package provides widgets based on the Siemens iX Design System. The
 
 Icons come from the official `@siemens/ix-icons` npm package (MIT License, Copyright (c) 2022 Siemens AG). See `UPSTREAM.md` for the exact version, tag, commit and tarball checksum.
 
-- The library bundles a minimal internal set (28 icons) required by its own widgets (see `packages/ix_flutter/assets/icons/internal/NOTICE`). Bundling is subject to the LEGAL REVIEW gate documented in `UPSTREAM.md`.
+- Once the LEGAL REVIEW gate documented in `UPSTREAM.md` is passed, the library will bundle a minimal internal set (28 icons) required by its own widgets, with the MIT notice in `packages/ix_flutter/assets/icons/internal/NOTICE`; until then library widgets fall back to Material glyphs through `IxIconResolver.material()`.
 - The full catalogue (1 479 icons in 3.5.0) is optional and generated into your app with `dart run ix_icons_generator:generate_icons`.
 - Redistribution keeps the MIT copyright/permission notice and `READMEOSS.html`. Siemens trademarks and brand guidelines are separate from the MIT copyright license.
 
