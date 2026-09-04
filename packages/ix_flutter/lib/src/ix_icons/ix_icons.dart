@@ -1,14 +1,8 @@
-// GENERATED STUB FILE
+// INTERNAL PLACEHOLDER (deprecated; removed in 2.0)
 //
-// IMPORTANT: Icons are NO LONGER bundled with ix_flutter library.
-// Due to licensing restrictions, you must generate icons in your project.
-//
-// To use Siemens iX icons:
-// 1. Add library to pubspec.yaml dev_dependencies
-// 2. Run: dart run ix_flutter:generate_icons
-// 3. Import: import 'package:your_app/ix_icons.dart';
-//
-// See documentation: doc/ix_icons.md
+// Library widgets resolve icons through IxIconResolver (see ix_icon_resolver.dart).
+// Icons for apps are generated with: dart run ix_icons_generator:generate_icons
+// License and upstream version: see UPSTREAM.md (@siemens/ix-icons is MIT).
 
 import 'package:flutter/material.dart';
 

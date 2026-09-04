@@ -6,34 +6,13 @@ This Flutter package provides widgets based on the Siemens iX Design System. The
 
 ## Icon Licensing
 
-### Icon Source
+### Icon Source and License
 
-Icons are sourced from the official **@siemens/ix-icons** npm package maintained by Siemens AG. These icons are NOT bundled with this package for licensing and distribution compliance reasons.
+Icons come from the official `@siemens/ix-icons` npm package (MIT License, Copyright (c) 2022 Siemens AG). See `UPSTREAM.md` for the exact version, tag, commit and tarball checksum.
 
-Package: https://www.npmjs.com/package/@siemens/ix-icons
-
-### Icon Generation Process
-
-Users must generate icons locally using the integrated icon generator:
-
-```bash
-dart run ix_flutter:generate_icons
-```
-
-This command:
-1. Downloads icons from the official Siemens source (`@siemens/ix-icons` npm package)
-2. Processes them into Flutter-compatible SVG format
-3. Stores them in your application's assets directory
-
-### Siemens iX Design System Terms
-
-The Siemens iX Design System is owned and maintained by Siemens AG. When using icons from this system, you must comply with:
-
-1. **Official Attribution**: Icons are provided by Siemens iX Design System
-2. **Usage Rights**: Icons are provided for use in applications implementing Siemens iX Design System
-3. **Restrictions**: Icons are subject to the Siemens iX Design System terms and conditions
-
-For complete terms, visit: https://ix.siemens.io
+- The library bundles a minimal internal set (28 icons) required by its own widgets (see `packages/ix_flutter/assets/icons/internal/NOTICE`). Bundling is subject to the LEGAL REVIEW gate documented in `UPSTREAM.md`.
+- The full catalogue (1 479 icons in 3.5.0) is optional and generated into your app with `dart run ix_icons_generator:generate_icons`.
+- Redistribution keeps the MIT copyright/permission notice and `READMEOSS.html`. Siemens trademarks and brand guidelines are separate from the MIT copyright license.
 
 ### Visual Language and Guidelines
 

@@ -4,7 +4,7 @@ This project bundles third-party assets under their respective licenses. Keep th
 
 ## Icons: @siemens/ix-icons (MIT)
 
-Version: 3.2.0 (downloaded via the icon generator)
+Version: 3.5.0 (tag v3.5.0, commit c46e1b13f7ccdaf66e4fcf2261f3765c55d45557, tarball sha1 be50b3f933c8a5e210f980245a3df9825e8bcb7b). The Siemens third-party disclosure `READMEOSS.html` from the package is reproduced in `packages/ix_flutter/assets/icons/internal/READMEOSS.html` once the internal icon set is bundled.
 
 ```
 MIT License
