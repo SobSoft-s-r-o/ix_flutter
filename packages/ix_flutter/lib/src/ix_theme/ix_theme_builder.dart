@@ -381,18 +381,25 @@ class IxTheme extends ThemeExtension<IxTheme> {
 
   /// Resolves the [IxTheme] registered on the closest [Theme].
   ///
-  /// Asserts with guidance if the context's [Theme] was not built by
-  /// [IxThemeBuilder]; wrap the app with
+  /// Throws a [FlutterError] with guidance if the context's [Theme] was not
+  /// built by [IxThemeBuilder]; wrap the app with
   /// `MaterialApp(theme: IxThemeBuilder(...).build())`.
   static IxTheme of(BuildContext context) {
     final theme = maybeOf(context);
-    assert(
-      theme != null,
-      'IxTheme.of() called with a context whose Theme was not built by '
-      'IxThemeBuilder. Wrap your app with '
-      'MaterialApp(theme: IxThemeBuilder(...).build()).',
-    );
-    return theme!;
+    if (theme == null) {
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+          'IxTheme.of() called with a context that does not contain an '
+          'IxThemeBuilder theme.',
+        ),
+        ErrorDescription(
+          'Build your ThemeData with IxThemeBuilder(...).build() and pass '
+          'it to MaterialApp(theme: ...).',
+        ),
+        context.describeElement('The context used was'),
+      ]);
+    }
+    return theme;
   }
 
   final IxThemeFamily family;

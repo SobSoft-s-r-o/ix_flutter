@@ -46,7 +46,7 @@ void main() {
           home: Builder(
             builder: (c) {
               expect(IxTheme.maybeOf(c), isNull);
-              expect(() => IxTheme.of(c), throwsAssertionError);
+              expect(() => IxTheme.of(c), throwsFlutterError);
               return const SizedBox();
             },
           ),
