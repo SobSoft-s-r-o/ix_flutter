@@ -321,6 +321,15 @@ class IxRadioTheme extends ThemeExtension<IxRadioTheme> {
       if (states.contains(WidgetState.disabled)) {
         return Colors.transparent;
       }
+      if (states.contains(WidgetState.focused)) {
+        // Material's Radio can't paint an outline outside its own circle
+        // (unlike Checkbox/Button, which have a `side`), so a *selected*
+        // radio's focus indicator is this halo instead: it applies
+        // regardless of `selected`, on top of the unselected-only fill
+        // recolour above (which already turns the ring itself focusBdr
+        // when unselected).
+        return color(IxThemeColorToken.focusBdr).withValues(alpha: 0.3);
+      }
       if (states.contains(WidgetState.pressed)) {
         return color(IxThemeColorToken.component1Active);
       }
