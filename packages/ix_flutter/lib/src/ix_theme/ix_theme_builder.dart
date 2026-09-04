@@ -189,7 +189,11 @@ class IxThemeBuilder {
       ),
       cardColor: palette[IxThemeColorToken.color3],
       dividerColor: palette[IxThemeColorToken.softBdr],
-      focusColor: palette[IxThemeColorToken.focusBdr],
+      // Material's built-in focus overlay is an opaque tint; the visible
+      // focus affordance is the 1px `focusBdr` outline painted by
+      // IxFocusRing and the state-based borders on checkbox/radio/button
+      // instead (WCAG 2.4.7), so this stays transparent.
+      focusColor: Colors.transparent,
       hoverColor: palette[IxThemeColorToken.color1Hover],
       highlightColor: palette[IxThemeColorToken.component1Hover],
       splashColor: palette[IxThemeColorToken.component1],

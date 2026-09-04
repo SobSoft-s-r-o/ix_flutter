@@ -384,10 +384,24 @@ class IxCheckboxTheme extends ThemeExtension<IxCheckboxTheme> {
           width: IxCommonGeometry.borderWidthDefault,
         ),
       ),
-      side: BorderSide(
-        color: standard.unchecked.borderColor,
-        width: IxCommonGeometry.borderWidthDefault,
-      ),
+      side: WidgetStateBorderSide.resolveWith((states) {
+        if (states.contains(WidgetState.focused)) {
+          return BorderSide(
+            color: color(IxThemeColorToken.focusBdr),
+            width: IxCommonGeometry.focusBorderThickness,
+          );
+        }
+        if (states.contains(WidgetState.selected)) {
+          // Checked: rely on the fill color instead of an extra outline,
+          // matching the previous static `side` (which Flutter suppressed
+          // for selected states).
+          return null;
+        }
+        return BorderSide(
+          color: standard.unchecked.borderColor,
+          width: IxCommonGeometry.borderWidthDefault,
+        );
+      }),
       fillColor: WidgetStateProperty.resolveWith(resolveBackground),
       checkColor: WidgetStateProperty.resolveWith(resolveIcon),
       overlayColor: overlay,

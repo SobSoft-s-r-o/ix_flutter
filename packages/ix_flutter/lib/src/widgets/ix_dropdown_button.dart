@@ -99,6 +99,68 @@ class _IxDropdownMenuContentState extends State<_IxDropdownMenuContent>
   }
 }
 
+/// A single dropdown menu row that shows a 1px `focusBdr` [IxFocusRing] on
+/// keyboard focus.
+///
+/// Temporary: Task A-2 rewrites this overlay's keyboard contract wholesale
+/// and keeps this ring.
+class _IxDropdownMenuItemTile<T> extends StatefulWidget {
+  const _IxDropdownMenuItemTile({
+    required this.item,
+    required this.textColor,
+    required this.hoverColor,
+    required this.onTap,
+  });
+
+  final IxDropdownMenuItem<T> item;
+  final Color textColor;
+  final Color? hoverColor;
+  final VoidCallback? onTap;
+
+  @override
+  State<_IxDropdownMenuItemTile<T>> createState() =>
+      _IxDropdownMenuItemTileState<T>();
+}
+
+class _IxDropdownMenuItemTileState<T>
+    extends State<_IxDropdownMenuItemTile<T>> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final item = widget.item;
+    return IxFocusRing(
+      focused: _focused,
+      child: InkWell(
+        onTap: widget.onTap,
+        focusColor: Colors.transparent,
+        onFocusChange: (focused) => setState(() => _focused = focused),
+        hoverColor: widget.hoverColor,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              if (item.icon != null) ...[item.icon!, const SizedBox(width: 8)],
+              Expanded(
+                child: Text(
+                  item.label,
+                  style: TextStyle(
+                    color: item.disabled
+                        ? widget.textColor.withValues(
+                            alpha: widget.textColor.a * 0.5,
+                          )
+                        : widget.textColor,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
   final LayerLink _layerLink = LayerLink();
   OverlayEntry? _overlayEntry;
@@ -316,40 +378,16 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: widget.items.map((item) {
-                    return InkWell(
+                    return _IxDropdownMenuItemTile<T>(
+                      item: item,
+                      textColor: textColor,
+                      hoverColor: hoverColor,
                       onTap: item.disabled
                           ? null
                           : () {
                               _closeDropdown();
                               widget.onItemSelected?.call(item.value);
                             },
-                      hoverColor: hoverColor,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        child: Row(
-                          children: [
-                            if (item.icon != null) ...[
-                              item.icon!,
-                              const SizedBox(width: 8),
-                            ],
-                            Expanded(
-                              child: Text(
-                                item.label,
-                                style: TextStyle(
-                                  color: item.disabled
-                                      ? textColor.withValues(
-                                          alpha: textColor.a * 0.5,
-                                        )
-                                      : textColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
                     );
                   }).toList(),
                 ),

@@ -306,6 +306,13 @@ class IxRadioTheme extends ThemeExtension<IxRadioTheme> {
     IxRadioStateBundle defaultBundle = styles[IxRadioStatus.standard]!;
 
     Color resolveFill(Set<WidgetState> states) {
+      if (states.contains(WidgetState.focused) &&
+          !states.contains(WidgetState.selected)) {
+        // The unchecked radio's outline ring is painted via `fillColor`
+        // (there is no separate `side` for Radio), so this is where the
+        // 1px focus-bdr outline is surfaced.
+        return color(IxThemeColorToken.focusBdr);
+      }
       final visuals = _radioVisualStateFor(defaultBundle, states);
       return _radioFillFor(visuals, states);
     }

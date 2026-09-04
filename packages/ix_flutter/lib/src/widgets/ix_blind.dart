@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
+import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart';
@@ -15,7 +16,7 @@ export 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart'
 ///
 /// See also:
 /// * [IxBlindVariant], which defines the visual style of the blind.
-class IxBlind extends StatelessWidget {
+class IxBlind extends StatefulWidget {
   /// Creates a Siemens iX blind.
   const IxBlind({
     super.key,
@@ -63,66 +64,88 @@ class IxBlind extends StatelessWidget {
   final Widget child;
 
   @override
+  State<IxBlind> createState() => _IxBlindState();
+}
+
+class _IxBlindState extends State<IxBlind> {
+  // Tracks whether the header's InkWell currently has keyboard focus, so the
+  // focus ring can be painted around the *whole* blind (see build() below)
+  // rather than clipped away by the outer Container's `Clip.antiAlias`.
+  bool _headerFocused = false;
+
+  @override
   Widget build(BuildContext context) {
     final themeData = Theme.of(context);
     final blindTheme =
         themeData.extension<IxBlindTheme>() ?? IxBlindTheme.fallback(themeData);
-    final style = blindTheme.style(variant);
+    final style = blindTheme.style(widget.variant);
 
     // Resolve colors based on state (hover, active handled by InkWell/Material)
     // But we need to set the base style.
     // Since we use InkWell, we can rely on its splash/highlight, but we need
     // to set the container background and border.
 
-    return Container(
-      decoration: BoxDecoration(
-        color: style.background,
-        border: Border.all(
-          color: style.borderColor,
-          width: blindTheme.borderWidth,
-        ),
-        borderRadius: BorderRadius.circular(blindTheme.borderRadius),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _IxBlindHeader(
-            title: title,
-            subtitle: subtitle,
-            icon: icon,
-            headerActions: headerActions,
-            expanded: expanded,
-            onTap: disabled ? null : () => onExpandedChanged?.call(!expanded),
-            style: style,
-            disabled: disabled,
+    // The ring wraps the whole Container (not just the header) because the
+    // header sits flush against the Container's own edge: a ring painted
+    // around the header alone would extend past that edge and be clipped
+    // away by the Container's `Clip.antiAlias`.
+    return IxFocusRing(
+      focused: _headerFocused,
+      borderRadius: BorderRadius.circular(blindTheme.borderRadius),
+      child: Container(
+        decoration: BoxDecoration(
+          color: style.background,
+          border: Border.all(
+            color: style.borderColor,
+            width: blindTheme.borderWidth,
           ),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeInOut,
-            alignment: Alignment.topCenter,
-            child: expanded
-                ? Container(
-                    decoration: BoxDecoration(
-                      border: Border(
-                        top: BorderSide(
-                          color: style.borderColor,
-                          width: blindTheme.borderWidth,
+          borderRadius: BorderRadius.circular(blindTheme.borderRadius),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _IxBlindHeader(
+              title: widget.title,
+              subtitle: widget.subtitle,
+              icon: widget.icon,
+              headerActions: widget.headerActions,
+              expanded: widget.expanded,
+              onTap: widget.disabled
+                  ? null
+                  : () => widget.onExpandedChanged?.call(!widget.expanded),
+              style: style,
+              disabled: widget.disabled,
+              onFocusChanged: (focused) =>
+                  setState(() => _headerFocused = focused),
+            ),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              alignment: Alignment.topCenter,
+              child: widget.expanded
+                  ? Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            color: style.borderColor,
+                            width: blindTheme.borderWidth,
+                          ),
                         ),
                       ),
-                    ),
-                    child: child,
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ],
+                      child: widget.child,
+                    )
+                  : const SizedBox.shrink(),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class _IxBlindHeader extends StatefulWidget {
+class _IxBlindHeader extends StatelessWidget {
   const _IxBlindHeader({
     required this.title,
     this.subtitle,
@@ -132,6 +155,7 @@ class _IxBlindHeader extends StatefulWidget {
     this.onTap,
     required this.style,
     required this.disabled,
+    this.onFocusChanged,
   });
 
   final String title;
@@ -142,25 +166,23 @@ class _IxBlindHeader extends StatefulWidget {
   final VoidCallback? onTap;
   final IxBlindStyle style;
   final bool disabled;
+  final ValueChanged<bool>? onFocusChanged;
 
-  @override
-  State<_IxBlindHeader> createState() => _IxBlindHeaderState();
-}
-
-class _IxBlindHeaderState extends State<_IxBlindHeader> {
   @override
   Widget build(BuildContext context) {
     final ixTypography = IxTheme.maybeOf(context)?.typography ?? IxTypography();
 
     // Determine foreground color
-    final foregroundColor = widget.style.foreground;
+    final foregroundColor = style.foreground;
 
     return Material(
       color: Colors.transparent, // Container handles background
       child: InkWell(
-        onTap: widget.onTap,
-        hoverColor: widget.style.hoverBackground.withValues(
-          alpha: widget.style.hoverBackground.a * 0.1,
+        onTap: onTap,
+        focusColor: Colors.transparent,
+        onFocusChange: onFocusChanged,
+        hoverColor: style.hoverBackground.withValues(
+          alpha: style.hoverBackground.a * 0.1,
         ), // Use a subtle overlay
 
         child: Container(
@@ -173,7 +195,7 @@ class _IxBlindHeaderState extends State<_IxBlindHeader> {
             children: [
               // Chevron
               AnimatedRotation(
-                turns: widget.expanded ? 0.25 : 0.0,
+                turns: expanded ? 0.25 : 0.0,
                 duration: const Duration(milliseconds: 200),
                 child: IconTheme(
                   data: IconThemeData(color: foregroundColor, size: 24),
@@ -182,10 +204,10 @@ class _IxBlindHeaderState extends State<_IxBlindHeader> {
               ),
               const SizedBox(width: IxCommonGeometry.space1), // 0.5rem
               // Optional Icon
-              if (widget.icon != null) ...[
+              if (icon != null) ...[
                 IconTheme(
                   data: IconThemeData(color: foregroundColor, size: 24),
-                  child: widget.icon!,
+                  child: icon!,
                 ),
                 const SizedBox(width: IxCommonGeometry.space1),
               ],
@@ -197,7 +219,7 @@ class _IxBlindHeaderState extends State<_IxBlindHeader> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      widget.title,
+                      title,
                       style: ixTypography.label.copyWith(
                         color: foregroundColor,
                         fontWeight: FontWeight.bold,
@@ -205,9 +227,9 @@ class _IxBlindHeaderState extends State<_IxBlindHeader> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (widget.subtitle != null)
+                    if (subtitle != null)
                       Text(
-                        widget.subtitle!,
+                        subtitle!,
                         style: ixTypography.bodySm.copyWith(
                           color: foregroundColor.withValues(
                             alpha: foregroundColor.a * 0.8,
@@ -221,12 +243,12 @@ class _IxBlindHeaderState extends State<_IxBlindHeader> {
               ),
 
               // Header Actions
-              if (widget.headerActions != null) ...[
+              if (headerActions != null) ...[
                 const SizedBox(width: 8.0),
                 // Prevent header actions from triggering the blind toggle?
                 // The user said: "except where header actions might intercept the event".
                 // If headerActions contains buttons, they will intercept taps if they handle them.
-                widget.headerActions!,
+                headerActions!,
               ],
             ],
           ),

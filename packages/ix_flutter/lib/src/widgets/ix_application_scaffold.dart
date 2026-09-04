@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
+import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
@@ -734,7 +735,7 @@ class _BottomNavigationEntry extends StatelessWidget {
   }
 }
 
-class _NavigationTile extends StatelessWidget {
+class _NavigationTile extends StatefulWidget {
   const _NavigationTile({
     required this.entry,
     required this.depth,
@@ -760,118 +761,135 @@ class _NavigationTile extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
+  State<_NavigationTile> createState() => _NavigationTileState();
+}
+
+class _NavigationTileState extends State<_NavigationTile> {
+  bool _focused = false;
+
+  @override
   Widget build(BuildContext context) {
     final states = <WidgetState>{};
-    if (selected) {
+    if (widget.selected) {
       states.add(WidgetState.selected);
     }
-    if (!enabled) {
+    if (!widget.enabled) {
       states.add(WidgetState.disabled);
     }
 
     final backgroundColor =
-        sidebarTheme.itemBackground.resolve(states) ?? Colors.transparent;
+        widget.sidebarTheme.itemBackground.resolve(states) ??
+        Colors.transparent;
     final foregroundColor =
-        sidebarTheme.itemForeground.resolve(states) ??
+        widget.sidebarTheme.itemForeground.resolve(states) ??
         Theme.of(context).colorScheme.onSurface;
     final iconColor =
-        sidebarTheme.itemIconColor.resolve(states) ??
+        widget.sidebarTheme.itemIconColor.resolve(states) ??
         foregroundColor.withValues(alpha: 0.9);
     final badgeBackground =
-        appMenuTheme?.badgeBackgroundColor ??
+        widget.appMenuTheme?.badgeBackgroundColor ??
         Theme.of(context).colorScheme.error;
     final badgeForeground =
-        appMenuTheme?.badgeForegroundColor ??
+        widget.appMenuTheme?.badgeForegroundColor ??
         Theme.of(context).colorScheme.onError;
 
-    final badgeCount = entry.notificationCount;
+    final badgeCount = widget.entry.notificationCount;
     final indicatorColor = Theme.of(context).colorScheme.primary;
 
     final iconWidget =
-        entry.iconWidget ??
+        widget.entry.iconWidget ??
         Icon(
-          entry.icon ?? Icons.circle_outlined,
+          widget.entry.icon ?? Icons.circle_outlined,
           color: iconColor,
-          size: isExpanded ? 22 : 18,
+          size: widget.isExpanded ? 22 : 18,
         );
 
-    final gap = isExpanded ? 12.0 : 4.0;
+    final gap = widget.isExpanded ? 12.0 : 4.0;
 
     return Tooltip(
-      message: entry.tooltip ?? entry.label,
+      message: widget.entry.tooltip ?? widget.entry.label,
       waitDuration: const Duration(milliseconds: 500),
       child: Semantics(
-        button: onTap != null,
-        enabled: enabled,
-        selected: selected,
-        label: entry.label,
+        button: widget.onTap != null,
+        enabled: widget.enabled,
+        selected: widget.selected,
+        label: widget.entry.label,
         child: Padding(
-          padding: EdgeInsetsDirectional.only(start: depth * 16.0),
-          child: InkWell(
+          padding: EdgeInsetsDirectional.only(start: widget.depth * 16.0),
+          child: IxFocusRing(
+            focused: _focused,
             borderRadius: BorderRadius.circular(12),
-            onTap: enabled ? onTap : null,
-            child: AnimatedContainer(
-              duration: animationDuration,
-              padding: EdgeInsets.symmetric(
-                horizontal: isExpanded ? 12 : 8,
-                vertical: 10,
-              ),
-              decoration: BoxDecoration(
-                color: backgroundColor,
-                borderRadius: BorderRadius.circular(
-                  IxCommonGeometry.smallBorderRadius,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: widget.enabled ? widget.onTap : null,
+              focusColor: Colors.transparent,
+              onFocusChange: (focused) => setState(() => _focused = focused),
+              child: AnimatedContainer(
+                duration: widget.animationDuration,
+                padding: EdgeInsets.symmetric(
+                  horizontal: widget.isExpanded ? 12 : 8,
+                  vertical: 10,
                 ),
-              ),
-              child: Row(
-                children: [
-                  AnimatedContainer(
-                    duration: animationDuration,
-                    width: 4,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: selected ? indicatorColor : Colors.transparent,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(
+                    IxCommonGeometry.smallBorderRadius,
                   ),
-                  SizedBox(width: gap),
-                  if (isExpanded) ...[
-                    iconWidget,
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        entry.label,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: foregroundColor,
-                          fontWeight: selected
-                              ? FontWeight.w600
-                              : FontWeight.w500,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+                ),
+                child: Row(
+                  children: [
+                    AnimatedContainer(
+                      duration: widget.animationDuration,
+                      width: 4,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: widget.selected
+                            ? indicatorColor
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(2),
                       ),
                     ),
-                    if (badgeCount != null && badgeCount > 0)
-                      Padding(
-                        padding: const EdgeInsetsDirectional.only(start: 8),
-                        child: _NotificationBadge(
-                          count: badgeCount,
-                          background: badgeBackground,
-                          foreground: badgeForeground,
+                    SizedBox(width: gap),
+                    if (widget.isExpanded) ...[
+                      iconWidget,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          widget.entry.label,
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(
+                                color: foregroundColor,
+                                fontWeight: widget.selected
+                                    ? FontWeight.w600
+                                    : FontWeight.w500,
+                              ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    if (trailing != null)
-                      Padding(
-                        padding: const EdgeInsetsDirectional.only(start: 4),
-                        child: trailing!,
+                      if (badgeCount != null && badgeCount > 0)
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(start: 8),
+                          child: _NotificationBadge(
+                            count: badgeCount,
+                            background: badgeBackground,
+                            foreground: badgeForeground,
+                          ),
+                        ),
+                      if (widget.trailing != null)
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(start: 4),
+                          child: widget.trailing!,
+                        ),
+                    ] else ...[
+                      _CollapsedIconBadge(
+                        icon: iconWidget,
+                        badgeCount: badgeCount,
+                        badgeBackground: badgeBackground,
+                        badgeForeground: badgeForeground,
                       ),
-                  ] else ...[
-                    _CollapsedIconBadge(
-                      icon: iconWidget,
-                      badgeCount: badgeCount,
-                      badgeBackground: badgeBackground,
-                      badgeForeground: badgeForeground,
-                    ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           ),
