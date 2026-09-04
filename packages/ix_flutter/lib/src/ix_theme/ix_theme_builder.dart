@@ -23,6 +23,7 @@ import 'package:ix_flutter/src/ix_theme/components/ix_toggle_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_upload_theme.dart';
 import 'package:ix_flutter/src/ix_theme/ix_custom_palette.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon_resolver.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
 /// scale guidance.
@@ -53,6 +54,7 @@ class IxThemeBuilder {
     this.systemBrightness = Brightness.light,
     this.typography,
     this.customPalette,
+    this.icons,
   });
 
   /// Siemens IX visual family (classic vs. custom overrides).
@@ -69,6 +71,10 @@ class IxThemeBuilder {
 
   /// Optional custom palette that replaces the built-in family colors.
   final IxCustomPalette? customPalette;
+
+  /// Optional icon resolver registered as the [IxIconResolver] theme
+  /// extension. Defaults to [IxIconResolver.material] when unset.
+  final IxIconResolver? icons;
 
   /// Returns [ThemeData] configured with Siemens IX global colors and fonts.
   ///
@@ -153,6 +159,7 @@ class IxThemeBuilder {
       palette: palette,
       typography: typeScale,
     );
+    final iconResolver = icons ?? IxIconResolver.material();
 
     return ThemeData(
       useMaterial3: true,
@@ -229,6 +236,7 @@ class IxThemeBuilder {
       scrollbarTheme: scrollbarTheme.materialScrollbarTheme,
       extensions: [
         ixThemeExtension,
+        iconResolver,
         buttonTheme,
         appHeaderTheme,
         appMenuTheme,
@@ -263,6 +271,7 @@ class IxThemeBuilder {
     Brightness? systemBrightness,
     IxTypography? typography,
     IxCustomPalette? customPalette,
+    IxIconResolver? icons,
   }) {
     return IxThemeBuilder(
       family: family ?? this.family,
@@ -270,6 +279,7 @@ class IxThemeBuilder {
       systemBrightness: systemBrightness ?? this.systemBrightness,
       typography: typography ?? this.typography,
       customPalette: customPalette ?? this.customPalette,
+      icons: icons ?? this.icons,
     );
   }
 

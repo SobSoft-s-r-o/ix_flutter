@@ -26,9 +26,11 @@ export 'src/ix_theme/components/ix_sidebar_theme.dart';
 export 'src/ix_theme/components/ix_tabs_theme.dart';
 export 'src/ix_theme/ix_theme_builder.dart';
 export 'src/ix_theme/ix_custom_palette.dart';
-// Note: ix_icons are no longer exported from library due to licensing restrictions.
-// Users must generate icons using: dart run ix_flutter:generate_icons
-// See doc/ix_icons.md for complete documentation.
+export 'src/ix_icons/ix_icon_size.dart';
+export 'src/ix_icons/ix_icon_data.dart';
+export 'src/ix_icons/ix_icon_key.dart';
+export 'src/ix_icons/ix_icon_resolver.dart';
+export 'src/ix_icons/ix_icon.dart';
 export 'src/widgets/ix_breadcrumb.dart';
 export 'src/widgets/ix_blind.dart';
 export 'src/ix_theme/components/ix_blind_theme.dart';
