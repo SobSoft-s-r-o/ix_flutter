@@ -1599,7 +1599,12 @@ class _NavigationTileState extends State<_NavigationTile> {
       // `excludeSemantics` drops the InkWell's own focused flag, so the
       // state the focus ring already tracks is republished here -- without
       // it assistive technology cannot follow the arrow keys.
-      focused: _focused,
+      //
+      // `null`, not `false`, while disabled: `focusable` and `focused` share
+      // one tristate flag and `focused` is applied *after* `focusable`, so an
+      // explicit `focused: false` would undo the line above and put a
+      // disabled tile back into the traversal order.
+      focused: widget.enabled ? _focused : null,
       label: widget.entry.label,
       value: widget.value,
       hint: widget.entry.tooltip,

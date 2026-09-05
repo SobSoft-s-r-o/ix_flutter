@@ -205,4 +205,49 @@ void main() {
   }
 
   focusedTilePublishesFocus();
+
+  @Upstream(
+    "menu-item.tsx:324 'ix-focusable': !this.disabled; :348 aria-disabled",
+  )
+  void disabledTileIsNotFocusable() {
+    testWidgets('a disabled menu tile does not claim to be focusable', (
+      tester,
+    ) async {
+      final releaseSemantics = ensureSemantics(tester);
+      await pumpIx(
+        tester,
+        IxApplicationScaffold(
+          appTitle: 'App',
+          initiallyExpanded: true,
+          entries: const [
+            IxMenuEntry(
+              id: 'off',
+              type: IxMenuEntryType.item,
+              label: 'Disabled entry',
+              enabled: false,
+            ),
+          ],
+          onNavigate: (_) {},
+          body: const SizedBox(),
+        ),
+        size: const Size(1440, 900),
+      );
+      // `focusable` and `focused` share one tristate flag, and `focused` is
+      // applied *after* `focusable`, so publishing `focused: false` on a
+      // tile that already declared `focusable: false` puts it back into the
+      // traversal order it must stay out of.
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Disabled entry')),
+        matchesSemantics(
+          isButton: true,
+          hasSelectedState: true,
+          hasEnabledState: true,
+          label: 'Disabled entry',
+        ),
+      );
+      releaseSemantics();
+    });
+  }
+
+  disabledTileIsNotFocusable();
 }
