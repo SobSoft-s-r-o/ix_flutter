@@ -78,25 +78,32 @@ void main() {
 
     @Upstream('dropdown-button.ct.ts:106-133 aria-expanded')
     void ixDropdownButtonTriggerExposesExpandedState() {
-      testWidgets(
-        'IxDropdownButton trigger exposes expanded state',
-        (tester) async {
-          final handle = tester.ensureSemantics();
-          await pumpIx(
-            tester,
-            IxDropdownButton<int>(
-              label: 'Actions',
-              items: const [IxDropdownMenuItem(label: 'Edit', value: 1)],
-            ),
-          );
-          expect(
-            tester.getSemantics(find.text('Actions')),
-            matchesSemantics(isButton: true, hasExpandedState: true),
-          );
-          handle.dispose();
-        },
-        skip: true,
-      ); // IXF-001 – implemented by accessibility-interaction Task 2 (A-2)
+      testWidgets('IxDropdownButton trigger exposes expanded state', (
+        tester,
+      ) async {
+        final handle = tester.ensureSemantics();
+        await pumpIx(
+          tester,
+          IxDropdownButton<int>(
+            label: 'Actions',
+            items: const [IxDropdownMenuItem(label: 'Edit', value: 1)],
+          ),
+        );
+        // `isSemantics` (not `matchesSemantics`) because the flags this
+        // case is about are additions to the trigger's own button
+        // semantics: `matchesSemantics` asserts every unlisted flag is
+        // absent, which no real button can satisfy. The exhaustive flag
+        // set is asserted in `test/a11y/keyboard_dropdown_test.dart`.
+        expect(
+          tester.getSemantics(find.text('Actions')),
+          isSemantics(
+            isButton: true,
+            hasExpandedState: true,
+            isExpanded: false,
+          ),
+        );
+        handle.dispose();
+      });
     }
 
     ixDropdownButtonTriggerExposesExpandedState();

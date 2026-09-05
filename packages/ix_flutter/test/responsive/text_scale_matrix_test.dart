@@ -11,8 +11,8 @@ import '../helpers/pump_ix.dart';
 /// scale priamy Playwright `.ct.ts` ani scss/tsx náprotivok (CSS breakpointy
 /// vs. Flutter `LayoutBuilder` sa nedajú mapovať 1:1), preto jednotlivé testy
 /// necitujú `@Upstream`. Matica stráži nález IXF-024 (WCAG 1.4.4 Resize
-/// text) pre `IxDropdownButton`; skip sa odstráni v úlohe A-4/A-2, ktorá
-/// spraví jeho label flexibilným.
+/// text) pre `IxDropdownButton`; skip bol odstránený v úlohe A-2, ktorá
+/// spravila label triggeru flexibilným s ellipsis.
 void main() {
   const widths = [320.0, 360.0, 600.0, 768.0, 1024.0, 1440.0];
   const scales = [1.0, 1.3, 2.0];
@@ -33,22 +33,20 @@ void main() {
         expect(tester.takeException(), isNull);
       });
 
-      testWidgets(
-        'IxDropdownButton trigger ${w.toInt()}px × $s',
-        (tester) async {
-          await pumpIx(
-            tester,
-            IxDropdownButton<int>(
-              label: 'Eine sehr lange Beschriftung für die Aktion',
-              items: const [IxDropdownMenuItem(label: 'A', value: 1)],
-            ),
-            size: Size(w, 800),
-            textScaler: TextScaler.linear(s),
-          );
-          expect(tester.takeException(), isNull);
-        },
-        skip: w <= 360 || (w <= 768 && s >= 2.0),
-      ); // IXF-024 – A-4/A-2 Flexible label
+      testWidgets('IxDropdownButton trigger ${w.toInt()}px × $s', (
+        tester,
+      ) async {
+        await pumpIx(
+          tester,
+          IxDropdownButton<int>(
+            label: 'Eine sehr lange Beschriftung für die Aktion',
+            items: const [IxDropdownMenuItem(label: 'A', value: 1)],
+          ),
+          size: Size(w, 800),
+          textScaler: TextScaler.linear(s),
+        );
+        expect(tester.takeException(), isNull);
+      });
     }
   }
 }

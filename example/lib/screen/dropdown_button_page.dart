@@ -155,10 +155,20 @@ class IxDropdownButtonExampleVariants extends StatelessWidget {
     return Wrap(
       spacing: 16,
       runSpacing: 16,
-      children: IxDropdownButtonVariant.values.map((variant) {
+      children: const [
+        IxButtonVariant.primary,
+        IxButtonVariant.secondary,
+        IxButtonVariant.tertiary,
+        IxButtonVariant.subtlePrimary,
+        IxButtonVariant.subtleSecondary,
+        IxButtonVariant.subtleTertiary,
+        IxButtonVariant.dangerPrimary,
+        IxButtonVariant.dangerSecondary,
+        IxButtonVariant.dangerTertiary,
+      ].map((variant) {
         return IxDropdownButton<String>(
           label: variant.name,
-          variant: variant,
+          buttonVariant: variant,
           items: const [IxDropdownMenuItem(label: 'Item', value: '1')],
         );
       }).toList(),

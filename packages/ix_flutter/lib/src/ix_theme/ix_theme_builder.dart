@@ -12,6 +12,7 @@ import 'package:ix_flutter/src/ix_theme/components/ix_bottom_sheet_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_checkbox_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_breadcrumb_theme.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_dropdown_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_form_field_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_label_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_modal_theme.dart';
@@ -153,6 +154,10 @@ class IxThemeBuilder {
       palette: palette,
       typography: typeScale,
     );
+    final dropdownTheme = IxDropdownTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
     final formFieldTheme = IxFormFieldTheme.fromPalette(
       palette: palette,
       typography: typeScale,
@@ -273,6 +278,7 @@ class IxThemeBuilder {
         badgeTheme,
         scrollbarTheme,
         breadcrumbTheme,
+        dropdownTheme,
       ],
     );
 

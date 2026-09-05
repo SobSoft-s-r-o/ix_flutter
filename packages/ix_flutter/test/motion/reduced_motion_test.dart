@@ -70,13 +70,17 @@ void main() {
         // MaterialApp's own route transition (Material 3's default
         // ZoomPageTransitionsBuilder) already contributes FadeTransition
         // widgets to the tree, so find.byType(FadeTransition) alone is not
-        // unique here -- narrow to the one that is an ancestor of the menu
-        // item text.
+        // unique here -- narrow to the ancestors of the menu item text. The
+        // menu is hosted by an OverlayPortal, so it stays a descendant of
+        // the route (and of the route transition's own FadeTransition) in
+        // the element tree: take the nearest ancestor, which is the menu's.
         final dropdownFade = tester.widget<FadeTransition>(
-          find.ancestor(
-            of: find.text('Edit'),
-            matching: find.byType(FadeTransition),
-          ),
+          find
+              .ancestor(
+                of: find.text('Edit'),
+                matching: find.byType(FadeTransition),
+              )
+              .first,
         );
         expect(dropdownFade.opacity.value, 1.0);
         // Let the trigger button's Material ink-splash (started by the tap

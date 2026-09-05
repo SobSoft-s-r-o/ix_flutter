@@ -16,6 +16,7 @@ export 'src/ix_theme/components/ix_bottom_sheet_theme.dart';
 export 'src/ix_theme/components/ix_checkbox_theme.dart';
 export 'src/ix_theme/components/ix_chip_theme.dart';
 export 'src/ix_theme/components/ix_breadcrumb_theme.dart';
+export 'src/ix_theme/components/ix_dropdown_theme.dart';
 export 'src/ix_theme/components/ix_label_theme.dart';
 export 'src/ix_theme/components/ix_modal_theme.dart';
 export 'src/ix_theme/components/ix_toggle_theme.dart';

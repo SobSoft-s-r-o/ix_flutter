@@ -1,7 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:ix_flutter/ix_flutter.dart';
-import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+
+part 'ix_dropdown_menu.dart';
+
+/// Visual variants of [IxDropdownButton]'s trigger.
+///
+/// Superseded by [IxButtonVariant]; pass it through
+/// [IxDropdownButton.buttonVariant] instead. Removed in 2.0.
+@Deprecated(
+  'Use IxDropdownButton.buttonVariant with an IxButtonVariant instead. '
+  'Removed in 2.0.',
+)
 enum IxDropdownButtonVariant {
   primary,
   secondary,
@@ -13,6 +26,11 @@ enum IxDropdownButtonVariant {
   subtleDanger,
 }
 
+/// Preferred position of the dropdown menu relative to its trigger.
+///
+/// `start`/`end` align the menu with the trigger's leading/trailing edge on
+/// the cross axis. The menu flips to the opposite side when the preferred
+/// side has no room, and is always shifted back inside the viewport.
 enum IxDropdownPlacement {
   bottomStart,
   bottomEnd,
@@ -24,390 +42,393 @@ enum IxDropdownPlacement {
   rightEnd,
 }
 
-class IxDropdownMenuItem<T> {
-  final String label;
-  final T value;
-  final Widget? icon;
-  final bool disabled;
+/// Governs which interactions dismiss an open [IxDropdownButton] menu.
+///
+/// Mirrors the upstream `closeBehavior` property
+/// (`dropdown-controller.ts:154-158`). `Escape` and `Tab` always close the
+/// menu regardless of this setting, because a keyboard user must always be
+/// able to leave the menu (WCAG 2.1.2 No Keyboard Trap).
+enum IxDropdownCloseBehavior {
+  /// Only selecting an item closes the menu.
+  inside,
 
+  /// Only a tap outside the trigger and the menu closes it.
+  outside,
+
+  /// Both an item selection and an outside tap close the menu.
+  both,
+
+  /// Neither closes the menu; the owner drives it via
+  /// [IxDropdownButton.isOpen].
+  none,
+}
+
+/// A single row of an [IxDropdownButton] menu.
+class IxDropdownMenuItem<T> {
+  /// Creates a dropdown menu row.
   const IxDropdownMenuItem({
     required this.label,
     required this.value,
     this.icon,
     this.disabled = false,
+    this.checked = false,
   });
+
+  /// The text rendered in the row, and the row's accessible name.
+  final String label;
+
+  /// The value reported to [IxDropdownButton.onItemSelected].
+  final T value;
+
+  /// An optional leading icon.
+  final Widget? icon;
+
+  /// Whether the row is inert: it cannot be focused, activated or reached by
+  /// the arrow keys.
+  final bool disabled;
+
+  /// Whether the row is currently checked.
+  ///
+  /// A menu that contains at least one checked row reserves a leading
+  /// checkmark column for every row, so the labels stay aligned.
+  final bool checked;
 }
 
+/// A button that reveals a menu of actions, mirroring the Siemens IX
+/// `<ix-dropdown-button>` web component.
+///
+/// ## Keyboard model
+///
+/// Mirrors upstream `dropdown.tsx` / `dropdown-focus.ts`:
+///
+/// | Key | On the trigger | In the menu |
+/// | --- | --- | --- |
+/// | `ArrowDown`, `Home`, `Enter`, `Space` | opens on the first item | — |
+/// | `ArrowUp`, `End` | opens on the last item | — |
+/// | `ArrowDown` / `ArrowUp` | — | cycles, skipping disabled rows |
+/// | `Home` / `End` | — | first / last enabled row |
+/// | `Enter` / `Space` | — | activates the focused row |
+/// | `Escape` | — | closes, focus returns to the trigger |
+/// | `Tab` | — | closes, focus continues past the trigger |
+///
+/// ## Open state
+///
+/// The widget is uncontrolled by default. Passing [isOpen] makes it
+/// controlled: it then only ever *requests* a state change through
+/// [onOpenChanged] and renders whatever [isOpen] says.
+///
+/// ```dart
+/// IxDropdownButton<String>(
+///   label: 'Actions',
+///   items: const [IxDropdownMenuItem(label: 'Edit', value: 'edit')],
+///   onItemSelected: (value) => debugPrint(value),
+/// )
+/// ```
 class IxDropdownButton<T> extends StatefulWidget {
+  /// Creates a Siemens IX dropdown button.
   const IxDropdownButton({
     super.key,
     required this.label,
     required this.items,
+    @Deprecated(
+      'Use buttonVariant with an IxButtonVariant instead. Removed in 2.0.',
+    )
+    // ignore: deprecated_member_use_from_same_package
     this.variant = IxDropdownButtonVariant.primary,
+    this.buttonVariant,
     this.placement = IxDropdownPlacement.bottomStart,
     this.disabled = false,
     this.icon,
     this.onItemSelected,
+    this.isOpen,
+    this.onOpenChanged,
+    this.onWillOpen,
+    this.closeBehavior = IxDropdownCloseBehavior.both,
+    this.maxHeight,
+    this.semanticLabel,
   });
 
+  /// The text label rendered on the trigger.
   final String label;
+
+  /// The rows of the menu.
   final List<IxDropdownMenuItem<T>> items;
+
+  /// The trigger's visual style.
+  ///
+  /// Ignored when [buttonVariant] is set.
+  @Deprecated(
+    'Use buttonVariant with an IxButtonVariant instead. Removed in 2.0.',
+  )
+  // ignore: deprecated_member_use_from_same_package
   final IxDropdownButtonVariant variant;
+
+  /// The trigger's visual style, taking precedence over [variant].
+  final IxButtonVariant? buttonVariant;
+
+  /// The preferred position of the menu relative to the trigger.
   final IxDropdownPlacement placement;
+
+  /// Whether the trigger is disabled.
   final bool disabled;
+
+  /// An optional icon rendered before [label].
   final Widget? icon;
+
+  /// Called with the selected row's value.
   final ValueChanged<T>? onItemSelected;
+
+  /// When non-null, the menu's visibility is owned by the caller.
+  ///
+  /// The widget then never opens or closes on its own: it reports the
+  /// requested state through [onOpenChanged] and renders [isOpen].
+  final bool? isOpen;
+
+  /// Called whenever the menu wants to open (`true`) or close (`false`).
+  final ValueChanged<bool>? onOpenChanged;
+
+  /// Consulted before the menu opens; returning `false` vetoes the request.
+  ///
+  /// [onOpenChanged] is not called for a vetoed request.
+  final bool Function()? onWillOpen;
+
+  /// Which interactions dismiss the open menu.
+  final IxDropdownCloseBehavior closeBehavior;
+
+  /// Maximum height of the menu, in logical pixels.
+  ///
+  /// Defaults to half the viewport height minus 48px; the menu scrolls
+  /// vertically once its rows exceed it.
+  final double? maxHeight;
+
+  /// Accessible name of the trigger, replacing [label] for screen readers.
+  final String? semanticLabel;
 
   @override
   State<IxDropdownButton<T>> createState() => _IxDropdownButtonState<T>();
 }
 
-class _IxDropdownMenuContent extends StatefulWidget {
-  final Widget child;
+class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
+  final FocusNode _triggerFocus = FocusNode(
+    debugLabel: 'IxDropdownButton.trigger',
+  );
+  final FocusScopeNode _menuFocusScope = FocusScopeNode(
+    debugLabel: 'IxDropdownButton.menu',
+  );
+  final Map<int, FocusNode> _itemFocus = <int, FocusNode>{};
+  final OverlayPortalController _portal = OverlayPortalController(
+    debugLabel: 'IxDropdownButton.menu',
+  );
+  final Object _tapRegionGroupId = Object();
 
-  const _IxDropdownMenuContent({required this.child});
+  bool _internalOpen = false;
+  int? _focusedIndex;
 
-  @override
-  State<_IxDropdownMenuContent> createState() => _IxDropdownMenuContentState();
-}
-
-class _IxDropdownMenuContentState extends State<_IxDropdownMenuContent>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _opacity;
-  bool _forwardStarted = false;
+  /// Whether the menu is currently open, honouring the controlled
+  /// [IxDropdownButton.isOpen] property when it is set.
+  bool get _isOpen => widget.isOpen ?? _internalOpen;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this);
-    _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+    // The overlay child is always mounted and renders nothing while the menu
+    // is closed. Toggling the controller instead would have to happen from
+    // `didUpdateWidget` in controlled mode, where `show()`/`hide()` are
+    // forbidden (they run inside the build phase).
+    _portal.show();
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // The reduced-motion-aware duration depends on MediaQuery, which is only
-    // safe to read from didChangeDependencies (not initState).
-    _controller.duration = IxMotion.of(context, IxMotion.defaultTime);
-    if (!_forwardStarted) {
-      _forwardStarted = true;
-      _controller.forward();
+  void didUpdateWidget(covariant IxDropdownButton<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_focusedIndex != null && _focusedIndex! >= widget.items.length) {
+      _focusedIndex = null;
     }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _disposeItemFocusNodes();
+    _menuFocusScope.dispose();
+    _triggerFocus.dispose();
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return FadeTransition(opacity: _opacity, child: widget.child);
-  }
-}
-
-/// A single dropdown menu row that shows a 1px `focusBdr` [IxFocusRing] on
-/// keyboard focus.
-///
-/// Temporary: Task A-2 rewrites this overlay's keyboard contract wholesale
-/// and keeps this ring.
-class _IxDropdownMenuItemTile<T> extends StatefulWidget {
-  const _IxDropdownMenuItemTile({
-    required this.item,
-    required this.textColor,
-    required this.hoverColor,
-    required this.onTap,
-  });
-
-  final IxDropdownMenuItem<T> item;
-  final Color textColor;
-  final Color? hoverColor;
-  final VoidCallback? onTap;
-
-  @override
-  State<_IxDropdownMenuItemTile<T>> createState() =>
-      _IxDropdownMenuItemTileState<T>();
-}
-
-class _IxDropdownMenuItemTileState<T>
-    extends State<_IxDropdownMenuItemTile<T>> {
-  bool _focused = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final item = widget.item;
-    return IxFocusRing(
-      focused: _focused,
-      child: InkWell(
-        onTap: widget.onTap,
-        focusColor: Colors.transparent,
-        onFocusChange: (focused) => setState(() => _focused = focused),
-        hoverColor: widget.hoverColor,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Row(
-            children: [
-              if (item.icon != null) ...[item.icon!, const SizedBox(width: 8)],
-              Expanded(
-                child: Text(
-                  item.label,
-                  style: TextStyle(
-                    color: item.disabled
-                        ? widget.textColor.withValues(
-                            alpha: widget.textColor.a * 0.5,
-                          )
-                        : widget.textColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
-  final LayerLink _layerLink = LayerLink();
-  OverlayEntry? _overlayEntry;
-  bool _isOpen = false;
-  final FocusNode _buttonFocusNode = FocusNode();
-  final Object _tapRegionGroupId = Object();
-
-  @override
-  void dispose() {
-    _removeOverlay();
-    _buttonFocusNode.dispose();
-    super.dispose();
+  void _disposeItemFocusNodes() {
+    for (final node in _itemFocus.values) {
+      node.dispose();
+    }
+    _itemFocus.clear();
   }
 
-  void _toggleDropdown() {
-    if (widget.disabled) return;
+  /// Returns the focus node of row [index], creating it on first use.
+  FocusNode _focusNodeFor(int index) => _itemFocus.putIfAbsent(
+    index,
+    () => FocusNode(debugLabel: 'IxDropdownButton.item[$index]'),
+  );
 
-    if (_isOpen) {
-      _closeDropdown();
+  int? _firstEnabled() {
+    for (var i = 0; i < widget.items.length; i++) {
+      if (!widget.items[i].disabled) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  int? _lastEnabled() {
+    for (var i = widget.items.length - 1; i >= 0; i--) {
+      if (!widget.items[i].disabled) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  /// Requests focus for row [index]; the request is honoured as soon as the
+  /// overlay attaches the node, so it is safe to call while opening.
+  void _focusIndex(int? index) {
+    if (index == null) {
+      return;
+    }
+    _focusedIndex = index;
+    _focusNodeFor(index).requestFocus();
+  }
+
+  /// Moves focus [delta] rows, cycling and skipping disabled rows.
+  void _focusRelative(int delta) {
+    final count = widget.items.length;
+    if (count == 0) {
+      return;
+    }
+    final start = _focusedIndex ?? (delta > 0 ? -1 : 0);
+    for (var step = 1; step <= count; step++) {
+      // Dart's `%` is Euclidean, so a negative dividend still wraps to a
+      // valid index.
+      final index = (start + delta * step) % count;
+      if (!widget.items[index].disabled) {
+        _focusIndex(index);
+        return;
+      }
+    }
+  }
+
+  /// Opens or closes the menu.
+  ///
+  /// In controlled mode ([IxDropdownButton.isOpen] set) this only reports the
+  /// request through [IxDropdownButton.onOpenChanged]; the overlay follows
+  /// once the owner rebuilds with the new value.
+  void _setOpen(bool open, {int? focusIndex}) {
+    if (open == _isOpen) {
+      return;
+    }
+    if (open && widget.onWillOpen?.call() == false) {
+      return;
+    }
+    if (open) {
+      _focusIndex(focusIndex);
     } else {
-      _openDropdown();
+      _focusedIndex = null;
+    }
+    if (widget.isOpen == null) {
+      setState(() => _internalOpen = open);
+    }
+    widget.onOpenChanged?.call(open);
+    if (!open) {
+      _triggerFocus.requestFocus();
     }
   }
 
-  void _openDropdown() {
-    _overlayEntry = _createOverlayEntry();
-    Overlay.of(context).insert(_overlayEntry!);
-    setState(() {
-      _isOpen = true;
-    });
-  }
-
-  void _closeDropdown() {
-    _removeOverlay();
-    setState(() {
-      _isOpen = false;
-    });
-  }
-
-  void _removeOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
-  }
-
-  OverlayEntry _createOverlayEntry() {
-    Alignment followerAnchor = Alignment.topLeft;
-    Alignment targetAnchor = Alignment.bottomLeft;
-    Offset offset = Offset.zero;
-
-    // Calculate available space and flip if necessary
-    final RenderBox renderBox = context.findRenderObject() as RenderBox;
-    final size = renderBox.size;
-    final buttonPosition = renderBox.localToGlobal(Offset.zero);
-    final mediaQuery = MediaQuery.of(context);
-    final screenHeight = mediaQuery.size.height;
-    final screenWidth = mediaQuery.size.width;
-    final paddingBottom = mediaQuery.padding.bottom;
-    final paddingTop = mediaQuery.padding.top;
-    final paddingLeft = mediaQuery.padding.left;
-    final paddingRight = mediaQuery.padding.right;
-
-    // Estimate dropdown height
-    // ~48px per item (12+12 padding + ~24 text/icon) + 2px border
-    const double estimatedItemHeight = 48.0;
-    final double estimatedDropdownHeight =
-        widget.items.length * estimatedItemHeight + 8.0;
-    const double estimatedDropdownWidth = 200.0; // Fixed width for now
-
-    IxDropdownPlacement effectivePlacement = widget.placement;
-
-    bool isBottom =
-        widget.placement == IxDropdownPlacement.bottomStart ||
-        widget.placement == IxDropdownPlacement.bottomEnd;
-    bool isTop =
-        widget.placement == IxDropdownPlacement.topStart ||
-        widget.placement == IxDropdownPlacement.topEnd;
-    bool isLeft =
-        widget.placement == IxDropdownPlacement.leftStart ||
-        widget.placement == IxDropdownPlacement.leftEnd;
-    bool isRight =
-        widget.placement == IxDropdownPlacement.rightStart ||
-        widget.placement == IxDropdownPlacement.rightEnd;
-
-    if (isBottom) {
-      final double bottomSpace =
-          screenHeight - (buttonPosition.dy + size.height) - paddingBottom;
-      if (bottomSpace < estimatedDropdownHeight) {
-        final double topSpace = buttonPosition.dy - paddingTop;
-        if (topSpace > bottomSpace) {
-          if (widget.placement == IxDropdownPlacement.bottomStart) {
-            effectivePlacement = IxDropdownPlacement.topStart;
-          } else {
-            effectivePlacement = IxDropdownPlacement.topEnd;
-          }
-        }
-      }
-    } else if (isTop) {
-      final double topSpace = buttonPosition.dy - paddingTop;
-      if (topSpace < estimatedDropdownHeight) {
-        final double bottomSpace =
-            screenHeight - (buttonPosition.dy + size.height) - paddingBottom;
-        if (bottomSpace > topSpace) {
-          if (widget.placement == IxDropdownPlacement.topStart) {
-            effectivePlacement = IxDropdownPlacement.bottomStart;
-          } else {
-            effectivePlacement = IxDropdownPlacement.bottomEnd;
-          }
-        }
-      }
-    } else if (isLeft) {
-      final double leftSpace = buttonPosition.dx - paddingLeft;
-      if (leftSpace < estimatedDropdownWidth) {
-        final double rightSpace =
-            screenWidth - (buttonPosition.dx + size.width) - paddingRight;
-        if (rightSpace > leftSpace) {
-          if (widget.placement == IxDropdownPlacement.leftStart) {
-            effectivePlacement = IxDropdownPlacement.rightStart;
-          } else {
-            effectivePlacement = IxDropdownPlacement.rightEnd;
-          }
-        }
-      }
-    } else if (isRight) {
-      final double rightSpace =
-          screenWidth - (buttonPosition.dx + size.width) - paddingRight;
-      if (rightSpace < estimatedDropdownWidth) {
-        final double leftSpace = buttonPosition.dx - paddingLeft;
-        if (leftSpace > rightSpace) {
-          if (widget.placement == IxDropdownPlacement.rightStart) {
-            effectivePlacement = IxDropdownPlacement.leftStart;
-          } else {
-            effectivePlacement = IxDropdownPlacement.leftEnd;
-          }
-        }
-      }
+  void _toggle() {
+    if (widget.disabled) {
+      return;
     }
-
-    switch (effectivePlacement) {
-      case IxDropdownPlacement.bottomStart:
-        targetAnchor = Alignment.bottomLeft;
-        followerAnchor = Alignment.topLeft;
-        offset = const Offset(0, 4);
-        break;
-      case IxDropdownPlacement.bottomEnd:
-        targetAnchor = Alignment.bottomRight;
-        followerAnchor = Alignment.topRight;
-        offset = const Offset(0, 4);
-        break;
-      case IxDropdownPlacement.topStart:
-        targetAnchor = Alignment.topLeft;
-        followerAnchor = Alignment.bottomLeft;
-        offset = const Offset(0, -4);
-        break;
-      case IxDropdownPlacement.topEnd:
-        targetAnchor = Alignment.topRight;
-        followerAnchor = Alignment.bottomRight;
-        offset = const Offset(0, -4);
-        break;
-      case IxDropdownPlacement.leftStart:
-        targetAnchor = Alignment.topLeft;
-        followerAnchor = Alignment.topRight;
-        offset = const Offset(-4, 0);
-        break;
-      case IxDropdownPlacement.leftEnd:
-        targetAnchor = Alignment.bottomLeft;
-        followerAnchor = Alignment.bottomRight;
-        offset = const Offset(-4, 0);
-        break;
-      case IxDropdownPlacement.rightStart:
-        targetAnchor = Alignment.topRight;
-        followerAnchor = Alignment.topLeft;
-        offset = const Offset(4, 0);
-        break;
-      case IxDropdownPlacement.rightEnd:
-        targetAnchor = Alignment.bottomRight;
-        followerAnchor = Alignment.bottomLeft;
-        offset = const Offset(4, 0);
-        break;
-    }
-
-    final ixTheme = Theme.of(context).extension<IxTheme>();
-    final backgroundColor =
-        ixTheme?.color(IxThemeColorToken.color2) ?? Colors.white;
-    final borderColor =
-        ixTheme?.color(IxThemeColorToken.softBdr) ?? Colors.grey;
-    final shadowColor =
-        ixTheme?.color(IxThemeColorToken.shadow2) ?? Colors.black12;
-    final textColor = ixTheme?.color(IxThemeColorToken.stdText) ?? Colors.black;
-    final hoverColor =
-        ixTheme?.color(IxThemeColorToken.component1Hover) ?? Colors.grey[200];
-
-    return OverlayEntry(
-      builder: (context) => Positioned(
-        width: 200, // TODO: Dynamic width or min width
-        child: CompositedTransformFollower(
-          link: _layerLink,
-          showWhenUnlinked: false,
-          targetAnchor: targetAnchor,
-          followerAnchor: followerAnchor,
-          offset: offset,
-          child: TapRegion(
-            groupId: _tapRegionGroupId,
-            child: _IxDropdownMenuContent(
-              child: Material(
-                elevation: 4,
-                color: backgroundColor,
-                shadowColor: shadowColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                    4,
-                  ), // IxCommonGeometry.smallBorderRadius
-                  side: BorderSide(color: borderColor),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: widget.items.map((item) {
-                    return _IxDropdownMenuItemTile<T>(
-                      item: item,
-                      textColor: textColor,
-                      hoverColor: hoverColor,
-                      onTap: item.disabled
-                          ? null
-                          : () {
-                              _closeDropdown();
-                              widget.onItemSelected?.call(item.value);
-                            },
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
+    _setOpen(!_isOpen, focusIndex: _isOpen ? null : _firstEnabled());
   }
 
+  void _selectItem(IxDropdownMenuItem<T> item) {
+    widget.onItemSelected?.call(item.value);
+    if (widget.closeBehavior == IxDropdownCloseBehavior.inside ||
+        widget.closeBehavior == IxDropdownCloseBehavior.both) {
+      _setOpen(false);
+    }
+  }
+
+  KeyEventResult _onTriggerKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent || _isOpen || widget.disabled) {
+      return KeyEventResult.ignored;
+    }
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.arrowDown ||
+        key == LogicalKeyboardKey.home ||
+        key == LogicalKeyboardKey.enter ||
+        key == LogicalKeyboardKey.space) {
+      _setOpen(true, focusIndex: _firstEnabled());
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowUp || key == LogicalKeyboardKey.end) {
+      _setOpen(true, focusIndex: _lastEnabled());
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  KeyEventResult _onMenuKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) {
+      return KeyEventResult.ignored;
+    }
+    final key = event.logicalKey;
+    if (key == LogicalKeyboardKey.escape) {
+      _setOpen(false);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.tab) {
+      final forward = !HardwareKeyboard.instance.isShiftPressed;
+      _setOpen(false);
+      // The focused row is about to leave the tree, so traversal is resumed
+      // from the trigger once the close has been applied.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) {
+          return;
+        }
+        if (forward) {
+          _triggerFocus.nextFocus();
+        } else {
+          _triggerFocus.previousFocus();
+        }
+      });
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowDown) {
+      _focusRelative(1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.arrowUp) {
+      _focusRelative(-1);
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.home) {
+      _focusIndex(_firstEnabled());
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.end) {
+      _focusIndex(_lastEnabled());
+      return KeyEventResult.handled;
+    }
+    return KeyEventResult.ignored;
+  }
+
+  void _onTapOutside(PointerDownEvent event) {
+    if (!_isOpen) {
+      return;
+    }
+    if (widget.closeBehavior == IxDropdownCloseBehavior.outside ||
+        widget.closeBehavior == IxDropdownCloseBehavior.both) {
+      _setOpen(false);
+    }
+  }
+
+  // ignore: deprecated_member_use_from_same_package
   IxButtonVariant _mapVariant(IxDropdownButtonVariant variant) {
     switch (variant) {
       case IxDropdownButtonVariant.primary:
@@ -429,35 +450,128 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     }
   }
 
+  /// Builds the overlay contents.
+  ///
+  /// Runs in the host's element tree, so the ambient `Theme`,
+  /// `Directionality` and `MediaQuery` are the ones surrounding the trigger.
+  /// [info] is recomputed on every layout, so the menu keeps following the
+  /// trigger when the page around it scrolls or resizes.
+  Widget _buildMenu(BuildContext context, OverlayChildLayoutInfo info) {
+    if (!_isOpen) {
+      return const SizedBox.shrink();
+    }
+    final theme = Theme.of(context);
+    final dropdownTheme =
+        theme.extension<IxDropdownTheme>() ?? IxDropdownTheme.fallback(theme);
+    final viewport = info.overlaySize;
+    final triggerSize = info.childSize;
+    final triggerOrigin = MatrixUtils.transformPoint(
+      info.childPaintTransform,
+      Offset.zero,
+    );
+    final maxHeight =
+        widget.maxHeight ??
+        math.max(0.0, viewport.height / 2 - _kMaxHeightInset);
+    final reserveCheckColumn = widget.items.any((item) => item.checked);
+
+    return CustomSingleChildLayout(
+      delegate: _IxDropdownMenuLayout(
+        triggerSize: triggerSize,
+        triggerOrigin: triggerOrigin,
+        viewport: viewport,
+        placement: widget.placement,
+        maxHeight: maxHeight,
+      ),
+      child: TapRegion(
+        groupId: _tapRegionGroupId,
+        child: FocusScope(
+          node: _menuFocusScope,
+          onKeyEvent: _onMenuKey,
+          child: _IxDropdownMenu(
+            theme: dropdownTheme,
+            label: widget.semanticLabel ?? widget.label,
+            children: [
+              for (var i = 0; i < widget.items.length; i++)
+                _IxDropdownMenuItemTile<T>(
+                  item: widget.items[i],
+                  theme: dropdownTheme,
+                  focusNode: widget.items[i].disabled ? null : _focusNodeFor(i),
+                  reserveCheckColumn: reserveCheckColumn,
+                  onFocused: () => _focusedIndex = i,
+                  onTap: widget.items[i].disabled
+                      ? null
+                      : () => _selectItem(widget.items[i]),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final ixButtonTheme = Theme.of(context).extension<IxButtonTheme>();
-    final buttonStyle = ixButtonTheme?.style(_mapVariant(widget.variant));
+    final buttonTheme = Theme.of(context).extension<IxButtonTheme>();
+    final variant =
+        // ignore: deprecated_member_use_from_same_package
+        widget.buttonVariant ?? _mapVariant(widget.variant);
+    final buttonStyle = buttonTheme?.style(variant);
 
     return TapRegion(
       groupId: _tapRegionGroupId,
-      onTapOutside: (event) {
-        if (_isOpen) {
-          _closeDropdown();
-        }
-      },
-      child: CompositedTransformTarget(
-        link: _layerLink,
-        child: ElevatedButton(
-          onPressed: widget.disabled ? null : _toggleDropdown,
-          style: buttonStyle,
-          focusNode: _buttonFocusNode,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (widget.icon != null) ...[
-                widget.icon!,
-                const SizedBox(width: 8),
-              ],
-              Text(widget.label),
-              const SizedBox(width: 8),
-              _isOpen ? IxIcons.chevronUpSmall : IxIcons.chevronDownSmall,
-            ],
+      onTapOutside: _onTapOutside,
+      child: OverlayPortal.overlayChildLayoutBuilder(
+        controller: _portal,
+        overlayChildBuilder: _buildMenu,
+        child: Focus(
+          canRequestFocus: false,
+          skipTraversal: true,
+          onKeyEvent: _onTriggerKey,
+          child: ElevatedButton(
+            onPressed: widget.disabled ? null : _toggle,
+            style: buttonStyle,
+            focusNode: _triggerFocus,
+            child: Semantics(
+              expanded: _isOpen,
+              label: widget.semanticLabel,
+              child: ExcludeSemantics(
+                excluding: widget.semanticLabel != null,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final label = Text(
+                      widget.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    );
+                    return Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (widget.icon != null) ...[
+                          widget.icon!,
+                          const SizedBox(width: IxCommonGeometry.space1),
+                        ],
+                        // A `Flexible` label would assert inside a row with
+                        // unbounded width (a trigger placed directly in
+                        // another `Row`), so it only flexes when there is a
+                        // width to shrink into.
+                        if (constraints.maxWidth.isFinite)
+                          Flexible(child: label)
+                        else
+                          label,
+                        const SizedBox(width: IxCommonGeometry.space1),
+                        IxIcon.key(
+                          _isOpen
+                              ? IxIconKey.chevronUpSmall
+                              : IxIconKey.chevronDownSmall,
+                          size: IxIconSize.s24,
+                          excludeFromSemantics: true,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
           ),
         ),
       ),

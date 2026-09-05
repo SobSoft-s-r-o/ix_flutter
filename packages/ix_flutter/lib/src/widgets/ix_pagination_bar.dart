@@ -70,7 +70,7 @@ class IxPaginationBar extends StatelessWidget {
             const SizedBox(width: 8),
             IxDropdownButton<int>(
               label: pageSize.toString(),
-              variant: IxDropdownButtonVariant.subtleTertiary,
+              buttonVariant: IxButtonVariant.subtleTertiary,
               items: pageSizeOptions!
                   .map(
                     (size) => IxDropdownMenuItem<int>(

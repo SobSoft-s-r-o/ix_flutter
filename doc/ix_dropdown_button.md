@@ -4,11 +4,15 @@ The `IxDropdownButton` widget is a button that reveals a dropdown menu of action
 
 ## Features
 
-*   **Variants**: Supports all standard button variants (primary, secondary, ghost, danger, etc.).
+*   **Variants**: Supports all standard button variants (primary, secondary, tertiary, subtle, danger).
 *   **Placements**: Supports 8 placement options (top/bottom/left/right + start/end alignment).
-*   **Auto-Placement**: Automatically flips the dropdown position if there isn't enough screen space.
+*   **Auto-Placement**: Automatically flips the dropdown position if there isn't enough screen space, and always shifts the menu back inside the viewport (8px margin).
+*   **Content width**: The menu is as wide as its widest item and never wider than the viewport; longer labels are ellipsized.
+*   **Scrolling**: The menu scrolls vertically once it exceeds `maxHeight` (half the viewport height minus 48px by default).
+*   **Keyboard**: A full iX keyboard model (see below) with a 1px focus outline on the focused row.
+*   **Screen readers**: The trigger is a button with an expanded state, the menu carries the `menu` role and every row the `menuItem` role, including enabled and checked state.
 *   **Icons**: Supports optional leading icons on the button and within menu items.
-*   **Theming**: Fully integrated with `IxTheme` and `IxButtonTheme`.
+*   **Theming**: Fully integrated with `IxTheme`, `IxButtonTheme` and `IxDropdownTheme`.
 
 ## Usage
 
@@ -30,7 +34,7 @@ class MyDropdownExample extends StatelessWidget {
         IxDropdownMenuItem(label: 'Action 2', value: '2'),
       ],
       onItemSelected: (value) {
-        print('Selected: $value');
+        debugPrint('Selected: $value');
       },
     );
   }
@@ -42,8 +46,8 @@ class MyDropdownExample extends StatelessWidget {
 ```dart
 IxDropdownButton<String>(
   label: 'Settings',
-  icon: IxIcons.cogwheel,
-  variant: IxDropdownButtonVariant.secondary,
+  icon: IxIcon.key(IxIconKey.cogwheel, size: IxIconSize.s16),
+  buttonVariant: IxButtonVariant.secondary,
   items: const [
     IxDropdownMenuItem(
       label: 'Profile',
@@ -61,6 +65,58 @@ IxDropdownButton<String>(
   },
 )
 ```
+
+### Checked items
+
+A menu that contains at least one `checked` item reserves a leading checkmark column for every row, so all labels stay aligned. The checked state is exposed to screen readers.
+
+```dart
+IxDropdownButton<String>(
+  label: 'Sort by',
+  items: const [
+    IxDropdownMenuItem(label: 'Name', value: 'name', checked: true),
+    IxDropdownMenuItem(label: 'Date', value: 'date'),
+  ],
+)
+```
+
+### Controlled open state
+
+Passing `isOpen` makes the widget controlled: it never opens or closes on its own, it only reports the requested state through `onOpenChanged` and renders whatever `isOpen` says. Leave `isOpen` unset for the uncontrolled default.
+
+```dart
+bool _open = false;
+
+IxDropdownButton<String>(
+  label: 'Actions',
+  isOpen: _open,
+  onOpenChanged: (open) => setState(() => _open = open),
+  items: const [IxDropdownMenuItem(label: 'Edit', value: 'edit')],
+)
+```
+
+`onWillOpen` vetoes an open request before it happens (and before `onOpenChanged` fires), which is useful for lazily loading the items or blocking the menu while a form is invalid:
+
+```dart
+IxDropdownButton<String>(
+  label: 'Actions',
+  onWillOpen: () => _formIsValid,
+  items: _items,
+)
+```
+
+### Close behaviour
+
+`closeBehavior` decides which interactions dismiss the open menu:
+
+| Value | Item selection closes | Outside tap closes |
+| :--- | :--- | :--- |
+| `IxDropdownCloseBehavior.both` (default) | yes | yes |
+| `IxDropdownCloseBehavior.inside` | yes | no |
+| `IxDropdownCloseBehavior.outside` | no | yes |
+| `IxDropdownCloseBehavior.none` | no | no |
+
+`Escape` and `Tab` always close the menu regardless of this setting, so a keyboard user can never be trapped inside it (WCAG 2.1.2).
 
 ### Placements
 
@@ -84,6 +140,29 @@ Supported placements:
 *   `rightStart`
 *   `rightEnd`
 
+## Keyboard model
+
+Mirrors upstream `dropdown.tsx` / `dropdown-focus.ts`.
+
+| Key | On the trigger | In the menu |
+| :--- | :--- | :--- |
+| `ArrowDown`, `Home`, `Enter`, `Space` | opens the menu on the first enabled item | — |
+| `ArrowUp`, `End` | opens the menu on the last enabled item | — |
+| `ArrowDown` / `ArrowUp` | — | moves to the next/previous enabled item, cycling |
+| `Home` / `End` | — | first / last enabled item |
+| `Enter` / `Space` | — | activates the focused item |
+| `Escape` | — | closes the menu, focus returns to the trigger |
+| `Tab` / `Shift+Tab` | — | closes the menu, focus continues past the trigger |
+
+Disabled items are skipped by every one of these keys and cannot be activated. Opening with a pointer also focuses the first enabled item, so the arrow keys work immediately.
+
+## Accessibility
+
+*   The trigger is a `button` with an expanded state (`aria-expanded`), so screen readers announce whether the menu is open.
+*   `semanticLabel` replaces the visible `label` as the trigger's accessible name — useful when the visible label is terse (`IxPaginationBar` uses it for its "rows per page" trigger).
+*   The menu is a `menu` node labelled with the trigger's name; every row is a `menuItem` with its enabled state and, when applicable, its checked state.
+*   The focused row draws a 1px `focusBdr` outline inside its own bounds, so it never overlaps the neighbouring row or the menu's rounded corner.
+
 ## API
 
 ### IxDropdownButton
@@ -92,17 +171,45 @@ Supported placements:
 | :--- | :--- | :--- | :--- |
 | `label` | `String` | required | The text label displayed on the button. |
 | `items` | `List<IxDropdownMenuItem<T>>` | required | The list of items to display in the dropdown menu. |
-| `variant` | `IxDropdownButtonVariant` | `primary` | The visual style of the button. |
+| `buttonVariant` | `IxButtonVariant?` | `null` | The visual style of the button. Takes precedence over `variant`. |
+| `variant` | `IxDropdownButtonVariant` | `primary` | **Deprecated**, removed in 2.0 — use `buttonVariant`. |
 | `placement` | `IxDropdownPlacement` | `bottomStart` | The preferred position of the dropdown menu. |
 | `disabled` | `bool` | `false` | Whether the button is disabled. |
 | `icon` | `Widget?` | `null` | An optional icon to display before the label. |
 | `onItemSelected` | `ValueChanged<T>?` | `null` | Callback triggered when a menu item is selected. |
+| `isOpen` | `bool?` | `null` | When set, the caller owns the open state (controlled mode). |
+| `onOpenChanged` | `ValueChanged<bool>?` | `null` | Called whenever the menu wants to open (`true`) or close (`false`). |
+| `onWillOpen` | `bool Function()?` | `null` | Consulted before opening; returning `false` vetoes the request. |
+| `closeBehavior` | `IxDropdownCloseBehavior` | `both` | Which interactions dismiss the open menu. |
+| `maxHeight` | `double?` | `null` | Maximum menu height. Defaults to half the viewport height minus 48px. |
+| `semanticLabel` | `String?` | `null` | Accessible name of the trigger, replacing `label` for screen readers. |
 
 ### IxDropdownMenuItem
 
 | Property | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| `label` | `String` | required | The text to display for the item. |
+| `label` | `String` | required | The text to display for the item, and its accessible name. |
 | `value` | `T` | required | The value associated with the item. |
 | `icon` | `Widget?` | `null` | An optional icon to display before the item label. |
-| `disabled` | `bool` | `false` | Whether the item is disabled (unselectable). |
+| `disabled` | `bool` | `false` | Whether the item is disabled (unfocusable and unselectable). |
+| `checked` | `bool` | `false` | Whether the item is checked; reserves a checkmark column for the whole menu. |
+
+### IxDropdownTheme
+
+Registered by `IxThemeBuilder` as a `ThemeExtension`; read it with `Theme.of(context).extension<IxDropdownTheme>()`.
+
+| Property | Type | Value | Description |
+| :--- | :--- | :--- | :--- |
+| `background` | `Color` | `color2` | Background of the menu surface. |
+| `borderRadius` | `double` | `4` | Corner radius of the menu surface. |
+| `shadow` | `List<BoxShadow>` | 3 layers | Approximation of the upstream `--theme-shadow-4`. |
+| `padding` | `EdgeInsets` | vertical `4` | Padding between the surface and its first/last row. |
+| `itemHeight` | `double` | `40` | Minimum height of a menu row. |
+| `itemPadding` | `EdgeInsets` | left `8`, right `24` | Horizontal padding inside a row. |
+| `checkColumnWidth` | `double` | `24` | Width of the leading checkmark column. |
+| `itemHover` | `Color` | `ghostHover` | Row background on hover. |
+| `itemActive` | `Color` | `ghostActive` | Row background while pressed. |
+| `itemDisabledText` | `Color` | `weakText` | Label color of a disabled row. |
+| `itemFocusBorder` | `Color` | `focusBdr` | Color of the row's focus outline. |
+| `itemText` | `Color` | `stdText` | Label color of an enabled row. |
+| `itemTextStyle` | `TextStyle` | `typography.body` | Text style of a row label. |

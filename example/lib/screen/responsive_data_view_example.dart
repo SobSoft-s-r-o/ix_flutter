@@ -165,7 +165,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
               const SizedBox(width: 8),
               IxDropdownButton<IxPaginationMode>(
                 label: _paginationMode.name.toUpperCase(),
-                variant: IxDropdownButtonVariant.subtleSecondary,
+                buttonVariant: IxButtonVariant.subtleSecondary,
                 items: IxPaginationMode.values
                     .map(
                       (mode) => IxDropdownMenuItem<IxPaginationMode>(
