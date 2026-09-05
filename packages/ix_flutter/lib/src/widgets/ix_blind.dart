@@ -3,7 +3,9 @@ import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
 import 'package:ix_flutter/src/ix_core/ix_motion.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
-import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon_key.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon_size.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart';
 import 'package:ix_flutter/src/ix_theme/ix_theme_builder.dart';
 
@@ -67,7 +69,8 @@ class IxBlind extends StatefulWidget {
 
   /// An optional icon displayed before the title.
   ///
-  /// Typically an [IxIcons] widget.
+  /// Typically an [IxIcon] (the header sizes it via an ambient [IconTheme],
+  /// which [IxIcon] ignores -- pass [IxIcon.size] explicitly).
   final Widget? icon;
 
   /// Optional widgets to display on the right side of the header.
@@ -335,7 +338,10 @@ class _IxBlindHeader extends StatelessWidget {
                   duration: IxMotion.of(context, IxMotion.defaultTime),
                   child: IconTheme(
                     data: IconThemeData(color: foregroundColor, size: 24),
-                    child: IxIcons.chevronRight,
+                    child: const IxIcon.key(
+                      IxIconKey.chevronRight,
+                      size: IxIconSize.s24,
+                    ),
                   ),
                 ),
                 const SizedBox(width: IxCommonGeometry.space1), // 0.5rem

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
-import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
 
 /// Pagination modes supported by [IxResponsiveDataView].
 enum IxPaginationMode { none, standard, infinite }
@@ -190,7 +189,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
       if (searchQuery != null && searchQuery!.isNotEmpty) {
         return Center(
           child: IxEmptyState(
-            icon: IxIcons.search,
+            icon: const IxIcon.key(IxIconKey.search, size: IxIconSize.s32),
             title:
                 noResultsTextBuilder?.call(searchQuery!) ??
                 effectiveStrings.noResultsTitle(searchQuery!),
@@ -214,7 +213,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
       }
       return Center(
         child: IxEmptyState(
-          icon: IxIcons.info,
+          icon: const IxIcon.key(IxIconKey.info, size: IxIconSize.s32),
           title: effectiveStrings.emptyTitle,
           subtitle: effectiveStrings.emptyBody,
         ),

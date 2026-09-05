@@ -3,7 +3,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
-import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon_key.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon_size.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_breadcrumb_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_button_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_dropdown_theme.dart';
@@ -187,7 +189,10 @@ class IxBreadcrumb extends StatelessWidget {
               theme: breadcrumbTheme,
               dropdownTheme: dropdownTheme,
               buttonStyle: buttonStyle,
-              homeIcon: homeIcon ?? rootItem.icon ?? IxIcons.home,
+              homeIcon:
+                  homeIcon ??
+                  rootItem.icon ??
+                  const IxIcon.key(IxIconKey.home, size: IxIconSize.s16),
               menuItems: items,
               menuLabel: menuSemanticLabel,
               showNavigationMenu: showNavigationMenu && items.length > 1,
@@ -696,7 +701,10 @@ class _BreadcrumbContent extends StatelessWidget {
           padding: EdgeInsets.only(left: theme.itemSpacing / 2),
           child: IconTheme.merge(
             data: IconThemeData(color: theme.separatorColor, size: 16),
-            child: IxIcons.chevronRightSmall,
+            child: const IxIcon.key(
+              IxIconKey.chevronRightSmall,
+              size: IxIconSize.s16,
+            ),
           ),
         ),
       );
@@ -706,7 +714,10 @@ class _BreadcrumbContent extends StatelessWidget {
           padding: EdgeInsets.only(left: theme.itemSpacing / 2),
           child: IconTheme.merge(
             data: IconThemeData(color: theme.separatorColor, size: 16),
-            child: IxIcons.chevronDownSmall,
+            child: const IxIcon.key(
+              IxIconKey.chevronDownSmall,
+              size: IxIconSize.s16,
+            ),
           ),
         ),
       );
@@ -728,7 +739,10 @@ class _BreadcrumbSeparator extends StatelessWidget {
         color: theme.separatorColor,
         size: _separatorIconExtent,
       ),
-      child: IxIcons.chevronRightSmall,
+      child: const IxIcon.key(
+        IxIconKey.chevronRightSmall,
+        size: IxIconSize.s16,
+      ),
     );
   }
 }
@@ -803,7 +817,7 @@ class _HomeMenuIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     final indicator = IconTheme.merge(
       data: IconThemeData(color: theme.separatorColor, size: 16),
-      child: IxIcons.chevronDownSmall,
+      child: const IxIcon.key(IxIconKey.chevronDownSmall, size: IxIconSize.s16),
     );
 
     if (!showOverflowBadge) {
