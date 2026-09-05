@@ -59,6 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - the `IxBlind` header's semantics node reports `isFocused` while it holds the keyboard focus, so assistive technology can follow the keyboard through a stack of blinds instead of only seeing the ring (WCAG 2.4.7)
 - the dropdown item focus ring is drawn inside the row (rounded, negative outline offset) instead of overlapping the neighbouring row and the menu's rounded corner
 - the dropdown trigger label is flexible with ellipsis, so it no longer overflows at narrow widths or large text scales (WCAG 1.4.4)
+- moving the keyboard focus inside an `IxDropdownButton` menu now scrolls the focused row into view (arrows, `Home`/`End`, and the row the menu opens on), so a focused row in a menu taller than its height budget is no longer left off screen (WCAG 2.4.7)
+- `Escape` closes an open `IxDropdownButton` menu whose rows are all disabled, or that has no rows at all. Focus stays on the trigger in that case, so the menu's own focus scope never saw the key and the menu could not be dismissed from the keyboard (WCAG 2.1.2)
 - `IxEmptyState`/`IxToast`/`IxSpinner` render without `IxThemeBuilder`
 - `IxBlindTheme.fallback`'s `critical`/`warning`/`success`/`info`/`neutral` variants no longer hard-code Material `Colors.*` swatches; they derive from the ambient `ColorScheme` (`error`/`tertiary`/`secondary`/`primary`/`outline`) instead
 - toggling an `IxBlind` (controlled or uncontrolled) no longer throws under `MediaQuery.disableAnimations` (a zero-duration `AnimatedSize` re-entering layout while resizing)

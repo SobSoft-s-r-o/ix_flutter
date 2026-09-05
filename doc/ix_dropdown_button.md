@@ -155,10 +155,14 @@ Mirrors upstream `dropdown.tsx` / `dropdown-focus.ts`.
 | `ArrowDown` / `ArrowUp` | — | moves to the next/previous enabled item, cycling |
 | `Home` / `End` | — | first / last enabled item |
 | `Enter` / `Space` | — | activates the focused item |
-| `Escape` | — | closes the menu, focus returns to the trigger |
+| `Escape` | closes the open menu, focus stays on the trigger | closes the menu, focus returns to the trigger |
 | `Tab` / `Shift+Tab` | — | closes the menu, focus continues past the trigger |
 
 Disabled items are skipped by every one of these keys and cannot be activated. Opening with a pointer also focuses the first enabled item, so the arrow keys work immediately.
+
+`Escape` is handled on the trigger as well, because a menu whose items are all disabled (or that has none) leaves the focus on the trigger with nothing inside the menu to receive the key — a keyboard user must still be able to close it (WCAG 2.1.2).
+
+Every key that moves the focus also scrolls the menu by the smallest amount that brings the focused row fully into view, including when the focus wraps around the ends of the list and when the menu opens on a row that is already past its height budget.
 
 ## Accessibility
 

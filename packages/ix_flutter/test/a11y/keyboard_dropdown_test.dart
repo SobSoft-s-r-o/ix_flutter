@@ -24,6 +24,12 @@ Widget _dropdown({
   FocusNode? before,
   FocusNode? after,
   IxDropdownCloseBehavior closeBehavior = IxDropdownCloseBehavior.both,
+  List<IxDropdownMenuItem<int>> items = const [
+    IxDropdownMenuItem(label: 'Edit', value: 1),
+    IxDropdownMenuItem(label: 'Duplicate', value: 2),
+    IxDropdownMenuItem(label: 'Delete', value: 3, disabled: true),
+  ],
+  double? maxHeight,
 }) {
   return Column(
     children: [
@@ -32,16 +38,58 @@ Widget _dropdown({
         key: const Key('dd'),
         label: 'Actions',
         closeBehavior: closeBehavior,
-        items: const [
-          IxDropdownMenuItem(label: 'Edit', value: 1),
-          IxDropdownMenuItem(label: 'Duplicate', value: 2),
-          IxDropdownMenuItem(label: 'Delete', value: 3, disabled: true),
-        ],
+        maxHeight: maxHeight,
+        items: items,
         onItemSelected: selected?.add,
         onOpenChanged: opens?.add,
       ),
       TextField(key: const Key('after'), focusNode: after),
     ],
+  );
+}
+
+/// A trigger whose 30 rows do not fit the menu's 160px height budget, so
+/// keyboard navigation has to scroll the focused row into view.
+Widget _scrollingDropdown({Set<int> disabled = const {}}) => _dropdown(
+  maxHeight: 160,
+  items: [
+    for (var i = 0; i < 30; i++)
+      IxDropdownMenuItem(
+        label: 'Item $i',
+        value: i,
+        disabled: disabled.contains(i),
+      ),
+  ],
+);
+
+/// The open menu's current scroll offset, in logical pixels.
+double _menuScrollOffset(WidgetTester tester) {
+  return tester
+      .state<ScrollableState>(
+        find.descendant(
+          of: find.byKey(const Key('ix-dropdown-menu')),
+          matching: find.byType(Scrollable),
+        ),
+      )
+      .position
+      .pixels;
+}
+
+/// Asserts that the row labelled [label] is laid out inside the menu's own
+/// bounds, i.e. is actually on screen rather than merely present in the
+/// (eagerly built) scroll view.
+void _expectRowVisible(WidgetTester tester, String label) {
+  final menu = tester.getRect(find.byKey(const Key('ix-dropdown-menu')));
+  final row = tester.getRect(find.text(label));
+  expect(
+    row.top,
+    greaterThanOrEqualTo(menu.top - 0.5),
+    reason: '"$label" is scrolled off the top of the menu',
+  );
+  expect(
+    row.bottom,
+    lessThanOrEqualTo(menu.bottom + 0.5),
+    reason: '"$label" is scrolled off the bottom of the menu',
   );
 }
 
@@ -394,4 +442,120 @@ void main() {
   }
 
   menuScrollsInsideHalfViewportMaxHeight();
+
+  @Upstream(
+    'dropdown-focus.ts:75-92 focusItem() follows focusElement() with '
+    "element.scrollIntoView({block: 'nearest'})",
+  )
+  void keyboardFocusScrollsTheRowIntoView() {
+    testWidgets('End, Home and repeated ArrowDown keep the focused row inside '
+        'the menu viewport', (tester) async {
+      await pumpIx(tester, _scrollingDropdown());
+      await _focusTrigger(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(_focusedText(tester), 'Item 0');
+      expect(_menuScrollOffset(tester), 0);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(_focusedText(tester), 'Item 29');
+      expect(_menuScrollOffset(tester), greaterThan(0));
+      _expectRowVisible(tester, 'Item 29');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.home);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(_focusedText(tester), 'Item 0');
+      _expectRowVisible(tester, 'Item 0');
+
+      for (var i = 1; i <= 20; i++) {
+        await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+        await tester.pump(const Duration(milliseconds: 200));
+        expect(_focusedText(tester), 'Item $i');
+        _expectRowVisible(tester, 'Item $i');
+      }
+    });
+  }
+
+  keyboardFocusScrollsTheRowIntoView();
+
+  @Upstream(
+    'dropdown-focus.ts:75-92 focusItem() follows focusElement() with '
+    "element.scrollIntoView({block: 'nearest'})",
+  )
+  void openingRevealsTheInitiallyFocusedRow() {
+    testWidgets('opening reveals the initially focused row when it is off '
+        'screen', (tester) async {
+      // The first *enabled* row is the one the menu opens on, so a long
+      // run of disabled rows above it puts it outside the menu's viewport
+      // on the very first frame -- before any row's focus node is even
+      // attached.
+      await pumpIx(
+        tester,
+        _scrollingDropdown(disabled: {for (var i = 0; i < 25; i++) i}),
+      );
+      await _focusTrigger(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(_focusedText(tester), 'Item 25');
+      expect(_menuScrollOffset(tester), greaterThan(0));
+      _expectRowVisible(tester, 'Item 25');
+    });
+  }
+
+  openingRevealsTheInitiallyFocusedRow();
+
+  @Upstream(
+    'dropdown-controller.ts:154-158 a window keydown of Escape dismisses '
+    'the open dropdown stack',
+  )
+  void escapeClosesAMenuWithNothingToFocus() {
+    testWidgets('Escape closes a menu with no focusable row and keeps the '
+        'trigger focused', (tester) async {
+      await pumpIx(
+        tester,
+        _dropdown(
+          items: const [
+            IxDropdownMenuItem(label: 'Only', value: 1, disabled: true),
+          ],
+        ),
+      );
+      await _focusTrigger(tester);
+      // Opened from the keyboard with nothing focusable inside: focus stays
+      // on the trigger, so the menu's own FocusScope never sees a key event.
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.byKey(const Key('ix-dropdown-menu')), findsOneWidget);
+      expect(_focusedText(tester), 'Actions');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.byKey(const Key('ix-dropdown-menu')), findsNothing);
+      expect(_focusedText(tester), 'Actions');
+    });
+  }
+
+  escapeClosesAMenuWithNothingToFocus();
+
+  @Upstream(
+    'dropdown-controller.ts:154-158 a window keydown of Escape dismisses '
+    'the open dropdown stack',
+  )
+  void escapeClosesAnEmptyMenu() {
+    testWidgets('Escape closes a menu with no rows at all', (tester) async {
+      await pumpIx(tester, _dropdown(items: const []));
+      await _focusTrigger(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.byKey(const Key('ix-dropdown-menu')), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.byKey(const Key('ix-dropdown-menu')), findsNothing);
+      expect(_focusedText(tester), 'Actions');
+    });
+  }
+
+  escapeClosesAnEmptyMenu();
 }

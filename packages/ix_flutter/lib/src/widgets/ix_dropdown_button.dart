@@ -108,8 +108,15 @@ class IxDropdownMenuItem<T> {
 /// | `ArrowDown` / `ArrowUp` | — | cycles, skipping disabled rows |
 /// | `Home` / `End` | — | first / last enabled row |
 /// | `Enter` / `Space` | — | activates the focused row |
-/// | `Escape` | — | closes, focus returns to the trigger |
+/// | `Escape` | closes an open menu, focus stays put | closes, focus returns to the trigger |
 /// | `Tab` | — | closes, focus continues past the trigger |
+///
+/// `Escape` is handled on the trigger too: a menu whose rows are all
+/// disabled (or that has none) leaves the focus on the trigger, so nothing
+/// inside the menu would ever see the key (WCAG 2.1.2 No Keyboard Trap).
+///
+/// Every key that moves the focus also scrolls the menu by the smallest
+/// amount that brings the focused row fully into view.
 ///
 /// ## Open state
 ///
@@ -285,14 +292,68 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     return null;
   }
 
-  /// Requests focus for row [index]; the request is honoured as soon as the
-  /// overlay attaches the node, so it is safe to call while opening.
+  /// Requests focus for row [index] and scrolls it into view; the request is
+  /// honoured as soon as the overlay attaches the node, so it is safe to call
+  /// while opening.
   void _focusIndex(int? index) {
     if (index == null) {
       return;
     }
     _focusedIndex = index;
-    _focusNodeFor(index).requestFocus();
+    final node = _focusNodeFor(index);
+    node.requestFocus();
+    _revealFocusedRow(node);
+  }
+
+  /// Scrolls the menu by the smallest amount that brings the row owning
+  /// [node] fully into view, mirroring upstream's
+  /// `element.scrollIntoView({block: 'nearest'})`
+  /// (`dropdown-focus.ts:75-92`).
+  ///
+  /// The rows are all built eagerly, so focusing one that is scrolled out of
+  /// sight would otherwise leave it focused but invisible (WCAG 2.4.7).
+  ///
+  /// The two `ensureVisible` calls are the "nearest" part: each of these
+  /// policies only ever scrolls one way (`keepVisibleAtEnd` never scrolls
+  /// backwards, `keepVisibleAtStart` never forwards) and a call whose
+  /// computed target equals the current offset returns without touching the
+  /// position, so exactly one of the pair moves the menu -- whichever
+  /// direction the row happens to be off screen in. A single
+  /// direction-of-travel policy would miss the cases where focus wraps
+  /// (ArrowDown from the last row to the first) or opens on a row far down
+  /// the list.
+  void _revealFocusedRow(FocusNode node) {
+    void reveal() {
+      final nodeContext = node.context;
+      if (nodeContext == null || !nodeContext.mounted) {
+        return;
+      }
+      final duration = IxMotion.of(nodeContext, IxMotion.defaultTime);
+      for (final policy in const [
+        ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+        ScrollPositionAlignmentPolicy.keepVisibleAtStart,
+      ]) {
+        Scrollable.ensureVisible(
+          nodeContext,
+          alignmentPolicy: policy,
+          duration: duration,
+          curve: Curves.easeOut,
+        );
+      }
+    }
+
+    if (node.context == null) {
+      // The menu is still opening: this row has no element yet, so there is
+      // nothing to scroll to until the overlay has been built and laid out.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !_isOpen) {
+          return;
+        }
+        reveal();
+      });
+      return;
+    }
+    reveal();
   }
 
   /// Moves focus [delta] rows, cycling and skipping disabled rows.
@@ -355,10 +416,23 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
   }
 
   KeyEventResult _onTriggerKey(FocusNode node, KeyEvent event) {
-    if (event is! KeyDownEvent || _isOpen || widget.disabled) {
+    if (event is! KeyDownEvent || widget.disabled) {
       return KeyEventResult.ignored;
     }
     final key = event.logicalKey;
+    if (_isOpen) {
+      // Every row can be disabled (or there may be none at all), in which
+      // case opening from the keyboard leaves the focus on the trigger and
+      // the menu's own FocusScope never sees a key event. Escape must still
+      // close the menu -- a keyboard user has to be able to leave it
+      // (WCAG 2.1.2 No Keyboard Trap). Focus is already here, so it stays.
+      if (key == LogicalKeyboardKey.escape) {
+        _setOpen(false);
+        return KeyEventResult.handled;
+      }
+      // Anything else while open belongs to the menu scope.
+      return KeyEventResult.ignored;
+    }
     if (key == LogicalKeyboardKey.arrowDown ||
         key == LogicalKeyboardKey.home ||
         key == LogicalKeyboardKey.enter ||
