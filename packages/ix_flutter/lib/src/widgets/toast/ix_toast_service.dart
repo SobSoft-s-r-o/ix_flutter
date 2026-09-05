@@ -1,10 +1,10 @@
 import 'dart:async';
 
-import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
 
 import 'ix_toast_data.dart';
-import 'ix_toast_handle.dart';
+
+part 'ix_toast_handle.dart';
 
 /// Service to manage toast notifications.
 class IxToastService extends ChangeNotifier {
@@ -15,6 +15,16 @@ class IxToastService extends ChangeNotifier {
   final Map<String, Duration> _remainingTimes = {};
   final Set<String> _pausedIds = {};
   int _counter = 0;
+
+  /// The time source used to compute auto-close countdowns.
+  ///
+  /// Overridable so tests can drive `pauseTimer`/`resumeTimer` timing
+  /// deterministically under `package:fake_async`'s `fakeAsync()` -- plain
+  /// `DateTime.now()` is not zone-aware and ignores the fake clock. Assign
+  /// `clock.now` (from the `clock` package, a dev dependency of this
+  /// package) inside a `fakeAsync` callback, e.g. `service.now = clock.now;`.
+  @visibleForTesting
+  DateTime Function() now = DateTime.now;
 
   /// Current list of active toasts.
   List<IxToastData> get toasts => List.unmodifiable(_toasts);
@@ -27,7 +37,9 @@ class IxToastService extends ChangeNotifier {
   /// just calls [showToast] and returns its [IxToastHandle.data].
   ///
   /// This overload's defaults (`dismissOnAction: true`) match `IxToast`'s
-  /// 1.x behaviour; [showToast] defaults `dismissOnAction` to `false`.
+  /// 1.x behaviour; [showToast]'s own default is also `true` today (a
+  /// planned 2.0 change flips [showToast]'s default to `false` -- `show`
+  /// is unaffected).
   IxToastData show({
     IxToastType type = IxToastType.info,
     required String message,
@@ -91,7 +103,7 @@ class IxToastService extends ChangeNotifier {
       hideIcon: hideIcon,
       dismissOnAction: dismissOnAction,
     );
-    final handle = IxToastHandle(this, toast);
+    final handle = IxToastHandle._(this, toast);
     _handles[id] = handle;
 
     _toasts.add(toast);
@@ -105,7 +117,7 @@ class IxToastService extends ChangeNotifier {
   }
 
   void _startTimer(String id, Duration duration) {
-    _startTimes[id] = clock.now();
+    _startTimes[id] = now();
     _remainingTimes[id] = duration;
     _timers[id] = Timer(duration, () {
       dismiss(id);
@@ -124,7 +136,7 @@ class IxToastService extends ChangeNotifier {
       final initialDuration = _remainingTimes[id];
 
       if (startTime != null && initialDuration != null) {
-        final elapsed = clock.now().difference(startTime);
+        final elapsed = now().difference(startTime);
         final remaining = initialDuration - elapsed;
         if (remaining > Duration.zero) {
           _remainingTimes[id] = remaining;
@@ -161,7 +173,7 @@ class IxToastService extends ChangeNotifier {
     _pausedIds.remove(id);
     _toasts.removeWhere((t) => t.id == id);
     notifyListeners();
-    _handles.remove(id)?.notifyClosed(result);
+    _handles.remove(id)?._notifyClosed(result);
   }
 
   /// Dismisses all active toasts.
@@ -177,7 +189,7 @@ class IxToastService extends ChangeNotifier {
     _toasts.clear();
     notifyListeners();
     for (final toast in closed) {
-      _handles.remove(toast.id)?.notifyClosed(null);
+      _handles.remove(toast.id)?._notifyClosed(null);
     }
   }
 

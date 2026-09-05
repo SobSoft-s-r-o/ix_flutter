@@ -153,8 +153,10 @@ final handle = ToastProvider.of(context).showToast(
   message: 'This may take a moment.',
   actionLabel: 'Cancel',
   onAction: () => cancelUpload(),
-  // showToast()'s default is false: tapping the action keeps the toast
-  // open until you close it yourself (e.g. once the upload finishes).
+  // showToast()'s default is true (same as show()); pass false here so
+  // tapping the action keeps the toast open until you close it yourself
+  // (e.g. once the upload finishes). A planned 2.0 release flips
+  // showToast()'s own default to false.
   dismissOnAction: false,
 );
 
@@ -172,7 +174,7 @@ handle.close('done'); // completes onClose with 'done'
 ```dart
 IxToastOverlay(
   service: _toastService,
-  position: IxToastPosition.bottomRight,
+  placement: IxToastPosition.bottomRight,
   strings: const IxToastStrings(closeToast: 'Zavrieť'),
 )
 ```
@@ -205,7 +207,7 @@ IxToastOverlay(
 
 ### IxToastPosition
 
-*   `topRight` -- `IxToastOverlay`'s 1.x-compatible default.
+*   `topRight` -- `IxToastOverlay.placement`'s 1.x-compatible default.
 *   `bottomRight` -- the 2.0 default.
 
 ### IxToastStrings
@@ -215,7 +217,8 @@ IxToastOverlay(
 ### IxToastOverlay
 
 *   `service`: The `IxToastService` instance to listen to.
-*   `position`: An `IxToastPosition` -- which corner the toast stack anchors to (default: `IxToastPosition.topRight`; 2.0 default: `IxToastPosition.bottomRight`).
+*   `placement`: An `IxToastPosition` -- which corner the toast stack anchors to (default: `IxToastPosition.topRight`; 2.0 default: `IxToastPosition.bottomRight`). Ignored when `position` is set to anything other than its own default.
+*   `position` (deprecated -- use `placement`): an `Alignment`, defaulting to `Alignment.topRight`. Kept, and still fully functional exactly as before `placement` existed (both axes honoured), for 1.x callers; when set to anything other than its own default, it takes precedence over `placement`.
 *   `strings`: `IxToastStrings`, forwarded to every toast.
 *   `width`: target card width in logical pixels (default `280`); shrinks to fit narrower viewports with a 16px margin instead of overflowing.
 
@@ -223,14 +226,14 @@ IxToastOverlay(
 
 *   `action`: a fully custom action widget, shown under the message instead of the default `actionLabel`/`onAction` text button.
 *   `hideIcon`: hides the type icon entirely.
-*   `dismissOnAction`: whether tapping the default action button also closes the toast (default `true`; `showToast()`'s own default is `false`).
+*   `dismissOnAction`: whether tapping the default action button also closes the toast (default `true`, matching both `show()` and `showToast()`'s current default; a planned 2.0 release flips `showToast()`'s own default to `false`).
 
 ## Deprecations
 
 *   `IxToastType.critical` / `.alarm` -- use `IxToastType.error` (both now render with the same styling as `error`).
 *   `IxToastType.neutral` -- use `IxToastType.info`.
-*   `IxToastOverlay.alignment` -- use `position`. When set, its vertical (`y`) axis is still honoured for 1.x callers; toasts are always right-aligned regardless of `alignment`'s `x` axis.
+*   `IxToastOverlay.position` (`Alignment`) -- use `placement` (`IxToastPosition`).
 
 ## 2.0 default changes
 
-`IxToastOverlay`'s `position` currently defaults to `IxToastPosition.topRight` and `IxToastService.showToast()`'s `dismissOnAction` currently defaults to `true`, both to preserve 1.x behaviour. The planned 2.0 release changes these defaults to `IxToastPosition.bottomRight` and `dismissOnAction: false` respectively -- `show()`'s behaviour (`dismissOnAction: true`, unaffected by `showToast()`'s default) does not change.
+`IxToastOverlay`'s `placement` currently defaults to `IxToastPosition.topRight` and `IxToastService.showToast()`'s `dismissOnAction` currently defaults to `true`, both to preserve 1.x behaviour. The planned 2.0 release changes these defaults to `IxToastPosition.bottomRight` and `dismissOnAction: false` respectively -- `show()`'s behaviour (`dismissOnAction: true`, unaffected by `showToast()`'s default) does not change.

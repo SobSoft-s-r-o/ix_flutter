@@ -125,7 +125,17 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
 
   void _pauseIfAutoClosing() {
     if (widget.data.autoClose && widget.data.duration != null) {
+      _progressController.stop();
       widget.onEnter?.call();
+    }
+  }
+
+  void _resumeIfAutoClosing() {
+    if (widget.data.autoClose && widget.data.duration != null) {
+      // AnimationController.forward() is a no-op once already at 1.0, so
+      // this is safe to call even if the countdown had already completed.
+      _progressController.forward();
+      widget.onExit?.call();
     }
   }
 
@@ -200,27 +210,23 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
       ),
     );
 
+    final effectiveType = _effectiveType(widget.data.type);
     final toastRole =
-        widget.data.type == IxToastType.error ||
-            widget.data.type == IxToastType.warning
+        effectiveType == IxToastType.error ||
+            effectiveType == IxToastType.warning
         ? SemanticsRole.alert
         : SemanticsRole.status;
 
     return Listener(
+      // Touch has no hover concept, so a tap only pauses for as long as the
+      // pointer is actually down -- paired resume on both a normal release
+      // and a cancelled gesture (e.g. the pointer sliding off-screen).
       onPointerDown: (_) => _pauseIfAutoClosing(),
+      onPointerUp: (_) => _resumeIfAutoClosing(),
+      onPointerCancel: (_) => _resumeIfAutoClosing(),
       child: MouseRegion(
         onEnter: (_) => _pauseIfAutoClosing(),
-        onExit: (_) {
-          if (widget.data.autoClose && widget.data.duration != null) {
-            // Only resume if we haven't completed yet.
-            // If we stopped at 1.0 (completed), we shouldn't restart unless we reset.
-            // But usually we stop *before* completion.
-            // However, if the user hovers, we want to keep it open.
-            // When they leave, we resume the countdown.
-            _progressController.forward();
-            widget.onExit?.call();
-          }
-        },
+        onExit: (_) => _resumeIfAutoClosing(),
         child: Material(
           type: MaterialType.transparency,
           child: ConstrainedBox(

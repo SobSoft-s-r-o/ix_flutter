@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,7 +19,11 @@ void main() {
   void handlePauseResumeIsPausedCloseOnClose() {
     test('handle: pause/resume/isPaused/close/onClose', () {
       fakeAsync((async) {
-        final s = IxToastService();
+        final s = IxToastService()
+          // DateTime.now() is not zone-aware and would ignore async.elapse
+          // below (verified empirically); clock.now() is fakeAsync's own
+          // zone-local clock, so pause/resume see the simulated time.
+          ..now = clock.now;
         final h = s.showToast(
           message: 'x',
           autoCloseDelay: const Duration(seconds: 5),
@@ -90,4 +95,50 @@ void main() {
   }
 
   dismissOnActionFalseKeepsTheToastOpenAfterTheAction();
+
+  @Upstream('toast.tsx:53-58 pause the auto-close timer while pressed')
+  void pointerDownPausesAndPointerUpResumes() {
+    testWidgets('pointer down pauses the countdown; pointer up resumes it', (
+      tester,
+    ) async {
+      final service = IxToastService()
+        // testWidgets bodies already run inside flutter_test's own
+        // FakeAsync zone (AutomatedTestWidgetsFlutterBinding.runTest
+        // wraps every test in FakeAsync().run(...), which itself installs
+        // package:clock's zone override -- verified by reading
+        // package:fake_async's source), so clock.now() tracks
+        // tester.pump(duration)'s simulated time the same way it tracks
+        // fakeAsync's `async.elapse` in the unit test above; plain
+        // DateTime.now() would not.
+        ..now = clock.now;
+      await pumpIx(tester, Stack(children: [IxToastOverlay(service: service)]));
+      final handle = service.showToast(
+        message: 'Saved',
+        autoCloseDelay: const Duration(seconds: 5),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+
+      // Press down somewhere on the card away from the close/action
+      // buttons (near its top-left corner).
+      final gesture = await tester.startGesture(
+        tester.getTopLeft(find.byType(IxToast)) + const Offset(2, 2),
+      );
+      await tester.pump();
+      expect(handle.isPaused, isTrue);
+
+      // Paused: the countdown doesn't advance while the pointer is down.
+      await tester.pump(const Duration(seconds: 10));
+      expect(service.toasts, hasLength(1));
+
+      await gesture.up();
+      await tester.pump();
+      expect(handle.isPaused, isFalse);
+
+      // Resumed: the remaining countdown still completes on release.
+      await tester.pump(const Duration(seconds: 6));
+      expect(service.toasts, isEmpty);
+    });
+  }
+
+  pointerDownPausesAndPointerUpResumes();
 }

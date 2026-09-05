@@ -12,34 +12,35 @@ import 'ix_toast_strings.dart';
 
 /// Overlay widget that renders the stack of active toasts.
 ///
-/// Right-aligned per [position] and safe-area aware (upstream
-/// `toast-container.scss:25-33`); its content sits inside a
-/// [FocusTraversalGroup] using [ReadingOrderTraversalPolicy] so Tab visits
-/// every toast's controls in on-screen order.
+/// Safe-area aware (upstream `toast-container.scss:25-33`); its content
+/// sits inside a [FocusTraversalGroup] using [ReadingOrderTraversalPolicy]
+/// so Tab visits every toast's controls in on-screen order.
 class IxToastOverlay extends StatefulWidget {
   const IxToastOverlay({
     super.key,
     required this.service,
-    this.position = IxToastPosition.topRight,
-    @Deprecated('Use position') this.alignment,
+    @Deprecated('Use placement') this.position = Alignment.topRight,
+    this.placement = IxToastPosition.topRight,
     this.strings = const IxToastStrings(),
     this.width = 280,
   });
 
   final IxToastService service;
 
-  /// Which corner the toast stack anchors to.
+  /// Superseded by [placement]. Kept, and still fully functional (both
+  /// axes honoured, exactly as before [placement] existed), for 1.x
+  /// callers -- when set to anything other than its own default
+  /// ([Alignment.topRight]), it takes precedence over [placement].
+  @Deprecated('Use placement')
+  final Alignment position;
+
+  /// Which corner the toast stack anchors to (always right-edge; upstream
+  /// only defines a top/bottom axis).
   ///
   /// Defaults to [IxToastPosition.topRight] (1.x-compatible behaviour);
-  /// 2.0 changes this default to [IxToastPosition.bottomRight].
-  final IxToastPosition position;
-
-  /// Superseded by [position]. When set, its `y` axis (top vs bottom) is
-  /// still honoured for 1.x callers -- toasts are always right-aligned
-  /// regardless of `alignment`'s `x` axis, matching [IxToastPosition]'s
-  /// narrower (right-edge only) scope.
-  @Deprecated('Use position')
-  final Alignment? alignment;
+  /// 2.0 changes this default to [IxToastPosition.bottomRight]. Ignored
+  /// when [position] is set to anything other than its own default.
+  final IxToastPosition placement;
 
   /// Localizable chrome strings, forwarded to every [IxToast].
   final IxToastStrings strings;
@@ -167,27 +168,44 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
     );
   }
 
-  /// Resolves the vertical anchor: [alignment] (when set, for 1.x callers)
-  /// takes precedence over [IxToastOverlay.position].
-  bool get _isTopAligned {
+  /// Resolves the four [Positioned] edge offsets.
+  ///
+  /// [IxToastOverlay.position] (when set to anything other than its own
+  /// [Alignment.topRight] default) takes precedence and is honoured on
+  /// both axes exactly as it was before [IxToastOverlay.placement]
+  /// existed; otherwise [IxToastOverlay.placement] anchors the (always
+  /// right-edge) top/bottom corner.
+  ({double? top, double? bottom, double? left, double? right}) get _edges {
     // ignore: deprecated_member_use_from_same_package
-    final legacyAlignment = widget.alignment;
-    if (legacyAlignment != null) {
-      return legacyAlignment.y <= 0;
+    final legacyPosition = widget.position;
+    if (legacyPosition != Alignment.topRight) {
+      return (
+        top: legacyPosition.y == -1.0 ? 16 : null,
+        bottom: legacyPosition.y == 1.0 ? 16 : null,
+        left: legacyPosition.x == -1.0 ? 16 : null,
+        right: legacyPosition.x == 1.0 ? 16 : null,
+      );
     }
-    return widget.position == IxToastPosition.topRight;
+    final isTop = widget.placement == IxToastPosition.topRight;
+    return (
+      top: isTop ? 32 : null,
+      bottom: isTop ? null : 32,
+      left: null,
+      right: 16,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
     final effectiveWidth = math.min(widget.width, screenSize.width - 32);
-    final isTop = _isTopAligned;
+    final edges = _edges;
 
     return Positioned(
-      top: isTop ? 32 : null,
-      bottom: isTop ? null : 32,
-      right: 16,
+      top: edges.top,
+      bottom: edges.bottom,
+      left: edges.left,
+      right: edges.right,
       child: SafeArea(
         child: ConstrainedBox(
           constraints: BoxConstraints(maxHeight: screenSize.height),

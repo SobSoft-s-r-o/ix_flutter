@@ -27,7 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxSpinnerVariant.standard`
 - `IxButtonVariant.warning*`/`info*`/`success*` (not part of Siemens iX)
 - `IxDropdownButtonVariant` and `IxDropdownButton.variant` (use `buttonVariant:` with an `IxButtonVariant`)
-- `IxToastType.critical`/`.alarm`/`.neutral` (use `.error`/`.error`/`.info`), `IxToastOverlay.alignment` (use `position:`)
+- `IxToastType.critical`/`.alarm`/`.neutral` (use `.error`/`.error`/`.info`)
+- `IxToastOverlay.position` (`Alignment`); use `placement` (`IxToastPosition`)
 
 ### Fixed
 - `IxBlind` now honours `IxThemeBuilder(typography:)` instead of always falling back to the default typography

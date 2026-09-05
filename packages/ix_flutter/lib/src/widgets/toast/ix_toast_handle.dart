@@ -1,17 +1,15 @@
-import 'dart:async';
-
-import 'ix_toast_data.dart';
-import 'ix_toast_service.dart';
+part of 'ix_toast_service.dart';
 
 /// A live reference to a single shown toast, returned by
 /// [IxToastService.showToast].
 ///
 /// Mirrors the upstream `toast.ct.ts` pause/resume/`isPaused` API and the
 /// close-with-result contract implied by `toast.tsx:163-184,199-213`.
+///
+/// Constructed by [IxToastService.showToast] only -- there is no public
+/// constructor.
 class IxToastHandle {
-  /// Constructed by [IxToastService.showToast]. Application code receives
-  /// instances from there and should not construct this directly.
-  IxToastHandle(this._service, this.data);
+  IxToastHandle._(this._service, this.data);
 
   final IxToastService _service;
   final Completer<Object?> _completer = Completer<Object?>();
@@ -44,9 +42,8 @@ class IxToastHandle {
   /// Called by [IxToastService] once the toast has actually been removed
   /// from [IxToastService.toasts] -- through [close], the close button, the
   /// auto-close timer, or [IxToastService.dismissAll] -- so [onClose]
-  /// resolves exactly once no matter which of those removed it. Not meant
-  /// to be called by application code.
-  void notifyClosed(Object? result) {
+  /// resolves exactly once no matter which of those removed it.
+  void _notifyClosed(Object? result) {
     if (!_completer.isCompleted) {
       _completer.complete(result);
     }
