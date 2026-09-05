@@ -261,11 +261,11 @@ Icons have separate licensing. See [ICON_LICENSING.md](ICON_LICENSING.md).
 
 ### Q: Can I use Siemens iX icons?
 
-**A:** Yes, but you must:
-1. Generate them using our tool
-2. Comply with Siemens iX licensing
-3. Provide proper attribution
-4. See [ICON_LICENSING.md](ICON_LICENSING.md)
+**A:** Yes:
+1. `ix_flutter`'s own widgets already use them — no generator needed. They render as Material glyphs today; once the LEGAL REVIEW gate documented in [UPSTREAM.md](UPSTREAM.md) is passed, the library bundles a minimal internal set (28 icons) with an MIT notice.
+2. For the full 1 479-icon catalogue in your own code, running the optional `ix_icons_generator` (`dart run ix_icons_generator:generate_icons`) is up to you.
+3. `@siemens/ix-icons` is MIT-licensed: redistribution keeps the copyright/permission notice and `READMEOSS.html`. Siemens trademarks and brand guidelines are separate from the MIT license.
+4. See [ICON_LICENSING.md](ICON_LICENSING.md) for details.
 
 ---
 
