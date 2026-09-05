@@ -24,19 +24,19 @@ class CardsPage extends StatelessWidget {
         variant: IxCardVariant.filled,
         title: 'Analytics overview',
         subtitle: 'High-level KPIs and quick filters tuned for dashboards.',
-        icon: IxIcons.dashboard,
+        icon: IxIcon(IxIconsData.dashboard),
       ),
       _CardDemo(
         variant: IxCardVariant.outline,
         title: 'Experiment rollout',
         subtitle: 'Outline treatment for filters and supporting tools.',
-        icon: IxIcons.appMenu,
+        icon: IxIcon(IxIconsData.appMenu),
       ),
       _CardDemo(
         variant: IxCardVariant.primary,
         title: 'Initiate workflow',
         subtitle: 'Highlighted action cards meant for primary flows.',
-        icon: IxIcons.rocket,
+        icon: IxIcon(IxIconsData.rocket),
       ),
     ];
 
@@ -45,37 +45,37 @@ class CardsPage extends StatelessWidget {
         variant: IxCardVariant.alarm,
         title: 'Alarm condition',
         subtitle: 'Notify operators when thresholds exceed safe ranges.',
-        icon: IxIcons.alarmBell,
+        icon: IxIcon(IxIconsData.alarmBell),
       ),
       _CardDemo(
         variant: IxCardVariant.critical,
         title: 'Critical outage',
         subtitle: 'Escalate incidents that block production entirely.',
-        icon: IxIcons.warning,
+        icon: IxIcon(IxIconsData.warning),
       ),
       _CardDemo(
         variant: IxCardVariant.warning,
         title: 'Maintenance soon',
         subtitle: 'Warn teams about upcoming maintenance windows.',
-        icon: IxIcons.warning,
+        icon: IxIcon(IxIconsData.warning),
       ),
       _CardDemo(
         variant: IxCardVariant.success,
         title: 'Inspection cleared',
         subtitle: 'Celebrate a green status after QA handoff.',
-        icon: IxIcons.check,
+        icon: IxIcon(IxIconsData.check),
       ),
       _CardDemo(
         variant: IxCardVariant.info,
         title: 'Documentation update',
         subtitle: 'Share product changes or release notes with teams.',
-        icon: IxIcons.info,
+        icon: IxIcon(IxIconsData.info),
       ),
       _CardDemo(
         variant: IxCardVariant.neutral,
         title: 'Backlog summary',
         subtitle: 'Neutral information blocks for supporting content.',
-        icon: IxIcons.folder,
+        icon: IxIcon(IxIconsData.folder),
       ),
     ];
 

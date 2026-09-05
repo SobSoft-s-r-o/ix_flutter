@@ -53,7 +53,7 @@ class ButtonsPage extends StatelessWidget {
                       FilledButton.icon(
                         style: style,
                         onPressed: () {},
-                        icon: IxIcons.add,
+                        icon: IxIcon(IxIconsData.add),
                         label: const Text('With icon'),
                       ),
                       FilledButton(
@@ -124,7 +124,7 @@ class _ChipExamples extends StatelessWidget {
                   context,
                   label: 'With icon',
                   style: ixChips.variant(IxChipVariant.standard),
-                  icon: IxIcons.filter,
+                  icon: IxIcon(IxIconsData.filter),
                 ),
               ],
             ),

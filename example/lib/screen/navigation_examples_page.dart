@@ -181,8 +181,8 @@ final List<_NavigationSpec> _navigationSpecs = [
     title: 'Snack bar guidance',
     description:
         'Use snack bars for transient status or undo affordances. Buttons below trigger different severities.',
-    icon: IxIcons.notification,
-    selectedIcon: IxIcons.notificationFilled,
+    icon: IxIcon(IxIconsData.notification),
+    selectedIcon: IxIcon(IxIconsData.notificationFilled),
     builder: (context) => const _SnackBarExamples(),
   ),
   _NavigationSpec(
@@ -190,8 +190,8 @@ final List<_NavigationSpec> _navigationSpecs = [
     title: 'Dialog walkthrough',
     description:
         'Dialogs pause the flow for confirmations, warnings, or detail review. Explore the alert and form dialogs here.',
-    icon: IxIcons.warning,
-    selectedIcon: IxIcons.warningFilled,
+    icon: IxIcon(IxIconsData.warning),
+    selectedIcon: IxIcon(IxIconsData.warningFilled),
     builder: (context) => const _DialogExamples(),
   ),
   _NavigationSpec(
@@ -199,8 +199,8 @@ final List<_NavigationSpec> _navigationSpecs = [
     title: 'Breadcrumb navigation',
     description:
         'Breadcrumbs expose deep information architecture and offer shortcuts back to previous levels.',
-    icon: IxIcons.folder,
-    selectedIcon: IxIcons.folderFilled,
+    icon: IxIcon(IxIconsData.folder),
+    selectedIcon: IxIcon(IxIconsData.folderFilled),
     builder: (context) => const _BreadcrumbExamples(),
   ),
 ];
@@ -222,7 +222,7 @@ class _SnackBarExamples extends StatelessWidget {
           children: [
             IconTheme.merge(
               data: IconThemeData(color: colorScheme.primary, size: 48),
-              child: IxIcons.notification,
+              child: IxIcon(IxIconsData.notification),
             ),
             const SizedBox(height: 16),
             Text(
@@ -306,7 +306,7 @@ class _DialogExamples extends StatelessWidget {
           children: [
             IconTheme.merge(
               data: IconThemeData(color: colorScheme.secondary, size: 48),
-              child: IxIcons.warning,
+              child: IxIcon(IxIconsData.warning),
             ),
             const SizedBox(height: 16),
             Text(
@@ -422,7 +422,7 @@ class _BreadcrumbExamplesState extends State<_BreadcrumbExamples> {
   bool _showHomeLabel = false;
 
   List<IxBreadcrumbItemData> get _demoItems => [
-    IxBreadcrumbItemData(label: 'Home', icon: IxIcons.home),
+    IxBreadcrumbItemData(label: 'Home', icon: IxIcon(IxIconsData.home)),
     const IxBreadcrumbItemData(label: 'Manufacturing'),
     const IxBreadcrumbItemData(label: 'Lines'),
     const IxBreadcrumbItemData(label: 'Line 04'),

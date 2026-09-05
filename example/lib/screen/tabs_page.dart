@@ -524,7 +524,7 @@ final List<_TextTabSpec> _textTabs = [
     panelBody:
         'Track live KPIs for turbines and connected lines. '
         'Tab copy inherits IxTypography.label with bold weight.',
-    icon: IxIcons.dashboard,
+    icon: IxIcon(IxIconsData.dashboard),
     count: 4,
   ),
   _TextTabSpec(
@@ -533,22 +533,26 @@ final List<_TextTabSpec> _textTabs = [
     panelBody:
         'Use a badge to highlight open alerts. '
         'Indicator height stays at 0.125rem per IX Flutter tokens.',
-    icon: IxIcons.warning,
+    icon: IxIcon(IxIconsData.warning),
     count: 8,
-    leading: IxIcons.warning,
+    leading: IxIcon(IxIconsData.warning),
   ),
   _TextTabSpec(
     label: 'Insights',
     panelTitle: 'Data insights',
     panelBody:
         'Tabs align to the ghost surface tokens, keeping text legible on dashboards.',
-    icon: IxIcons.ai,
+    icon: IxIcon(IxIconsData.ai),
   ),
 ];
 
 final List<_CircleTabSpec> _circleTabs = [
-  _CircleTabSpec(label: 'Devices', icon: IxIcons.layers),
-  _CircleTabSpec(label: 'Logbook', icon: IxIcons.appMenu),
-  _CircleTabSpec(label: 'Analytics', icon: IxIcons.analysis),
-  _CircleTabSpec(label: 'Disabled', icon: IxIcons.close, disabled: true),
+  _CircleTabSpec(label: 'Devices', icon: IxIcon(IxIconsData.layers)),
+  _CircleTabSpec(label: 'Logbook', icon: IxIcon(IxIconsData.appMenu)),
+  _CircleTabSpec(label: 'Analytics', icon: IxIcon(IxIconsData.analysis)),
+  _CircleTabSpec(
+    label: 'Disabled',
+    icon: IxIcon(IxIconsData.close),
+    disabled: true,
+  ),
 ];

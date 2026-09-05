@@ -126,7 +126,7 @@ class _FormsPageState extends State<FormsPage> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                prefixIcon: _FormIcon(child: IxIcons.search),
+                prefixIcon: _FormIcon(child: IxIcon(IxIconsData.search)),
                 suffixIcon: _searchController.text.isEmpty
                     ? null
                     : IconButton(
@@ -170,7 +170,7 @@ class _FormsPageState extends State<FormsPage> {
                 errorText: 'Please enter a valid email',
                 suffixIcon: _FormIcon(
                   color: ixFields?.error.icon,
-                  child: IxIcons.alarm,
+                  child: IxIcon(IxIconsData.alarm),
                 ),
               ),
             ),
@@ -206,9 +206,9 @@ class _FormsPageState extends State<FormsPage> {
                 setState(() => _selectedStatus = value);
               },
               dropdownMenuEntries: _statusEntries,
-              leadingIcon: _FormIcon(child: IxIcons.layers),
-              trailingIcon: IxIcons.chevronDownSmall,
-              selectedTrailingIcon: IxIcons.chevronUpSmall,
+              leadingIcon: _FormIcon(child: IxIcon(IxIconsData.layers)),
+              trailingIcon: IxIcon(IxIconsData.chevronDownSmall),
+              selectedTrailingIcon: IxIcon(IxIconsData.chevronUpSmall),
             ),
             const SizedBox(height: 4),
             Text(
@@ -226,8 +226,8 @@ class _FormsPageState extends State<FormsPage> {
               dropdownMenuEntries: [
                 DropdownMenuEntry(value: 'disabled', label: 'Unavailable'),
               ],
-              trailingIcon: IxIcons.chevronDownSmall,
-              selectedTrailingIcon: IxIcons.chevronUpSmall,
+              trailingIcon: IxIcon(IxIconsData.chevronDownSmall),
+              selectedTrailingIcon: IxIcon(IxIconsData.chevronUpSmall),
             ),
             const SizedBox(height: 16),
             const _FieldLabel('Due date'),
@@ -241,7 +241,7 @@ class _FormsPageState extends State<FormsPage> {
                   decoration: InputDecoration(
                     helperText:
                         'Tap to open showDatePicker themed by IX tokens.',
-                    suffixIcon: _FormIcon(child: IxIcons.calendar),
+                    suffixIcon: _FormIcon(child: IxIcon(IxIconsData.calendar)),
                   ),
                 ),
               ),
@@ -431,21 +431,21 @@ class _FormsPageState extends State<FormsPage> {
                 message:
                     'Surface subtle hints or descriptions near related inputs.',
                 colors: ixFields.info,
-                icon: IxIcons.infoFeed,
+                icon: IxIcon(IxIconsData.infoFeed),
               ),
               const SizedBox(height: 12),
               _SemanticBanner(
                 label: 'Warning state',
                 message: 'Use when downstream inputs have limited validity.',
                 colors: ixFields.warning,
-                icon: IxIcons.maintenanceWarning,
+                icon: IxIcon(IxIconsData.maintenanceWarning),
               ),
               const SizedBox(height: 12),
               _SemanticBanner(
                 label: 'Error state',
                 message: 'Reserve for blocking issues that prevent submission.',
                 colors: ixFields.error,
-                icon: IxIcons.alarmBell,
+                icon: IxIcon(IxIconsData.alarmBell),
               ),
             ],
           ),
@@ -699,14 +699,14 @@ class _UploadDropzoneTile extends StatelessWidget {
       case IxUploadSurfaceState.dragOver:
         return IconTheme(
           data: IconTheme.of(context).copyWith(color: textColor, size: 20),
-          child: IxIcons.cloudUpload,
+          child: IxIcon(IxIconsData.cloudUpload),
         );
       case IxUploadSurfaceState.disabled:
         return Icon(Icons.block, size: 20, color: textColor);
       case IxUploadSurfaceState.idle:
         return IconTheme(
           data: IconTheme.of(context).copyWith(color: textColor, size: 20),
-          child: IxIcons.upload,
+          child: IxIcon(IxIconsData.upload),
         );
     }
   }

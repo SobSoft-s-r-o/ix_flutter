@@ -191,7 +191,7 @@ class BadgesPage extends StatelessWidget {
                   description:
                       'Use for informational notices like planned downtime or configuration tips.',
                   style: ixBadges.style(IxBadgeTone.info),
-                  icon: IxIcons.info,
+                  icon: IxIcon(IxIconsData.info),
                 ),
                 const SizedBox(height: 12),
                 _BannerSemanticsExample(
@@ -200,7 +200,7 @@ class BadgesPage extends StatelessWidget {
                   description:
                       'Escalate when partial degradation or manual validation is required.',
                   style: ixBadges.style(IxBadgeTone.warning),
-                  icon: IxIcons.maintenanceWarning,
+                  icon: IxIcon(IxIconsData.maintenanceWarning),
                 ),
                 const SizedBox(height: 12),
                 _BannerSemanticsExample(
@@ -209,7 +209,7 @@ class BadgesPage extends StatelessWidget {
                   description:
                       'Reserve for outage scenarios where immediate user action is mandatory.',
                   style: ixBadges.style(IxBadgeTone.critical),
-                  icon: IxIcons.alarmBell,
+                  icon: IxIcon(IxIconsData.alarmBell),
                 ),
               ],
             ),

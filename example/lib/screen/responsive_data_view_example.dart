@@ -386,7 +386,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                 IxRowAction(
                   id: 'edit',
                   label: 'Edit',
-                  icon: IxIcons.pen,
+                  icon: IxIcon(IxIconsData.pen),
                   onSelected: (item) {
                     print('Edit ${item.name}');
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -397,7 +397,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                 IxRowAction(
                   id: 'add_payment',
                   label: 'Add Payment',
-                  icon: IxIcons.plus,
+                  icon: IxIcon(IxIconsData.plus),
                   onSelected: (item) {
                     print('Add Payment for ${item.name}');
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -408,7 +408,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                 IxRowAction(
                   id: 'delete',
                   label: 'Delete',
-                  icon: IxIcons.trashcan,
+                  icon: IxIcon(IxIconsData.trashcan),
                   destructive: true,
                   onSelected: (item) {
                     print('Delete ${item.name}');

@@ -1,6 +1,6 @@
 name: ix_icons_generator
 description: "Icon generator tool for Siemens iX Design System Flutter icons. Downloads and generates 1400+ icons from the official npm package."
-version: 1.0.0
+version: 1.1.0
 repository: https://github.com/SobSoft-s-r-o/ix_flutter
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
 issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
@@ -15,6 +15,9 @@ dependencies:
   recase: ^4.1.0
   archive: ^4.0.7
   args: ^2.7.0
+
+dev_dependencies:
+  test: ^1.25.0
 
 executables:
   generate_icons: generate_icons
