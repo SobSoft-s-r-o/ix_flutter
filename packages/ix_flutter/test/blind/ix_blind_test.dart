@@ -68,6 +68,52 @@ void main() {
 
   headerIsButtonWithExpandedStateAndActionsStaySeparate();
 
+  testWidgets(
+    "header actions keep the header content's 16px right-edge margin",
+    (tester) async {
+      await pumpIx(
+        tester,
+        IxBlind(
+          title: 'T',
+          expanded: false,
+          onExpandedChanged: (_) {},
+          headerActions: IconButton(
+            icon: const Icon(Icons.edit),
+            tooltip: 'Edit',
+            onPressed: () {},
+          ),
+          child: const Text('body'),
+        ),
+        size: const Size(400, 600),
+      );
+      final theme = Theme.of(tester.element(find.byType(IxBlind)));
+      final borderWidth =
+          (theme.extension<IxBlindTheme>() ?? IxBlindTheme.fallback(theme))
+              .borderWidth;
+      final blindRight = tester.getRect(find.byType(IxBlind)).right;
+      // `find.byType(IconButton)`, not `find.byTooltip(...)`: `Tooltip`
+      // reports a hit-test box inset a further 4px from its child's own
+      // bounds, which is not the edge that matters for a visible margin --
+      // `IconButton`'s own rect is the space actually allocated to
+      // `headerActions` by the header's `Row`.
+      final actionsRight = tester.getRect(find.byType(IconButton)).right;
+      // The blind's own card border insets its content by `borderWidth`
+      // (Container applies a decoration border as implicit padding), and
+      // the header's own padded Container insets by `space3` (16px) on
+      // top of that -- the same margin plain header content (chevron,
+      // title) gets. `headerActions` must keep that margin now that it
+      // lives outside the header's `Semantics` node (see the previous
+      // test), instead of losing it to the bare 8px inter-item gap.
+      expect(
+        actionsRight,
+        moreOrLessEquals(
+          blindRight - borderWidth - IxCommonGeometry.space3,
+          epsilon: 0.5,
+        ),
+      );
+    },
+  );
+
   testWidgets('uncontrolled blind toggles on tap without a callback', (
     tester,
   ) async {
