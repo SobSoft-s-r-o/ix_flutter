@@ -447,12 +447,17 @@ class _BreadcrumbSegment extends StatelessWidget {
           hint: strings.currentPage,
           label: item.semanticLabel ?? item.label,
           child: ExcludeSemantics(
-            child: SizedBox(
-              height: theme.height,
-              child: Padding(
-                padding: theme.itemPadding,
-                child: Align(alignment: Alignment.centerLeft, child: content),
-              ),
+            // A minimum (not exact) height mirrors the interactive
+            // TextButton's own `minimumSize`; `content` is a
+            // `mainAxisSize: MainAxisSize.min` Row, so -- unlike wrapping
+            // it in `Align`, which would expand to this box's full
+            // *width* inside the row's unbounded-width scroll axis --
+            // this only affects height, and Row's default
+            // `CrossAxisAlignment.center` still centers `content`
+            // vertically within it.
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: theme.height),
+              child: Padding(padding: theme.itemPadding, child: content),
             ),
           ),
         ),
