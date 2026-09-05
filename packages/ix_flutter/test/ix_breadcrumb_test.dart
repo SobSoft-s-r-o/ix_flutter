@@ -9,17 +9,16 @@ import 'helpers/upstream.dart';
 /// Rendering, callback and accessibility regression tests for
 /// [IxBreadcrumb].
 ///
-/// The first two tests below predate this repository's `@Upstream`
-/// citation convention (`test/helpers/upstream.dart`): they assert plain
-/// rendering/callback mechanics native to this Flutter port
-/// (`visibleItemCount` overflow, `onItemPressed`) with no single upstream
-/// `.ct.ts`/`.tsx` counterpart of their own. The tests added for the
-/// accessibility-interaction programme (Task A-8: navigation landmark,
-/// one labelled node per crumb, current-page state, stable
-/// `breadcrumbKey` click payloads) each carry their own `@Upstream` tag,
-/// except the `breadcrumbKey`-fallback test at the bottom: falling back to
-/// `label` (with a one-time debug notice) is a migration shim specific to
-/// this Flutter port, with no upstream counterpart of its own either.
+/// The tests added for the accessibility-interaction programme (Task A-8:
+/// navigation landmark, one labelled node per crumb, current-page state,
+/// stable `breadcrumbKey` click payloads) that mirror a specific upstream
+/// ARIA/keyboard contract carry their own `@Upstream` tag. The remaining
+/// tests -- the first two (predating this repository's `@Upstream`
+/// citation convention, `test/helpers/upstream.dart`), the
+/// `breadcrumbKey`-fallback test, and the `IxBreadcrumbTheme`/layout
+/// regression tests at the bottom -- assert plain rendering/callback/theme
+/// mechanics native to this Flutter port, with no single upstream
+/// `.ct.ts`/`.tsx` counterpart of their own.
 void main() {
   testWidgets('breadcrumbs render and trigger callbacks', (tester) async {
     final pressed = <String>[];
@@ -180,6 +179,119 @@ void main() {
       await tester.tap(find.text('Legacy'));
       await tester.pumpAndSettle();
       expect(clicks, ['Legacy']);
+    },
+  );
+
+  testWidgets(
+    'a custom IxBreadcrumbTheme.dropdownBackground still colours the open '
+    'overflow menu',
+    (tester) async {
+      // dropdownBackground/dropdownBorderRadius are deprecated (removed in
+      // 2.0, superseded by IxDropdownTheme for the rest of the popup's
+      // styling) but must keep working until then -- an explicit override
+      // must not silently stop applying.
+      final baseTheme = const IxThemeBuilder().build();
+      const customBackground = Color(0xFFAB1234);
+      final customTheme = baseTheme.copyWith(
+        extensions: [
+          // ThemeData.copyWith(extensions:) *replaces* the whole
+          // extensions map rather than merging into it, so every other
+          // extension is carried over unchanged and only IxBreadcrumbTheme
+          // is swapped out.
+          for (final extension in baseTheme.extensions.values)
+            if (extension is IxBreadcrumbTheme)
+              // ignore: deprecated_member_use_from_same_package
+              extension.copyWith(dropdownBackground: customBackground)
+            else
+              extension,
+        ],
+      );
+
+      await pumpIx(
+        tester,
+        const IxBreadcrumb(
+          showHomeLabel: true,
+          items: [
+            IxBreadcrumbItemData(label: 'Home', breadcrumbKey: 'home'),
+            IxBreadcrumbItemData(label: 'Plants', breadcrumbKey: 'plants'),
+          ],
+        ),
+        theme: customTheme,
+      );
+
+      await tester.tap(find.text('Home'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.byWidgetPredicate(
+          (widget) => widget is Material && widget.color == customBackground,
+        ),
+        findsOneWidget,
+      );
+    },
+  );
+
+  testWidgets(
+    'a non-interactive current-page crumb shrink-wraps like an interactive '
+    'one, instead of stretching to maxItemWidth',
+    (tester) async {
+      final maxItemWidth = const IxThemeBuilder()
+          .build()
+          .extension<IxBreadcrumbTheme>()!
+          .maxItemWidth;
+
+      // No press callback anywhere: the last crumb ('Hi') takes the
+      // non-interactive "current page" branch. Regression test for the
+      // bug fixed alongside this task: that branch used to wrap its
+      // content in `Align`, which -- sitting inside the row's
+      // unbounded-width horizontal scroll view -- expanded to the full
+      // `maxItemWidth` ceiling instead of shrink-wrapping to "Hi".
+      await pumpIx(
+        tester,
+        const IxBreadcrumb(
+          items: [
+            IxBreadcrumbItemData(label: 'Home', breadcrumbKey: 'home'),
+            IxBreadcrumbItemData(label: 'Hi', breadcrumbKey: 'hi'),
+          ],
+        ),
+      );
+      final nonInteractiveWidth = tester
+          .getSize(
+            find
+                .ancestor(
+                  of: find.text('Hi'),
+                  matching: find.byType(ConstrainedBox),
+                )
+                .first,
+          )
+          .width;
+
+      // onItemClick set: 'Hi' stays a normal, interactive TextButton
+      // (1.x-preserving behaviour), which already shrink-wraps -- the
+      // previous, known-good behaviour this compares against.
+      await pumpIx(
+        tester,
+        IxBreadcrumb(
+          items: const [
+            IxBreadcrumbItemData(label: 'Home', breadcrumbKey: 'home'),
+            IxBreadcrumbItemData(label: 'Hi', breadcrumbKey: 'hi'),
+          ],
+          onItemClick: (_) {},
+        ),
+      );
+      final interactiveWidth = tester
+          .getSize(
+            find
+                .ancestor(
+                  of: find.text('Hi'),
+                  matching: find.byType(ConstrainedBox),
+                )
+                .first,
+          )
+          .width;
+
+      expect(nonInteractiveWidth, lessThan(maxItemWidth / 2));
+      expect(nonInteractiveWidth, closeTo(interactiveWidth, 0.5));
     },
   );
 }

@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxToastType.critical`/`.alarm`/`.neutral` (use `.error`/`.error`/`.info`)
 - `IxToastOverlay.position` (`Alignment`); use `placement` (`IxToastPosition`)
 - `IxBreadcrumbItemData`/`IxBreadcrumbMenuItem` label-only items (no `breadcrumbKey`); `breadcrumbKey` becomes required in 2.0
+- `IxBreadcrumbTheme.dropdownBackground`/`.dropdownBorderRadius` (still honoured for now; overflow menus are styled by `IxDropdownTheme` instead, removed in 2.0)
 
 ### Fixed
 - `IxBlind` now honours `IxThemeBuilder(typography:)` instead of always falling back to the default typography

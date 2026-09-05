@@ -340,6 +340,7 @@ ThemeData(
       separatorColor: Colors.grey,
       iconColor: Colors.blue,
       ellipsisFontWeight: FontWeight.w700,
+      // ignore: deprecated_member_use
       dropdownBackground: Colors.white,
       dropdownTextStyle: const TextStyle(fontSize: 14),
       dropdownElevation: 4,
@@ -348,16 +349,20 @@ ThemeData(
         horizontal: 16,
         vertical: 8,
       ),
+      // ignore: deprecated_member_use
       dropdownBorderRadius: const BorderRadius.all(Radius.circular(4)),
     ),
   ],
 )
 ```
 
-The overflow/next-items popup itself (background, corner radius and row
-height) is styled from the shared `IxDropdownTheme` extension instead, so
-it matches every other Siemens IX dropdown surface in the app -- override
-that extension to restyle it.
+`dropdownBackground`/`dropdownBorderRadius` style the overflow/next-items
+popup's surface and corner radius; they are deprecated (removed in 2.0,
+once every dropdown-like surface in the app shares one styling source)
+but still take effect until then. The popup's row height comes from the
+shared `IxDropdownTheme` extension instead, so it already matches every
+other Siemens IX dropdown menu's row height -- override that extension to
+restyle it.
 
 ## Accessibility
 
