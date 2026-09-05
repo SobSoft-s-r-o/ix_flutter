@@ -12,8 +12,11 @@ import '../helpers/pump_ix.dart';
 /// adaptive precedence -- that has no single upstream `.scss`/`.tsx`
 /// counterpart of its own: the upstream web components simply render at a
 /// fixed density. None of the tests below carry an `@Upstream` tag for that
-/// reason. The final test only reconfirms that the nine invented (non-iX)
-/// button variants stay usable, unchanged, while newly deprecated in 1.x.
+/// reason. One test guards a Flutter-specific robustness requirement --
+/// [IxDensityScope] must not crash when the ambient [ThemeData] was not
+/// built by [IxThemeBuilder] -- and the final test only reconfirms that
+/// the nine invented (non-iX) button variants stay usable, unchanged,
+/// while newly deprecated in 1.x.
 Future<IxDensity> _effective(
   WidgetTester tester, {
   Size size = const Size(1024, 768),
@@ -85,6 +88,31 @@ void main() {
       IxDensity.compact,
     );
   });
+
+  testWidgets(
+    'IxDensityScope tolerates a non-iX theme (no IxTheme extension) and '
+    'still grows the hit area',
+    (tester) async {
+      await pumpIx(
+        tester,
+        IxDensityScope(
+          density: IxDensity.comfortable,
+          child: FilledButton(
+            key: const Key('plainFilled'),
+            onPressed: () {},
+            child: const Text('Save'),
+          ),
+        ),
+        // A plain ThemeData carries no IxTheme extension at all -- the
+        // scenario this test guards against IxDensityAdapter.apply
+        // crashing on `base.extension<IxTheme>()!`.
+        theme: ThemeData(),
+      );
+      final size = tester.getSize(find.byKey(const Key('plainFilled')));
+      expect(size.height, greaterThanOrEqualTo(48));
+      expect(size.width, greaterThanOrEqualTo(48));
+    },
+  );
 
   test('deprecated invented button variants are still present in 1.x', () {
     // ignore: deprecated_member_use_from_same_package

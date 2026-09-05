@@ -139,12 +139,22 @@ class _IxDensityInherited extends InheritedWidget {
 /// [IxDensityScope] (to re-theme a subtree with a live-resolved density).
 abstract final class IxDensityAdapter {
   /// Returns a copy of [base] with every button/checkbox/radio/switch/slider
-  /// theme adapted to [density]'s [IxDensity.tapTargetSize], and `IxTheme`'s
-  /// `density` field (see `IxThemeBuilder`) set to [density].
+  /// theme adapted to [density]'s [IxDensity.tapTargetSize], and, when
+  /// [base] carries an `IxTheme` extension (i.e. it was built by
+  /// [IxThemeBuilder]), that extension's `density` field set to [density].
+  ///
+  /// [IxDensityScope] calls this on whatever ambient [ThemeData] is
+  /// current, which is not guaranteed to be an [IxThemeBuilder] theme (an
+  /// app may wrap a plain [MaterialApp] in [IxDensityScope], or simply
+  /// forget `theme: IxThemeBuilder().build()`); the Material component
+  /// tap-target adaptation below applies regardless, but the `IxTheme`
+  /// re-stamp is skipped rather than throwing when there is no `IxTheme`
+  /// to re-stamp.
   static ThemeData apply(ThemeData base, IxDensity density) {
     final tts = density.tapTargetSize;
     ButtonStyle? withTts(ButtonStyle? style) =>
         (style ?? const ButtonStyle()).copyWith(tapTargetSize: tts);
+    final ixTheme = base.extension<IxTheme>();
 
     return base.copyWith(
       materialTapTargetSize: tts,
@@ -173,7 +183,7 @@ abstract final class IxDensityAdapter {
       ),
       extensions: [
         ...base.extensions.values.where((e) => e is! IxTheme),
-        base.extension<IxTheme>()!.copyWith(density: density),
+        if (ixTheme != null) ixTheme.copyWith(density: density),
       ],
     );
   }

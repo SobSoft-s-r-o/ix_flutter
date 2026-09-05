@@ -7,14 +7,16 @@ import '../helpers/upstream.dart';
 
 /// Traceability: the comfortable-density hit-area check below cites the
 /// upstream `button-mixin.scss` control height and WCAG 2.5.8 target-size
-/// guidance via `@Upstream`. The other three tests in this file have no
+/// guidance via `@Upstream`. The other tests in this file have no
 /// upstream `.scss`/`.tsx` counterpart of their own: they guard
 /// Flutter-specific mechanics introduced by this package --
 /// [IxDensityAdapter]'s `MaterialTapTargetSize` wiring keeping `1.x`
 /// buttons at their existing 40px visual height while only the hit area
 /// grows, [IxIconButton]'s fixed 32/24/16px visual sizes and matching
 /// `IconTheme` size at each [IxIconButtonSize], and [IxIconButton]'s
-/// merged semantics node -- so they carry no `@Upstream` tag.
+/// merged semantics node (both with a `tooltip`-derived label and with an
+/// icon-supplied `semanticLabel` alone) -- so they carry no `@Upstream`
+/// tag.
 Widget _controls() => Column(
   mainAxisSize: MainAxisSize.min,
   children: [
@@ -155,4 +157,35 @@ void main() {
     );
     handle.dispose();
   });
+
+  testWidgets(
+    'IxIconButton keeps an icon-supplied semanticLabel when tooltip and '
+    'semanticLabel are both absent',
+    (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpIx(
+        tester,
+        IxIconButton(
+          // No tooltip, no IxIconButton.semanticLabel: the icon's own
+          // semanticLabel must not be discarded (regression test for the
+          // `excludeSemantics: true` version, which dropped it).
+          icon: const Icon(Icons.close, semanticLabel: 'Close'),
+          onPressed: () {},
+        ),
+      );
+      expect(
+        tester.getSemantics(find.byType(IxIconButton)),
+        matchesSemantics(
+          isButton: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          isFocusable: true,
+          hasTapAction: true,
+          hasFocusAction: true,
+          label: 'Close',
+        ),
+      );
+      handle.dispose();
+    },
+  );
 }

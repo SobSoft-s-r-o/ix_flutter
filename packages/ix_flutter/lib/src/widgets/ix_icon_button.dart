@@ -115,9 +115,15 @@ class IxIconButton extends StatelessWidget {
       // without a spoken label. Merging an explicit `label` into the icon
       // (a non-boundary descendant of IconButton's own semantics node)
       // covers both cases uniformly, with or without a visible tooltip.
+      // `excludeSemantics` only drops the icon's own descendant semantics
+      // when this button supplies its own label; when neither [tooltip]
+      // nor [semanticLabel] is set, descendant semantics pass through
+      // untouched so an icon-supplied `semanticLabel` (e.g. `Icon(...,
+      // semanticLabel: ...)` or `IxIcon.key(..., semanticLabel: ...)`)
+      // still reaches the button instead of being silently discarded.
       icon: Semantics(
         label: label,
-        excludeSemantics: true,
+        excludeSemantics: label != null,
         child: IconTheme.merge(
           data: IconThemeData(size: size.iconSize.px),
           child: icon,
