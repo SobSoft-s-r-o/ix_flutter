@@ -31,6 +31,19 @@ class _LeakyAssetBundle extends CachingAssetBundle {
   }
 }
 
+/// Leaks the same unrelated error, then hands back a load that never
+/// settles at all — a bundle waiting on a network call that hangs, say.
+///
+/// The guard cannot compare an unrelated error against a failure that never
+/// arrives, so it must not hold it back indefinitely either.
+class _StalledAssetBundle extends CachingAssetBundle {
+  @override
+  Future<ByteData> load(String key) {
+    Future<void>.error(StateError('unrelated bookkeeping failure'));
+    return Completer<ByteData>().future;
+  }
+}
+
 const String _brokenFixture = 'test/fixtures/icons/broken.svg';
 const String _validFixture = 'test/fixtures/icons/valid.svg';
 
@@ -363,6 +376,43 @@ void main() {
     expect(
       _iconErrors(reported).where((e) => e.exception is StateError),
       isNotEmpty,
+    );
+  });
+
+  testWidgets('an unrelated async error is reported even when the load never '
+      'settles', (tester) async {
+    final reported = _captureReportedErrors();
+
+    await tester.runAsync(() async {
+      await _uncaughtDuring(() async {
+        await pumpIx(
+          tester,
+          DefaultAssetBundle(
+            bundle: _StalledAssetBundle(),
+            child: const IxIcon(
+              IxIconData.asset('missing.svg', fallback: Icons.close),
+            ),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 200));
+      });
+    });
+    await tester.pump();
+
+    // The load is still in flight and always will be, so there is no own
+    // failure to compare against -- the unrelated one must not be held back
+    // waiting for one.
+    expect(
+      _iconErrors(reported).where((e) => e.exception is StateError),
+      hasLength(1),
+    );
+
+    // Disposing the icon does not double-report it either.
+    await pumpIx(tester, const SizedBox());
+    await tester.pump();
+    expect(
+      _iconErrors(reported).where((e) => e.exception is StateError),
+      hasLength(1),
     );
   });
 

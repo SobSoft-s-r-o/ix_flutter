@@ -71,12 +71,16 @@ class IxIcon extends StatelessWidget {
   /// Forgets every SVG asset whose load has failed, and the cached empty-SVG
   /// bytes handed to `flutter_svg` in their place.
   ///
+  /// **A test hook, not part of the supported runtime API.** It exists so a
+  /// test suite that deliberately fails an asset load can start each test
+  /// from a clean slate, and it may change or be removed without notice —
+  /// including in a patch release. Application code should not call it.
+  ///
   /// [IxIcon] remembers a failed asset — identified by its path, package and
   /// [AssetBundle] — for the life of the process, so a missing or corrupt
   /// icon is not re-loaded (and re-reported) by every later instance of it.
   /// That is the right behaviour for an application, where a bundle does not
-  /// change under a running app, and the wrong one for a test suite, where
-  /// each test wants a clean slate:
+  /// change under a running app, and the wrong one for a test:
   ///
   /// ```dart
   /// setUp(IxIcon.debugResetFailedSvgAssets);
@@ -316,14 +320,18 @@ class _IxGuardedSvgLoader extends BytesLoader {
       );
     }
 
-    void settle() {
-      settled = true;
+    void flushBuffered() {
       for (final (error, stack) in buffered) {
         if (!identical(error, handledError)) {
           reportUnrelated(error, stack);
         }
       }
       buffered.clear();
+    }
+
+    void settle() {
+      settled = true;
+      flushBuffered();
     }
 
     runZonedGuarded(
@@ -371,6 +379,13 @@ class _IxGuardedSvgLoader extends BytesLoader {
       (Object error, StackTrace stack) {
         if (!settled) {
           buffered.add((error, stack));
+          // Bounded: flutter_svg's leaked copy is completed from the same
+          // propagation as the handler this loader attached to that future,
+          // so it is buffered and resolved inside one microtask drain.
+          // Draining here rather than waiting for the load means an
+          // unrelated error is still reported when the load never settles at
+          // all -- a bundle waiting on something that hangs.
+          scheduleMicrotask(flushBuffered);
           return;
         }
         if (identical(error, handledError)) {
