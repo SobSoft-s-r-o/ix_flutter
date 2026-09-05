@@ -43,10 +43,17 @@ Represents a single level in the navigation hierarchy.
 
 ```dart
 IxBreadcrumbItemData(
-  label: 'Manufacturing',    // Required: Display text
-  icon: IxIcons.factory,     // Optional: Leading icon
+  label: 'Manufacturing',       // Required: Display text
+  breadcrumbKey: 'manufacturing', // Recommended: stable identifier
+  icon: IxIcons.factory,        // Optional: Leading icon
 )
 ```
+
+`breadcrumbKey` is the identifier reported through `onItemClick`/
+`onNextClick` (see below) and falls back to `label` when omitted -- which
+is only safe as long as no two items share the same label. A missing
+`breadcrumbKey` also prints a one-time debug notice, since it becomes a
+required parameter starting with ix_flutter 2.0.
 
 ### With Navigation Menu
 
@@ -143,13 +150,16 @@ IxBreadcrumb(
 | `buttonAppearance` | `IxBreadcrumbButtonAppearance` | `tertiary` | Visual style of breadcrumb buttons |
 | `nextItems` | `List<IxBreadcrumbMenuItem>` | `[]` | Child destinations menu for last item |
 | `onItemPressed` | `ValueChanged<IxBreadcrumbItemData>?` | `null` | Callback when item is tapped |
+| `onItemClick` | `ValueChanged<IxBreadcrumbClick>?` | `null` | Stable-key callback fired alongside `onItemPressed` |
 | `onNextItemPressed` | `ValueChanged<IxBreadcrumbMenuItem>?` | `null` | Callback when next menu item is tapped |
+| `onNextClick` | `ValueChanged<IxBreadcrumbClick>?` | `null` | Stable-key callback fired alongside `onNextItemPressed` |
 | `homeIcon` | `Widget?` | `null` | Custom icon for home button |
 | `showHomeLabel` | `bool` | `false` | Show label text next to home icon |
 | `showNavigationMenu` | `bool` | `true` | Enable navigation menu on home button |
-| `previousItemsLabel` | `String` | `'Previous levels'` | Semantic label for overflow menu |
-| `homeMenuLabel` | `String` | `'Navigate to level'` | Semantic label for home menu |
-| `semanticLabel` | `String?` | `null` | Overall semantic description |
+| `previousItemsLabel` | `String` | `'Previous levels'` | Semantic label for the popup route announced when the overflow menu opens |
+| `homeMenuLabel` | `String` | `'Navigate to level'` | Semantic label for the popup route announced when the home navigation menu opens |
+| `semanticLabel` | `String?` | `null` | Overall semantic description; overrides `strings.breadcrumbs` |
+| `strings` | `IxBreadcrumbStrings` | English copy | Localizable strings for the landmark, overflow trigger and current-page hint |
 
 ## Common Patterns
 
@@ -275,6 +285,44 @@ class AppBreadcrumb extends StatelessWidget {
 }
 ```
 
+## Stable Keys and Click Payloads
+
+`onItemPressed`/`onNextItemPressed` report the whole `IxBreadcrumbItemData`/
+`IxBreadcrumbMenuItem`, which breaks down once two items share the same
+`label` -- there is no way to tell them apart from the callback alone. The
+additive `onItemClick`/`onNextClick` callbacks solve this: they fire
+alongside the legacy callbacks (both run when both are set) with an
+`IxBreadcrumbClick` payload carrying the activated item's stable
+`breadcrumbKey`.
+
+```dart
+IxBreadcrumb(
+  items: const [
+    IxBreadcrumbItemData(label: 'Reports', breadcrumbKey: 'reports-2024'),
+    IxBreadcrumbItemData(label: 'Reports', breadcrumbKey: 'reports-2025'),
+  ],
+  onItemClick: (click) {
+    // click.breadcrumbKey is 'reports-2024' or 'reports-2025', never
+    // ambiguous even though both items render as "Reports".
+    context.go('/reports/${click.breadcrumbKey}');
+  },
+)
+```
+
+Pass `strings:` to localize the root landmark's accessible name, the
+overflow trigger's accessible name and the current-page hint:
+
+```dart
+IxBreadcrumb(
+  items: myItems,
+  strings: const IxBreadcrumbStrings(
+    breadcrumbs: 'Navigation de fil d\'Ariane',
+    previousItems: 'Afficher les éléments précédents',
+    currentPage: 'page actuelle',
+  ),
+)
+```
+
 ## Theming
 
 Customize breadcrumb appearance through `IxBreadcrumbTheme`:
@@ -284,22 +332,51 @@ ThemeData(
   extensions: [
     IxBreadcrumbTheme(
       height: 40,
+      itemPadding: const EdgeInsets.symmetric(horizontal: 4),
       itemSpacing: 8,
-      labelStyle: TextStyle(fontSize: 14),
+      maxItemWidth: 240,
+      labelStyle: const TextStyle(fontSize: 14, color: Colors.blue),
+      currentItemStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+      separatorColor: Colors.grey,
       iconColor: Colors.blue,
-      separatorIcon: Icon(Icons.chevron_right),
+      ellipsisFontWeight: FontWeight.w700,
+      dropdownBackground: Colors.white,
+      dropdownTextStyle: const TextStyle(fontSize: 14),
+      dropdownElevation: 4,
+      focusOutlineColor: Colors.blue,
+      dropdownPadding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
+      dropdownBorderRadius: const BorderRadius.all(Radius.circular(4)),
     ),
   ],
 )
 ```
 
+The overflow/next-items popup itself (background, corner radius and row
+height) is styled from the shared `IxDropdownTheme` extension instead, so
+it matches every other Siemens IX dropdown surface in the app -- override
+that extension to restyle it.
+
 ## Accessibility
 
 The breadcrumb component provides comprehensive accessibility support:
 
-- **Screen readers**: Announces navigation structure and current position
-- **Keyboard navigation**: Full keyboard support for navigation
-- **Semantic labels**: Custom labels for overflow and navigation menus
+- **Navigation landmark**: The root is exposed as a `navigation` landmark
+  named `strings.breadcrumbs` (`semanticLabel` overrides it per instance)
+- **One node per crumb**: Every crumb -- home, visible items and the
+  overflow/next-items trigger -- is a single labelled, focusable node
+- **Current-page state**: The last crumb is marked `selected` with a
+  `strings.currentPage` hint, and becomes non-interactive automatically
+  when no `onItemPressed`/`onItemClick`/`item.onPressed` callback is wired
+  up for it (set one of those to keep it a regular, clickable crumb)
+- **Labelled overflow trigger**: While the home button also reveals
+  collapsed items, its accessible name switches to
+  `strings.previousItems` so screen-reader users know it does more than
+  navigate home
+- **Keyboard navigation**: Full keyboard support -- Tab reaches every
+  crumb and trigger, Enter/Space activates them and opens their menu
 - **Focus management**: Proper focus indicators and tab order
 
 ### Custom Semantic Labels
@@ -310,6 +387,7 @@ IxBreadcrumb(
   semanticLabel: 'Page navigation breadcrumb',
   previousItemsLabel: 'Earlier pages',
   homeMenuLabel: 'Jump to page',
+  strings: const IxBreadcrumbStrings(currentPage: 'you are here'),
 )
 ```
 
@@ -318,10 +396,11 @@ IxBreadcrumb(
 1. **Keep paths concise**: Limit hierarchy depth when possible (5-7 levels max)
 2. **Use meaningful labels**: Clear, descriptive text for each level
 3. **Home icon consistency**: Use the same home icon across your app
-4. **Handle navigation**: Always implement `onItemPressed` for functional breadcrumbs
+4. **Handle navigation**: Always implement `onItemPressed`/`onItemClick` for functional breadcrumbs
 5. **Consider mobile**: Use lower `visibleItemCount` on small screens
 6. **Test overflow**: Verify breadcrumb behavior at various widths
 7. **Match router structure**: Align breadcrumb hierarchy with routing
+8. **Set `breadcrumbKey`**: Give every item a stable, unique `breadcrumbKey` -- required if any two items can share the same `label`, and required outright starting with ix_flutter 2.0
 
 ## See Also
 

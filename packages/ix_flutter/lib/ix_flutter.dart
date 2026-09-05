@@ -36,6 +36,7 @@ export 'src/ix_icons/ix_icon_key.dart';
 export 'src/ix_icons/ix_icon_resolver.dart';
 export 'src/ix_icons/ix_icon.dart';
 export 'src/widgets/ix_breadcrumb.dart';
+export 'src/widgets/ix_breadcrumb_strings.dart';
 export 'src/widgets/ix_icon_button.dart';
 export 'src/widgets/ix_blind.dart';
 export 'src/ix_theme/components/ix_blind_theme.dart';
