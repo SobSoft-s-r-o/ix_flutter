@@ -59,6 +59,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.2] - 2026-01-28
 Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 
+Note: the wiki listed 1.0.3 and 1.0.4 (2026-01-28); these were internal bumps never published to pub.dev. The next published version after 1.0.2 is 1.1.0.
+
 ### Changed
 - Icon generator moved to separate package `ix_icons_generator` for cleaner dependencies
 - Removed generator-related dev_dependencies (http, args, recase, archive, path, yaml, meta)

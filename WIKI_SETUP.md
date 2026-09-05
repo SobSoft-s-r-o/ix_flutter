@@ -1,93 +1,38 @@
-# GitHub Wiki Setup
+# Wiki Sync
 
-The ix_flutter project now has a comprehensive GitHub Wiki with all documentation organized and easily navigable.
+The GitHub wiki at https://github.com/SobSoft-s-r-o/ix_flutter/wiki is **generated** from this repository. It is not a git submodule, it is not edited by hand, and a fresh clone of this repository never needs to initialize it.
 
-## Wiki Access
+## How it works
 
-**Wiki URL**: https://github.com/SobSoft-s-r-o/ix_flutter/wiki
+The [`wiki-sync.yml`](.github/workflows/wiki-sync.yml) workflow performs a **one-way** sync — repository to wiki, never the other direction — after every merge to `main`:
 
-## Wiki Structure
+1. A `push` to `main` touching `doc/**`, a root `*.md`, `packages/ix_flutter/*.md`, or `tool/wiki_sync*` triggers the workflow.
+2. The workflow checks out this repository and, separately, `SobSoft-s-r-o/ix_flutter.wiki` (into `wiki-checkout`).
+3. `tool/wiki_sync.sh wiki-checkout` copies every file listed in the mapping below into the wiki checkout, rewriting in-repo relative links (`doc/x.md`, `X.md`) to wiki-style link targets (`x`, `X`).
+4. If the wiki checkout changed, the workflow commits and pushes it as `github-actions[bot]`.
 
-The wiki includes the following sections:
+## Mapping
 
-### Getting Started
-- **Home** - Wiki homepage and quick navigation
-- **Installation** - Setup and installation guide
-- **Getting Started** - Quick start guide and overview
+The source-to-destination mapping lives in [`tool/wiki_sync_map.txt`](tool/wiki_sync_map.txt) as `source -> destination` lines, for example:
 
-### Documentation
-- **API Reference** - Complete API documentation for all components
-- **FAQ** - Frequently asked questions
-- **Icon Licensing** - Icon licensing and compliance information
-
-### Components
-A dedicated Components section with individual pages for each UI component:
-- IxApplicationScaffold - Main application container and layout
-- IxBlind - Sliding drawer/panel component
-- IxBreadcrumb - Hierarchical navigation breadcrumb component
-- IxDropdownButton - Dropdown selection component
-- IxEmptyState - Empty state display component
-- IxResponsiveDataView - Responsive data table component
-- IxSpinner - Animated loading spinner component
-- IxToast - Toast notification component
-- IxIcons - Icon integration and management
-- Copilot Colors - Color system reference
-
-### Contributing & Community
-- **Contributing** - Contribution guidelines and code of conduct
-- **Security Policy** - Security and vulnerability reporting
-- **Changelog** - Version history and updates
-
-## Wiki Features
-
-✅ **Sidebar Navigation** - Easy navigation through all wiki pages  
-✅ **Component Documentation** - Dedicated pages for each UI component  
-✅ **Quick Links** - Links to GitHub issues, discussions, and external resources  
-✅ **Organized Structure** - Documentation organized by topic  
-✅ **Searchable** - GitHub wiki has built-in search functionality  
-
-## Updating Wiki Content
-
-To update the wiki:
-
-1. Clone the wiki repository:
-```bash
-git clone https://github.com/SobSoft-s-r-o/ix_flutter.wiki.git
-cd ix_flutter.wiki
+```text
+README.md -> Home.md
+GETTING_STARTED.md -> Getting-Started.md
+doc/ix_icons.md -> ix_icons.md
 ```
 
-2. Edit markdown files or create new pages
+To publish a new canonical document to the wiki, add a line to that file — the workflow and `tool/wiki_sync.sh` need no other changes.
 
-3. Commit and push changes:
-```bash
-git add .
-git commit -m "Update wiki documentation"
-git push
-```
+## Manual edits are overwritten
 
-## Wiki Pages
+**Do not edit wiki pages directly.** Any push to `main` that touches a synced source file overwrites the corresponding wiki page on the next sync. Edit the canonical document in this repository instead (see the mapping above) and let the workflow publish it.
 
-All documentation files from the `doc/` folder and root documentation have been imported into the wiki:
+## Secret
 
-- Root documentation files become top-level wiki pages
-- Component documentation (`doc/*.md`) are in the Components folder
-- File names are automatically converted to page URLs with spaces
+The workflow authenticates to the wiki repository with the `WIKI_SYNC_TOKEN` repository secret — a GitHub personal access token with `repo` scope. It is required because wiki repositories are not covered by the workflow's default `GITHUB_TOKEN`.
 
-## Integration with Main Repository
+## Dry run
 
-The wiki is separate from the main repository but automatically linked from:
+Trigger the workflow manually from the Actions tab (`workflow_dispatch`) with `dry_run: true` (the default) to print the planned copies without touching the wiki repository. Use `dry_run: false` to run a real sync on demand, outside of the `push`-to-`main` trigger.
 
-- **README.md** - Links to wiki and documentation
-- **DOCUMENTATION.md** - Index of all documentation resources
-- **GitHub repository settings** - Wiki enabled by default
-
-## Resources
-
-- Main Repository: https://github.com/SobSoft-s-r-o/ix_flutter
-- Package on Pub.dev: https://pub.dev/packages/ix_flutter
-- Siemens iX Design System: https://ix.siemens.io
-- Flutter Documentation: https://flutter.dev
-
----
-
-For more information, visit the [wiki homepage](https://github.com/SobSoft-s-r-o/ix_flutter/wiki).
+Locally, `tool/wiki_sync.sh --dry-run <wiki-checkout-dir>` prints the same plan against any wiki checkout on disk without writing anything; `tool/wiki_sync.sh <wiki-checkout-dir>` performs the sync.

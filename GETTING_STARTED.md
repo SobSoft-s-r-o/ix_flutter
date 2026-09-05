@@ -14,6 +14,10 @@ Complete guide to get started with the ix_flutter component library.
 
 ## Installation
 
+### Prerequisites
+
+Flutter SDK 3.44.6 (stable) or later — the version this package is developed and tested against.
+
 ### Step 1: Add Dependency
 
 Add `ix_flutter` to your `pubspec.yaml`:
@@ -23,6 +27,12 @@ dependencies:
   flutter:
     sdk: flutter
   ix_flutter: ^1.1.0
+```
+
+Or add it with the Flutter CLI instead of editing `pubspec.yaml` by hand:
+
+```bash
+flutter pub add ix_flutter
 ```
 
 ### Step 2: Get Dependencies
@@ -92,6 +102,12 @@ class HomePage extends StatelessWidget {
 ```yaml
 dev_dependencies:
   ix_icons_generator: ^1.1.0
+```
+
+Or:
+
+```bash
+dart pub add --dev ix_icons_generator
 ```
 
 ### Step 2: Generate Icons
