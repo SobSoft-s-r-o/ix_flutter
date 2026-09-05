@@ -252,6 +252,10 @@ jobs:
         working-directory: packages/ix_flutter
         run: flutter pub get
 
+      - name: Check screenshots
+        working-directory: packages/ix_flutter
+        run: dart run tool/check_screenshots.dart
+
       - name: Install ix_icons_generator dependencies
         working-directory: packages/ix_icons_generator
         run: dart pub get

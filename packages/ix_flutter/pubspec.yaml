@@ -4,11 +4,17 @@ version: 1.0.2
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
 repository: https://github.com/SobSoft-s-r-o/ix_flutter
 issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
-documentation: https://github.com/SobSoft-s-r-o/ix_flutter/wiki
+documentation: https://github.com/SobSoft-s-r-o/ix_flutter/tree/main/doc
 
 screenshots:
-  - description: 'Example app showing ix_flutter components with dark theme'
-    path: screenshots/main_page_example_dark.jpg
+  - description: 'Application scaffold and component overview (classic light)'
+    path: screenshots/overview_light.png
+  - description: 'Application scaffold and component overview (classic dark)'
+    path: screenshots/overview_dark.png
+  - description: 'Buttons, variants and states (classic light)'
+    path: screenshots/components_light.png
+  - description: 'Buttons, variants and states (classic dark)'
+    path: screenshots/components_dark.png
 
 platforms:
   android:
