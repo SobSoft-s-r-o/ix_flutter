@@ -7,13 +7,13 @@ issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
 documentation: https://github.com/SobSoft-s-r-o/ix_flutter/tree/main/doc
 
 screenshots:
-  - description: 'Application scaffold and component overview (classic light)'
+  - description: 'Theme configuration and token overview with the bundled Work Sans typography (classic light)'
     path: screenshots/overview_light.png
-  - description: 'Application scaffold and component overview (classic dark)'
+  - description: 'Theme configuration and token overview with the bundled Work Sans typography (classic dark)'
     path: screenshots/overview_dark.png
-  - description: 'Buttons, variants and states (classic light)'
+  - description: 'Buttons: variants and states, Work Sans typography (classic light)'
     path: screenshots/components_light.png
-  - description: 'Buttons, variants and states (classic dark)'
+  - description: 'Buttons: variants and states, Work Sans typography (classic dark)'
     path: screenshots/components_dark.png
 
 platforms:

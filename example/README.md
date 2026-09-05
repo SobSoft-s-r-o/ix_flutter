@@ -35,7 +35,13 @@ references.
 `packages/ix_flutter/pubspec.yaml`'s `screenshots:` metadata) are captured by
 `test/screenshots_test.dart`, which renders `HomePage` and `ButtonsPage`
 against the light and dark classic themes at 1440x900 and writes the PNGs
-straight into the library's `screenshots/` directory:
+straight into the library's `screenshots/` directory. The capture explicitly
+opts into the bundled Work Sans typeface (`IxTypography(fontFamily:
+IxFonts.workSans, package: IxFonts.packageName)`) so the marketing
+screenshots show it off; the 1.x default typography stays Roboto Mono
+(a monospace face) until Work Sans becomes the default in 2.0, so an app
+that builds its theme with plain `IxThemeBuilder.light()/.dark()` still
+renders Roboto Mono today, unlike these screenshots:
 
 ```bash
 flutter test --dart-define=IX_CAPTURE_SCREENSHOTS=true test/screenshots_test.dart

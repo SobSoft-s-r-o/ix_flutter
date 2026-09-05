@@ -16,11 +16,15 @@ import 'package:ix_flutter/ix_flutter.dart';
 const _capture = bool.fromEnvironment('IX_CAPTURE_SCREENSHOTS');
 const _out = '../packages/ix_flutter/screenshots';
 
-/// The sans-serif UI font family baked into [IxThemeBuilder]'s default
-/// [IxTypography]. Work Sans ([IxFonts.workSans]) is opt-in pre-2.0 -- see
-/// its doc comment -- so this (not Work Sans) is what the theme actually
-/// resolves to, and therefore what the screenshots render, today.
-const _uiFontFamily = 'Roboto Mono';
+/// The sans-serif UI font family the screenshot themes below are explicitly
+/// built with. [IxThemeBuilder]'s own default resolves to
+/// `IxFonts.robotoMono` -- a monospace face -- because Work Sans
+/// ([IxFonts.workSans]) is opt-in pre-2.0 (see its doc comment); pub.dev
+/// screenshots should show the bundled iX typeface instead, so `main()`
+/// below passes `typography: IxTypography(fontFamily: IxFonts.workSans,
+/// package: IxFonts.packageName)`, which resolves to this package-prefixed
+/// family name.
+const _uiFontFamily = 'packages/ix_flutter/Work Sans';
 
 Future<void> _shoot(
   WidgetTester tester,
@@ -87,8 +91,21 @@ Future<void> _shoot(
 }
 
 void main() {
-  final light = const IxThemeBuilder.light().build();
-  final dark = const IxThemeBuilder.dark().build();
+  // Not `const`: IxTypography's constructor is a factory, so it isn't a
+  // compile-time constant and neither is the IxThemeBuilder call it's passed
+  // into.
+  final light = IxThemeBuilder.light(
+    typography: IxTypography(
+      fontFamily: IxFonts.workSans,
+      package: IxFonts.packageName,
+    ),
+  ).build();
+  final dark = IxThemeBuilder.dark(
+    typography: IxTypography(
+      fontFamily: IxFonts.workSans,
+      package: IxFonts.packageName,
+    ),
+  ).build();
 
   testWidgets(
     'overview light',
