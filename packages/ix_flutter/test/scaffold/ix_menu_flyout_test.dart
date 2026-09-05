@@ -131,6 +131,47 @@ void main() {
   builtInPanels();
 
   testWidgets(
+    'drawer layout: a built-in panel opens next to the drawer and neither it '
+    'nor the theme toggle closes the drawer',
+    (tester) async {
+      await pumpIx(
+        tester,
+        IxApplicationScaffold(
+          appTitle: 'App',
+          entries: const [
+            IxMenuEntry(id: 'home', type: IxMenuEntryType.item, label: 'Home'),
+          ],
+          settings: const Text('settings-panel'),
+          onThemeModeChanged: (_) {},
+          onNavigate: (_) {},
+          body: const SizedBox(),
+        ),
+        // Below the 1024px breakpoint the menu lives in a Drawer.
+        size: const Size(600, 800),
+      );
+
+      await tester.tap(find.byTooltip('Open menu'));
+      // The drawer's own slide-in is not driven by MediaQuery, so it needs
+      // to settle rather than a single fixed pump.
+      await tester.pumpAndSettle();
+      expect(find.text('Settings'), findsOneWidget);
+
+      await tester.tap(find.text('Settings'));
+      await tester.pumpAndSettle();
+      expect(find.text('settings-panel'), findsOneWidget);
+      expect(
+        find.text('Home'),
+        findsOneWidget,
+        reason: 'the drawer stays open behind the panel',
+      );
+
+      await tester.tap(find.text('Toggle theme'));
+      await tester.pumpAndSettle();
+      expect(find.text('Home'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
     'reserved id "settings" still works through the shim and warns once in '
     'debug',
     (tester) async {
