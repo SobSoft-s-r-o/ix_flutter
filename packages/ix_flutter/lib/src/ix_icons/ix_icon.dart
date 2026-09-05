@@ -68,6 +68,29 @@ class IxIcon extends StatelessWidget {
   /// ambient [IconTheme] says anything.
   static const double _defaultSizePx = 24;
 
+  /// Forgets every SVG asset whose load has failed, and the cached empty-SVG
+  /// bytes handed to `flutter_svg` in their place.
+  ///
+  /// [IxIcon] remembers a failed asset — identified by its path, package and
+  /// [AssetBundle] — for the life of the process, so a missing or corrupt
+  /// icon is not re-loaded (and re-reported) by every later instance of it.
+  /// That is the right behaviour for an application, where a bundle does not
+  /// change under a running app, and the wrong one for a test suite, where
+  /// each test wants a clean slate:
+  ///
+  /// ```dart
+  /// setUp(IxIcon.debugResetFailedSvgAssets);
+  /// tearDown(IxIcon.debugResetFailedSvgAssets);
+  /// ```
+  ///
+  /// Every currently mounted [IxIcon] rebuilds, so an icon showing the
+  /// Material fallback retries its asset on the next frame.
+  @visibleForTesting
+  static void debugResetFailedSvgAssets() {
+    _IxSvgFailures.reset();
+    _emptySvgBytes = null;
+  }
+
   /// Overrides the resolved color outright, taking precedence over
   /// [colorToken] and every other fallback.
   final Color? color;
@@ -162,20 +185,40 @@ class IxIcon extends StatelessWidget {
 /// for the life of the process by design, and a never-disposed
 /// [ChangeNotifier] is exactly what leak-tracking test suites flag.
 abstract final class _IxSvgFailures {
-  static final Set<String> _keys = <String>{};
+  static final Set<Object> _keys = <Object>{};
   static final Set<VoidCallback> _listeners = <VoidCallback>{};
 
-  static bool contains(String key) => _keys.contains(key);
+  static bool contains(Object key) => _keys.contains(key);
 
   static void addListener(VoidCallback listener) => _listeners.add(listener);
 
   static void removeListener(VoidCallback listener) =>
       _listeners.remove(listener);
 
-  static void record(String key) {
+  /// Records [key] as failed.
+  ///
+  /// Returns `true` only for a key that was not already recorded, so a
+  /// caller reports the failure exactly once even when several loads of the
+  /// same asset are in flight together (two `SvgTheme`s, say, are two
+  /// separate `flutter_svg` cache entries and therefore two separate loads).
+  static bool record(Object key) {
     if (!_keys.add(key)) {
+      return false;
+    }
+    _notify();
+    return true;
+  }
+
+  /// See [IxIcon.debugResetFailedSvgAssets].
+  static void reset() {
+    if (_keys.isEmpty) {
       return;
     }
+    _keys.clear();
+    _notify();
+  }
+
+  static void _notify() {
     for (final listener in _listeners.toList(growable: false)) {
       listener();
     }
@@ -223,50 +266,121 @@ class _IxGuardedSvgLoader extends BytesLoader {
 
   final SvgAssetLoader inner;
 
-  /// The key this loader's failures are remembered under: the asset path as
-  /// the bundle sees it.
-  String get failureKey => inner.packageName == null
-      ? inner.assetName
-      : 'packages/${inner.packageName}/${inner.assetName}';
+  /// The key this loader's failures are remembered under.
+  ///
+  /// The wrapped loader's own `SvgCacheKey.keyData` — the asset path, its
+  /// package, and the [AssetBundle] resolved from [context] — so a path that
+  /// is missing from one bundle does not condemn the same path in another.
+  ///
+  /// Deliberately *not* the whole `SvgCacheKey`: that also carries the
+  /// [SvgTheme], and whether an asset exists and decodes has nothing to do
+  /// with the theme it would be encoded with. Keying on the theme too would
+  /// record — and report — the same missing asset once per theme in use.
+  Object failureKey(BuildContext? context) => inner.cacheKey(context).keyData;
 
   @override
   Future<ByteData> loadBytes(BuildContext? context) {
-    if (_IxSvgFailures.contains(failureKey)) {
+    final key = failureKey(context);
+    if (_IxSvgFailures.contains(key)) {
       return _loadEmptySvg(context);
     }
     final completer = Completer<ByteData>();
+    // The wrapped load's own failure, so the zone handler below can tell it
+    // apart from anything else that fails in there. `flutter_svg`'s
+    // unobserved cache future is completed *before* the handler this loader
+    // attached to the same load future, so the leaked copy reliably reaches
+    // the zone before `handledError` is known -- hence the buffer, drained
+    // once the load has settled and the comparison can actually be made.
+    Object? handledError;
+    var settled = false;
+    final buffered = <(Object, StackTrace)>[];
+
+    void reportUnrelated(Object error, StackTrace stack) {
+      // Not this loader's to hide: a future `flutter_svg` change could route
+      // an unrelated failure through the same call, and silently dropping it
+      // would be worse than the leak this guard closes. Reported rather than
+      // rethrown so it still cannot crash the app from here, and
+      // unconditionally -- unlike the load's own failure, which the fallback
+      // glyph already makes visible, this one has no other trace.
+      FlutterError.reportError(
+        FlutterErrorDetails(
+          exception: error,
+          stack: stack,
+          library: 'ix_flutter icons',
+          context: ErrorDescription(
+            'caught by the guarded loader for icon "${inner.assetName}" '
+            '(package: ${inner.packageName}) but unrelated to its own '
+            'load failure',
+          ),
+        ),
+      );
+    }
+
+    void settle() {
+      settled = true;
+      for (final (error, stack) in buffered) {
+        if (!identical(error, handledError)) {
+          reportUnrelated(error, stack);
+        }
+      }
+      buffered.clear();
+    }
+
     runZonedGuarded(
       () {
-        inner
-            .loadBytes(context)
-            .then(
+        Future<ByteData> load;
+        try {
+          load = inner.loadBytes(context);
+        } catch (error, stack) {
+          // A loader that throws synchronously (an asset bundle that does
+          // not defer its lookup, say) must take the same path as one whose
+          // future fails -- otherwise the error would only reach the zone
+          // handler and the completer below would never complete.
+          load = Future<ByteData>.error(error, stack);
+        }
+        load.then(
+          (ByteData bytes) {
+            settle();
+            completer.complete(bytes);
+          },
+          onError: (Object error, StackTrace stack) {
+            handledError = error;
+            settle();
+            // Report only for a key that was not already known to have
+            // failed: several loads of the same asset can be in flight
+            // at once (one per `SvgTheme`), and they are one failure.
+            if (_IxSvgFailures.record(key)) {
+              _report(error, stack);
+            }
+            // `null`, not `context`: this runs after an async gap, so
+            // the element may already be gone. The empty SVG carries no
+            // `currentColor`/font-size units, so the default `SvgTheme`
+            // encodes it identically to the ambient one.
+            _loadEmptySvg(null).then(
               completer.complete,
-              onError: (Object error, StackTrace stack) {
-                _report(error, stack);
-                _IxSvgFailures.record(failureKey);
-                // `null`, not `context`: this runs after an async gap, so
-                // the element may already be gone. The empty SVG carries no
-                // `currentColor`/font-size units, so the default `SvgTheme`
-                // encodes it identically to the ambient one.
-                _loadEmptySvg(null).then(
-                  completer.complete,
-                  // The empty SVG is a compile-time constant string; if even
-                  // that cannot be encoded there is nothing left to render,
-                  // so complete with an empty buffer rather than handing
-                  // flutter_svg a failed future after all.
-                  onError: (Object _, StackTrace _) =>
-                      completer.complete(ByteData(0)),
-                );
-              },
+              // The empty SVG is a compile-time constant string; if even
+              // that cannot be encoded there is nothing left to render,
+              // so complete with an empty buffer rather than handing
+              // flutter_svg a failed future after all.
+              onError: (Object _, StackTrace _) =>
+                  completer.complete(ByteData(0)),
             );
+          },
+        );
       },
       (Object error, StackTrace stack) {
-        // Deliberately swallowed: the only work started in this zone is the
-        // load above, whose failure is already reported and handled by the
-        // `onError` handler. What arrives here is flutter_svg's unobserved
-        // cache-bookkeeping rejection for that same failure (see the class
-        // doc); re-reporting it would duplicate the error, and letting it
-        // out is the leak this loader exists to close.
+        if (!settled) {
+          buffered.add((error, stack));
+          return;
+        }
+        if (identical(error, handledError)) {
+          // flutter_svg's unobserved cache-bookkeeping rejection for the
+          // failure already reported above (see the class doc). Swallowed
+          // on purpose: it is the leak this loader exists to close, and
+          // re-reporting it would duplicate the error.
+          return;
+        }
+        reportUnrelated(error, stack);
       },
     );
     return completer.future;
@@ -348,7 +462,7 @@ class _IxSvgIconState extends State<_IxSvgIcon> {
 
   @override
   Widget build(BuildContext context) {
-    if (_IxSvgFailures.contains(widget.loader.failureKey)) {
+    if (_IxSvgFailures.contains(widget.loader.failureKey(context))) {
       return _fallbackIcon();
     }
     return SvgPicture(

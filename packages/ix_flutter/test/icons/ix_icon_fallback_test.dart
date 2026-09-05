@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
@@ -10,6 +11,25 @@ import '../helpers/pump_ix.dart';
 
 Widget _bundled(Widget child, Map<String, String> files) =>
     DefaultAssetBundle(bundle: FixtureAssetBundle(files), child: child);
+
+Widget _inBundle(Widget child, AssetBundle bundle) =>
+    DefaultAssetBundle(bundle: bundle, child: child);
+
+/// A bundle whose every load fails *and* leaks an unrelated, unobserved
+/// asynchronous error into whatever zone asked for the asset.
+///
+/// That second failure is the one `IxIcon`'s guard must not hide: it is not
+/// the load's own error, so swallowing it would mean a future `flutter_svg`
+/// change could silently take unrelated application errors with it.
+class _LeakyAssetBundle extends CachingAssetBundle {
+  @override
+  Future<ByteData> load(String key) async {
+    // Unobserved on purpose, and created in the caller's zone -- exactly the
+    // shape of the `flutter_svg` cache leak, but with an unrelated error.
+    Future<void>.error(StateError('unrelated bookkeeping failure'));
+    throw FlutterError('Unable to load asset: "$key" (leaky fixture)');
+  }
+}
 
 const String _brokenFixture = 'test/fixtures/icons/broken.svg';
 const String _validFixture = 'test/fixtures/icons/valid.svg';
@@ -84,10 +104,14 @@ Iterable<FlutterErrorDetails> _otherErrors(List<FlutterErrorDetails> all) =>
 /// reported to whatever zone started it — which, without containment inside
 /// `IxIcon`, is the application's own zone.
 ///
-/// Each test uses its own asset key: `IxIcon` remembers a failed key for the
-/// life of the process, so reusing one would make a later test observe the
-/// earlier test's recorded failure.
+/// `IxIcon` remembers a failed asset for the life of the process, so every
+/// test here clears that record through
+/// [IxIcon.debugResetFailedSvgAssets] in an `addTearDown` rather than
+/// tiptoeing around it with a unique asset name per test.
 void main() {
+  setUp(IxIcon.debugResetFailedSvgAssets);
+  tearDown(IxIcon.debugResetFailedSvgAssets);
+
   testWidgets('a missing asset falls back with the same box and semantics, '
       'and leaks no uncaught error', (tester) async {
     final handle = tester.ensureSemantics();
@@ -100,7 +124,7 @@ void main() {
           tester,
           _bundled(
             const IxIcon(
-              IxIconData.asset('missing-box.svg', fallback: Icons.close),
+              IxIconData.asset('missing.svg', fallback: Icons.close),
               size: IxIconSize.s16,
               semanticLabel: 'Close',
               key: Key('i'),
@@ -134,10 +158,10 @@ void main() {
           tester,
           _bundled(
             const IxIcon(
-              IxIconData.asset('broken-a.svg', fallback: Icons.info),
+              IxIconData.asset('broken.svg', fallback: Icons.info),
               key: Key('i'),
             ),
-            const {'broken-a.svg': _brokenFixture},
+            const {'broken.svg': _brokenFixture},
           ),
         );
         await tester.pump(const Duration(milliseconds: 200));
@@ -155,16 +179,20 @@ void main() {
   testWidgets('a second icon for an asset that already failed falls back on '
       'its first frame, without loading again', (tester) async {
     final reported = _captureReportedErrors();
+    // One bundle for both pumps: a recorded failure belongs to the bundle it
+    // happened in (see the bundle test below), so a fresh one would be a
+    // different asset as far as the registry is concerned.
+    final bundle = FixtureAssetBundle(const {});
 
     await tester.runAsync(() async {
       final uncaught = await _uncaughtDuring(() async {
         await pumpIx(
           tester,
-          _bundled(
+          _inBundle(
             const IxIcon(
-              IxIconData.asset('missing-twice.svg', fallback: Icons.close),
+              IxIconData.asset('missing.svg', fallback: Icons.close),
             ),
-            const {},
+            bundle,
           ),
         );
         await tester.pump(const Duration(milliseconds: 200));
@@ -181,12 +209,12 @@ void main() {
     // an empty `reported` shows -- a second load attempt would report again).
     await pumpIx(
       tester,
-      _bundled(
+      _inBundle(
         const IxIcon(
-          IxIconData.asset('missing-twice.svg', fallback: Icons.close),
+          IxIconData.asset('missing.svg', fallback: Icons.close),
           key: Key('second'),
         ),
-        const {},
+        bundle,
       ),
     );
     expect(find.byIcon(Icons.close), findsOneWidget);
@@ -205,8 +233,8 @@ void main() {
         await pumpIx(
           tester,
           _bundled(
-            const IxIcon(IxIconData.asset('valid-a.svg', fallback: Icons.info)),
-            const {'valid-a.svg': _validFixture},
+            const IxIcon(IxIconData.asset('valid.svg', fallback: Icons.info)),
+            const {'valid.svg': _validFixture},
           ),
         );
         await tester.pump(const Duration(milliseconds: 200));
@@ -218,6 +246,124 @@ void main() {
     expect(reported, isEmpty);
     expect(find.byType(SvgPicture), findsOneWidget);
     expect(find.byType(Icon), findsNothing);
+  });
+
+  testWidgets('the same missing asset under two SvgThemes reports once', (
+    tester,
+  ) async {
+    final reported = _captureReportedErrors();
+
+    late List<Object> uncaught;
+    await tester.runAsync(() async {
+      uncaught = await _uncaughtDuring(() async {
+        // Two `SvgTheme`s means two separate `flutter_svg` cache entries, so
+        // both icons really do start their own load in the same frame --
+        // whether the asset exists has nothing to do with the theme, so the
+        // pair must still be recorded and reported once.
+        await pumpIx(
+          tester,
+          _bundled(
+            const Column(
+              children: [
+                DefaultSvgTheme(
+                  theme: SvgTheme(fontSize: 12),
+                  child: IxIcon(
+                    IxIconData.asset('missing.svg', fallback: Icons.close),
+                  ),
+                ),
+                DefaultSvgTheme(
+                  theme: SvgTheme(fontSize: 24),
+                  child: IxIcon(
+                    IxIconData.asset('missing.svg', fallback: Icons.close),
+                  ),
+                ),
+              ],
+            ),
+            const {},
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 200));
+      });
+    });
+    await tester.pump();
+
+    expect(uncaught, isEmpty);
+    expect(_otherErrors(reported), isEmpty);
+    expect(find.byIcon(Icons.close), findsNWidgets(2));
+    expect(_iconErrors(reported), hasLength(1));
+  });
+
+  testWidgets('a failure recorded for one bundle does not condemn the same '
+      'path in another', (tester) async {
+    final reported = _captureReportedErrors();
+
+    await tester.runAsync(() async {
+      await _uncaughtDuring(() async {
+        await pumpIx(
+          tester,
+          _bundled(
+            const IxIcon(IxIconData.asset('valid.svg', fallback: Icons.info)),
+            const {},
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 200));
+      });
+    });
+    await tester.pump();
+    expect(find.byIcon(Icons.info), findsOneWidget, reason: 'missing here');
+    expect(_iconErrors(reported), hasLength(1));
+
+    // The very same asset path, served by a different bundle that does have
+    // it: the recorded failure belongs to the bundle it happened in.
+    await tester.runAsync(() async {
+      await _uncaughtDuring(() async {
+        await pumpIx(
+          tester,
+          _bundled(
+            const IxIcon(IxIconData.asset('valid.svg', fallback: Icons.info)),
+            const {'valid.svg': _validFixture},
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 200));
+      });
+    });
+    await tester.pump();
+    expect(find.byType(SvgPicture), findsOneWidget);
+    expect(find.byType(Icon), findsNothing);
+  });
+
+  testWidgets('an unrelated async error raised by the load is not swallowed', (
+    tester,
+  ) async {
+    final reported = _captureReportedErrors();
+
+    await tester.runAsync(() async {
+      await _uncaughtDuring(() async {
+        await pumpIx(
+          tester,
+          DefaultAssetBundle(
+            bundle: _LeakyAssetBundle(),
+            child: const IxIcon(
+              IxIconData.asset('missing.svg', fallback: Icons.close),
+            ),
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 200));
+      });
+    });
+    await tester.pump();
+
+    expect(find.byIcon(Icons.close), findsOneWidget);
+    // The load's own failure, reported as usual...
+    expect(
+      _iconErrors(reported).where((e) => e.exception is FlutterError),
+      isNotEmpty,
+    );
+    // ...and the unrelated one, surfaced rather than hidden by the guard.
+    expect(
+      _iconErrors(reported).where((e) => e.exception is StateError),
+      isNotEmpty,
+    );
   });
 
   testWidgets(
