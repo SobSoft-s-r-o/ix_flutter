@@ -77,9 +77,13 @@ class _AppState extends State<App> {
 | `mode` | The resolved `Brightness` (never ambiguous, even for `system`) |
 | `themeMode` | The `ThemeMode` for `MaterialApp.themeMode` |
 | `light` / `dark` | The two `ThemeData` variants for `theme` |
-| `setTheme(name, schema)` / `setColorSchema(schema)` | Change the configuration |
+| `setTheme(name, schema)` / `setColorSchema(schema)` | Change the configuration (setting the current values is a no-op) |
 | `updatePlatformBrightness(brightness)` | Feed in a new platform brightness |
 | `themeChanged` | `Stream<IxThemeChange>` of every change |
+
+The constructor also takes `customPalette:`, `typography:`, `icons:` and
+`density:` and hands them to every `IxThemeBuilder` it runs, so a controller
+can do everything the builder can.
 
 `IxThemeChange` carries the same payload as the upstream
 `themeChanged` event: `theme`, `colorSchema`, `mode` and `isMediaChange`.
@@ -125,7 +129,13 @@ for patching a specific base family.
 
 ## Migration from the 1.x `family`/`mode` API
 
-The old API keeps working until 2.0; it only produces deprecation warnings.
+The old API keeps working until 2.0 and only produces deprecation warnings,
+with one exception: `IxThemeBuilder(family: IxThemeFamily.custom)` *without* a
+`customPalette` now trips an assertion in debug builds (it used to fall back
+to the classic palette silently). Either pass the palette the family promises,
+or drop the family -- `customPalette:` alone is enough. Building with
+`IxThemeFamily.brand` also logs a one-time debug notice, since it has always
+resolved to the classic palette.
 
 | Deprecated (1.x) | Replacement |
 |---|---|

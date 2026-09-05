@@ -1,8 +1,23 @@
+// This file is the 1.x regression guard for the deprecated builder
+// (`family`/`mode`) and button-variant APIs: it keeps driving them on
+// purpose until they are removed in 2.0 (plan item B-2).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 void main() {
+  // `family: IxThemeFamily.brand` logs a one-time debug notice on its first
+  // use; trigger it here with `debugPrint` silenced so that none of the
+  // builds below leak it into the suite log.
+  setUpAll(() {
+    final previous = debugPrint;
+    debugPrint = (String? message, {int? wrapWidth}) {};
+    const IxThemeBuilder(family: IxThemeFamily.brand).build();
+    debugPrint = previous;
+  });
+
   test('builds Siemens IX theme with extension', () {
     const builder = IxThemeBuilder(
       family: IxThemeFamily.brand,
@@ -95,7 +110,6 @@ void main() {
     expect(borderRadius.topLeft.x, expectedRadiusPx);
 
     final warningBorder = ixButtons
-        // ignore: deprecated_member_use_from_same_package
         .style(IxButtonVariant.warningSecondary)
         .side
         ?.resolve(<WidgetState>{});
@@ -103,14 +117,12 @@ void main() {
     expect(warningBorder!.color, ixTheme.color(IxThemeColorToken.warningBdr));
 
     final successPrimaryBackground = ixButtons
-        // ignore: deprecated_member_use_from_same_package
         .style(IxButtonVariant.successPrimary)
         .backgroundColor!
         .resolve(<WidgetState>{});
     expect(successPrimaryBackground, ixTheme.color(IxThemeColorToken.success));
 
     final infoGhostForeground = ixButtons
-        // ignore: deprecated_member_use_from_same_package
         .style(IxButtonVariant.infoTertiary)
         .foregroundColor!
         .resolve(<WidgetState>{});

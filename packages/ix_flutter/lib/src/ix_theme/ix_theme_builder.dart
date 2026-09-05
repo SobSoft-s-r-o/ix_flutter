@@ -150,6 +150,36 @@ class IxThemeBuilder {
   /// [IxDensityScope] to resolve [IxDensity.adaptive] live instead.
   final IxDensity density;
 
+  /// Forgets that the [IxThemeFamily.brand] deprecation notice was already
+  /// printed, so a test that asserts on the one-time notice starts from a
+  /// clean slate. Call it from `addTearDown`.
+  @visibleForTesting
+  static void debugResetBrandNotice() {
+    _brandNoticeShown = false;
+  }
+
+  /// Whether the `brand` deprecation notice has already been printed. Static
+  /// so an app that builds many themes is told exactly once.
+  static bool _brandNoticeShown = false;
+
+  /// Reports the deprecated `brand` family once per process, in debug builds
+  /// only; a no-op for every other family and in release builds.
+  static void _warnBrandOnce(IxThemeFamily family) {
+    assert(() {
+      // ignore: deprecated_member_use_from_same_package
+      if (family == IxThemeFamily.brand && !_brandNoticeShown) {
+        _brandNoticeShown = true;
+        debugPrint(
+          'IxThemeBuilder: IxThemeFamily.brand is deprecated and resolves to '
+          'the classic palette -- the brand palette is not part of the '
+          'open-source build. Use theme: IxThemeName.classic, or supply your '
+          'own customPalette; IxThemeFamily.brand is removed in 2.0.',
+        );
+      }
+      return true;
+    }());
+  }
+
   /// Returns [ThemeData] configured with Siemens IX global colors and fonts.
   ///
   /// The resulting theme exports both Material defaults (color scheme,
@@ -161,17 +191,20 @@ class IxThemeBuilder {
       family != IxThemeFamily.custom || customPalette != null,
       'IxThemeFamily.custom requires customPalette',
     );
+    // ignore: deprecated_member_use_from_same_package
+    _warnBrandOnce(family);
     final resolvedBrightness =
         brightness ??
         // ignore: deprecated_member_use_from_same_package
         _resolveBrightness(mode, systemBrightness);
+    // `brand` is a deprecated alias of classic, so only `custom` carries a
+    // theme name of its own.
     final resolvedTheme =
         theme ??
         // ignore: deprecated_member_use_from_same_package
-        (family == IxThemeFamily.classic
-            ? IxThemeName.classic
-            // ignore: deprecated_member_use_from_same_package
-            : IxThemeName(family.name));
+        (family == IxThemeFamily.custom
+            ? const IxThemeName('custom')
+            : IxThemeName.classic);
     // Every bundled family resolves to the classic palette (`brand` is a
     // deprecated alias, `custom` is served by `customPalette`), so the
     // palette only depends on the resolved brightness.
@@ -634,7 +667,10 @@ class IxTheme extends ThemeExtension<IxTheme> {
   }) {
     return IxTheme(
       themeName: themeName ?? this.themeName,
-      colorSchema: colorSchema ?? this.colorSchema,
+      // A new brightness without an explicit schema re-derives the schema in
+      // the constructor (passing null); otherwise the current one is kept.
+      colorSchema:
+          colorSchema ?? (brightness == null ? this.colorSchema : null),
       // ignore: deprecated_member_use_from_same_package
       family: family ?? this.family,
       // ignore: deprecated_member_use_from_same_package

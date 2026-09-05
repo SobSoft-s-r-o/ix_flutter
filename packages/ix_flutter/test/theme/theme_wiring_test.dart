@@ -1,3 +1,8 @@
+// The IxBlind typography case below builds through the deprecated
+// `mode:` parameter on purpose (it is the 1.x spelling that must keep
+// working until 2.0).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart'; // jediný import – overuje verejný barrel

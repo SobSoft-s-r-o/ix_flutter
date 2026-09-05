@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../ix_core/ix_density.dart';
 import '../ix_core/ix_typography.dart';
+import '../ix_icons/ix_icon_resolver.dart';
 import 'ix_color_schema.dart';
 import 'ix_custom_palette.dart';
 import 'ix_theme_builder.dart';
@@ -86,6 +88,10 @@ class IxThemeChange {
 class IxThemeController extends ChangeNotifier {
   /// Creates a controller for [theme] and [colorSchema].
   ///
+  /// [customPalette], [typography], [icons] and [density] are handed to every
+  /// [IxThemeBuilder] the controller runs, so they mean exactly what they
+  /// mean there.
+  ///
   /// [platformBrightness] seeds the value used to resolve
   /// [IxColorSchema.system]; it defaults to the binding's current platform
   /// brightness and is kept up to date from then on.
@@ -94,11 +100,15 @@ class IxThemeController extends ChangeNotifier {
     IxColorSchema colorSchema = IxColorSchema.system,
     IxCustomPalette? customPalette,
     IxTypography? typography,
+    IxIconResolver? icons,
+    IxDensity density = IxDensity.adaptive,
     Brightness? platformBrightness,
   }) : _theme = theme,
        _colorSchema = colorSchema,
        _customPalette = customPalette,
        _typography = typography,
+       _icons = icons,
+       _density = density,
        _platformBrightness =
            platformBrightness ??
            WidgetsBinding.instance.platformDispatcher.platformBrightness {
@@ -110,6 +120,13 @@ class IxThemeController extends ChangeNotifier {
   IxColorSchema _colorSchema;
   final IxCustomPalette? _customPalette;
   final IxTypography? _typography;
+
+  /// Icon resolver registered on both themes; `null` keeps
+  /// [IxIconResolver.material].
+  final IxIconResolver? _icons;
+
+  /// Density policy baked into both themes.
+  final IxDensity _density;
   Brightness _platformBrightness;
   late ThemeData _light;
   late ThemeData _dark;
@@ -149,10 +166,22 @@ class IxThemeController extends ChangeNotifier {
 
   /// Sets the theme identity and color schema, then emits a non-media
   /// [IxThemeChange] (upstream `themeSwitcher.setTheme`).
+  ///
+  /// Setting the values it already has is a no-op: no rebuild, no
+  /// notification and no [themeChanged] event.
   void setTheme(IxThemeName theme, IxColorSchema colorSchema) {
+    if (theme == _theme && colorSchema == _colorSchema) {
+      return;
+    }
+    // [light] and [dark] depend on the theme identity, not on the schema, so
+    // a pure schema change keeps both `ThemeData` objects (and with them the
+    // app's `AnimatedTheme` state) as they are.
+    final rebuildThemes = theme != _theme;
     _theme = theme;
     _colorSchema = colorSchema;
-    _rebuild();
+    if (rebuildThemes) {
+      _rebuild();
+    }
     _emit(isMediaChange: false);
   }
 
@@ -186,11 +215,15 @@ class IxThemeController extends ChangeNotifier {
       theme: _theme,
       typography: _typography,
       customPalette: _customPalette,
+      icons: _icons,
+      density: _density,
     ).build();
     _dark = IxThemeBuilder.dark(
       theme: _theme,
       typography: _typography,
       customPalette: _customPalette,
+      icons: _icons,
+      density: _density,
     ).build();
   }
 

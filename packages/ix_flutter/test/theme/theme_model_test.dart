@@ -13,6 +13,30 @@ import 'package:ix_flutter/src/ix_colors/theme/ix_classic_light_colors.dart';
 
 import '../helpers/upstream.dart';
 
+/// Captures `debugPrint` so the one-time `IxThemeFamily.brand` notice never
+/// leaks into the suite log, and returns the captured lines plus the callback
+/// that puts `debugPrint` back (same helper as
+/// `test/scaffold/ix_menu_flyout_test.dart`).
+///
+/// The tear-down is only the guard for a body that throws first, latched so
+/// it can never clobber a later override; the body restores it itself.
+({List<String> logs, VoidCallback restore}) _captureDebugPrint() {
+  final logs = <String>[];
+  final previous = debugPrint;
+  var restored = false;
+  void restore() {
+    if (restored) {
+      return;
+    }
+    restored = true;
+    debugPrint = previous;
+  }
+
+  addTearDown(restore);
+  debugPrint = (String? message, {int? wrapWidth}) => logs.add(message ?? '');
+  return (logs: logs, restore: restore);
+}
+
 /// Covers spec finding TM-1 (the v5-style theme model next to the deprecated
 /// `family`/`mode` API). Apart from the `@Upstream`-tagged equivalence test,
 /// the tests here guard our own 1.x API shape (`IxCustomPalette`, the
@@ -95,9 +119,45 @@ void main() {
     expect(renamed.colorSchema, IxColorSchema.light);
     expect(renamed.brightness, Brightness.light);
 
+    // A new brightness re-derives the schema, unless one is passed too.
+    expect(
+      light.copyWith(brightness: Brightness.dark).colorSchema,
+      IxColorSchema.dark,
+    );
+    expect(
+      dark.copyWith(brightness: Brightness.light).colorSchema,
+      IxColorSchema.light,
+    );
+    expect(
+      light
+          .copyWith(
+            brightness: Brightness.dark,
+            colorSchema: IxColorSchema.light,
+          )
+          .colorSchema,
+      IxColorSchema.light,
+    );
+
     expect(light.lerp(dark, 0.4).colorSchema, IxColorSchema.light);
     expect(light.lerp(dark, 0.6).colorSchema, IxColorSchema.dark);
     expect(light.lerp(dark, 0.6).themeName, IxThemeName.classic);
+  });
+
+  test('IxThemeName compares and hashes by value', () {
+    // Built at runtime, so this is a distinct instance rather than the
+    // canonicalized `const IxThemeName('classic')`.
+    final sameValue = IxThemeName(IxThemeName.classic.value);
+
+    expect(sameValue, IxThemeName.classic);
+    expect(sameValue.hashCode, IxThemeName.classic.hashCode);
+    expect(const IxThemeName('acme'), isNot(IxThemeName.classic));
+    expect(<IxThemeName>{
+      IxThemeName.classic,
+      sameValue,
+      const IxThemeName('acme'),
+    }, hasLength(2));
+    expect(IxThemeName.classic.value, 'classic');
+    expect(IxThemeName.classic.toString(), contains('classic'));
   });
 
   test('IxThemeBuilder.copyWith carries theme and brightness', () {
@@ -118,11 +178,70 @@ void main() {
   });
 
   test('IxThemeFamily.brand is a deprecated classic alias', () {
+    // Building with `brand` logs the one-time deprecation notice; capture it
+    // so it never reaches the suite log.
+    final capture = _captureDebugPrint();
+    addTearDown(IxThemeBuilder.debugResetBrandNotice);
+
     final brand = const IxThemeBuilder(
       family: IxThemeFamily.brand,
       mode: ThemeMode.light,
     ).build();
     final classic = const IxThemeBuilder.light().build();
     expect(brand.colorScheme.primary, classic.colorScheme.primary);
+    // brand is an alias, so it reports the classic theme name as well.
+    expect(brand.extension<IxTheme>()!.themeName, IxThemeName.classic);
+
+    capture.restore();
+  });
+
+  test('the custom family keeps its own theme name', () {
+    final custom = IxThemeBuilder(
+      family: IxThemeFamily.custom,
+      mode: ThemeMode.light,
+      customPalette: IxCustomPalette.partial(),
+    ).build();
+
+    expect(custom.extension<IxTheme>()!.themeName, const IxThemeName('custom'));
+  });
+
+  test('brand logs one deprecation notice per process in debug builds', () {
+    final capture = _captureDebugPrint();
+    addTearDown(IxThemeBuilder.debugResetBrandNotice);
+    IxThemeBuilder.debugResetBrandNotice();
+
+    const IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    ).build();
+    const IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.dark,
+    ).build();
+    final notices = capture.logs.where(
+      (l) => l.contains('IxThemeFamily.brand'),
+    );
+    expect(notices, hasLength(1));
+    expect(notices.single, contains('classic'));
+
+    // Not logged for the non-deprecated families...
+    const IxThemeBuilder.light().build();
+    expect(
+      capture.logs.where((l) => l.contains('IxThemeFamily.brand')),
+      hasLength(1),
+    );
+
+    // ...and the reset re-arms it for the next test.
+    IxThemeBuilder.debugResetBrandNotice();
+    const IxThemeBuilder(
+      family: IxThemeFamily.brand,
+      mode: ThemeMode.light,
+    ).build();
+    expect(
+      capture.logs.where((l) => l.contains('IxThemeFamily.brand')),
+      hasLength(2),
+    );
+
+    capture.restore();
   });
 }
