@@ -3,6 +3,13 @@ import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 
+// This file's `style()` switch necessarily still refers to the nine
+// deprecated variants below (every IxButtonVariant value must resolve to a
+// style so they stay usable, unchanged, until they're removed in 2.0), so
+// the same-package deprecation notice is suppressed file-wide instead of
+// at each of the nine `case` labels individually.
+// ignore_for_file: deprecated_member_use_from_same_package
+
 /// Enumerates the Siemens IX button variants.
 enum IxButtonVariant {
   primary,
@@ -14,14 +21,77 @@ enum IxButtonVariant {
   dangerPrimary,
   dangerSecondary,
   dangerTertiary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   warningPrimary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   warningSecondary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   warningTertiary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   infoPrimary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   infoSecondary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   infoTertiary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   successPrimary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   successSecondary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
+    'subtle* or danger* variants.',
+  )
   successTertiary,
 }
 

@@ -63,7 +63,17 @@ void main() {
     final ixButtons = theme.extension<IxButtonTheme>();
 
     expect(ixButtons, isNotNull);
-    expect(theme.filledButtonTheme.style, same(ixButtons!.primary));
+    // IxDensityAdapter.apply (run unconditionally by IxThemeBuilder.build,
+    // see test/density/ix_density_test.dart and test/theme/
+    // component_sizes_test.dart) now derives theme.filledButtonTheme.style
+    // from ixButtons.primary via copyWith(tapTargetSize:), so it is a
+    // distinct but wired-up instance rather than the same object; the
+    // backgroundColor property is untouched by that copyWith and so stays
+    // identical, confirming the derivation.
+    expect(
+      theme.filledButtonTheme.style?.backgroundColor,
+      same(ixButtons!.primary.backgroundColor),
+    );
 
     final secondaryBackground = ixButtons
         .style(IxButtonVariant.secondary)
@@ -85,6 +95,7 @@ void main() {
     expect(borderRadius.topLeft.x, expectedRadiusPx);
 
     final warningBorder = ixButtons
+        // ignore: deprecated_member_use_from_same_package
         .style(IxButtonVariant.warningSecondary)
         .side
         ?.resolve(<WidgetState>{});
@@ -92,12 +103,14 @@ void main() {
     expect(warningBorder!.color, ixTheme.color(IxThemeColorToken.warningBdr));
 
     final successPrimaryBackground = ixButtons
+        // ignore: deprecated_member_use_from_same_package
         .style(IxButtonVariant.successPrimary)
         .backgroundColor!
         .resolve(<WidgetState>{});
     expect(successPrimaryBackground, ixTheme.color(IxThemeColorToken.success));
 
     final infoGhostForeground = ixButtons
+        // ignore: deprecated_member_use_from_same_package
         .style(IxButtonVariant.infoTertiary)
         .foregroundColor!
         .resolve(<WidgetState>{});

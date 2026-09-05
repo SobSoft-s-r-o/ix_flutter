@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/src/ix_colors/ix_colors.dart';
 import 'package:ix_flutter/src/ix_core/ix_color_palette.dart';
+import 'package:ix_flutter/src/ix_core/ix_density.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_header_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
@@ -55,6 +56,7 @@ class IxThemeBuilder {
     this.typography,
     this.customPalette,
     this.icons,
+    this.density = IxDensity.adaptive,
   });
 
   /// Siemens IX visual family (classic vs. custom overrides).
@@ -75,6 +77,15 @@ class IxThemeBuilder {
   /// Optional icon resolver registered as the [IxIconResolver] theme
   /// extension. Defaults to [IxIconResolver.material] when unset.
   final IxIconResolver? icons;
+
+  /// The adaptive density policy for interactive control hit areas.
+  ///
+  /// Defaults to [IxDensity.adaptive]. [build] always bakes a static
+  /// [IxDensity.comfortable] tap-target sizing into the returned
+  /// [ThemeData] when this is [IxDensity.adaptive] (a touch-safe default
+  /// with no [BuildContext] to resolve modality from); wrap the app in an
+  /// [IxDensityScope] to resolve [IxDensity.adaptive] live instead.
+  final IxDensity density;
 
   /// Returns [ThemeData] configured with Siemens IX global colors and fonts.
   ///
@@ -158,10 +169,11 @@ class IxThemeBuilder {
       brightness: brightness,
       palette: palette,
       typography: typeScale,
+      density: density,
     );
     final iconResolver = icons ?? IxIconResolver.material();
 
-    return ThemeData(
+    final theme = ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
       brightness: brightness,
@@ -263,6 +275,29 @@ class IxThemeBuilder {
         breadcrumbTheme,
       ],
     );
+
+    // No BuildContext is available here, so `adaptive` cannot be resolved
+    // to a real input modality yet: bake in `comfortable` (touch-safe) as
+    // the static Material component tap-target sizing. `IxDensityScope`
+    // re-adapts this live once a BuildContext exists.
+    final adapted = IxDensityAdapter.apply(
+      theme,
+      density == IxDensity.adaptive ? IxDensity.comfortable : density,
+    );
+    if (density != IxDensity.adaptive) {
+      return adapted;
+    }
+    // IxDensityAdapter.apply() stamps the density it was given onto
+    // IxTheme.density, which would otherwise leave `comfortable` (the
+    // static default above) baked into the theme. Restore the original,
+    // still-adaptive extension so IxDensity.effectiveOf can resolve it
+    // live from a BuildContext when no IxDensityScope is present.
+    return adapted.copyWith(
+      extensions: [
+        ...adapted.extensions.values.where((e) => e is! IxTheme),
+        ixThemeExtension,
+      ],
+    );
   }
 
   /// Copies the builder with selective overrides.
@@ -276,6 +311,7 @@ class IxThemeBuilder {
     IxTypography? typography,
     IxCustomPalette? customPalette,
     IxIconResolver? icons,
+    IxDensity? density,
   }) {
     return IxThemeBuilder(
       family: family ?? this.family,
@@ -284,6 +320,7 @@ class IxThemeBuilder {
       typography: typography ?? this.typography,
       customPalette: customPalette ?? this.customPalette,
       icons: icons ?? this.icons,
+      density: density ?? this.density,
     );
   }
 
@@ -386,6 +423,7 @@ class IxTheme extends ThemeExtension<IxTheme> {
     required this.brightness,
     required this.palette,
     required this.typography,
+    this.density = IxDensity.adaptive,
   });
 
   /// Resolves the [IxTheme] registered on the closest [Theme], or `null` if
@@ -422,6 +460,13 @@ class IxTheme extends ThemeExtension<IxTheme> {
   final Map<IxThemeColorToken, Color> palette;
   final IxTypography typography;
 
+  /// The adaptive density policy in effect for this theme.
+  ///
+  /// Set from `IxThemeBuilder(density:)`. Read via [IxDensity.effectiveOf]
+  /// rather than directly: an ambient [IxDensityScope] always takes
+  /// precedence over this value.
+  final IxDensity density;
+
   /// Resolves a tokenized Siemens IX color.
   Color color(IxThemeColorToken token) => palette[token]!;
 
@@ -445,6 +490,7 @@ class IxTheme extends ThemeExtension<IxTheme> {
     Brightness? brightness,
     Map<IxThemeColorToken, Color>? palette,
     IxTypography? typography,
+    IxDensity? density,
   }) {
     return IxTheme(
       family: family ?? this.family,
@@ -452,6 +498,7 @@ class IxTheme extends ThemeExtension<IxTheme> {
       brightness: brightness ?? this.brightness,
       palette: palette ?? this.palette,
       typography: typography ?? this.typography,
+      density: density ?? this.density,
     );
   }
 
@@ -474,6 +521,7 @@ class IxTheme extends ThemeExtension<IxTheme> {
       brightness: t < 0.5 ? brightness : other.brightness,
       palette: Map.unmodifiable(blended),
       typography: t < 0.5 ? typography : other.typography,
+      density: t < 0.5 ? density : other.density,
     );
   }
 

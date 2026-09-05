@@ -246,22 +246,35 @@ String _variantLabel(IxButtonVariant variant) {
       return 'Danger / Secondary';
     case IxButtonVariant.dangerTertiary:
       return 'Danger / Tertiary';
+    // The nine cases below are deprecated (not part of Siemens iX; removed
+    // in 2.0) but this page still demonstrates every IxButtonVariant, so
+    // the deprecation notice is suppressed at each site rather than
+    // dropping the demo entries.
+    // ignore: deprecated_member_use
     case IxButtonVariant.warningPrimary:
       return 'Warning / Primary';
+    // ignore: deprecated_member_use
     case IxButtonVariant.warningSecondary:
       return 'Warning / Secondary';
+    // ignore: deprecated_member_use
     case IxButtonVariant.warningTertiary:
       return 'Warning / Tertiary';
+    // ignore: deprecated_member_use
     case IxButtonVariant.infoPrimary:
       return 'Info / Primary';
+    // ignore: deprecated_member_use
     case IxButtonVariant.infoSecondary:
       return 'Info / Secondary';
+    // ignore: deprecated_member_use
     case IxButtonVariant.infoTertiary:
       return 'Info / Tertiary';
+    // ignore: deprecated_member_use
     case IxButtonVariant.successPrimary:
       return 'Success / Primary';
+    // ignore: deprecated_member_use
     case IxButtonVariant.successSecondary:
       return 'Success / Secondary';
+    // ignore: deprecated_member_use
     case IxButtonVariant.successTertiary:
       return 'Success / Tertiary';
   }
@@ -295,22 +308,35 @@ String _variantDescription(IxButtonVariant variant, IxTheme? ixTheme) {
       return 'Outlined danger action accenting ${token(IxThemeColorToken.alarmText)} borders.';
     case IxButtonVariant.dangerTertiary:
       return 'Text treatment for alarm flows with hover/error overlays.';
+    // The nine cases below are deprecated (not part of Siemens iX; removed
+    // in 2.0) but this page still demonstrates every IxButtonVariant, so
+    // the deprecation notice is suppressed at each site rather than
+    // dropping the demo entries.
+    // ignore: deprecated_member_use
     case IxButtonVariant.warningPrimary:
       return 'Prominent caution state using ${token(IxThemeColorToken.warning)} fills with ${token(IxThemeColorToken.warningContrast)} text.';
+    // ignore: deprecated_member_use
     case IxButtonVariant.warningSecondary:
       return 'Warning outline featuring ${token(IxThemeColorToken.warningText)} ink and ${token(IxThemeColorToken.warningBdr)} borders.';
+    // ignore: deprecated_member_use
     case IxButtonVariant.warningTertiary:
       return 'Ghost warning action that keeps ${token(IxThemeColorToken.warningText)} copy on ${token(IxThemeColorToken.ghost)} surfaces.';
+    // ignore: deprecated_member_use
     case IxButtonVariant.infoPrimary:
       return 'Informational highlight using ${token(IxThemeColorToken.info)} backgrounds and ${token(IxThemeColorToken.infoContrast)} text.';
+    // ignore: deprecated_member_use
     case IxButtonVariant.infoSecondary:
       return 'Info outline pairing neutral fills with ${token(IxThemeColorToken.info)} strokes.';
+    // ignore: deprecated_member_use
     case IxButtonVariant.infoTertiary:
       return 'Ghost info button reserved for inline help cues with ${token(IxThemeColorToken.info)} ink.';
+    // ignore: deprecated_member_use
     case IxButtonVariant.successPrimary:
       return 'Affirmative confirmation state driven by ${token(IxThemeColorToken.success)} fills and ${token(IxThemeColorToken.successContrast)} text.';
+    // ignore: deprecated_member_use
     case IxButtonVariant.successSecondary:
       return 'Success outline balancing ${token(IxThemeColorToken.success)} borders over ${token(IxThemeColorToken.color0)} surfaces.';
+    // ignore: deprecated_member_use
     case IxButtonVariant.successTertiary:
       return 'Ghost success control for passive confirmations relying on ${token(IxThemeColorToken.success)} text.';
   }
