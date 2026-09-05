@@ -64,6 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxApplicationScaffold`'s collapsed-rail/drawer fly-out is clamped against the correct edge in RTL, so the panel no longer opens partly outside the viewport
 - `IxApplicationScaffold` disposes the `OverlayEntry` it self-hosts when built above the `Navigator`, so leak-tracking suites no longer report it
 - `IxResponsiveDataView` headers/rows/mobile cards/search-clear and `IxPaginationBar` no longer hard-code Material `Colors.*`; they derive from `IxTheme` tokens (`color0`/`softBdr`/`weakBdr`/`ghostHover`) with a `ColorScheme` fallback, and no longer overflow at narrow widths or large text scales (WCAG 1.4.4)
+- an `IxSpinnerTheme` whose `variants`/`sizes` map does not carry every key no longer throws `Null check operator used on a null value`. A map written before `IxSpinnerVariant.secondary` existed (`{standard, primary}`) now renders the default `IxSpinner()` through the `standard` alias, and both `IxSpinnerTheme.style`/`.size` and `lerp` fall back to the built-in style for any key neither the map nor its alias carries
 
 ---
 

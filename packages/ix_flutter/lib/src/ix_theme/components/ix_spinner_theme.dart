@@ -2,6 +2,7 @@ import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
+import 'package:ix_flutter/src/ix_colors/theme/ix_classic_light_colors.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 
 const double _xxSmallDiameter = IxCommonGeometry.space2;
@@ -150,18 +151,74 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
     );
   }
 
+  /// The built-in theme, used as the last-resort source of a size spec or
+  /// variant style a consumer-supplied map does not carry.
+  ///
+  /// Built once from the classic light palette -- the same palette
+  /// `IxSpinner` already falls back to when no [IxSpinnerTheme] is
+  /// registered at all -- so the geometry is always the upstream one and
+  /// only the colors can differ from the active theme.
+  static final IxSpinnerTheme _builtIn = IxSpinnerTheme.fromPalette(
+    palette: IxClassicLightColors.palette,
+  );
+
+  /// The variant that names the same style as [variant].
+  ///
+  /// [IxSpinnerVariant.standard] is a deprecated alias of
+  /// [IxSpinnerVariant.secondary]; the two are one style under two names, so
+  /// either key answers a lookup for the other.
+  static IxSpinnerVariant _aliasOf(IxSpinnerVariant variant) =>
+      switch (variant) {
+        // ignore: deprecated_member_use_from_same_package
+        IxSpinnerVariant.standard => IxSpinnerVariant.secondary,
+        // ignore: deprecated_member_use_from_same_package
+        IxSpinnerVariant.secondary => IxSpinnerVariant.standard,
+        IxSpinnerVariant.primary => IxSpinnerVariant.primary,
+      };
+
+  static IxSpinnerVariantStyle _resolveVariant(
+    Map<IxSpinnerVariant, IxSpinnerVariantStyle> variants,
+    IxSpinnerVariant variant,
+  ) {
+    final alias = _aliasOf(variant);
+    return variants[variant] ??
+        variants[alias] ??
+        _builtIn.variants[variant] ??
+        _builtIn.variants[alias] ??
+        _builtIn.variants[IxSpinnerVariant.secondary]!;
+  }
+
+  static IxSpinnerSizeSpec _resolveSize(
+    Map<IxSpinnerSize, IxSpinnerSizeSpec> sizes,
+    IxSpinnerSize size,
+  ) {
+    return sizes[size] ??
+        _builtIn.sizes[size] ??
+        _builtIn.sizes[IxSpinnerSize.medium]!;
+  }
+
   final Map<IxSpinnerSize, IxSpinnerSizeSpec> sizes;
   final Map<IxSpinnerVariant, IxSpinnerVariantStyle> variants;
   final double ringInsetFraction;
   final Duration rotationDuration;
   final Duration maskDuration;
 
+  /// The size spec for [size], falling back to the built-in spec when a
+  /// consumer-supplied [sizes] map does not carry that key.
   IxSpinnerSizeSpec size(IxSpinnerSize size) {
-    return sizes[size] ?? sizes[IxSpinnerSize.medium]!;
+    return _resolveSize(sizes, size);
   }
 
+  /// The variant style for [variant].
+  ///
+  /// Resolution order: the exact key, then its alias
+  /// ([IxSpinnerVariant.standard] and [IxSpinnerVariant.secondary] name the
+  /// same style by definition), then the built-in style for that variant.
+  /// A [variants] map supplied by a consumer therefore never has to be
+  /// exhaustive -- in particular a map written before
+  /// [IxSpinnerVariant.secondary] existed keeps rendering every spinner.
   IxSpinnerVariantStyle style(IxSpinnerVariant variant) {
-    return variants[variant] ?? variants[IxSpinnerVariant.secondary]!;
+    return _resolveVariant(variants, variant);
   }
 
   @override
@@ -187,12 +244,19 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
       return this;
     }
 
+    // Both loops resolve each key through the same fallback chain `size()`
+    // and `style()` use, so a key only one side declares still interpolates
+    // from a real style on the other side (its alias, or the built-in one)
+    // instead of snapping -- and neither loop can trip a `!` on a
+    // consumer-supplied map that is missing a key entirely.
     final blendedSizes = <IxSpinnerSize, IxSpinnerSizeSpec>{};
     final sizeKeys = <IxSpinnerSize>{...sizes.keys, ...other.sizes.keys};
     for (final sizeKey in sizeKeys) {
-      final first = sizes[sizeKey] ?? other.sizes[sizeKey]!;
-      final second = other.sizes[sizeKey] ?? sizes[sizeKey]!;
-      blendedSizes[sizeKey] = IxSpinnerSizeSpec.lerp(first, second, t);
+      blendedSizes[sizeKey] = IxSpinnerSizeSpec.lerp(
+        _resolveSize(sizes, sizeKey),
+        _resolveSize(other.sizes, sizeKey),
+        t,
+      );
     }
 
     final blendedVariants = <IxSpinnerVariant, IxSpinnerVariantStyle>{};
@@ -201,11 +265,9 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
       ...other.variants.keys,
     };
     for (final variantKey in variantKeys) {
-      final first = variants[variantKey] ?? other.variants[variantKey]!;
-      final second = other.variants[variantKey] ?? variants[variantKey]!;
       blendedVariants[variantKey] = IxSpinnerVariantStyle.lerp(
-        first,
-        second,
+        _resolveVariant(variants, variantKey),
+        _resolveVariant(other.variants, variantKey),
         t,
       );
     }
