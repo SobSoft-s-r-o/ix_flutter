@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -36,6 +37,30 @@ enum IxDensity {
     final directional =
         MediaQuery.navigationModeOf(context) == NavigationMode.directional;
     return pointer || directional ? IxDensity.compact : IxDensity.comfortable;
+  }
+
+  /// The static density default for [platform] (defaults to
+  /// [defaultTargetPlatform]).
+  ///
+  /// Mirrors Material's own platform rule for `materialTapTargetSize`:
+  /// touch platforms (Android/iOS/Fuchsia) get [comfortable] (48x48 hit
+  /// areas), desktop platforms (Linux/macOS/Windows, and therefore
+  /// desktop browsers) get [compact] (hit area equals the visual size).
+  ///
+  /// Used by `IxThemeBuilder.build()` to bake a static default when
+  /// `density` is [adaptive] and no [BuildContext] exists yet. Prefer
+  /// [IxDensityScope] / [effectiveOf] for live, input-modality-driven
+  /// resolution, which additionally accounts for a connected mouse, the
+  /// viewport width and [NavigationMode.directional].
+  static IxDensity resolvePlatform([TargetPlatform? platform]) {
+    return switch (platform ?? defaultTargetPlatform) {
+      TargetPlatform.android ||
+      TargetPlatform.iOS ||
+      TargetPlatform.fuchsia => IxDensity.comfortable,
+      TargetPlatform.linux ||
+      TargetPlatform.macOS ||
+      TargetPlatform.windows => IxDensity.compact,
+    };
   }
 
   /// Resolves the effective density for [context].

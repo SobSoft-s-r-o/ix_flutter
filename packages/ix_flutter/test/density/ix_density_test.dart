@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -113,6 +114,110 @@ void main() {
       expect(size.width, greaterThanOrEqualTo(48));
     },
   );
+
+  group('static bake in IxThemeBuilder.build()', () {
+    // `build()` has no BuildContext, so `adaptive` cannot be resolved from
+    // the live input modality: the static bake follows Material's own
+    // platform rule for `materialTapTargetSize` (padded on touch
+    // platforms, shrinkWrap on desktop) so a desktop app keeps its 1.0.2
+    // layout while touch platforms get 48x48 hit areas.
+    void usePlatform(TargetPlatform platform) {
+      debugDefaultTargetPlatformOverride = platform;
+      addTearDown(() => debugDefaultTargetPlatformOverride = null);
+    }
+
+    MaterialTapTargetSize? buttonTts(ThemeData theme) =>
+        theme.filledButtonTheme.style?.tapTargetSize;
+
+    test('desktop platform bakes shrinkWrap tap targets', () {
+      usePlatform(TargetPlatform.macOS);
+      final theme = const IxThemeBuilder().build();
+      expect(theme.materialTapTargetSize, MaterialTapTargetSize.shrinkWrap);
+      expect(
+        theme.switchTheme.materialTapTargetSize,
+        MaterialTapTargetSize.shrinkWrap,
+      );
+      expect(
+        theme.checkboxTheme.materialTapTargetSize,
+        MaterialTapTargetSize.shrinkWrap,
+      );
+      expect(
+        theme.radioTheme.materialTapTargetSize,
+        MaterialTapTargetSize.shrinkWrap,
+      );
+      expect(buttonTts(theme), MaterialTapTargetSize.shrinkWrap);
+    });
+
+    test('touch platform bakes padded tap targets', () {
+      usePlatform(TargetPlatform.android);
+      final theme = const IxThemeBuilder().build();
+      expect(theme.materialTapTargetSize, MaterialTapTargetSize.padded);
+      expect(
+        theme.switchTheme.materialTapTargetSize,
+        MaterialTapTargetSize.padded,
+      );
+      expect(
+        theme.checkboxTheme.materialTapTargetSize,
+        MaterialTapTargetSize.padded,
+      );
+      expect(buttonTts(theme), MaterialTapTargetSize.padded);
+    });
+
+    test('explicit comfortable stays padded on a desktop platform', () {
+      usePlatform(TargetPlatform.macOS);
+      final theme = const IxThemeBuilder(
+        density: IxDensity.comfortable,
+      ).build();
+      expect(theme.materialTapTargetSize, MaterialTapTargetSize.padded);
+      expect(buttonTts(theme), MaterialTapTargetSize.padded);
+      expect(theme.extension<IxTheme>()!.density, IxDensity.comfortable);
+    });
+
+    test('explicit compact stays shrinkWrap on a touch platform', () {
+      usePlatform(TargetPlatform.android);
+      final theme = const IxThemeBuilder(density: IxDensity.compact).build();
+      expect(theme.materialTapTargetSize, MaterialTapTargetSize.shrinkWrap);
+      expect(buttonTts(theme), MaterialTapTargetSize.shrinkWrap);
+      expect(theme.extension<IxTheme>()!.density, IxDensity.compact);
+    });
+
+    test('IxTheme.density stays adaptive so effectiveOf resolves live', () {
+      usePlatform(TargetPlatform.macOS);
+      expect(
+        const IxThemeBuilder().build().extension<IxTheme>()!.density,
+        IxDensity.adaptive,
+      );
+    });
+
+    test('resolvePlatform follows Material per platform', () {
+      expect(
+        IxDensity.resolvePlatform(TargetPlatform.android),
+        IxDensity.comfortable,
+      );
+      expect(
+        IxDensity.resolvePlatform(TargetPlatform.iOS),
+        IxDensity.comfortable,
+      );
+      expect(
+        IxDensity.resolvePlatform(TargetPlatform.fuchsia),
+        IxDensity.comfortable,
+      );
+      expect(
+        IxDensity.resolvePlatform(TargetPlatform.macOS),
+        IxDensity.compact,
+      );
+      expect(
+        IxDensity.resolvePlatform(TargetPlatform.windows),
+        IxDensity.compact,
+      );
+      expect(
+        IxDensity.resolvePlatform(TargetPlatform.linux),
+        IxDensity.compact,
+      );
+      usePlatform(TargetPlatform.windows);
+      expect(IxDensity.resolvePlatform(), IxDensity.compact);
+    });
+  });
 
   test('deprecated invented button variants are still present in 1.x', () {
     // ignore: deprecated_member_use_from_same_package

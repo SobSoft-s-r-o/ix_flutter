@@ -406,21 +406,24 @@ class IxThemeBuilder {
     );
 
     // No BuildContext is available here, so `adaptive` cannot be resolved
-    // to a real input modality yet: bake in `comfortable` (touch-safe) as
-    // the static Material component tap-target sizing. `IxDensityScope`
+    // to a real input modality yet: bake in the platform default the way
+    // Material derives `materialTapTargetSize` itself -- `comfortable`
+    // (48x48 hit areas) on touch platforms, `compact` (hit area equals the
+    // visual size) on desktop and desktop browsers. `IxDensityScope`
     // re-adapts this live once a BuildContext exists.
     final adapted = IxDensityAdapter.apply(
       themeData,
-      density == IxDensity.adaptive ? IxDensity.comfortable : density,
+      density == IxDensity.adaptive ? IxDensity.resolvePlatform() : density,
     );
     if (density != IxDensity.adaptive) {
       return adapted;
     }
     // IxDensityAdapter.apply() stamps the density it was given onto
-    // IxTheme.density, which would otherwise leave `comfortable` (the
-    // static default above) baked into the theme. Restore the original,
-    // still-adaptive extension so IxDensity.effectiveOf can resolve it
-    // live from a BuildContext when no IxDensityScope is present.
+    // IxTheme.density, which would otherwise leave the resolved platform
+    // default (the static bake above) inside the theme. Restore the
+    // original, still-adaptive extension so IxDensity.effectiveOf can
+    // resolve it live from a BuildContext when no IxDensityScope is
+    // present.
     return adapted.copyWith(
       extensions: [
         ...adapted.extensions.values.where((e) => e is! IxTheme),

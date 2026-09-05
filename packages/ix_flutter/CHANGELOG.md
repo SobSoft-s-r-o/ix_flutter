@@ -10,19 +10,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Public exports for `IxPaginationBar` and `IxBottomSheetTheme` from the package barrel
 - `IxTheme.of`/`IxTheme.maybeOf` static accessors for reading the Siemens IX theme extension from a `BuildContext`
+- `IxFocusRing`, the shared 1px focus indicator used by the iX controls and available for wrapping custom focusables
+- `IxUpstream` exported from the package barrel (the `@Upstream` traceability annotation)
 - Work Sans (OFL) declared as an opt-in bundled UI font, `IxFonts.workSans`, `buttonLabel`/`caption`/`textDefault` styles, `liga`/`clig` disabled on every typography variant
-- `IxIcon`, `IxIconData`, `IxIconKey`, `IxIconResolver`, `IxIconSize` public icon contract; `IxThemeBuilder(icons:)` resolver override (defaults to `IxIconResolver.material()`)
+- `IxTypography(package:, monospacePackage:)` for pointing the UI/monospace families at a font shipped by another package (pass `monospacePackage: null` to force-disable the built-in package prefix)
+- `IxIcon`, `IxIconData`, `IxIconKey`, `IxIconResolver`, `IxIconSize` public icon contract; `IxThemeBuilder(icons:)` resolver override (defaults to `IxIconResolver.material()`); `IxIconData.fallback` plus SVG asset support (`IxIconData.asset`/`.packageAsset`) that falls back to the `fallback` glyph when an asset fails to load and reports the failure through `FlutterError.reportError` in debug builds
 - `IxMotion` tokens with reduced-motion support, `IxSpinner.semanticLabel` + status role, `IxSpinnerVariant.secondary`
-- `IxDensity` (adaptive touch/pointer hit areas), `IxDensityScope`, `IxThemeBuilder(density:)`, `IxIconButton` (32/24/16)
+- `IxDensity` (adaptive touch/pointer hit areas), `IxDensity.resolvePlatform`, `IxDensityScope`, `IxThemeBuilder(density:)`, `IxIconButton` (32/24/16)
 - `IxDropdownButton` keyboard model (Arrow/Home/End/Enter/Space to open and navigate, Escape/Tab to close), menu semantics (`menu`/`menuItem` roles, expanded state on the trigger), controlled `isOpen`/`onOpenChanged`/`onWillOpen`, `closeBehavior`, content-sized scrollable overlay (`maxHeight`), `semanticLabel`, `IxDropdownMenuItem.checked`, `buttonVariant` and the `IxDropdownTheme` theme extension
 - IxBlind uncontrolled mode (`expanded: null` + `initiallyExpanded`), button/expanded semantics, header actions kept outside the header's own semantics node
 - `IxToastService.showToast()` returning an `IxToastHandle` (`onClose`/`close`/`pause`/`resume`/`isPaused`), `IxToastType.error`, `IxToastPosition`, `IxToastStrings`, toast live region + labelled close, 280px width, safe-area aware overlay
 - `IxBreadcrumb` `breadcrumbKey` + `IxBreadcrumbClick` callbacks (`onItemClick`/`onNextClick`), navigation landmark, current-page state, `IxBreadcrumbStrings`
 - `IxPaginationStrings`, keyboard-focusable RDV headers/rows/cards with sort semantics, wrap-capable pagination bar with 32px chevrons and labelled page-size trigger
 - `IxApplicationStrings`, `IxApplicationScaffold` `settings`/`about`/`enableToggleTheme` API, menu keyboard navigation (Arrow/Home/End), `menuBar` landmark with a single semantics node per tile, and a category fly-out in the collapsed rail
-- `IxThemeName` and `IxColorSchema` (the upstream `data-ix-theme`/`data-ix-color-schema` model), `IxThemeController` (resolves the `system` schema at runtime, `themeChanged` stream, `updatePlatformBrightness`), `IxThemeBuilder.light()`/`IxThemeBuilder.dark()` plus `IxThemeBuilder(theme:/brightness:)`, `IxTheme.themeName`/`IxTheme.colorSchema`, `IxCustomPalette.partial()`/`IxCustomPalette.copyWith()` -- see `doc/theming.md`
+- `IxThemeName` and `IxColorSchema` (the upstream `data-ix-theme`/`data-ix-color-schema` model), `IxThemeController` (resolves the `system` schema at runtime, `themeChanged` stream, `updatePlatformBrightness`, and forwards `icons:`/`density:` to both built themes), `IxThemeBuilder.light()`/`IxThemeBuilder.dark()` plus `IxThemeBuilder(theme:/brightness:)`, `IxTheme.themeName`/`IxTheme.colorSchema`, `IxCustomPalette.partial()`/`IxCustomPalette.copyWith()` -- see `doc/theming.md`
 
 ### Changed
+- `IxThemeBuilder.build()` now bakes the static tap-target density from the platform the way Material derives `materialTapTargetSize` itself: touch platforms (Android/iOS/Fuchsia) get 48x48 hit areas (`IxDensity.comfortable`), desktop and desktop browsers keep the 1.0.2 layout (`IxDensity.compact`). Buttons, checkboxes, radios and switches therefore grow ~7px taller on touch platforms only. Pass `density: IxDensity.comfortable` (or wrap the app in `IxDensityScope`, which resolves the density live from the input modality) to opt every platform in; `density: IxDensity.compact` pins the 1.0.2 layout everywhere
+- New enum values break exhaustive `switch` statements in consumer code (Dart 3 makes a non-exhaustive `switch` over an enum a compile error): `IxSpinnerVariant.secondary`, `IxToastType.error`, and `IxTypographyVariant.buttonLabel`/`.caption`/`.textDefault`. Add a `default:` arm to any `switch` over these enums
+- `IxBlind` changed supertype from `StatelessWidget` to `StatefulWidget` (required by the new uncontrolled mode); subclasses and `find.byType`-style structural assumptions may need updating
+- `IxToastOverlay`'s default top offset is 32px (was 16px), matching the upstream toast container; the deprecated `position:` path keeps its 16px offsets
+- `IxBreadcrumbTheme.dropdownBorderRadius` defaults to `defaultBorderRadius` (was `smallBorderRadius`), matching the overflow menu now styled by `IxDropdownTheme`
 - `ThemeData.focusColor` is transparent; Material widgets without an iX adapter no longer receive an opaque focus fill — wrap custom focusables in `IxFocusRing`
 - `IxSpinner`'s default variant is now `IxSpinnerVariant.secondary` (identical styling to the deprecated `standard`)
 - `IxApplicationScaffold` menu icons (drawer button, sidebar toggle, category chevron, theme indicator, entries without an `icon`) resolve through `IxIconResolver` instead of hard-coded Material glyphs
@@ -51,7 +59,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - the dropdown trigger label is flexible with ellipsis, so it no longer overflows at narrow widths or large text scales (WCAG 1.4.4)
 - `IxEmptyState`/`IxToast`/`IxSpinner` render without `IxThemeBuilder`
 - `IxBlindTheme.fallback`'s `critical`/`warning`/`success`/`info`/`neutral` variants no longer hard-code Material `Colors.*` swatches; they derive from the ambient `ColorScheme` (`error`/`tertiary`/`secondary`/`primary`/`outline`) instead
-- toggling an uncontrolled `IxBlind` no longer throws under `MediaQuery.disableAnimations` (a zero-duration `AnimatedSize` re-entering layout while resizing)
+- toggling an `IxBlind` (controlled or uncontrolled) no longer throws under `MediaQuery.disableAnimations` (a zero-duration `AnimatedSize` re-entering layout while resizing)
 - `IxResponsiveDataView` headers/rows/mobile cards/search-clear and `IxPaginationBar` no longer hard-code Material `Colors.*`; they derive from `IxTheme` tokens (`color0`/`softBdr`/`weakBdr`/`ghostHover`) with a `ColorScheme` fallback, and no longer overflow at narrow widths or large text scales (WCAG 1.4.4)
 
 ---

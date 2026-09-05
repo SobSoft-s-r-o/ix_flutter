@@ -75,11 +75,29 @@ Widget compactSubtree(Widget toolbar) => IxDensityScope(
 `IxThemeBuilder(density: IxDensity.compact)` bakes a fixed density into
 the built `ThemeData` for apps that don't use `IxDensityScope` at all (for
 example, if `MaterialApp.theme` is constructed once outside of any
-`BuildContext` and modality never needs to be resolved at runtime). Left
-at the default `IxDensity.adaptive`, `IxThemeBuilder.build()` still bakes
-in `comfortable` tap targets as a touch-safe static default (there is no
-`BuildContext` available inside `build()` to resolve modality from) --
-wrap the app in `IxDensityScope` to get live resolution instead.
+`BuildContext` and modality never needs to be resolved at runtime).
+
+Left at the default `IxDensity.adaptive`, `IxThemeBuilder.build()` has no
+`BuildContext` to resolve the modality from, so it bakes in the *platform*
+default -- exactly the rule Material uses for `materialTapTargetSize`
+itself (`IxDensity.resolvePlatform()`):
+
+| `defaultTargetPlatform` | Static bake | Tap targets |
+|---|---|---|
+| `android`, `iOS`, `fuchsia` | `comfortable` | padded to 48x48 |
+| `linux`, `macOS`, `windows` (and desktop browsers) | `compact` | equal to the visual size |
+
+This keeps a desktop app's layout unchanged while touch platforms get the
+WCAG 2.5.8 hit areas. Pass an explicit `density:` to override the platform
+rule in either direction (`IxDensity.comfortable` for 48x48 everywhere,
+`IxDensity.compact` for hit-area-equals-visual-size everywhere), or wrap
+the app in `IxDensityScope` to get live, input-modality-driven resolution
+instead of any static bake.
+
+Note that only the Material component *tap target* sizing is baked:
+`IxTheme.density` keeps the value you passed (`adaptive` by default), so
+`IxDensity.effectiveOf(context)` still resolves live from the input
+modality wherever a `BuildContext` exists.
 
 ## `IxIconButton`
 
