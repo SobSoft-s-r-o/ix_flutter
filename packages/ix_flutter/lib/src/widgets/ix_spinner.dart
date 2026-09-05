@@ -1,21 +1,39 @@
 import 'dart:math' as math;
+import 'dart:ui' show SemanticsRole;
 
 import 'package:flutter/material.dart';
+import 'package:ix_flutter/src/ix_colors/theme/ix_classic_light_colors.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_spinner_theme.dart';
 
 /// Animated Siemens IX spinner that pulls its colors and sizing from
 /// [IxSpinnerTheme].
+///
+/// Exposes a [SemanticsRole.status] node labelled [semanticLabel] (defaults
+/// to `'Loading'`) so assistive technologies announce the loading state, and
+/// stops its repeating animation -- rather than merely slowing it down --
+/// when the platform's reduced-motion preference
+/// (`MediaQuery.disableAnimationsOf`) is set. When no [IxThemeBuilder] theme
+/// is present, it still renders its own custom-painted arc (sized and
+/// colored from the classic light palette) instead of a Material
+/// [CircularProgressIndicator].
 class IxSpinner extends StatefulWidget {
   const IxSpinner({
     super.key,
     this.size = IxSpinnerSize.medium,
-    this.variant = IxSpinnerVariant.standard,
+    this.variant = IxSpinnerVariant.secondary,
     this.hideTrack = false,
+    this.semanticLabel,
   });
 
   final IxSpinnerSize size;
   final IxSpinnerVariant variant;
   final bool hideTrack;
+
+  /// The label announced by assistive technologies for the spinner's
+  /// [SemanticsRole.status] node.
+  ///
+  /// Defaults to `'Loading'` when unset.
+  final String? semanticLabel;
 
   @override
   State<IxSpinner> createState() => _IxSpinnerState();
@@ -41,12 +59,22 @@ class _IxSpinnerState extends State<IxSpinner> with TickerProviderStateMixin {
     final maskDuration =
         spinnerTheme?.maskDuration ?? const Duration(seconds: 3);
 
-    _rotationController
-      ..duration = rotationDuration
-      ..repeat();
-    _sweepController
-      ..duration = maskDuration
-      ..repeat();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      // Reduced motion: stop rather than merely speed up the animation, and
+      // park both controllers at a fixed, sensible frame instead of leaving
+      // a repeating ticker alive.
+      _rotationController.stop();
+      _sweepController.stop();
+      _rotationController.value = 0;
+      _sweepController.value = 0.25;
+    } else {
+      _rotationController
+        ..duration = rotationDuration
+        ..repeat();
+      _sweepController
+        ..duration = maskDuration
+        ..repeat();
+    }
   }
 
   @override
@@ -58,40 +86,40 @@ class _IxSpinnerState extends State<IxSpinner> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final spinnerTheme = Theme.of(context).extension<IxSpinnerTheme>();
-    if (spinnerTheme == null) {
-      return const SizedBox(
-        width: 32,
-        height: 32,
-        child: CircularProgressIndicator(strokeWidth: 3),
-      );
-    }
+    final spinnerTheme =
+        Theme.of(context).extension<IxSpinnerTheme>() ??
+        IxSpinnerTheme.fromPalette(palette: IxClassicLightColors.palette);
 
     final spec = spinnerTheme.size(widget.size);
     final style = spinnerTheme.style(widget.variant);
 
-    return SizedBox(
-      width: spec.diameter,
-      height: spec.diameter,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_rotationController, _sweepController]),
-        builder: (context, _) {
-          final startAngle = _rotationController.value * 2 * math.pi;
-          final sweepAngle = _calculateSweepAngle(_sweepController.value);
+    return Semantics(
+      role: SemanticsRole.status,
+      liveRegion: false,
+      label: widget.semanticLabel ?? 'Loading',
+      child: SizedBox(
+        width: spec.diameter,
+        height: spec.diameter,
+        child: AnimatedBuilder(
+          animation: Listenable.merge([_rotationController, _sweepController]),
+          builder: (context, _) {
+            final startAngle = _rotationController.value * 2 * math.pi;
+            final sweepAngle = _calculateSweepAngle(_sweepController.value);
 
-          return CustomPaint(
-            painter: _SpinnerPainter(
-              startAngle: startAngle,
-              sweepAngle: sweepAngle,
-              strokeWidth: spec.trackWidth,
-              indicatorColor: style.indicatorColor,
-              trackColor: widget.hideTrack
-                  ? Colors.transparent
-                  : style.trackColor,
-              insetFraction: spinnerTheme.ringInsetFraction,
-            ),
-          );
-        },
+            return CustomPaint(
+              painter: _SpinnerPainter(
+                startAngle: startAngle,
+                sweepAngle: sweepAngle,
+                strokeWidth: spec.trackWidth,
+                indicatorColor: style.indicatorColor,
+                trackColor: widget.hideTrack
+                    ? Colors.transparent
+                    : style.trackColor,
+                insetFraction: spinnerTheme.ringInsetFraction,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

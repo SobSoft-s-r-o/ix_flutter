@@ -17,7 +17,18 @@ const Duration _maskDuration = Duration(seconds: 3);
 enum IxSpinnerSize { xxSmall, xSmall, small, medium, large }
 
 /// Supported Siemens IX spinner color variants.
-enum IxSpinnerVariant { standard, primary }
+enum IxSpinnerVariant {
+  /// Deprecated alias of [secondary]; the value is unchanged, only the name.
+  @Deprecated('Use secondary')
+  standard,
+
+  /// Uses the muted "soft" UI colors from the theme for subtle loading
+  /// indicators. Replaces [standard].
+  secondary,
+
+  /// Uses the primary brand color for emphasized loading states.
+  primary,
+}
 
 /// Captures the physical footprint and stroke width for a given spinner size.
 class IxSpinnerSizeSpec {
@@ -120,7 +131,7 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
     });
 
     final variants = Map<IxSpinnerVariant, IxSpinnerVariantStyle>.unmodifiable({
-      IxSpinnerVariant.standard: IxSpinnerVariantStyle(
+      IxSpinnerVariant.secondary: IxSpinnerVariantStyle(
         indicatorColor: pick(IxThemeColorToken.softText),
         trackColor: pick(IxThemeColorToken.component3),
       ),
@@ -150,7 +161,7 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
   }
 
   IxSpinnerVariantStyle style(IxSpinnerVariant variant) {
-    return variants[variant] ?? variants[IxSpinnerVariant.standard]!;
+    return variants[variant] ?? variants[IxSpinnerVariant.secondary]!;
   }
 
   @override

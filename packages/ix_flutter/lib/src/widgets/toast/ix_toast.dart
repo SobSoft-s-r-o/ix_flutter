@@ -83,7 +83,7 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
     }
   }
 
-  Widget _getIcon(IxTheme theme) {
+  Widget _getIcon(IxTheme? theme) {
     if (widget.data.icon != null) {
       return widget.data.icon!;
     }
@@ -107,11 +107,27 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
-    if (theme == null) return const SizedBox.shrink();
+    final cs = Theme.of(context).colorScheme;
 
-    final borderColor = _getColor(theme, widget.data.type);
+    // Without an IxThemeBuilder theme there is no per-type semantic palette
+    // (info/success/warning/... colors) to fall back to, so every toast
+    // renders with the same neutral Material colors instead.
+    final borderColor = theme != null
+        ? _getColor(theme, widget.data.type)
+        : cs.outlineVariant;
     final iconColor =
-        widget.data.iconColor ?? _getIconColor(theme, widget.data.type);
+        widget.data.iconColor ??
+        (theme != null ? _getIconColor(theme, widget.data.type) : cs.onSurface);
+    final backgroundColor =
+        theme?.color(IxThemeColorToken.component8) ?? cs.surface;
+    final outerBorderColor =
+        theme?.color(IxThemeColorToken.softBdr) ?? cs.outlineVariant;
+    final closeButtonColor =
+        theme?.color(IxThemeColorToken.softText) ?? cs.onSurface;
+    final progressColor =
+        theme?.color(IxThemeColorToken.softText) ?? cs.onSurface;
+    final titleStyle = theme?.typography.h5 ?? IxTypography().h5;
+    final bodyStyle = theme?.typography.body ?? IxTypography().body;
 
     return MouseRegion(
       onEnter: (_) {
@@ -136,8 +152,8 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
         child: Container(
           width: 320, // Standard width for toasts
           decoration: BoxDecoration(
-            color: theme.color(IxThemeColorToken.component8), // Background
-            border: Border.all(color: theme.color(IxThemeColorToken.softBdr)),
+            color: backgroundColor,
+            border: Border.all(color: outerBorderColor),
             borderRadius: BorderRadius.circular(4), // Standard radius
             boxShadow: [
               BoxShadow(
@@ -185,13 +201,10 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
                                       ),
                                       child: Text(
                                         widget.data.title!,
-                                        style: theme.typography.h5,
+                                        style: titleStyle,
                                       ),
                                     ),
-                                  Text(
-                                    widget.data.message,
-                                    style: theme.typography.body,
-                                  ),
+                                  Text(widget.data.message, style: bodyStyle),
                                 ],
                               ),
                             ),
@@ -223,7 +236,7 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
                                   size: 20,
                                 ), // Use IxIcons.close if available
                                 onPressed: widget.onDismiss,
-                                color: theme.color(IxThemeColorToken.softText),
+                                color: closeButtonColor,
                               ),
                               const SizedBox(width: 8),
                             ],
@@ -241,9 +254,7 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
                     return LinearProgressIndicator(
                       value: 1.0 - _progressController.value,
                       backgroundColor: Colors.transparent,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        theme.color(IxThemeColorToken.softText),
-                      ),
+                      valueColor: AlwaysStoppedAnimation<Color>(progressColor),
                       minHeight: 2,
                     );
                   },

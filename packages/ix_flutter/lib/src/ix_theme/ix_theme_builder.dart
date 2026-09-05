@@ -207,9 +207,9 @@ class IxThemeBuilder {
       radioTheme: radioTheme.materialRadioTheme,
       sliderTheme: sliderTheme.materialSliderTheme,
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: spinnerTheme.style(IxSpinnerVariant.standard).indicatorColor,
+        color: spinnerTheme.style(IxSpinnerVariant.secondary).indicatorColor,
         circularTrackColor: spinnerTheme
-            .style(IxSpinnerVariant.standard)
+            .style(IxSpinnerVariant.secondary)
             .trackColor,
       ),
       switchTheme: toggleTheme.materialSwitchTheme,

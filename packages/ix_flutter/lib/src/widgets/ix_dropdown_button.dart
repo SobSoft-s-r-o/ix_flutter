@@ -75,16 +75,25 @@ class _IxDropdownMenuContentState extends State<_IxDropdownMenuContent>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacity;
+  bool _forwardStarted = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
+    _controller = AnimationController(vsync: this);
     _opacity = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
-    _controller.forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The reduced-motion-aware duration depends on MediaQuery, which is only
+    // safe to read from didChangeDependencies (not initState).
+    _controller.duration = IxMotion.of(context, IxMotion.defaultTime);
+    if (!_forwardStarted) {
+      _forwardStarted = true;
+      _controller.forward();
+    }
   }
 
   @override

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
+import 'package:ix_flutter/src/ix_core/ix_motion.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
@@ -194,6 +195,13 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     return width < _mobileBreakpoint;
   }
 
+  /// [widget.animationDuration] resolved against the ambient reduced-motion
+  /// preference. Computed once here and threaded down to every navigation
+  /// panel widget that animates on it, so none of them need their own
+  /// `MediaQuery` lookup.
+  Duration get _effectiveAnimationDuration =>
+      IxMotion.of(context, widget.animationDuration);
+
   @override
   Widget build(BuildContext context) {
     if (_useDrawerLayout) {
@@ -231,7 +239,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
             bottomEntries: _bottomEntries,
             isExpanded: true,
             showCollapseAction: false,
-            animationDuration: widget.animationDuration,
+            animationDuration: _effectiveAnimationDuration,
             expandedWidth: widget.expandedWidth,
             collapsedWidth: widget.collapsedWidth,
             themeMode: widget.themeMode,
@@ -256,7 +264,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       body: Row(
         children: [
           AnimatedContainer(
-            duration: widget.animationDuration,
+            duration: _effectiveAnimationDuration,
             width: _isExpanded ? widget.expandedWidth : widget.collapsedWidth,
             child: _NavigationPanel(
               appTitle: widget.appTitle,
@@ -264,7 +272,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
               bottomEntries: _bottomEntries,
               isExpanded: _isExpanded,
               showCollapseAction: true,
-              animationDuration: widget.animationDuration,
+              animationDuration: _effectiveAnimationDuration,
               expandedWidth: widget.expandedWidth,
               collapsedWidth: widget.collapsedWidth,
               themeMode: widget.themeMode,
@@ -808,7 +816,7 @@ class _NavigationTileState extends State<_NavigationTile> {
 
     return Tooltip(
       message: widget.entry.tooltip ?? widget.entry.label,
-      waitDuration: const Duration(milliseconds: 500),
+      waitDuration: IxMotion.of(context, IxMotion.slow),
       child: Semantics(
         button: widget.onTap != null,
         enabled: widget.enabled,
@@ -923,7 +931,7 @@ class _ThemeModeIndicator extends StatelessWidget {
     }
 
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
+      duration: IxMotion.of(context, IxMotion.defaultTime),
       child: Row(
         key: ValueKey(label),
         mainAxisSize: MainAxisSize.min,

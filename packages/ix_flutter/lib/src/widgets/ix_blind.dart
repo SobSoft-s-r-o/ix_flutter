@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
+import 'package:ix_flutter/src/ix_core/ix_motion.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart';
@@ -121,7 +122,7 @@ class _IxBlindState extends State<IxBlind> {
                   setState(() => _headerFocused = focused),
             ),
             AnimatedSize(
-              duration: const Duration(milliseconds: 200),
+              duration: IxMotion.of(context, IxMotion.defaultTime),
               curve: Curves.easeInOut,
               alignment: Alignment.topCenter,
               child: widget.expanded
@@ -196,7 +197,7 @@ class _IxBlindHeader extends StatelessWidget {
               // Chevron
               AnimatedRotation(
                 turns: expanded ? 0.25 : 0.0,
-                duration: const Duration(milliseconds: 200),
+                duration: IxMotion.of(context, IxMotion.defaultTime),
                 child: IconTheme(
                   data: IconThemeData(color: foregroundColor, size: 24),
                   child: IxIcons.chevronRight,

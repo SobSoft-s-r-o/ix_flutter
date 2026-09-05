@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:ix_flutter/src/ix_core/ix_motion.dart';
+
 import 'ix_toast_data.dart';
 import 'ix_toast_service.dart';
 import 'ix_toast.dart';
@@ -46,7 +48,7 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
         _listKey.currentState?.removeItem(
           i,
           (context, animation) => _buildItem(removedItem, animation),
-          duration: const Duration(milliseconds: 300),
+          duration: IxMotion.of(context, IxMotion.medium),
         );
       }
     }
@@ -58,7 +60,7 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
         _displayedToasts.insert(i, toast);
         _listKey.currentState?.insertItem(
           i,
-          duration: const Duration(milliseconds: 300),
+          duration: IxMotion.of(context, IxMotion.medium),
         );
       }
     }

@@ -38,11 +38,11 @@ The spinner comes with five size presets:
 
 | Size | Diameter | Use Case |
 |------|----------|----------|
-| `IxSpinnerSize.xxSmall` | 16px | Inline with small text, compact UI elements |
-| `IxSpinnerSize.xSmall` | 24px | Form inputs, small buttons |
-| `IxSpinnerSize.small` | 32px | List items, cards |
-| `IxSpinnerSize.medium` | 48px | Default loading states, dialogs |
-| `IxSpinnerSize.large` | 64px | Full-page loading, splash screens |
+| `IxSpinnerSize.xxSmall` | 12px | Inline with small text, compact UI elements |
+| `IxSpinnerSize.xSmall` | 20px | Form inputs, small buttons |
+| `IxSpinnerSize.small` | 24px | List items, cards |
+| `IxSpinnerSize.medium` | 48px | Default loading states, dialogs (note: medium becomes 32px in 2.0 -- tracked separately) |
+| `IxSpinnerSize.large` | 96px | Full-page loading, splash screens |
 
 ### Size Examples
 
@@ -64,12 +64,14 @@ Center(
 
 ## Variants
 
-### Standard (Default)
-Uses the standard UI colors from the theme for subtle loading indicators.
+### Secondary (Default)
+Uses the muted "soft" UI colors from the theme for subtle loading indicators.
 
 ```dart
-const IxSpinner(variant: IxSpinnerVariant.standard)
+const IxSpinner(variant: IxSpinnerVariant.secondary)
 ```
+
+`IxSpinnerVariant.standard` is a deprecated alias of `secondary` (same colors, kept for source compatibility) and will be removed in a future major version. Use `secondary` in new code.
 
 ### Primary
 Uses the primary brand color for emphasized loading states.
@@ -83,8 +85,9 @@ const IxSpinner(variant: IxSpinnerVariant.primary)
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `size` | `IxSpinnerSize` | `medium` | Physical size of the spinner |
-| `variant` | `IxSpinnerVariant` | `standard` | Color scheme variant |
+| `variant` | `IxSpinnerVariant` | `secondary` | Color scheme variant |
 | `hideTrack` | `bool` | `false` | Hide the background track, showing only the animated arc |
+| `semanticLabel` | `String?` | `'Loading'` | Label announced by assistive technologies on the spinner's status role |
 
 ## Common Patterns
 
@@ -189,15 +192,12 @@ ThemeData(
 
 ## Accessibility
 
-The spinner is purely visual and doesn't provide semantic loading information. For accessible loading states:
+`IxSpinner` exposes a `SemanticsRole.status` node labelled `'Loading'` by default, so assistive technologies announce the loading state without any extra wrapping. Override the announced text with `semanticLabel`:
 
 ```dart
-Semantics(
-  label: 'Loading content',
-  child: const IxSpinner(),
-)
+const IxSpinner(semanticLabel: 'Loading content')
 
-// Or use with a text label
+// Or pair it with a visible text label
 Column(
   children: [
     const IxSpinner(),
@@ -206,6 +206,8 @@ Column(
   ],
 )
 ```
+
+When the platform's reduced-motion accessibility setting is enabled (`MediaQuery.disableAnimations`), the spinner stops its repeating rotation/sweep animation entirely instead of just slowing it down.
 
 ## Best Practices
 

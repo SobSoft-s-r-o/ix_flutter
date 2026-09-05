@@ -60,9 +60,10 @@ class IxEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
-    if (theme == null) return const SizedBox.shrink();
-
-    final softTextColor = theme.color(IxThemeColorToken.softText);
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final softTextColor =
+        theme?.color(IxThemeColorToken.softText) ?? cs.onSurfaceVariant;
 
     // Icon styling
     Widget? styledIcon;
@@ -78,16 +79,21 @@ class IxEmptyState extends StatelessWidget {
       );
     }
 
-    // Text styling
-    final titleStyle = theme.textStyle(
-      layout == IxEmptyStateLayout.large
-          ? IxTypographyVariant.h3
-          : IxTypographyVariant.body,
-    );
+    // Text styling. Without an IxThemeBuilder theme, fall back to Material's
+    // own text theme so the widget still renders a title/subtitle instead of
+    // an empty box.
+    final titleStyle =
+        theme?.textStyle(
+          layout == IxEmptyStateLayout.large
+              ? IxTypographyVariant.h3
+              : IxTypographyVariant.body,
+        ) ??
+        (layout == IxEmptyStateLayout.large ? tt.titleLarge! : tt.bodyMedium!);
 
-    final subtitleStyle = theme
-        .textStyle(IxTypographyVariant.body)
-        .copyWith(color: softTextColor);
+    final subtitleStyle =
+        (theme?.textStyle(IxTypographyVariant.body) ?? tt.bodyMedium!).copyWith(
+          color: softTextColor,
+        );
 
     // Spacing
     final double iconGap = IxCommonGeometry.space3; // 16px (default-space)
