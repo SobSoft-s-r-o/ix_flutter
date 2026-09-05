@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:recase/recase.dart';
 import 'package:archive/archive.dart';
+import 'package:crypto/crypto.dart';
 
 /// Icon generator for Siemens iX Design System icons.
 ///
@@ -240,6 +241,25 @@ class IconGenerator {
 
     print('Downloaded ${tarballResponse.bodyBytes.length} bytes');
 
+    // Verify the download against the registry's own checksum before a
+    // single byte of it is written to disk or quoted in generated code.
+    // npm still publishes the legacy sha1 `dist.shasum` for every version;
+    // when the registry omits it there is nothing to check against and the
+    // generated header says so ("tarball sha1 unknown").
+    if (shasum != null) {
+      final actual = sha1.convert(tarballResponse.bodyBytes).toString();
+      if (actual != shasum) {
+        throw Exception(
+          'Tarball sha1 mismatch for $_packageName@$iconsVersion: the '
+          'registry declares $shasum but the downloaded bytes hash to '
+          '$actual. Refusing to extract.',
+        );
+      }
+      print('Verified tarball sha1 $actual');
+    } else {
+      print('Registry published no dist.shasum; skipping checksum check');
+    }
+
     // Create temporary directory
     final tempDir = await Directory.systemTemp.createTemp('ix_icons_');
 
@@ -250,7 +270,24 @@ class IconGenerator {
     );
 
     for (final file in archive) {
-      final filename = path.join(tempDir.path, file.name);
+      // A tar entry names its own output path, so a hostile or corrupt
+      // archive can point it outside the extraction directory
+      // ("zip slip", e.g. `../../.ssh/authorized_keys`). Resolve the entry
+      // against tempDir and refuse anything that does not stay inside it.
+      final filename = path.normalize(path.join(tempDir.path, file.name));
+      if (!path.isWithin(tempDir.path, filename)) {
+        throw Exception(
+          'Refusing to extract "${file.name}": it escapes the extraction '
+          'directory ${tempDir.path}.',
+        );
+      }
+      // Symlinks are never needed for an icon package and are the second
+      // half of the same attack (a link is followed by later entries
+      // written "through" it), so drop them instead of materialising them.
+      if (file.isSymbolicLink) {
+        print('Skipping symbolic link ${file.name}');
+        continue;
+      }
       if (file.isFile) {
         final outputFile = File(filename);
         await outputFile.create(recursive: true);

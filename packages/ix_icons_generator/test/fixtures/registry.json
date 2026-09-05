@@ -1,1 +1,13 @@
-{"versions":{"3.5.0":{"dist":{"tarball":"https://registry.npmjs.org/@siemens/ix-icons/-/ix-icons-3.5.0.tgz","shasum":"be50b3f933c8a5e210f980245a3df9825e8bcb7b"}}},"dist-tags":{"latest":"3.5.0"}}
+{
+  "versions": {
+    "3.5.0": {
+      "dist": {
+        "tarball": "https://registry.npmjs.org/@siemens/ix-icons/-/ix-icons-3.5.0.tgz",
+        "shasum": "32bcb1087aa6e948c064480f44895b287cf409ef"
+      }
+    }
+  },
+  "dist-tags": {
+    "latest": "3.5.0"
+  }
+}

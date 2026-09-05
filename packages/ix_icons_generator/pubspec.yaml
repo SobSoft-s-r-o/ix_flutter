@@ -10,6 +10,7 @@ environment:
   sdk: ">=3.10.0 <4.0.0"
 
 dependencies:
+  crypto: ^3.0.0
   http: ^1.6.0
   path: ^1.9.1
   recase: ^4.1.0

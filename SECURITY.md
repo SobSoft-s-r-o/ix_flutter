@@ -52,6 +52,7 @@ only and none of its dependencies ship in your app:
 - **args**: command-line argument parsing
 - **recase**: string case conversion
 - **archive**: tarball extraction
+- **crypto**: sha1 verification of the downloaded tarball
 
 All dependencies are regularly updated for security fixes. Please keep your
 `pubspec.yaml` updated.

@@ -13,6 +13,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Generated header records the icons version and the tarball sha1 checksum
 - Unit tests covering SVG cleaning, generated code and version selection
 
+### Security
+- The downloaded tarball is verified against the registry's `dist.shasum`
+  (sha1) before anything is written to disk; a mismatch aborts generation.
+  A version whose registry entry publishes no `shasum` still generates and
+  is marked `tarball sha1 unknown` in the generated header, as before
+- Tar entries that would resolve outside the temporary extraction directory
+  ("zip slip", e.g. `../../file`) are rejected, and symbolic-link entries
+  are skipped instead of being materialised
+
 ### Changed
 - Default `@siemens/ix-icons` version is now 3.5.0 (1479 icons)
 - Generated code exposes `IxIconsData` constants of `IxIconData` for

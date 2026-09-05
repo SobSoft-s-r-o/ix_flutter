@@ -51,6 +51,7 @@ time only, adds:
 - **args** (BSD License, Copyright 2013 the Dart project authors)
 - **recase** (BSD License, Copyright 2017 Keith Elliott)
 - **archive** (MIT License, Copyright (c) 2013-2021 Brendan Duncan)
+- **crypto** (BSD-3-Clause License, Copyright 2015 the Dart project authors)
 
 ## Commercial Use
 

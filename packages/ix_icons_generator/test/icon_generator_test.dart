@@ -1,9 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:archive/archive.dart';
+import 'package:crypto/crypto.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:ix_icons_generator/ix_icons_generator.dart';
 import 'package:test/test.dart';
+
+/// Sentinel for `clientForArchive(shasum:)` distinguishing "not passed"
+/// (use the tarball's real sha1) from an explicit `null` (omit the field).
+const Object _useRealShasum = Object();
 
 void main() {
   late Directory tmp;
@@ -25,6 +32,50 @@ void main() {
     }
     return http.Response('not found', 404);
   });
+
+  /// Serves an in-memory `.tgz` built from [archive] under the 3.5.0
+  /// version entry, with [shasum] (defaulting to the tarball's real sha1)
+  /// as `dist.shasum`.
+  MockClient clientForArchive(
+    Archive archive, {
+    Object? shasum = _useRealShasum,
+  }) {
+    final tarball = GZipEncoder().encodeBytes(
+      TarEncoder().encodeBytes(archive),
+    );
+    final declared = identical(shasum, _useRealShasum)
+        ? sha1.convert(tarball).toString()
+        : shasum as String?;
+    final registry = json.encode({
+      'versions': {
+        '3.5.0': {
+          'dist': {
+            'tarball':
+                'https://registry.npmjs.org/@siemens/ix-icons/-/ix-icons-3.5.0.tgz',
+            if (declared != null) 'shasum': declared,
+          },
+        },
+      },
+      'dist-tags': {'latest': '3.5.0'},
+    });
+    return MockClient((req) async {
+      if (req.url.path == '/@siemens/ix-icons') {
+        return http.Response(registry, 200);
+      }
+      if (req.url.path.endsWith('ix-icons-3.5.0.tgz')) {
+        return http.Response.bytes(tarball, 200);
+      }
+      return http.Response('not found', 404);
+    });
+  }
+
+  Archive validArchive() => Archive()
+    ..add(
+      ArchiveFile.string('package/svg/a.svg', '<svg><path d="M0 0"/></svg>'),
+    )
+    ..add(
+      ArchiveFile.string('package/svg/b-c.svg', '<svg><path d="M1 1"/></svg>'),
+    );
 
   test('cleanSvgContent removes fill="none" only on <g> elements', () {
     const svg =
@@ -84,4 +135,58 @@ void main() {
     final code = File('${tmp.path}/lib/ix_icons.dart').readAsStringSync();
     expect(code, isNot(contains('class IxIcons {')));
   });
+
+  test('rejects a tarball entry that escapes the temp directory', () async {
+    final archive = validArchive()
+      ..add(ArchiveFile.string('package/../../escape.svg', '<svg/>'));
+    await expectLater(
+      IconGenerator.generateIcons(
+        outputDir: '${tmp.path}/lib',
+        assetsDir: '${tmp.path}/assets/ix_icons',
+        client: clientForArchive(archive),
+      ),
+      throwsA(
+        predicate(
+          (e) => e.toString().contains('escapes the extraction directory'),
+        ),
+      ),
+    );
+  });
+
+  test('skips symbolic-link entries', () async {
+    final archive = validArchive()
+      ..add(ArchiveFile.symlink('package/svg/link.svg', '/etc/passwd'));
+    await IconGenerator.generateIcons(
+      outputDir: '${tmp.path}/lib',
+      assetsDir: '${tmp.path}/assets/ix_icons',
+      client: clientForArchive(archive),
+    );
+    final code = File('${tmp.path}/lib/ix_icons.dart').readAsStringSync();
+    expect(code, isNot(contains('link.svg')));
+    expect(File('${tmp.path}/assets/ix_icons/a.svg').existsSync(), isTrue);
+  });
+
+  test('rejects a tarball whose sha1 does not match dist.shasum', () async {
+    await expectLater(
+      IconGenerator.generateIcons(
+        outputDir: '${tmp.path}/lib',
+        assetsDir: '${tmp.path}/assets/ix_icons',
+        client: clientForArchive(validArchive(), shasum: 'deadbeef'),
+      ),
+      throwsA(predicate((e) => e.toString().contains('sha1 mismatch'))),
+    );
+  });
+
+  test(
+    'a registry without dist.shasum still generates, marked unknown',
+    () async {
+      await IconGenerator.generateIcons(
+        outputDir: '${tmp.path}/lib',
+        assetsDir: '${tmp.path}/assets/ix_icons',
+        client: clientForArchive(validArchive(), shasum: null),
+      );
+      final code = File('${tmp.path}/lib/ix_icons.dart').readAsStringSync();
+      expect(code, contains('tarball sha1 unknown'));
+    },
+  );
 }
