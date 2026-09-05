@@ -1,5 +1,6 @@
 import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
@@ -141,4 +142,181 @@ void main() {
   }
 
   pointerDownPausesAndPointerUpResumes();
+
+  @Upstream('toast.tsx:53-58 pause the auto-close timer while hovered')
+  void hoverThenClickInsideKeepsItPaused() {
+    testWidgets('hovering then clicking inside the toast keeps it paused', (
+      tester,
+    ) async {
+      final service = IxToastService()..now = clock.now;
+      await pumpIx(tester, Stack(children: [IxToastOverlay(service: service)]));
+      final handle = service.showToast(
+        message: 'Saved',
+        autoCloseDelay: const Duration(seconds: 5),
+      );
+      await tester.pump(const Duration(milliseconds: 100));
+
+      final location =
+          tester.getTopLeft(find.byType(IxToast)) + const Offset(2, 2);
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      addTearDown(() => mouse.removePointer());
+      await mouse.addPointer(location: location);
+      await tester.pump();
+      expect(handle.isPaused, isTrue, reason: 'hover pauses');
+
+      // A click (press then release) while the mouse stays over the
+      // toast must not resume the countdown: the cursor is still
+      // hovering.
+      await mouse.down(location);
+      await tester.pump();
+      await mouse.up();
+      await tester.pump();
+      expect(handle.isPaused, isTrue, reason: 'still hovering after the click');
+
+      await tester.pump(const Duration(seconds: 10));
+      expect(
+        service.toasts,
+        hasLength(1),
+        reason: 'paused countdown does not advance',
+      );
+
+      service.dismissAll();
+    });
+  }
+
+  hoverThenClickInsideKeepsItPaused();
+
+  @Upstream('toast.tsx:53-58 pause the auto-close timer while hovered')
+  void hoverClickExitReenterNeverOrphansTheTimer() {
+    testWidgets(
+      'hover, click, exit and re-enter never orphans the auto-close timer',
+      (tester) async {
+        final service = IxToastService()..now = clock.now;
+        await pumpIx(
+          tester,
+          Stack(children: [IxToastOverlay(service: service)]),
+        );
+        final handle = service.showToast(
+          message: 'Saved',
+          autoCloseDelay: const Duration(seconds: 5),
+        );
+        await tester.pump(const Duration(milliseconds: 100));
+
+        final location =
+            tester.getTopLeft(find.byType(IxToast)) + const Offset(2, 2);
+        const elsewhere = Offset(10, 10);
+        final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+        addTearDown(() => mouse.removePointer());
+
+        await mouse.addPointer(location: location);
+        await tester.pump();
+        expect(handle.isPaused, isTrue);
+
+        await mouse.down(location);
+        await tester.pump();
+        await mouse.up();
+        await tester.pump();
+        expect(
+          handle.isPaused,
+          isTrue,
+          reason: 'click while hovering keeps it paused',
+        );
+
+        // Exit: this is the transition that must produce exactly one
+        // resumeTimer call -- not an extra one orphaned by the earlier
+        // click's pointer-up.
+        await mouse.moveTo(elsewhere);
+        await tester.pump();
+        expect(
+          handle.isPaused,
+          isFalse,
+          reason: 'leaving resumes the countdown',
+        );
+
+        // Re-enter: pauses again.
+        await mouse.moveTo(location);
+        await tester.pump();
+        expect(handle.isPaused, isTrue);
+
+        await tester.pump(const Duration(seconds: 10));
+        expect(
+          service.toasts,
+          hasLength(1),
+          reason: 'paused again, still not closed',
+        );
+
+        // Final exit: resumes once, and the (single) remaining timer
+        // closes it exactly once -- if an earlier orphaned timer existed,
+        // this would either already be empty (closed too early) or would
+        // double-complete the handle.
+        await mouse.moveTo(elsewhere);
+        await tester.pump();
+        expect(handle.isPaused, isFalse);
+
+        await tester.pump(const Duration(seconds: 6));
+        expect(
+          service.toasts,
+          isEmpty,
+          reason: 'closes exactly once after the remaining time',
+        );
+      },
+    );
+  }
+
+  hoverClickExitReenterNeverOrphansTheTimer();
+
+  @Upstream('toast.tsx:53-58 pause the auto-close timer while hovered')
+  void progressBarFreezesWhileHoveredAndResumesAfterExit() {
+    testWidgets(
+      'the progress bar freezes while hovered and resumes after exit',
+      (tester) async {
+        final service = IxToastService()..now = clock.now;
+        await pumpIx(
+          tester,
+          Stack(children: [IxToastOverlay(service: service)]),
+          disableAnimations: false,
+        );
+        service.showToast(
+          message: 'Saved',
+          autoCloseDelay: const Duration(seconds: 5),
+        );
+        await tester.pump();
+
+        double progressValue() => tester
+            .widget<LinearProgressIndicator>(
+              find.byType(LinearProgressIndicator),
+            )
+            .value!;
+
+        final initial = progressValue();
+        await tester.pump(const Duration(milliseconds: 500));
+        final beforeHover = progressValue();
+        expect(beforeHover, isNot(initial), reason: 'moving before hover');
+
+        final location =
+            tester.getTopLeft(find.byType(IxToast)) + const Offset(2, 2);
+        final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+        addTearDown(() => mouse.removePointer());
+        await mouse.addPointer(location: location);
+        await tester.pump();
+
+        final atHoverStart = progressValue();
+        await tester.pump(const Duration(seconds: 1));
+        expect(progressValue(), atHoverStart, reason: 'frozen while hovered');
+
+        await mouse.moveTo(const Offset(10, 10));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 500));
+        expect(
+          progressValue(),
+          isNot(atHoverStart),
+          reason: 'moving again after exit',
+        );
+
+        service.dismissAll();
+      },
+    );
+  }
+
+  progressBarFreezesWhileHoveredAndResumesAfterExit();
 }

@@ -117,6 +117,12 @@ class IxToastService extends ChangeNotifier {
   }
 
   void _startTimer(String id, Duration duration) {
+    // Cancel first: a previous timer for this id must never be left running
+    // (and thus orphaned once this map entry is overwritten below) --
+    // without this, a redundant resumeTimer call could leave two live
+    // Timers racing for the same id, the earlier of which a later
+    // pauseTimer can no longer reach to cancel.
+    _timers[id]?.cancel();
     _startTimes[id] = now();
     _remainingTimes[id] = duration;
     _timers[id] = Timer(duration, () {
@@ -149,7 +155,15 @@ class IxToastService extends ChangeNotifier {
   }
 
   /// Resumes the auto-close timer for a toast.
+  ///
+  /// A no-op unless [id] is currently paused and has no timer already
+  /// running -- idempotent, so redundant calls (e.g. a mouse-hover exit
+  /// arriving in the same frame as an unrelated pointer-up) never start a
+  /// second, un-tracked timer racing the first.
   void resumeTimer(String id) {
+    if (!_pausedIds.contains(id) || (_timers[id]?.isActive ?? false)) {
+      return;
+    }
     _pausedIds.remove(id);
     // Only resume if it's in the list (not dismissed) and has remaining time
     if (_toasts.any((t) => t.id == id) && _remainingTimes.containsKey(id)) {

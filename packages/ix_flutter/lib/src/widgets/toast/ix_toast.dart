@@ -39,6 +39,16 @@ class IxToast extends StatefulWidget {
 class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
   late AnimationController _progressController;
 
+  // The countdown is paused while the toast is hovered OR pressed, and only
+  // resumes once neither holds -- a click inside a hovered toast must not
+  // resume it out from under the still-present cursor (mouse), and a touch
+  // that lifts must not resume it while a separate mouse hover is also
+  // active (unlikely in practice, but the two states are tracked
+  // independently either way; see IxToastService._startTimer/resumeTimer
+  // for the service-side idempotency that backs this up).
+  bool _hovered = false;
+  bool _pointerDown = false;
+
   @override
   void initState() {
     super.initState();
@@ -123,15 +133,16 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
     }
   }
 
-  void _pauseIfAutoClosing() {
-    if (widget.data.autoClose && widget.data.duration != null) {
+  /// Re-derives the paused/running state from [_hovered]/[_pointerDown] and
+  /// applies it, idempotently -- safe to call on every pointer/hover event
+  /// regardless of whether the combined state actually changed.
+  void _applyPauseState() {
+    if (!mounted) return; // A pointer event can arrive after dispose.
+    if (!widget.data.autoClose || widget.data.duration == null) return;
+    if (_hovered || _pointerDown) {
       _progressController.stop();
       widget.onEnter?.call();
-    }
-  }
-
-  void _resumeIfAutoClosing() {
-    if (widget.data.autoClose && widget.data.duration != null) {
+    } else {
       // AnimationController.forward() is a no-op once already at 1.0, so
       // this is safe to call even if the countdown had already completed.
       _progressController.forward();
@@ -219,14 +230,32 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
 
     return Listener(
       // Touch has no hover concept, so a tap only pauses for as long as the
-      // pointer is actually down -- paired resume on both a normal release
-      // and a cancelled gesture (e.g. the pointer sliding off-screen).
-      onPointerDown: (_) => _pauseIfAutoClosing(),
-      onPointerUp: (_) => _resumeIfAutoClosing(),
-      onPointerCancel: (_) => _resumeIfAutoClosing(),
+      // pointer is actually down. Releasing (or the gesture being
+      // cancelled, e.g. the pointer sliding off-screen) only resumes if the
+      // toast also isn't currently hovered by a mouse -- otherwise clicking
+      // inside an already-hovered toast would resume it out from under the
+      // still-present cursor.
+      onPointerDown: (_) {
+        _pointerDown = true;
+        _applyPauseState();
+      },
+      onPointerUp: (_) {
+        _pointerDown = false;
+        _applyPauseState();
+      },
+      onPointerCancel: (_) {
+        _pointerDown = false;
+        _applyPauseState();
+      },
       child: MouseRegion(
-        onEnter: (_) => _pauseIfAutoClosing(),
-        onExit: (_) => _resumeIfAutoClosing(),
+        onEnter: (_) {
+          _hovered = true;
+          _applyPauseState();
+        },
+        onExit: (_) {
+          _hovered = false;
+          _applyPauseState();
+        },
         child: Material(
           type: MaterialType.transparency,
           child: ConstrainedBox(
