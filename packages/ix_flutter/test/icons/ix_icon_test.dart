@@ -76,6 +76,89 @@ void main() {
     handle.dispose();
   });
 
+  group('size resolution', () {
+    testWidgets('without a custom IconTheme the box is 24px', (tester) async {
+      await pumpIx(
+        tester,
+        const IxIcon(IxIconData.material(Icons.close), key: Key('i')),
+      );
+      expect(tester.getSize(find.byKey(const Key('i'))), const Size(24, 24));
+    });
+
+    testWidgets('an explicit IxIconSize wins over the ambient IconTheme', (
+      tester,
+    ) async {
+      await pumpIx(
+        tester,
+        const IconTheme(
+          data: IconThemeData(size: 12),
+          child: IxIcon(
+            IxIconData.material(Icons.close),
+            size: IxIconSize.s32,
+            key: Key('i'),
+          ),
+        ),
+      );
+      expect(tester.getSize(find.byKey(const Key('i'))), const Size(32, 32));
+    });
+
+    testWidgets('the ambient IconTheme size is used exactly, not snapped to '
+        'an IxIconSize', (tester) async {
+      await pumpIx(
+        tester,
+        const IconTheme(
+          data: IconThemeData(size: 18),
+          child: IxIcon(IxIconData.material(Icons.close), key: Key('i')),
+        ),
+      );
+      expect(tester.getSize(find.byKey(const Key('i'))), const Size(18, 18));
+    });
+
+    testWidgets('a widget-builder source is sized through the same resolved '
+        'IconTheme', (tester) async {
+      await pumpIx(
+        tester,
+        IconTheme(
+          data: const IconThemeData(size: 18),
+          child: IxIcon(
+            IxIconData.widget(
+              (context) => Text('${IconTheme.of(context).size}'),
+            ),
+            key: const Key('i'),
+          ),
+        ),
+      );
+      expect(tester.getSize(find.byKey(const Key('i'))), const Size(18, 18));
+      expect(find.text('18.0'), findsOneWidget);
+    });
+
+    testWidgets('a Material slot that styles its icon reaches IxIcon too', (
+      tester,
+    ) async {
+      await pumpIx(
+        tester,
+        TextButton.icon(
+          onPressed: () {},
+          icon: const IxIcon(IxIconData.material(Icons.close), key: Key('i')),
+          label: const Text('Close'),
+        ),
+      );
+      final materialIconSize = tester.widget<IconTheme>(
+        find
+            .ancestor(
+              of: find.byKey(const Key('i')),
+              matching: find.byType(IconTheme),
+            )
+            .first,
+      );
+      expect(
+        tester.getSize(find.byKey(const Key('i'))),
+        Size.square(materialIconSize.data.size!),
+      );
+      expect(materialIconSize.data.size, 18);
+    });
+  });
+
   testWidgets('colorToken resolves through IxTheme', (tester) async {
     await pumpIx(
       tester,

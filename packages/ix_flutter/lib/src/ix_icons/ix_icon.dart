@@ -11,17 +11,23 @@ import 'ix_icon_size.dart';
 /// Renders a single Siemens IX icon from an explicit [IxIconData] source or,
 /// via [IxIcon.key], from the app's registered [IxIconResolver].
 ///
-/// Every [IxIcon] occupies a fixed [size.px] square box regardless of its
-/// source (a Material glyph, a bundled SVG, or a custom widget builder), so
-/// swapping sources — including falling back from a broken SVG asset to its
-/// Material [IxIconData.fallback] — never changes layout, hit area, or
-/// semantics.
+/// Every [IxIcon] occupies a fixed square box regardless of its source (a
+/// Material glyph, a bundled SVG, or a custom widget builder), so swapping
+/// sources — including falling back from a broken SVG asset to its Material
+/// [IxIconData.fallback] — never changes layout, hit area, or semantics.
+///
+/// The box is the explicit [size], else the ambient [IconTheme] size (used
+/// exactly, not snapped to an [IxIconSize]), else 24 px. That makes an
+/// [IxIcon] interchangeable with a Material [Icon] in any slot that styles
+/// its icon through an [IconTheme] — [IxIconButton], `TextButton.icon`,
+/// `InputDecoration.prefixIcon` — while an explicit [size] still wins over
+/// whatever the surrounding slot asks for.
 class IxIcon extends StatelessWidget {
   /// Renders [data] directly.
   const IxIcon(
     this.data, {
     super.key,
-    this.size = IxIconSize.s24,
+    this.size,
     this.color,
     this.colorToken,
     this.semanticLabel,
@@ -33,7 +39,7 @@ class IxIcon extends StatelessWidget {
   const IxIcon.key(
     this.iconKey, {
     super.key,
-    this.size = IxIconSize.s24,
+    this.size,
     this.color,
     this.colorToken,
     this.semanticLabel,
@@ -46,8 +52,18 @@ class IxIcon extends StatelessWidget {
   /// The resolver key, set by [IxIcon.key].
   final IxIconKey? iconKey;
 
-  /// The fixed square box size to render at. Defaults to [IxIconSize.s24].
-  final IxIconSize size;
+  /// The fixed square box size to render at.
+  ///
+  /// When `null` (the default) the ambient [IconTheme]'s size is used —
+  /// exactly as given, so a slot asking for a non-[IxIconSize] value such as
+  /// `TextButton.icon`'s 18 px is honoured — falling back to 24 px
+  /// ([IxIconSize.s24], and `MaterialApp`'s own default) when the ambient
+  /// theme declares no size either.
+  final IxIconSize? size;
+
+  /// The default box size, in logical pixels, when neither [size] nor the
+  /// ambient [IconTheme] says anything.
+  static const double _defaultSizePx = 24;
 
   /// Overrides the resolved color outright, taking precedence over
   /// [colorToken] and every other fallback.
@@ -68,10 +84,12 @@ class IxIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final resolved = data ?? IxIconResolver.of(context).resolve(iconKey!);
     final ix = Theme.of(context).extension<IxTheme>();
+    final iconTheme = IconTheme.of(context);
+    final resolvedSize = size?.px ?? iconTheme.size ?? _defaultSizePx;
     final resolvedColor =
         color ??
         (colorToken != null && ix != null ? ix.color(colorToken!) : null) ??
-        IconTheme.of(context).color ??
+        iconTheme.color ??
         ix?.color(IxThemeColorToken.stdText) ??
         Theme.of(context).colorScheme.onSurface;
     final label = semanticLabel ?? resolved.semanticLabel;
@@ -79,18 +97,18 @@ class IxIcon extends StatelessWidget {
     Widget child = switch (resolved) {
       IxMaterialIconData(icon: final icon) => Icon(
         icon,
-        size: size.px,
+        size: resolvedSize,
         color: resolvedColor,
       ),
       IxWidgetIconData(builder: final builder) => IconTheme(
-        data: IconThemeData(size: size.px, color: resolvedColor),
+        data: IconThemeData(size: resolvedSize, color: resolvedColor),
         child: Builder(builder: builder),
       ),
       IxPackageIconData() ||
-      IxAssetIconData() => _svg(context, resolved, resolvedColor),
+      IxAssetIconData() => _svg(context, resolved, resolvedColor, resolvedSize),
     };
     child = SizedBox.square(
-      dimension: size.px,
+      dimension: resolvedSize,
       child: Center(child: child),
     );
     if (excludeFromSemantics) {
@@ -108,7 +126,12 @@ class IxIcon extends StatelessWidget {
   /// debug mode — reports the failure via [FlutterError.reportError] under
   /// the `ix_flutter icons` library name so the app's error console/crash
   /// reporting surfaces it without crashing the UI.
-  Widget _svg(BuildContext context, IxIconData data, Color color) {
+  Widget _svg(
+    BuildContext context,
+    IxIconData data,
+    Color color,
+    double sizePx,
+  ) {
     final (path, package) = switch (data) {
       IxPackageIconData(assetPath: final p) => (p, 'ix_flutter'),
       IxAssetIconData(assetPath: final p, package: final pk) => (p, pk),
@@ -117,10 +140,10 @@ class IxIcon extends StatelessWidget {
     return SvgPicture.asset(
       path,
       package: package,
-      width: size.px,
-      height: size.px,
+      width: sizePx,
+      height: sizePx,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-      placeholderBuilder: (_) => SizedBox.square(dimension: size.px),
+      placeholderBuilder: (_) => SizedBox.square(dimension: sizePx),
       errorBuilder: (context, error, stack) {
         FlutterError.reportError(
           FlutterErrorDetails(
@@ -135,7 +158,7 @@ class IxIcon extends StatelessWidget {
         );
         return Icon(
           data.fallback ?? Icons.broken_image,
-          size: size.px,
+          size: sizePx,
           color: color,
         );
       },

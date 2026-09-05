@@ -22,11 +22,11 @@ ThemeData themeWithCustomIcon() => IxThemeBuilder(
   ),
 ).build();
 
-// IxIconButton sizes its icon via a merged IconTheme — but IxIcon doesn't
-// read IconTheme.size, so the button's slot and the icon's own `size:`
-// must be set to match explicitly.
+// IxIconButton sizes its icon via a merged IconTheme, which IxIcon reads:
+// an IxIconButtonSize.s24 button renders its icon at 16px on its own. Pass
+// `size:` only to override that.
 Widget closeButtonWithCatalogueIcon(VoidCallback onPressed) => IxIconButton(
-  icon: const IxIcon(IxIconsData.close, size: IxIconSize.s16), // s24 → 16px
+  icon: const IxIcon(IxIconsData.close), // 16px, from the button's slot
   size: IxIconButtonSize.s24,
   onPressed: onPressed,
 );

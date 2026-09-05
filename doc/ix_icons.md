@@ -13,7 +13,7 @@ Guide to using Siemens iX Design System icons in `ix_flutter`.
   - [IxIconSize](#ixiconsize)
   - [IxIconResolver](#ixiconresolver)
   - [Overriding icons with IxThemeBuilder](#overriding-icons-with-ixthemebuilder)
-  - [Sizing: IxIcon ignores IconTheme](#sizing-ixicon-ignores-icontheme)
+  - [Sizing](#sizing)
 - [Fallback Policy](#fallback-policy)
 - [Dependencies](#dependencies)
 - [License](#license)
@@ -99,7 +99,7 @@ Widget bothIconSources() => const Row(
 );
 ```
 
-Constructor parameters: `size` (`IxIconSize`, default `s24`), `color`, `colorToken` (an `IxThemeColorToken`, used when `color` is unset), `semanticLabel`, and `excludeFromSemantics`.
+Constructor parameters: `size` (`IxIconSize?`, defaulting to the ambient `IconTheme` size and then 24px — see [Sizing](#sizing)), `color`, `colorToken` (an `IxThemeColorToken`, used when `color` is unset), `semanticLabel`, and `excludeFromSemantics`.
 
 ### IxIconData
 
@@ -114,7 +114,7 @@ A sealed class describing where an icon's visual content comes from:
 
 ### IxIconSize
 
-A fixed set of square sizes: `s12`, `s16`, `s24` (the `IxIcon` default), `s32` — mirroring the Siemens iX `ix-icon` element's own size variants.
+A fixed set of square sizes: `s12`, `s16`, `s24`, `s32` — mirroring the Siemens iX `ix-icon` element's own size variants. `IxIcon.size` is optional; see [Sizing](#sizing) for what an `IxIcon` renders at when it is left unset.
 
 ### IxIconResolver
 
@@ -134,16 +134,22 @@ ThemeData themeWithCustomIcon() => IxThemeBuilder(
 
 `copyWith` merges the given keys over `IxIconResolver.material()`'s full map, so the result always stays resolvable for every `IxIconKey`.
 
-### Sizing: IxIcon ignores IconTheme
+### Sizing
 
-`IxIcon` always renders inside a fixed `size.px` square (`IxIconSize.s24` by default) — unlike the stock Flutter `Icon`, it does **not** read an ambient `IconTheme.size`. Pass `size:` explicitly, including when handing an `IxIcon` into a library widget's `icon:` slot:
+`IxIcon` always renders inside a fixed square box. Its edge length is:
+
+1. the explicit `size:` (`IxIconSize.s12`/`s16`/`s24`/`s32`), if given;
+2. otherwise the ambient `IconTheme.size`, used exactly as given — including values that are not `IxIconSize` steps, such as the 18px `TextButton.icon` styles its icon at;
+3. otherwise 24px, which is also `MaterialApp`'s own `IconTheme` default, so an `IxIcon` outside any custom `IconTheme` is unchanged.
+
+That makes `IxIcon` interchangeable with a Material `Icon` in any slot that sizes its icon through an `IconTheme` — `IxIconButton`, `TextButton.icon`, `InputDecoration.prefixIcon` — while an explicit `size:` still wins over whatever the surrounding slot asks for:
 
 ```dart
-// IxIconButton sizes its icon via a merged IconTheme — but IxIcon doesn't
-// read IconTheme.size, so the button's slot and the icon's own `size:`
-// must be set to match explicitly.
+// IxIconButton sizes its icon via a merged IconTheme, which IxIcon reads:
+// an IxIconButtonSize.s24 button renders its icon at 16px on its own. Pass
+// `size:` only to override that.
 Widget closeButtonWithCatalogueIcon(VoidCallback onPressed) => IxIconButton(
-  icon: const IxIcon(IxIconsData.close, size: IxIconSize.s16), // s24 → 16px
+  icon: const IxIcon(IxIconsData.close), // 16px, from the button's slot
   size: IxIconButtonSize.s24,
   onPressed: onPressed,
 );
@@ -236,7 +242,7 @@ Yes. `IxIcon` renders SVGs through `flutter_svg` (a direct `ix_flutter` dependen
 
 ### What's the difference between `IxIcon` and the deprecated `IxIcons.<name>` getters?
 
-`IxIcons.<name>` getters are generated for backward compatibility (pass `--no-legacy-getters` to skip them) and are removed in `ix_icons_generator` 2.0. They render a fixed 24px `IxIcon` and do not honor an ambient `IconTheme.size` — migrate to `IxIcon(IxIconsData.<name>)` and pass `size:` explicitly. See `ICON_MIGRATION.md` and `packages/ix_icons_generator/CHANGELOG.md`.
+`IxIcons.<name>` getters are generated for backward compatibility (pass `--no-legacy-getters` to skip them) and are removed in `ix_icons_generator` 2.0. They render an unsized `IxIcon`, which follows the ambient `IconTheme.size` (24px when none is set) exactly as the 1.x getters did — migrate to `IxIcon(IxIconsData.<name>)`, passing `size:` where you want a size of your own. See `ICON_MIGRATION.md` and `packages/ix_icons_generator/CHANGELOG.md`.
 
 ---
 

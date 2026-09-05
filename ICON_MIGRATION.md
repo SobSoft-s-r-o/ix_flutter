@@ -93,7 +93,7 @@ If you were previously using library icons, follow this checklist:
 - [ ] **Run `dart run ix_icons_generator:generate_icons`** to download icons
 - [ ] **Find all imports of `package:ix_flutter/src/ix_icons/ix_icons.dart`**
 - [ ] **Replace with `package:your_app/ix_icons.dart`** (your package name)
-- [ ] **Replace `IxIcons.<name>` usages with `IxIcon(IxIconsData.<name>)`**, passing `size:` explicitly wherever the old call site relied on an ambient `IconTheme` (see `packages/ix_icons_generator/CHANGELOG.md`)
+- [ ] **Replace `IxIcons.<name>` usages with `IxIcon(IxIconsData.<name>)`** — an unsized `IxIcon` follows the ambient `IconTheme.size` (24px when none is set), so a call site that sized its icon through an enclosing `IconTheme` keeps the size it had; pass `size:` only where the icon should override the surrounding slot (see `packages/ix_icons_generator/CHANGELOG.md`)
 - [ ] **Run `flutter clean && flutter pub get`**
 - [ ] **Test all screens that use icons**
 - [ ] **Commit the generated files** to version control (optional but recommended)

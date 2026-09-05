@@ -31,11 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Deprecated
 - `IxIcons` widget getters — use `IxIcon(IxIconsData.<name>)` instead; they are
-  removed in generator 2.0. They now render a fixed 24 px `IxIcon` and no
-  longer honour an ambient `IconTheme.size`, so pass `size:` when migrating
-  any call site that sized its icon through an enclosing `IconTheme`
-  (including Material slots such as `FilledButton.icon`, which style their
-  icon at 18 px)
+  removed in generator 2.0. They render an unsized `IxIcon`, which follows the
+  ambient `IconTheme.size` (24 px when none is set), so a call site that sized
+  its icon through an enclosing `IconTheme` — including Material slots such as
+  `FilledButton.icon`, which style their icon at 18 px — keeps the size it had.
+  Pass `size:` only where the icon should override the surrounding slot
 
 ## [1.0.0] - 2026-01-28
 

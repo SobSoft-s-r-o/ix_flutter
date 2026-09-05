@@ -278,8 +278,9 @@ class _TabLabelState extends State<_TabLabel> {
         if (widget.leading != null)
           Padding(
             padding: const EdgeInsets.only(right: 8),
-            // [IxIcon] renders at a fixed box size and ignores an ambient
-            // [IconTheme] size, so the tab's 16px glyph size is explicit.
+            // No ambient [IconTheme] sets the tab's 16px glyph size, so
+            // [IxIcon] is given it explicitly (it would otherwise fall back
+            // to the enclosing theme's 24px).
             child: IxIcon(
               widget.leading!,
               size: IxIconSize.s16,

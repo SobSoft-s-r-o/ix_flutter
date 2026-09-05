@@ -69,8 +69,9 @@ class IxBlind extends StatefulWidget {
 
   /// An optional icon displayed before the title.
   ///
-  /// Typically an [IxIcon] (the header sizes it via an ambient [IconTheme],
-  /// which [IxIcon] ignores -- pass [IxIcon.size] explicitly).
+  /// Typically an [IxIcon]. The header sizes it to 24px through an ambient
+  /// [IconTheme], which both [Icon] and [IxIcon] follow; pass
+  /// [IxIcon.size] to override that for one icon.
   final Widget? icon;
 
   /// Optional widgets to display on the right side of the header.

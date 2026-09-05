@@ -52,9 +52,13 @@ class IxIconButton extends StatelessWidget {
     this.autofocus = false,
   });
 
-  /// The icon shown inside the button. Its size is controlled by [size]'s
-  /// [IxIconButtonSize.iconSize] via a merged [IconTheme]; the widget's own
-  /// size (if any) is ignored.
+  /// The icon shown inside the button.
+  ///
+  /// Its size comes from [size]'s [IxIconButtonSize.iconSize] through a
+  /// merged [IconTheme], which both a Material [Icon] and an `IxIcon`
+  /// follow, so a plain `IxIcon.key(...)` renders at 12/16/24px to match
+  /// the button. An icon that sets its own size (`Icon(size:)`,
+  /// `IxIcon(size:)`) keeps it.
   final Widget icon;
 
   /// Called when the button is tapped; the button is disabled when `null`.

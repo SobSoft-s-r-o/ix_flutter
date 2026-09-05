@@ -87,17 +87,22 @@ getters (`IxIcons.home`) so existing code keeps compiling. They are removed in
 generator 2.0 — migrate to `IxIcon(IxIconsData.home)`, or generate without them
 using `--no-legacy-getters`.
 
-> **Migration note — icon size.** The deprecated getters render a fixed 24 px
-> `IxIcon` and no longer honour an ambient `IconTheme.size`. Wherever a call
-> site sized its icon through an enclosing `IconTheme`/`IconTheme.merge` — or
-> through a Material slot that does so, such as `FilledButton.icon` (18 px) or
-> `InputDecoration.prefixIcon` — pass `size:` explicitly when migrating:
+> **Migration note — icon size.** The deprecated getters render an unsized
+> `IxIcon`, and `IxIcon` follows the ambient `IconTheme.size` (24 px when
+> none is set), so a call site that sized its icon through an enclosing
+> `IconTheme`/`IconTheme.merge` — or through a Material slot that does so,
+> such as `FilledButton.icon` (18 px) or `InputDecoration.prefixIcon` —
+> keeps the size it had. Pass `size:` only where you want to override the
+> surrounding slot:
 >
 > ```dart
-> // 1.x: 16px, taken from the surrounding IconTheme
-> IconTheme.merge(data: const IconThemeData(size: 16), child: IxIcons.home)
+> // still 16px, taken from the surrounding IconTheme
+> IconTheme.merge(
+>   data: const IconThemeData(size: 16),
+>   child: const IxIcon(IxIconsData.home),
+> )
 >
-> // 2.x: the size belongs to the icon
+> // 16px regardless of what surrounds it
 > const IxIcon(IxIconsData.home, size: IxIconSize.s16)
 > ```
 
