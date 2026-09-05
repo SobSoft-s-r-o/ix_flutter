@@ -29,6 +29,12 @@ The Siemens iX Flutter package provides access to 1400+ icons from the Siemens i
 
 To use Siemens iX icons in your Flutter application, you **MUST** run the icon generator tool. The generator downloads icons directly from the official `@siemens/ix-icons` npm package, ensuring you always have properly licensed icons.
 
+## Dependencies
+
+- `ix_flutter` depends on `flutter_svg` directly because it renders its bundled internal icons.
+- Apps do **not** need to declare `flutter_svg`: generated icon code (generator ≥ 1.1.0) uses `IxIcon`/`IxIconData`.
+- If the icon runtime is extracted into a separate package in the future, `flutter_svg` moves with it.
+
 ## Quick Start
 
 **Required steps to use Siemens iX icons:**

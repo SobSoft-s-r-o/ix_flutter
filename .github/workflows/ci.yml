@@ -109,6 +109,7 @@ jobs:
       - name: Check upstream evidence
         working-directory: packages/ix_flutter
         run: dart run tool/upstream_check.dart
+      - run: tool/check_svg_imports.sh
       - name: Format ix_icons_generator
         working-directory: packages/ix_icons_generator
         run: dart format --output=none --set-exit-if-changed lib bin
