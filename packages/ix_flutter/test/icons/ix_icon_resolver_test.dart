@@ -19,6 +19,105 @@ void main() {
     }
   });
 
+  test('the material map itself is total over IxIconKey.values', () {
+    // Not the same assertion as the one above once `resolve` falls back to
+    // the material resolver: this one looks at the raw map, so adding an
+    // `IxIconKey` without a material glyph cannot be hidden by the fallback.
+    final material = IxIconResolver.material();
+    expect(
+      IxIconKey.values.where((k) => !material.icons.containsKey(k)),
+      isEmpty,
+      reason:
+          'IxIconResolver.material() must map every IxIconKey -- it is the '
+          'last resort every other resolver falls back to',
+    );
+  });
+
+  group('a partial resolver map', () {
+    final partial = IxIconResolver(
+      icons: {IxIconKey.close: const IxIconData.material(Icons.star)},
+    );
+
+    test('resolves every IxIconKey without throwing', () {
+      for (final key in IxIconKey.values) {
+        expect(() => partial.resolve(key), returnsNormally, reason: key.name);
+        expect(partial.resolve(key), isNotNull, reason: key.name);
+      }
+      // The one key it does declare is still its own.
+      expect(
+        (partial.resolve(IxIconKey.close) as IxMaterialIconData).icon,
+        Icons.star,
+      );
+      // Everything else comes from the material default.
+      expect(
+        (partial.resolve(IxIconKey.chevronRight) as IxMaterialIconData).icon,
+        (IxIconResolver.material().resolve(IxIconKey.chevronRight)
+                as IxMaterialIconData)
+            .icon,
+      );
+    });
+
+    testWidgets('lets a bare IxIcon.key render an unlisted key', (
+      tester,
+    ) async {
+      await pumpIx(
+        tester,
+        const IxIcon.key(IxIconKey.chevronRight),
+        theme: IxThemeBuilder(mode: ThemeMode.light, icons: partial).build(),
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.byIcon(Icons.chevron_right), findsOneWidget);
+    });
+
+    testWidgets('lets the built-in widgets render', (tester) async {
+      final theme = IxThemeBuilder(
+        mode: ThemeMode.light,
+        icons: partial,
+      ).build();
+
+      await pumpIx(
+        tester,
+        const IxBlind(title: 'Section', expanded: false, child: Text('body')),
+        theme: theme,
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.text('Section'), findsOneWidget);
+
+      await pumpIx(
+        tester,
+        const IxBreadcrumb(
+          items: [
+            IxBreadcrumbItemData(label: 'Home', breadcrumbKey: 'home'),
+            IxBreadcrumbItemData(label: 'Plant', breadcrumbKey: 'plant'),
+          ],
+          showHomeLabel: true,
+        ),
+        theme: theme,
+      );
+      expect(tester.takeException(), isNull);
+      expect(find.text('Plant'), findsOneWidget);
+    });
+
+    test('copyWith still merges over the declared entries', () {
+      final merged = partial.copyWith(
+        icons: {IxIconKey.home: const IxIconData.material(Icons.pets)},
+      );
+      expect(merged.icons, hasLength(2));
+      expect(
+        (merged.resolve(IxIconKey.home) as IxMaterialIconData).icon,
+        Icons.pets,
+      );
+      expect(
+        (merged.resolve(IxIconKey.close) as IxMaterialIconData).icon,
+        Icons.star,
+      );
+      expect(
+        (merged.resolve(IxIconKey.search) as IxMaterialIconData).icon,
+        Icons.search,
+      );
+    });
+  });
+
   testWidgets('IxThemeBuilder(icons:) overrides a single key', (tester) async {
     final custom = IxIconResolver.material().copyWith(
       icons: {IxIconKey.close: IxIconData.widget((_) => const Text('X'))},

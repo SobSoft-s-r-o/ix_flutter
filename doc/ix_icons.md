@@ -120,6 +120,8 @@ A fixed set of square sizes: `s12`, `s16`, `s24`, `s32` — mirroring the Siemen
 
 A `ThemeExtension<IxIconResolver>` that maps every `IxIconKey` to concrete `IxIconData`. `IxIconResolver.material()` maps all 28 keys to Material glyphs and is the default `IxThemeBuilder` registers. `IxIconResolver.of(context)` resolves the ambient resolver, or `.material()` if none is registered.
 
+`resolve` never fails: a key a resolver's own map does not declare falls back to `IxIconResolver.material()`'s glyph for it. A resolver built from a partial map — `IxIconResolver(icons: {IxIconKey.close: ...})` — is therefore a complete, usable resolver, and registering one does not break the built-in widgets that ask for other keys.
+
 ### Overriding icons with IxThemeBuilder
 
 Register a custom resolver — for example, once the bundled SVG set ships, or to swap in your own asset — with `IxThemeBuilder(icons:)`:
@@ -132,7 +134,7 @@ ThemeData themeWithCustomIcon() => IxThemeBuilder(
 ).build();
 ```
 
-`copyWith` merges the given keys over `IxIconResolver.material()`'s full map, so the result always stays resolvable for every `IxIconKey`.
+`copyWith` merges the given keys over the resolver it is called on, so starting from `IxIconResolver.material()` gives a resolver whose own map is exhaustive. It is not required for correctness — an unlisted key resolves through the material fallback either way — but it keeps `icons` a faithful description of what the resolver renders.
 
 ### Sizing
 

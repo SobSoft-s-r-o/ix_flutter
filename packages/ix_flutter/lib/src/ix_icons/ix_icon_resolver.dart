@@ -6,22 +6,33 @@ import 'ix_icon_key.dart';
 /// Theme extension that maps every [IxIconKey] to concrete [IxIconData].
 ///
 /// Register a custom resolver via `IxThemeBuilder(icons: ...)` to replace
-/// individual icons (e.g. swap in the bundled Siemens iX SVG set) while
-/// falling back to [IxIconResolver.material] for anything left unspecified.
+/// individual icons (e.g. swap in the bundled Siemens iX SVG set); anything
+/// the resolver leaves unspecified falls back to [IxIconResolver.material],
+/// so a partial map is a complete resolver.
 /// Until the SVG set ships (gated behind legal review), [material] is the
 /// default resolver registered by `IxThemeBuilder`.
 class IxIconResolver extends ThemeExtension<IxIconResolver> {
   /// Creates a resolver backed by an explicit [icons] map.
   ///
-  /// The map does not need to cover every [IxIconKey] — [resolve] asserts in
-  /// debug mode if a requested key is missing. Prefer starting from
-  /// [IxIconResolver.material] and layering overrides with [copyWith] so the
-  /// result always stays complete.
+  /// The map does not need to cover every [IxIconKey]: [resolve] falls back
+  /// to [IxIconResolver.material] for any key it omits, so a resolver that
+  /// declares a single override is a complete, usable resolver. Layering
+  /// overrides with [copyWith] on top of [IxIconResolver.material] is still
+  /// the way to get a resolver whose own map is exhaustive.
   const IxIconResolver({required this.icons});
 
-  /// The backing key-to-data map. May be a partial override map produced by
-  /// [copyWith]; see [resolve].
+  /// The backing key-to-data map.
+  ///
+  /// May be partial — an override map produced by [copyWith], or one written
+  /// by hand. It is the *declared* set, not the resolvable set; see
+  /// [resolve].
   final Map<IxIconKey, IxIconData> icons;
+
+  /// The built-in Material resolver, created on first use.
+  ///
+  /// Every other resolver falls back to it (see [resolve]), so its map must
+  /// stay total over `IxIconKey.values`; a test pins that.
+  static final IxIconResolver _material = IxIconResolver.material();
 
   /// Builds a resolver that maps every [IxIconKey] to a Material [IconData]
   /// glyph.
@@ -68,19 +79,13 @@ class IxIconResolver extends ThemeExtension<IxIconResolver> {
 
   /// Resolves [key] to its [IxIconData].
   ///
-  /// Asserts in debug mode when [icons] has no entry for [key], since every
-  /// [IxIconKey] the library requests is expected to be resolvable; in
-  /// release mode a missing entry throws when the map lookup is force
-  /// unwrapped.
-  IxIconData resolve(IxIconKey key) {
-    assert(
-      icons.containsKey(key),
-      'IxIconResolver.icons is missing an entry for IxIconKey.${key.name}. '
-      'Start from IxIconResolver.material() and override individual keys '
-      'with copyWith(icons: {...}) so the result always stays complete.',
-    );
-    return icons[key]!;
-  }
+  /// Never fails: a key this resolver's own [icons] map does not declare
+  /// falls back to [IxIconResolver.material]'s glyph for it. Every
+  /// [IxIconKey] is therefore resolvable through any resolver, which is what
+  /// lets a consumer register a one-key override with
+  /// `IxThemeBuilder(icons:)` without every built-in widget that asks for
+  /// some other key breaking.
+  IxIconData resolve(IxIconKey key) => icons[key] ?? _material.icons[key]!;
 
   /// Resolves the [IxIconResolver] registered on the closest [Theme], or
   /// [IxIconResolver.material] if the [ThemeData] carries no such extension
