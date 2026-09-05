@@ -4,7 +4,7 @@ version: 1.1.0
 repository: https://github.com/SobSoft-s-r-o/ix_flutter
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
 issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
-documentation: https://github.com/SobSoft-s-r-o/ix_flutter/wiki/ix_icons
+documentation: https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_icons.md
 
 environment:
   sdk: ">=3.10.0 <4.0.0"

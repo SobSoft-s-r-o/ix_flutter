@@ -44,7 +44,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ### Prerequisites
 
-- Flutter SDK: >=3.10.0
+- Flutter SDK: >=3.38.0 (CI pins 3.44.6 stable)
 - Dart SDK: >=3.10.0
 - Git
 - A code editor (VS Code, Android Studio, etc.)
@@ -68,11 +68,14 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
    ```
 
 4. **Install dependencies**
+
+   The repository root has no `pubspec.yaml`; every command runs inside a
+   package.
+
    ```bash
-   flutter pub get
-   cd example
-   flutter pub get
-   cd ..
+   cd packages/ix_flutter && flutter pub get && cd ../..
+   cd packages/ix_icons_generator && dart pub get && cd ../..
+   cd example && flutter pub get && cd ..
    ```
 
 5. **Create a new branch**
@@ -85,34 +88,39 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 #### Run Tests
 
 ```bash
-# Run all tests
+# The library suite
+cd packages/ix_flutter
 flutter test
+flutter test --coverage                          # with coverage
+flutter test test/ix_theme_color_tokens_test.dart # one file
 
-# Run tests with coverage
-flutter test --coverage
+# The generator suite
+cd ../ix_icons_generator && dart test
 
-# Run specific test file
-flutter test test/ix_theme_color_tokens_test.dart
+# The example suite
+cd ../../example && flutter test
 ```
 
 #### Static Analysis
 
 ```bash
-# Analyze the library
-flutter analyze lib/
-
-# Analyze the example
-flutter analyze example/lib/
+cd packages/ix_flutter && flutter analyze          # the library
+cd ../ix_icons_generator && dart analyze           # the generator
+cd ../../example && flutter analyze                # the example
+cd ../doc/snippets && flutter analyze              # the doc snippets
 ```
 
 #### Format Code
 
-```bash
-# Format Dart code
-dart format lib/ test/ example/lib/
+Same directories CI checks (see `.github/workflows/ci.yml`, job `format`):
 
-# Check formatting without modifying
-dart format --dry-run lib/ test/ example/lib/
+```bash
+cd packages/ix_flutter && dart format lib test tool example
+cd ../ix_icons_generator && dart format lib bin test
+cd ../../example && dart format lib test
+
+# Check formatting without modifying (what CI runs)
+dart format --output=none --set-exit-if-changed lib test
 ```
 
 #### Build Examples

@@ -3,8 +3,8 @@
 [![CI](https://github.com/SobSoft-s-r-o/ix_flutter/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/SobSoft-s-r-o/ix_flutter/actions/workflows/ci.yml)
 [![Version Bump](https://github.com/SobSoft-s-r-o/ix_flutter/actions/workflows/version-bump.yml/badge.svg?branch=main)](https://github.com/SobSoft-s-r-o/ix_flutter/actions/workflows/version-bump.yml)
 [![Pub Version](https://img.shields.io/pub/v/ix_flutter.svg)](https://pub.dev/packages/ix_flutter)
-[![Flutter](https://img.shields.io/badge/Flutter-3.10.0+-blue.svg)](https://flutter.dev)
-[![Dart](https://img.shields.io/badge/Dart-3.10.0+-blue.svg)](https://dart.dev)
+[![Flutter](https://img.shields.io/badge/Flutter-3.38+-blue.svg)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-3.10+-blue.svg)](https://dart.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](packages/ix_flutter/LICENSE)
 
 A Flutter component library that implements the Siemens iX Design System.
@@ -183,8 +183,10 @@ To run the example:
 cd example
 flutter pub get
 
-# Generate icons (required first time)
-dart run ix_icons_generator:generate_icons
+# The example ships with pre-generated icons (example/lib/ix_icons.dart
+# and its assets), so this step is optional -- run it only to
+# regenerate them, e.g. against a different @siemens/ix-icons version.
+# dart run ix_icons_generator:generate_icons
 
 flutter run
 ```
@@ -222,8 +224,10 @@ See [ix_icons_generator](packages/ix_icons_generator/) for complete generator do
 
 ## Requirements
 
-- Flutter SDK: >=3.10.0
+- Flutter SDK: >=3.38.0
 - Dart SDK: >=3.10.0
+
+CI builds and tests against the pinned Flutter 3.44.6 (stable).
 
 ## Important legal notice
 

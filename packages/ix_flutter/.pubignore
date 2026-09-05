@@ -18,3 +18,8 @@
 
 # Repository tooling: not part of the published library
 /tool/
+
+# The test suite is not part of the published library either, and
+# test/tool/* and test/upstream/* import ../../tool/..., which the
+# exclusion above removes from the tarball.
+/test/

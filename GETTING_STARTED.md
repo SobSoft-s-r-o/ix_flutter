@@ -16,7 +16,9 @@ Complete guide to get started with the ix_flutter component library.
 
 ### Prerequisites
 
-Flutter SDK 3.44.6 (stable) or later — the version this package is developed and tested against.
+Flutter SDK 3.38 or later (Dart 3.10 or later). CI builds and tests
+against Flutter 3.44.6 (stable), the version this package is developed
+against.
 
 ### Step 1: Add Dependency
 
