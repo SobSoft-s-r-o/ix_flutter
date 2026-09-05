@@ -7,6 +7,27 @@
 
 Constants in code: `IxUpstream` (`packages/ix_flutter/lib/src/ix_core/ix_upstream.dart`).
 
+## Release header format
+
+Every `CHANGELOG.md` entry for a released version (the first section that is
+not `[Unreleased]`) is immediately followed by one `Upstream:` line naming
+the exact `@siemens/ix` and `@siemens/ix-icons` revisions the release was
+verified against, as the tag plus the first 8 characters of the commit SHA:
+
+```markdown
+## [1.1.0] - 2026-10-01
+Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
+```
+
+`tool/upstream_check.dart` enforces that this line is present and matches
+`IxUpstream`.
+
+## Sync procedure
+
+1. `dart run tool/sync_upstream_tokens.dart <tag>` (from `packages/ix_flutter`) → fixtures and the palette diff.
+2. Update `IxUpstream` (`lib/src/ix_core/ix_upstream.dart`), the table above, and the `Upstream:` line under the release header in `CHANGELOG.md`.
+3. `dart run tool/upstream_check.dart` must pass (it also runs in CI).
+
 ## Icon License
 
 `@siemens/ix-icons` is published under MIT with no clause restricting redistribution. Redistribution requires keeping the copyright and permission notice (`LICENSE.md`) and including `READMEOSS.html`. This repository's earlier claim that icon use carried restrictive licensing and distribution terms (commit `4ebae21`, 2026-01-18) cited no source and has been removed.

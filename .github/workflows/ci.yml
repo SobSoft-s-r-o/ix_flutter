@@ -103,6 +103,12 @@ jobs:
       - name: Format ix_flutter
         working-directory: packages/ix_flutter
         run: dart format --output=none --set-exit-if-changed lib test example
+      - name: Install ix_flutter dependencies
+        working-directory: packages/ix_flutter
+        run: flutter pub get
+      - name: Check upstream evidence
+        working-directory: packages/ix_flutter
+        run: dart run tool/upstream_check.dart
       - name: Format ix_icons_generator
         working-directory: packages/ix_icons_generator
         run: dart format --output=none --set-exit-if-changed lib bin

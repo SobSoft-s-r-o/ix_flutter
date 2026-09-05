@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## [1.0.2] - 2026-01-28
+Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 
 ### Changed
 - Icon generator moved to separate package `ix_icons_generator` for cleaner dependencies
