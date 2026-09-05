@@ -1342,6 +1342,7 @@ class _NavigationEntry extends StatelessWidget {
           _CategoryChildren(
             expanded: showChildren,
             duration: animationDuration,
+            tileFocusNode: focus.node,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -1481,12 +1482,17 @@ class _CategoryChildren extends StatefulWidget {
   const _CategoryChildren({
     required this.expanded,
     required this.duration,
+    required this.tileFocusNode,
     required this.child,
   });
 
   /// Whether the category is currently open. The state is owned by the
   /// scaffold, so this widget is purely controlled.
   final bool expanded;
+
+  /// The category tile's own focus node: where the focus goes when the
+  /// entry holding it is collapsed away.
+  final FocusNode tileFocusNode;
 
   /// The scaffold's [IxApplicationScaffold.animationDuration], already
   /// resolved against the ambient reduced-motion preference by
@@ -1505,6 +1511,16 @@ class _CategoryChildrenState extends State<_CategoryChildren>
     with SingleTickerProviderStateMixin {
   late final AnimationController _expansion;
   late final CurvedAnimation _heightFactor;
+
+  /// A non-focusable, non-traversable ancestor of the children: the
+  /// `ExcludeFocus` that keeps traversal out of a collapsed (or still
+  /// collapsing) subtree, held as a node so [didUpdateWidget] can also ask
+  /// whether the focus is inside it.
+  final FocusNode _childrenFocus = FocusNode(
+    debugLabel: 'IxApplicationScaffold.categoryChildren',
+    skipTraversal: true,
+    canRequestFocus: false,
+  );
 
   @override
   void initState() {
@@ -1541,22 +1557,32 @@ class _CategoryChildrenState extends State<_CategoryChildren>
     }
     if (widget.expanded) {
       _expansion.forward();
-    } else {
-      _expansion.reverse().whenComplete(() {
-        if (!mounted) {
-          return;
-        }
-        // Rebuild so the now fully collapsed children leave the tree; the
-        // controller alone only repaints the transition.
-        setState(() {});
-      });
+      return;
     }
+    // The children are about to stop being focusable (and, once the
+    // transition ends, to leave the tree). Hand the focus to the category
+    // tile they belong to rather than letting the framework drop it into
+    // the enclosing scope, so the next Tab continues from the category
+    // instead of restarting at the top of the page (WCAG 2.4.3). Same
+    // rescue `IxBlind` does for its header.
+    if (_childrenFocus.hasFocus) {
+      widget.tileFocusNode.requestFocus();
+    }
+    _expansion.reverse().whenComplete(() {
+      if (!mounted) {
+        return;
+      }
+      // Rebuild so the now fully collapsed children leave the tree; the
+      // controller alone only repaints the transition.
+      setState(() {});
+    });
   }
 
   @override
   void dispose() {
     _heightFactor.dispose();
     _expansion.dispose();
+    _childrenFocus.dispose();
     super.dispose();
   }
 
@@ -1572,8 +1598,14 @@ class _CategoryChildrenState extends State<_CategoryChildren>
       // shrinks) and still painted, clipped, until the last frame. Until it
       // is fully open again it must not be announced or reachable by Tab,
       // or the focus would land on an entry that is about to be unmounted.
-      child: ExcludeFocus(
-        excluding: !widget.expanded,
+      //
+      // `ExcludeFocus`, spelled out as the `Focus` it is so the state holds
+      // the node too -- see [_childrenFocus].
+      child: Focus(
+        focusNode: _childrenFocus,
+        canRequestFocus: false,
+        skipTraversal: true,
+        descendantsAreFocusable: widget.expanded,
         child: ExcludeSemantics(
           excluding: !widget.expanded,
           child: hasChildren

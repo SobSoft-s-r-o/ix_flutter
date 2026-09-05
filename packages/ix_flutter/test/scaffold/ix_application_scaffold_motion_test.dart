@@ -201,7 +201,41 @@ void main() {
     await tester.pumpAndSettle();
     handle.dispose();
   });
+
+  testWidgets('collapsing a category whose child holds the focus moves it to '
+      'the category tile', (tester) async {
+    await pumpIx(
+      tester,
+      _scaffold(children: [_child('One')], trailingEntry: true),
+      disableAnimations: false,
+      size: _desktop,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Reports'));
+    await tester.pumpAndSettle();
+    final categoryTile = _tileFocusNode('Reports');
+    final childTile = _tileFocusNode('One');
+    childTile.requestFocus();
+    await tester.pump();
+    expect(childTile.hasPrimaryFocus, isTrue);
+
+    // Collapsing takes the focused entry away, so the focus has to land
+    // somewhere meaningful: the category it belonged to, the same way
+    // `IxBlind` hands the focus back to its header. Anything else drops the
+    // keyboard user back at the top of the page (WCAG 2.4.3).
+    await tester.tap(find.text('Reports'));
+    await tester.pumpAndSettle();
+
+    expect(childTile.hasFocus, isFalse);
+    expect(categoryTile.hasPrimaryFocus, isTrue);
+  });
 }
+
+/// The focus node of the entry rendering [label] -- `_NavigationTile` builds
+/// its `InkWell` with the tile's own focus node directly around this text.
+FocusNode _tileFocusNode(String label) =>
+    Focus.of(find.text(label).evaluate().single, createDependency: false);
 
 /// Whether the *compiled* semantics tree currently contains a node labelled
 /// [label].
