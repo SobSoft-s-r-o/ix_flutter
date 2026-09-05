@@ -274,6 +274,7 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
               onTap: widget.disabled ? null : _toggle,
               style: style,
               disabled: widget.disabled,
+              focused: _headerFocused,
               onFocusChanged: (focused) =>
                   setState(() => _headerFocused = focused),
             ),
@@ -319,6 +320,7 @@ class _IxBlindHeader extends StatelessWidget {
     this.onTap,
     required this.style,
     required this.disabled,
+    required this.focused,
     this.onFocusChanged,
   });
 
@@ -330,6 +332,10 @@ class _IxBlindHeader extends StatelessWidget {
   final VoidCallback? onTap;
   final IxBlindStyle style;
   final bool disabled;
+
+  /// Whether the header's `InkWell` currently holds the keyboard focus, as
+  /// last reported through [onFocusChanged].
+  final bool focused;
   final ValueChanged<bool>? onFocusChanged;
 
   @override
@@ -342,12 +348,18 @@ class _IxBlindHeader extends StatelessWidget {
     // One semantics node for the tappable part of the header:
     // `excludeSemantics: true` drops whatever the chevron, optional icon,
     // title/subtitle `Text`s and the `InkWell` itself would otherwise
-    // contribute (including the `Focus` node's own `isFocusable`), so every
-    // accessible property of the button -- label, hint,
-    // button/expanded/enabled state, the tap action, and focusability -- is
-    // set explicitly right here instead of being assembled from several
-    // descendants. `headerActions` (below) stays outside this node so it
-    // keeps its own accessible name.
+    // contribute (including the `Focus` node's own `isFocusable` and
+    // `isFocused`), so every accessible property of the button -- label,
+    // hint, button/expanded/enabled state, the tap action, focusability and
+    // the *current* focus -- is set explicitly right here instead of being
+    // assembled from several descendants. `headerActions` (below) stays
+    // outside this node so it keeps its own accessible name.
+    //
+    // `focused:` republishes the very state the focus ring around the blind
+    // is already painted from, so assistive technology can follow the
+    // keyboard through a stack of blinds (WCAG 2.4.7) -- the same fix
+    // `_NavigationTile` and `IxResponsiveDataView`'s sortable headers
+    // carry.
     //
     // The padding and 48px minimum height live *inside* the `InkWell`
     // (wrapping its content `Row`), not on an ancestor `Container`: a
@@ -362,6 +374,11 @@ class _IxBlindHeader extends StatelessWidget {
       enabled: !disabled,
       expanded: expanded,
       focusable: !disabled,
+      // `null`, not `false`, while disabled: `focusable` and `focused` share
+      // one tristate flag, and `focused` is applied *after* `focusable`, so
+      // an explicit `focused: false` would put a disabled header back into
+      // the traversal order it must stay out of.
+      focused: disabled ? null : focused,
       label: title,
       hint: subtitle,
       onTap: onTap,

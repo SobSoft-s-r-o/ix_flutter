@@ -56,6 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `neutralHover` (light), `primaryActive`/`secondaryActive`/`secondaryHover` (dark) aligned with iX 5.2.1
 - Code typography now loads the bundled JetBrains Mono (package-prefixed font family)
 - visible 1px focus ring on checkbox, radio, buttons, blind header, menu tiles and dropdown items (WCAG 2.4.7)
+- the `IxBlind` header's semantics node reports `isFocused` while it holds the keyboard focus, so assistive technology can follow the keyboard through a stack of blinds instead of only seeing the ring (WCAG 2.4.7)
 - the dropdown item focus ring is drawn inside the row (rounded, negative outline offset) instead of overlapping the neighbouring row and the menu's rounded corner
 - the dropdown trigger label is flexible with ellipsis, so it no longer overflows at narrow widths or large text scales (WCAG 1.4.4)
 - `IxEmptyState`/`IxToast`/`IxSpinner` render without `IxThemeBuilder`

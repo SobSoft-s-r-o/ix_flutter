@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
@@ -210,6 +211,55 @@ void main() {
     await tester.tap(find.text('T'));
     await tester.pump();
     expect(calls, 0);
+    handle.dispose();
+  });
+
+  testWidgets('the focused header reports isFocused, an unfocused sibling '
+      'does not', (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpIx(
+      tester,
+      const Column(
+        children: [
+          IxBlind(title: 'First', child: Text('a')),
+          IxBlind(title: 'Second', child: Text('b')),
+        ],
+      ),
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pumpAndSettle();
+
+    // The header's `Semantics` sets `excludeSemantics: true`, which drops
+    // the inner `InkWell`/`Focus` contribution -- including the focused
+    // flag a screen reader needs to follow the keyboard (WCAG 2.4.7). The
+    // header therefore has to republish the state its focus ring already
+    // tracks (same fix as `_NavigationTile` and the data view's sortable
+    // headers).
+    expect(
+      tester.getSemantics(find.text('First')),
+      matchesSemantics(
+        isButton: true,
+        hasExpandedState: true,
+        hasEnabledState: true,
+        isEnabled: true,
+        isFocusable: true,
+        isFocused: true,
+        hasTapAction: true,
+        label: 'First',
+      ),
+    );
+    expect(
+      tester.getSemantics(find.text('Second')),
+      matchesSemantics(
+        isButton: true,
+        hasExpandedState: true,
+        hasEnabledState: true,
+        isEnabled: true,
+        isFocusable: true,
+        hasTapAction: true,
+        label: 'Second',
+      ),
+    );
     handle.dispose();
   });
 
