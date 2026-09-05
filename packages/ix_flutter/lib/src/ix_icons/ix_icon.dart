@@ -100,9 +100,14 @@ class IxIcon extends StatelessWidget {
   }
 
   /// Renders a bundled/asset SVG source through [SvgPicture.asset], tinted
-  /// with [color] via a `srcIn` color filter (SVG bundling and its error
-  /// fallback land in later tasks; this wiring is exercised once assets
-  /// exist).
+  /// with [color] via a `srcIn` color filter.
+  ///
+  /// If the asset is missing or the SVG fails to decode, [errorBuilder]
+  /// swaps in `data.fallback ?? Icons.broken_image` at the same size (the
+  /// enclosing `SizedBox`/`Semantics` in [build] never changes), and — in
+  /// debug mode — reports the failure via [FlutterError.reportError] under
+  /// the `ix_flutter icons` library name so the app's error console/crash
+  /// reporting surfaces it without crashing the UI.
   Widget _svg(BuildContext context, IxIconData data, Color color) {
     final (path, package) = switch (data) {
       IxPackageIconData(assetPath: final p) => (p, 'ix_flutter'),
@@ -115,6 +120,25 @@ class IxIcon extends StatelessWidget {
       width: size.px,
       height: size.px,
       colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      placeholderBuilder: (_) => SizedBox.square(dimension: size.px),
+      errorBuilder: (context, error, stack) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stack,
+            library: 'ix_flutter icons',
+            context: ErrorDescription(
+              'while loading icon "$path" (package: $package); using '
+              'material fallback',
+            ),
+          ),
+        );
+        return Icon(
+          data.fallback ?? Icons.broken_image,
+          size: size.px,
+          color: color,
+        );
+      },
     );
   }
 }
