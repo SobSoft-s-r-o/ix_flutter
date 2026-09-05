@@ -61,12 +61,14 @@ Map<String, int> readPalette(String path) {
 }
 
 void main() {
-  if (!File(_lightSource).existsSync()) {
-    stderr.writeln(
-      'Cannot find $_lightSource -- run this from packages/ix_flutter:\n'
-      '  cd packages/ix_flutter && dart run tool/gen_token_table.dart',
-    );
-    exit(1);
+  for (final source in [_lightSource, _darkSource]) {
+    if (!File(source).existsSync()) {
+      stderr.writeln(
+        'Cannot find $source -- run this from packages/ix_flutter:\n'
+        '  cd packages/ix_flutter && dart run tool/gen_token_table.dart',
+      );
+      exit(1);
+    }
   }
 
   final light = readPalette(_lightSource);

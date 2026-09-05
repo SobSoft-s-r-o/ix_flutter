@@ -333,7 +333,9 @@ which only runs on demand (`workflow_dispatch`):
 3. Start **Version Bump (Manual)** from the Actions tab and choose the package
    (`ix_flutter`, `ix_icons_generator` or `both`), the semver bump
    (`patch`/`minor`/`major`) and, if needed, a prerelease identifier. The run
-   installs dependencies, analyzes and tests the package, bumps
+   installs dependencies, analyzes the selected package(s) and runs
+   `flutter test` for `ix_flutter` (`ix_icons_generator` is only analyzed
+   there -- its `dart test` suite runs in the regular CI workflow), bumps
    `pubspec.yaml` and turns `[Unreleased]` into the new release section with
    `cider bump` / `cider release`, and opens a `chore/release-…` pull request
    labelled `release`

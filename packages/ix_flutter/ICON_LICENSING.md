@@ -38,16 +38,19 @@ This includes:
 
 ### Third-Party Components
 
+Each license below was read from the `LICENSE` file of the version this package
+resolves to.
+
 `ix_flutter` itself has one direct third-party dependency:
-- **flutter_svg** (MIT License)
+- **flutter_svg** (MIT License, Copyright (c) 2018 Dan Field)
 
 The optional `ix_icons_generator` dev dependency, which runs at development
 time only, adds:
-- **http** (BSD License)
-- **path** (BSD License)
-- **args** (BSD License)
-- **recase** (MIT License)
-- **archive** (Apache 2.0 License)
+- **http** (BSD License, Copyright 2014 the Dart project authors)
+- **path** (BSD License, Copyright 2014 the Dart project authors)
+- **args** (BSD License, Copyright 2013 the Dart project authors)
+- **recase** (BSD License, Copyright 2017 Keith Elliott)
+- **archive** (MIT License, Copyright (c) 2013-2021 Brendan Duncan)
 
 ## Commercial Use
 
