@@ -14,36 +14,34 @@ void main() {
     // registers the test at the same point in `main()` either way.
     @Upstream('blind.tsx:145-156 <button aria-expanded aria-controls>')
     void ixBlindHeaderIsButtonWithExpandedState() {
-      testWidgets(
-        'IxBlind header is a button with expanded state',
-        (tester) async {
-          final handle = tester.ensureSemantics();
-          await pumpIx(
-            tester,
-            IxBlind(
-              title: 'Section',
-              expanded: true,
-              onExpandedChanged: (_) {},
-              child: const Text('body'),
-            ),
-          );
-          expect(
-            tester.getSemantics(find.text('Section')),
-            matchesSemantics(
-              isButton: true,
-              hasExpandedState: true,
-              isExpanded: true,
-              hasEnabledState: true,
-              isEnabled: true,
-              isFocusable: true,
-              hasTapAction: true,
-              label: 'Section',
-            ),
-          );
-          handle.dispose();
-        },
-        skip: true,
-      ); // IXF-023 – implemented by accessibility-interaction Task 5 (A-6)
+      testWidgets('IxBlind header is a button with expanded state', (
+        tester,
+      ) async {
+        final handle = tester.ensureSemantics();
+        await pumpIx(
+          tester,
+          IxBlind(
+            title: 'Section',
+            expanded: true,
+            onExpandedChanged: (_) {},
+            child: const Text('body'),
+          ),
+        );
+        expect(
+          tester.getSemantics(find.text('Section')),
+          matchesSemantics(
+            isButton: true,
+            hasExpandedState: true,
+            isExpanded: true,
+            hasEnabledState: true,
+            isEnabled: true,
+            isFocusable: true,
+            hasTapAction: true,
+            label: 'Section',
+          ),
+        );
+        handle.dispose();
+      });
     }
 
     ixBlindHeaderIsButtonWithExpandedState();

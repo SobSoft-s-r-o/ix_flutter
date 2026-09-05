@@ -280,25 +280,36 @@ class IxBlindTheme extends ThemeExtension<IxBlindTheme> {
         background: theme.colorScheme.error,
         foreground: theme.colorScheme.onError,
       ),
+      // No IxTheme means no Siemens IX critical/warning/success/info/neutral
+      // tokens either, so these five borrow the closest-matching role from
+      // the ambient Material `ColorScheme` instead of a hard-coded `Colors.*`
+      // swatch -- keeping the fallback responsive to the host app's own
+      // theme (including dark mode) rather than baking in fixed brand
+      // colors. `alarm` above already does the same for `error`; `critical`
+      // shares it (Material has only one danger role), `warning` maps to
+      // `tertiary` (M3's warm accent role), `success` to `secondary`, `info`
+      // to `primary`, and `neutral` to the muted `outline` role -- paired
+      // with `onSurface` since `outline` has no `onOutline` counterpart of
+      // its own.
       IxBlindVariant.critical: buildFallbackStyle(
-        background: Colors.red.shade900,
-        foreground: Colors.white,
+        background: theme.colorScheme.error,
+        foreground: theme.colorScheme.onError,
       ),
       IxBlindVariant.warning: buildFallbackStyle(
-        background: Colors.orange,
-        foreground: Colors.black,
+        background: theme.colorScheme.tertiary,
+        foreground: theme.colorScheme.onTertiary,
       ),
       IxBlindVariant.success: buildFallbackStyle(
-        background: Colors.green,
-        foreground: Colors.white,
+        background: theme.colorScheme.secondary,
+        foreground: theme.colorScheme.onSecondary,
       ),
       IxBlindVariant.info: buildFallbackStyle(
-        background: Colors.blue,
-        foreground: Colors.white,
+        background: theme.colorScheme.primary,
+        foreground: theme.colorScheme.onPrimary,
       ),
       IxBlindVariant.neutral: buildFallbackStyle(
-        background: Colors.grey,
-        foreground: Colors.black,
+        background: theme.colorScheme.outline,
+        foreground: theme.colorScheme.onSurface,
       ),
     };
 
