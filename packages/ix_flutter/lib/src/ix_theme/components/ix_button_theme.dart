@@ -25,72 +25,72 @@ enum IxButtonVariant {
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   warningPrimary,
 
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   warningSecondary,
 
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   warningTertiary,
 
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   infoPrimary,
 
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   infoSecondary,
 
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   infoTertiary,
 
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   successPrimary,
 
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   successSecondary,
 
   /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
   /// subtle* or danger* variants.
   @Deprecated(
-    'Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary, '
-    'subtle* or danger* variants.',
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
   )
   successTertiary,
 }

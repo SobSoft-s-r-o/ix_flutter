@@ -23,13 +23,13 @@ class IxFonts {
 
   @Deprecated(
     'Roboto Mono stops being the default UI font in 2.0; use '
-    'IxFonts.workSans or IxTypography(fontFamily:)',
+    'IxFonts.workSans or IxTypography(fontFamily:). Removed in 2.0.',
   )
   static const String robotoMono = 'Roboto Mono';
 
   @Deprecated(
     'Roboto Mono stops being the default UI font in 2.0; use '
-    'IxFonts.workSans or IxTypography(fontFamily:)',
+    'IxFonts.workSans or IxTypography(fontFamily:). Removed in 2.0.',
   )
   static const List<String> robotoMonoFallback = ['Arial', 'Helvetica'];
 

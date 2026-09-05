@@ -38,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxThemeBuilder(family: IxThemeFamily.custom)` without a `customPalette` now throws an `AssertionError` in debug builds instead of silently falling back to the classic palette (release builds keep the classic fallback)
 
 ### Deprecated
-- reserved menu entry ids `settings`/`theme-toggle`/`about-legal` (with `showSettings`/`showThemeToggle`/`showAboutLegal`/`onOpenSettings`/`onOpenAboutLegal`); they still work and now log a one-time debug notice, and become ordinary entries in 2.0 -- use `settings:`, `about:` and `enableToggleTheme` instead
+- reserved menu entry ids `settings`/`theme-toggle`/`about-legal` (with `showSettings`/`showThemeToggle`/`showAboutLegal`/`onOpenSettings`/`onOpenAboutLegal`, now carrying `@Deprecated` so the analyzer flags them); they still work and now log a one-time debug notice, and become ordinary entries in 2.0 -- use `settings:`, `about:` and `enableToggleTheme` instead
 - `IxFonts.robotoMono` as the default UI font (2.0 switches to Work Sans)
 - `IxSpinnerVariant.standard`
 - `IxButtonVariant.warning*`/`info*`/`success*` (not part of Siemens iX)
@@ -61,6 +61,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxEmptyState`/`IxToast`/`IxSpinner` render without `IxThemeBuilder`
 - `IxBlindTheme.fallback`'s `critical`/`warning`/`success`/`info`/`neutral` variants no longer hard-code Material `Colors.*` swatches; they derive from the ambient `ColorScheme` (`error`/`tertiary`/`secondary`/`primary`/`outline`) instead
 - toggling an `IxBlind` (controlled or uncontrolled) no longer throws under `MediaQuery.disableAnimations` (a zero-duration `AnimatedSize` re-entering layout while resizing)
+- `IxApplicationScaffold`'s collapsed-rail/drawer fly-out is clamped against the correct edge in RTL, so the panel no longer opens partly outside the viewport
+- `IxApplicationScaffold` disposes the `OverlayEntry` it self-hosts when built above the `Navigator`, so leak-tracking suites no longer report it
 - `IxResponsiveDataView` headers/rows/mobile cards/search-clear and `IxPaginationBar` no longer hard-code Material `Colors.*`; they derive from `IxTheme` tokens (`color0`/`softBdr`/`weakBdr`/`ghostHover`) with a `ColorScheme` fallback, and no longer overflow at narrow widths or large text scales (WCAG 1.4.4)
 
 ---

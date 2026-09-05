@@ -19,7 +19,7 @@ enum IxSpinnerSize { xxSmall, xSmall, small, medium, large }
 /// Supported Siemens IX spinner color variants.
 enum IxSpinnerVariant {
   /// Deprecated alias of [secondary]; the value is unchanged, only the name.
-  @Deprecated('Use secondary')
+  @Deprecated('Use secondary. Removed in 2.0.')
   standard,
 
   /// Uses the muted "soft" UI colors from the theme for subtle loading

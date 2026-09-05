@@ -19,7 +19,8 @@ class IxToastOverlay extends StatefulWidget {
   const IxToastOverlay({
     super.key,
     required this.service,
-    @Deprecated('Use placement') this.position = Alignment.topRight,
+    @Deprecated('Use placement. Removed in 2.0.')
+    this.position = Alignment.topRight,
     this.placement = IxToastPosition.topRight,
     this.strings = const IxToastStrings(),
     this.width = 280,
@@ -31,7 +32,7 @@ class IxToastOverlay extends StatefulWidget {
   /// axes honoured, exactly as before [placement] existed), for 1.x
   /// callers -- when set to anything other than its own default
   /// ([Alignment.topRight]), it takes precedence over [placement].
-  @Deprecated('Use placement')
+  @Deprecated('Use placement. Removed in 2.0.')
   final Alignment position;
 
   /// Which corner the toast stack anchors to (always right-edge; upstream

@@ -145,10 +145,21 @@ class IxApplicationScaffold extends StatefulWidget {
     this.collapsedWidth = 72,
     this.themeMode = ThemeMode.system,
     this.onThemeModeChanged,
+    @Deprecated(
+      'Use settings:/about:/enableToggleTheme instead. Removed in 2.0.',
+    )
     this.showSettings = true,
+    @Deprecated(
+      'Use settings:/about:/enableToggleTheme instead. Removed in 2.0.',
+    )
     this.showThemeToggle = true,
+    @Deprecated(
+      'Use settings:/about:/enableToggleTheme instead. Removed in 2.0.',
+    )
     this.showAboutLegal = true,
+    @Deprecated('Use settings:/about: instead. Removed in 2.0.')
     this.onOpenSettings,
+    @Deprecated('Use settings:/about: instead. Removed in 2.0.')
     this.onOpenAboutLegal,
     this.strings = const IxApplicationStrings(),
     this.settings,
@@ -170,10 +181,25 @@ class IxApplicationScaffold extends StatefulWidget {
   final double collapsedWidth;
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode>? onThemeModeChanged;
+
+  /// Whether the reserved built-in entry is shown.
+  @Deprecated('Use settings:/about:/enableToggleTheme instead. Removed in 2.0.')
   final bool showSettings;
+
+  /// Whether the reserved built-in entry is shown.
+  @Deprecated('Use settings:/about:/enableToggleTheme instead. Removed in 2.0.')
   final bool showThemeToggle;
+
+  /// Whether the reserved built-in entry is shown.
+  @Deprecated('Use settings:/about:/enableToggleTheme instead. Removed in 2.0.')
   final bool showAboutLegal;
+
+  /// Called when the reserved built-in entry is activated.
+  @Deprecated('Use settings:/about: instead. Removed in 2.0.')
   final VoidCallback? onOpenSettings;
+
+  /// Called when the reserved built-in entry is activated.
+  @Deprecated('Use settings:/about: instead. Removed in 2.0.')
   final VoidCallback? onOpenAboutLegal;
 
   /// Every user-facing string the menu renders, including the accessible
@@ -271,6 +297,16 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       node.dispose();
     }
     _tileNodes.clear();
+    // `OverlayEntry` is a `ChangeNotifier`, so the self-hosted entry has to
+    // be disposed too or leak-tracking suites report it. The Overlay that
+    // hosts it is this state's own child and unmounts first, but unmounting
+    // does not clear the entry's back-reference to it -- `remove()` is what
+    // does, and it is a no-op on an already unmounted Overlay. Same order
+    // Flutter's own `_WrappingOverlayState.dispose` uses.
+    _selfHostedEntry
+      ?..remove()
+      ..dispose();
+    _selfHostedEntry = null;
     super.dispose();
   }
 
@@ -373,6 +409,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
 
     return [
       if (widget.settings != null &&
+          // ignore: deprecated_member_use_from_same_package
           widget.showSettings &&
           !hasReserved('settings'))
         IxMenuEntry(
@@ -383,6 +420,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
           isBottom: true,
         ),
       if (widget.enableToggleTheme &&
+          // ignore: deprecated_member_use_from_same_package
           widget.showThemeToggle &&
           widget.onThemeModeChanged != null &&
           !hasReserved('theme-toggle'))
@@ -394,6 +432,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
           isBottom: true,
         ),
       if (widget.about != null &&
+          // ignore: deprecated_member_use_from_same_package
           widget.showAboutLegal &&
           !hasReserved('about-legal'))
         IxMenuEntry(
@@ -409,10 +448,13 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
   bool _isBottomEntryVisible(IxMenuEntry entry) {
     switch (entry.id) {
       case 'settings':
+        // ignore: deprecated_member_use_from_same_package
         return widget.showSettings;
       case 'theme-toggle':
+        // ignore: deprecated_member_use_from_same_package
         return widget.showThemeToggle;
       case 'about-legal':
+        // ignore: deprecated_member_use_from_same_package
         return widget.showAboutLegal;
       default:
         return true;
@@ -600,9 +642,14 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         MediaQuery.paddingOf(context).top;
     final anchorTop = anchor?.top ?? appBarBottom;
     final top = math.max(anchorTop, appBarBottom);
+    // `IxMenuFlyout` opens away from the menu rail, which in RTL means
+    // leftwards from the anchor's leading (left) edge, so the room left for
+    // the panel is measured from the opposite side there.
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
     final available = anchor == null
         ? _kFlyoutWidth
-        : viewport.width - anchor.right - _kFlyoutMargin;
+        : (isRtl ? anchor.left : viewport.width - anchor.right) -
+              _kFlyoutMargin;
 
     // The overlay lays its children out at the full overlay size; aligning
     // first hands the panel loose constraints so it can size to its content
@@ -762,20 +809,25 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         widget.onThemeModeChanged?.call(_nextThemeMode(widget.themeMode));
         return;
       case 'settings':
+        // ignore: deprecated_member_use_from_same_package
         if (widget.showSettings) {
+          // ignore: deprecated_member_use_from_same_package
           widget.onOpenSettings?.call();
         }
         break;
       case 'theme-toggle':
         // Switching the theme never closes the drawer: the menu is where
         // the switch lives, so 1.x users stay in it.
+        // ignore: deprecated_member_use_from_same_package
         if (widget.showThemeToggle) {
           final nextMode = _nextThemeMode(widget.themeMode);
           widget.onThemeModeChanged?.call(nextMode);
         }
         return;
       case 'about-legal':
+        // ignore: deprecated_member_use_from_same_package
         if (widget.showAboutLegal) {
+          // ignore: deprecated_member_use_from_same_package
           widget.onOpenAboutLegal?.call();
         }
         break;

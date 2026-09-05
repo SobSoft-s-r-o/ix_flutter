@@ -129,7 +129,9 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
   final FontWeight ellipsisFontWeight;
 
   /// Background of the overflow/next-items popup surface.
-  @Deprecated('Overflow menus are styled by IxDropdownTheme; removed in 2.0')
+  @Deprecated(
+    'Overflow menus are styled by IxDropdownTheme instead. Removed in 2.0.',
+  )
   final Color dropdownBackground;
   final TextStyle dropdownTextStyle;
   final double dropdownElevation;
@@ -137,7 +139,9 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
   final EdgeInsets dropdownPadding;
 
   /// Corner radius of the overflow/next-items popup surface.
-  @Deprecated('Overflow menus are styled by IxDropdownTheme; removed in 2.0')
+  @Deprecated(
+    'Overflow menus are styled by IxDropdownTheme instead. Removed in 2.0.',
+  )
   final BorderRadius dropdownBorderRadius;
 
   @override

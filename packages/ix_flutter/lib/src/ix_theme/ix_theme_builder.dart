@@ -62,11 +62,13 @@ class IxThemeBuilder {
   /// deprecated 1.x spelling of the same configuration and stay functional
   /// until 2.0.
   const IxThemeBuilder({
-    @Deprecated('Use theme: IxThemeName; brand is a classic alias')
+    @Deprecated(
+      'Use theme: IxThemeName; brand is a classic alias. Removed in 2.0.',
+    )
     this.family = IxThemeFamily.classic,
-    @Deprecated('Use brightness: or IxThemeController')
+    @Deprecated('Use brightness: or IxThemeController. Removed in 2.0.')
     this.mode = ThemeMode.system,
-    @Deprecated('Use IxThemeController for system resolution')
+    @Deprecated('Use IxThemeController for system resolution. Removed in 2.0.')
     this.systemBrightness = Brightness.light,
     this.theme,
     this.brightness,
@@ -109,15 +111,17 @@ class IxThemeBuilder {
        );
 
   /// Siemens IX visual family (classic vs. custom overrides).
-  @Deprecated('Use theme: IxThemeName; brand is a classic alias')
+  @Deprecated(
+    'Use theme: IxThemeName; brand is a classic alias. Removed in 2.0.',
+  )
   final IxThemeFamily family;
 
   /// Material theme mode to resolve light/dark variants.
-  @Deprecated('Use brightness: or IxThemeController')
+  @Deprecated('Use brightness: or IxThemeController. Removed in 2.0.')
   final ThemeMode mode;
 
   /// Platform brightness hint used when [mode] is [ThemeMode.system].
-  @Deprecated('Use IxThemeController for system resolution')
+  @Deprecated('Use IxThemeController for system resolution. Removed in 2.0.')
   final Brightness systemBrightness;
 
   /// Siemens iX theme identity (upstream `data-ix-theme`).
@@ -437,10 +441,13 @@ class IxThemeBuilder {
   /// Useful when you want to flip between light/dark or supply a custom
   /// [IxTypography] while reusing the remaining configuration.
   IxThemeBuilder copyWith({
-    @Deprecated('Use theme: IxThemeName; brand is a classic alias')
+    @Deprecated(
+      'Use theme: IxThemeName; brand is a classic alias. Removed in 2.0.',
+    )
     IxThemeFamily? family,
-    @Deprecated('Use brightness: or IxThemeController') ThemeMode? mode,
-    @Deprecated('Use IxThemeController for system resolution')
+    @Deprecated('Use brightness: or IxThemeController. Removed in 2.0.')
+    ThemeMode? mode,
+    @Deprecated('Use IxThemeController for system resolution. Removed in 2.0.')
     Brightness? systemBrightness,
     IxThemeName? theme,
     Brightness? brightness,
@@ -618,11 +625,11 @@ class IxTheme extends ThemeExtension<IxTheme> {
   final IxColorSchema colorSchema;
 
   /// The visual family this theme was built for.
-  @Deprecated('Use themeName')
+  @Deprecated('Use themeName. Removed in 2.0.')
   final IxThemeFamily family;
 
   /// The [ThemeMode] this theme was built for.
-  @Deprecated('Use colorSchema / brightness')
+  @Deprecated('Use colorSchema / brightness. Removed in 2.0.')
   final ThemeMode mode;
 
   /// The resolved brightness of this theme.
@@ -661,8 +668,9 @@ class IxTheme extends ThemeExtension<IxTheme> {
   IxTheme copyWith({
     IxThemeName? themeName,
     IxColorSchema? colorSchema,
-    @Deprecated('Use themeName') IxThemeFamily? family,
-    @Deprecated('Use colorSchema / brightness') ThemeMode? mode,
+    @Deprecated('Use themeName. Removed in 2.0.') IxThemeFamily? family,
+    @Deprecated('Use colorSchema / brightness. Removed in 2.0.')
+    ThemeMode? mode,
     Brightness? brightness,
     Map<IxThemeColorToken, Color>? palette,
     IxTypography? typography,

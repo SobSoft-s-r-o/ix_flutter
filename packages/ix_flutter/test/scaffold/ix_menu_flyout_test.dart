@@ -376,6 +376,61 @@ void main() {
   );
 
   testWidgets(
+    'drawer layout in RTL: the panel opens leftwards and stays inside the '
+    'viewport',
+    (tester) async {
+      // Mirror of the LTR drawer assertion above. In RTL the drawer sits on
+      // the right edge and `IxMenuFlyout` opens leftwards, so the room left
+      // for the panel is measured from the anchor's left edge, not from the
+      // viewport's right edge.
+      await pumpIx(
+        tester,
+        IxApplicationScaffold(
+          appTitle: 'App',
+          entries: const [
+            IxMenuEntry(id: 'home', type: IxMenuEntryType.item, label: 'Home'),
+          ],
+          settings: const Text('settings-panel'),
+          onThemeModeChanged: (_) {},
+          onNavigate: (_) {},
+          body: const SizedBox(),
+        ),
+        size: const Size(600, 800),
+        textDirection: TextDirection.rtl,
+      );
+
+      await tester.tap(find.byTooltip('Open menu'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Settings'));
+      await tester.pumpAndSettle();
+      expect(find.text('settings-panel'), findsOneWidget);
+
+      const viewport = Size(600, 800);
+      final panel = tester.getRect(find.byKey(const Key('ix-menu-flyout')));
+      expect(
+        panel.left,
+        greaterThanOrEqualTo(0.0),
+        reason: 'panel $panel starts outside ${_viewportRect(viewport)}',
+      );
+      expect(
+        panel.right,
+        lessThanOrEqualTo(viewport.width),
+        reason: 'panel $panel is clipped on the right of $viewport',
+      );
+      expect(
+        panel.bottom,
+        lessThanOrEqualTo(viewport.height),
+        reason: 'panel $panel is clipped at the bottom of $viewport',
+      );
+      expect(
+        panel.width,
+        greaterThan(200),
+        reason: 'panel $panel was clamped down to an unusable width',
+      );
+    },
+  );
+
+  testWidgets(
     'reserved id "settings" still works through the shim and warns once in '
     'debug',
     (tester) async {

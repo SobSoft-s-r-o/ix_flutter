@@ -15,15 +15,15 @@ enum IxToastType {
   error,
 
   /// Critical error message.
-  @Deprecated('Use error')
+  @Deprecated('Use error. Removed in 2.0.')
   critical,
 
   /// Alarm message.
-  @Deprecated('Use error')
+  @Deprecated('Use error. Removed in 2.0.')
   alarm,
 
   /// Neutral message.
-  @Deprecated('Use info')
+  @Deprecated('Use info. Removed in 2.0.')
   neutral,
 }
 
