@@ -147,6 +147,20 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
   late final AnimationController _expansion;
   late final CurvedAnimation _heightFactor;
 
+  /// The header's own focus node, so the blind can put the focus back on it
+  /// when the content that held it is collapsed away.
+  final FocusNode _headerFocusNode = FocusNode(debugLabel: 'IxBlind.header');
+
+  /// A non-focusable, non-traversable ancestor of the content. It is the
+  /// `ExcludeFocus` that keeps traversal out of a collapsed (or still
+  /// collapsing) subtree, and its `hasFocus` is what tells [_animateTo]
+  /// whether the focus has to be rescued first.
+  final FocusNode _contentFocus = FocusNode(
+    debugLabel: 'IxBlind.content',
+    skipTraversal: true,
+    canRequestFocus: false,
+  );
+
   /// The effective expanded state: the controlled [IxBlind.expanded] value
   /// when set, otherwise the internally-tracked uncontrolled state.
   bool get _expanded => widget.expanded ?? _internal;
@@ -176,6 +190,8 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
   void dispose() {
     _heightFactor.dispose();
     _expansion.dispose();
+    _contentFocus.dispose();
+    _headerFocusNode.dispose();
     super.dispose();
   }
 
@@ -201,6 +217,14 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
     if (expanded) {
       _expansion.forward();
       return;
+    }
+    // The content is about to stop being focusable (and, once the
+    // transition ends, to leave the tree). Move the focus to the header
+    // *before* that rather than letting the framework drop it: it is the
+    // nearest still-meaningful stop, so the next Tab continues from the
+    // blind instead of restarting at the top of the page (WCAG 2.4.3).
+    if (_contentFocus.hasFocus) {
+      _headerFocusNode.requestFocus();
     }
     _expansion.reverse().whenComplete(() {
       if (!mounted) {
@@ -276,6 +300,7 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
               style: style,
               disabled: widget.disabled,
               focused: _headerFocused,
+              focusNode: _headerFocusNode,
               onFocusChanged: (focused) =>
                   setState(() => _headerFocused = focused),
             ),
@@ -287,21 +312,33 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
             SizeTransition(
               sizeFactor: _heightFactor,
               alignment: Alignment.topCenter,
-              child: ExcludeSemantics(
-                excluding: !isExpanded,
-                child: hasContent
-                    ? Container(
-                        decoration: BoxDecoration(
-                          border: Border(
-                            top: BorderSide(
-                              color: style.borderColor,
-                              width: blindTheme.borderWidth,
+              // `ExcludeFocus`, spelled out so the state also holds the node
+              // (see [_contentFocus]): a *collapsing* content subtree is
+              // still mounted -- it is what the transition is shrinking --
+              // so without this Tab could move the focus into a control
+              // that is about to be unmounted, dropping the focus
+              // altogether when it goes.
+              child: Focus(
+                focusNode: _contentFocus,
+                canRequestFocus: false,
+                skipTraversal: true,
+                descendantsAreFocusable: isExpanded,
+                child: ExcludeSemantics(
+                  excluding: !isExpanded,
+                  child: hasContent
+                      ? Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              top: BorderSide(
+                                color: style.borderColor,
+                                width: blindTheme.borderWidth,
+                              ),
                             ),
                           ),
-                        ),
-                        child: widget.child,
-                      )
-                    : const SizedBox.shrink(),
+                          child: widget.child,
+                        )
+                      : const SizedBox.shrink(),
+                ),
               ),
             ),
           ],
@@ -322,6 +359,7 @@ class _IxBlindHeader extends StatelessWidget {
     required this.style,
     required this.disabled,
     required this.focused,
+    required this.focusNode,
     this.onFocusChanged,
   });
 
@@ -337,6 +375,10 @@ class _IxBlindHeader extends StatelessWidget {
   /// Whether the header's `InkWell` currently holds the keyboard focus, as
   /// last reported through [onFocusChanged].
   final bool focused;
+
+  /// The header's focus node, owned by the state so it can put the focus
+  /// back here when the content that held it collapses away.
+  final FocusNode focusNode;
   final ValueChanged<bool>? onFocusChanged;
 
   @override
@@ -388,6 +430,7 @@ class _IxBlindHeader extends StatelessWidget {
         color: Colors.transparent, // Container handles background
         child: InkWell(
           onTap: onTap,
+          focusNode: focusNode,
           focusColor: Colors.transparent,
           onFocusChange: onFocusChanged,
           hoverColor: style.hoverBackground.withValues(

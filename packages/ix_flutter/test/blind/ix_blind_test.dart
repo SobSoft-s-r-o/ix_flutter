@@ -345,6 +345,70 @@ void main() {
       expect(atFullDuration, settled);
     });
 
+    testWidgets('a controlled blind animates when expanded flips', (
+      tester,
+    ) async {
+      late StateSetter setOuter;
+      var expanded = false;
+      await pumpIx(
+        tester,
+        StatefulBuilder(
+          builder: (context, setState) {
+            setOuter = setState;
+            return IxBlind(
+              title: 'T',
+              expanded: expanded,
+              onExpandedChanged: (_) {},
+              child: const SizedBox(key: _contentKey, height: 100),
+            );
+          },
+        ),
+        disableAnimations: false,
+      );
+      final collapsed = tester.getSize(find.byType(IxBlind)).height;
+
+      setOuter(() => expanded = true);
+      await tester.pump();
+      await tester.pump(IxMotion.defaultTime ~/ 2);
+      final midway = tester.getSize(find.byType(IxBlind)).height;
+      await tester.pumpAndSettle();
+      final settled = tester.getSize(find.byType(IxBlind)).height;
+
+      expect(midway, greaterThan(collapsed));
+      expect(midway, lessThan(settled));
+    });
+
+    testWidgets('a controlled blind snaps when expanded flips under reduced '
+        'motion', (tester) async {
+      late StateSetter setOuter;
+      var expanded = false;
+      Widget build(BuildContext context, StateSetter setState) {
+        setOuter = setState;
+        return IxBlind(
+          title: 'T',
+          expanded: expanded,
+          onExpandedChanged: (_) {},
+          child: const SizedBox(key: _contentKey, height: 100),
+        );
+      }
+
+      await pumpIx(
+        tester,
+        StatefulBuilder(builder: build),
+        disableAnimations: true,
+      );
+      final collapsed = tester.getSize(find.byType(IxBlind)).height;
+
+      setOuter(() => expanded = true);
+      await tester.pump();
+      // One frame is the whole transition: no intermediate height.
+      expect(tester.getSize(find.byKey(_contentKey)).height, 100);
+      expect(
+        tester.getSize(find.byType(IxBlind)).height,
+        greaterThanOrEqualTo(collapsed + 100),
+      );
+    });
+
     testWidgets('collapsing removes the content once the transition ends', (
       tester,
     ) async {
@@ -358,7 +422,98 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.text('body'), findsNothing);
     });
+
+    testWidgets('collapsing content is skipped by Tab while it is still on '
+        'screen', (tester) async {
+      final before = FocusNode(debugLabel: 'before');
+      final inside = FocusNode(debugLabel: 'inside');
+      final after = FocusNode(debugLabel: 'after');
+      addTearDown(before.dispose);
+      addTearDown(inside.dispose);
+      addTearDown(after.dispose);
+
+      await pumpIx(
+        tester,
+        Column(
+          children: [
+            TextField(focusNode: before),
+            IxBlind(
+              title: 'T',
+              initiallyExpanded: true,
+              child: TextField(focusNode: inside),
+            ),
+            TextField(focusNode: after),
+          ],
+        ),
+        disableAnimations: false,
+      );
+      await tester.pumpAndSettle();
+
+      before.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(_focusedDebugLabel(), 'IxBlind.header');
+
+      // Collapse and stop halfway: the content is still mounted (it is what
+      // the transition is shrinking) but it is no longer reachable content,
+      // so traversal must skip it -- otherwise Tab lands on a field that is
+      // about to be unmounted and the focus is dropped.
+      await tester.tap(find.text('T'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 60));
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pump();
+      expect(inside.hasFocus, isFalse);
+      expect(after.hasFocus, isTrue);
+
+      await tester.pumpAndSettle();
+      expect(after.hasFocus, isTrue);
+    });
+
+    testWidgets('collapsing a blind whose content holds the focus moves it to '
+        'the header', (tester) async {
+      final inside = FocusNode(debugLabel: 'inside');
+      addTearDown(inside.dispose);
+
+      await pumpIx(
+        tester,
+        Column(
+          children: [
+            IxBlind(
+              title: 'T',
+              initiallyExpanded: true,
+              child: TextField(focusNode: inside),
+            ),
+          ],
+        ),
+        disableAnimations: false,
+      );
+      await tester.pumpAndSettle();
+
+      inside.requestFocus();
+      await tester.pump();
+      expect(inside.hasFocus, isTrue);
+
+      await tester.tap(find.text('T'));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 60));
+      expect(inside.hasFocus, isFalse);
+      await tester.pumpAndSettle();
+
+      // The focus lands on the header rather than nowhere, so the next Tab
+      // continues from the blind instead of restarting at the top of the
+      // page.
+      expect(_focusedDebugLabel(), 'IxBlind.header');
+    });
   });
+}
+
+/// The `debugLabel` of the [FocusNode] that currently holds the primary
+/// focus, or `null` when nothing (or only the root scope) does.
+String? _focusedDebugLabel() {
+  final node = FocusManager.instance.primaryFocus;
+  return node?.debugLabel;
 }
 
 /// Counts how many times a [_StatefulContent] state has been created, so a
