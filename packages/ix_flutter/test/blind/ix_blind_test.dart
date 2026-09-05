@@ -212,4 +212,134 @@ void main() {
     expect(calls, 0);
     handle.dispose();
   });
+
+  group('expansion transition', () {
+    testWidgets('an open blind lays out a content height change under '
+        'reduced motion', (tester) async {
+      Future<void> pumpWithHeight(double height) => pumpIx(
+        tester,
+        IxBlind(
+          title: 'T',
+          expanded: true,
+          onExpandedChanged: (_) {},
+          child: SizedBox(key: _contentKey, height: height),
+        ),
+        disableAnimations: true,
+      );
+
+      await pumpWithHeight(50);
+      expect(tester.getSize(find.byKey(_contentKey)).height, 50);
+
+      // The open content grows on its own (a lazily loaded list, a text
+      // that wrapped, ...). Reduced motion must not make that a layout
+      // error, and the new height must actually be laid out.
+      await pumpWithHeight(100);
+      await tester.pump();
+      expect(tester.takeException(), isNull);
+      expect(tester.getSize(find.byKey(_contentKey)).height, 100);
+    });
+
+    testWidgets('turning reduced motion on keeps the open content mounted', (
+      tester,
+    ) async {
+      addTearDown(() => _contentInits = 0);
+      Future<void> pumpWith(bool disableAnimations) => pumpIx(
+        tester,
+        IxBlind(
+          title: 'T',
+          expanded: true,
+          onExpandedChanged: (_) {},
+          child: const _StatefulContent(),
+        ),
+        disableAnimations: disableAnimations,
+      );
+
+      await pumpWith(false);
+      await tester.pumpAndSettle();
+      expect(_contentInits, 1);
+      expect(find.text('instance 1'), findsOneWidget);
+
+      // The platform's reduce-motion setting flips while the blind is open.
+      // The transition's duration changes; the content subtree must not be
+      // torn down and rebuilt around it.
+      await pumpWith(true);
+      await tester.pumpAndSettle();
+      expect(_contentInits, 1);
+      expect(find.text('instance 1'), findsOneWidget);
+    });
+
+    testWidgets('expanding animates and completes at IxMotion.defaultTime', (
+      tester,
+    ) async {
+      await pumpIx(
+        tester,
+        const IxBlind(
+          title: 'T',
+          child: SizedBox(key: _contentKey, height: 100),
+        ),
+        disableAnimations: false,
+      );
+      final collapsed = tester.getSize(find.byType(IxBlind)).height;
+
+      await tester.tap(find.text('T'));
+      await tester.pump();
+      await tester.pump(IxMotion.defaultTime ~/ 2);
+      final midway = tester.getSize(find.byType(IxBlind)).height;
+      await tester.pump(IxMotion.defaultTime ~/ 2);
+      final atFullDuration = tester.getSize(find.byType(IxBlind)).height;
+      await tester.pumpAndSettle();
+      final settled = tester.getSize(find.byType(IxBlind)).height;
+
+      expect(midway, greaterThan(collapsed));
+      expect(midway, lessThan(settled));
+      expect(atFullDuration, settled);
+    });
+
+    testWidgets('collapsing removes the content once the transition ends', (
+      tester,
+    ) async {
+      await pumpIx(
+        tester,
+        const IxBlind(title: 'T', initiallyExpanded: true, child: Text('body')),
+      );
+      expect(find.text('body'), findsOneWidget);
+
+      await tester.tap(find.text('T'));
+      await tester.pumpAndSettle();
+      expect(find.text('body'), findsNothing);
+    });
+  });
+}
+
+/// Counts how many times a [_StatefulContent] state has been created, so a
+/// test can tell a preserved content subtree from a remounted one. Reset via
+/// `addTearDown` in every test that reads it.
+int _contentInits = 0;
+
+const Key _contentKey = Key('blind-content');
+
+/// Blind content that records its own mount and renders a stamp unique to
+/// its [State] instance, so both the mount count and the surviving state are
+/// observable from the widget tree.
+class _StatefulContent extends StatefulWidget {
+  const _StatefulContent();
+
+  @override
+  State<_StatefulContent> createState() => _StatefulContentState();
+}
+
+class _StatefulContentState extends State<_StatefulContent> {
+  late final String _stamp;
+
+  @override
+  void initState() {
+    super.initState();
+    _contentInits++;
+    _stamp = 'instance $_contentInits';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(key: _contentKey, height: 50, child: Text(_stamp));
+  }
 }

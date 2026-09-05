@@ -1340,9 +1340,15 @@ class _NavigationEntry extends StatelessWidget {
                 : () => onCategoryExpansionChanged(entry.id),
           ),
           AnimatedSize(
-            // See IxBlind: a zero-duration AnimatedSize asked to animate an
-            // actual size change re-enters layout, so under reduced motion
-            // every toggle gets a brand-new render object instead.
+            // A zero-duration AnimatedSize asked to animate an actual size
+            // change re-enters layout from its own performLayout ("A
+            // RenderObject must not re-dirty itself while still being laid
+            // out"), so under reduced motion every toggle gets a brand-new
+            // render object -- a first layout adopts the child's size
+            // outright and never runs that path. (IxBlind drives its own
+            // expansion controller instead; this menu's children are a
+            // fixed list that cannot resize itself while open, which is the
+            // case the re-key does not cover.)
             key: animationDuration == Duration.zero
                 ? ValueKey(showChildren)
                 : null,

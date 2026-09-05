@@ -22,19 +22,30 @@ void main() {
     testWidgets(
       'blind, dropdown and toast transitions are zero under reduced motion',
       (tester) async {
+        // IxBlind: the expansion transition is asserted by behaviour rather
+        // than by the duration of a particular widget -- the blind drives it
+        // with its own AnimationController, whose zero duration is not
+        // readable off the tree. A single pump after the tap is the whole
+        // transition: the content is already at its full height, with no
+        // intermediate frame in between.
         await pumpIx(
           tester,
-          IxBlind(
+          const IxBlind(
             title: 'T',
-            expanded: true,
-            onExpandedChanged: (_) {},
-            child: const Text('c'),
+            child: SizedBox(key: Key('blind-content'), height: 60),
           ),
           disableAnimations: true,
         );
+        await tester.tap(find.text('T'));
+        await tester.pump();
         expect(
-          tester.widget<AnimatedSize>(find.byType(AnimatedSize)).duration,
-          Duration.zero,
+          tester.getSize(find.byKey(const Key('blind-content'))).height,
+          60,
+        );
+        expect(
+          tester.getRect(find.byKey(const Key('blind-content'))).bottom,
+          tester.getRect(find.byType(IxBlind)).bottom -
+              IxCommonGeometry.borderWidthDefault,
         );
         expect(
           tester
