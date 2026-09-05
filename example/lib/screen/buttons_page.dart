@@ -53,7 +53,7 @@ class ButtonsPage extends StatelessWidget {
                       FilledButton.icon(
                         style: style,
                         onPressed: () {},
-                        icon: IxIcon(IxIconsData.add),
+                        icon: IxIcon(IxIconsData.add, size: IxIconSize.s16),
                         label: const Text('With icon'),
                       ),
                       FilledButton(
@@ -124,7 +124,7 @@ class _ChipExamples extends StatelessWidget {
                   context,
                   label: 'With icon',
                   style: ixChips.variant(IxChipVariant.standard),
-                  icon: IxIcon(IxIconsData.filter),
+                  icon: IxIconsData.filter,
                 ),
               ],
             ),
@@ -172,7 +172,7 @@ class _ChipExamples extends StatelessWidget {
     required IxChipStyle style,
     bool closable = false,
     bool outlined = false,
-    Widget? icon,
+    IxIconData? icon,
   }) {
     return Chip(
       label: Text(
@@ -181,12 +181,11 @@ class _ChipExamples extends StatelessWidget {
           context,
         ).textTheme.labelMedium?.copyWith(color: style.foreground),
       ),
+      // [IxIcon] renders at a fixed box size and ignores an ambient
+      // [IconTheme] size, so the chip's 16px avatar size is passed explicitly.
       avatar: icon == null
           ? null
-          : IconTheme.merge(
-              data: IconThemeData(color: style.foreground, size: 16),
-              child: icon,
-            ),
+          : IxIcon(icon, size: IxIconSize.s16, color: style.foreground),
       backgroundColor: style.background,
       side: outlined ? BorderSide(color: style.borderColor) : null,
       deleteIcon: closable ? const Icon(Icons.close, size: 16) : null,

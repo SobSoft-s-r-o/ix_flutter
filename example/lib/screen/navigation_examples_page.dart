@@ -110,11 +110,16 @@ class _BottomAppBarItem extends StatelessWidget {
   });
 
   final String label;
-  final Widget icon;
-  final Widget selectedIcon;
+  final IxIconData icon;
+  final IxIconData selectedIcon;
   final bool selected;
   final ColorScheme colorScheme;
   final VoidCallback onSelect;
+
+  /// [IxIcon] renders at a fixed box size and ignores an ambient [IconTheme]
+  /// size, so the 20px this pill used to request has to be passed explicitly.
+  /// `s16` keeps the glyph proportional to the pill's `labelLarge` text.
+  static const _iconSize = IxIconSize.s16;
 
   @override
   Widget build(BuildContext context) {
@@ -138,9 +143,10 @@ class _BottomAppBarItem extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            IconTheme.merge(
-              data: IconThemeData(color: foreground, size: 20),
-              child: selected ? selectedIcon : icon,
+            IxIcon(
+              selected ? selectedIcon : icon,
+              size: _iconSize,
+              color: foreground,
             ),
             const SizedBox(width: 8),
             Text(
@@ -170,8 +176,8 @@ class _NavigationSpec {
   final String label;
   final String title;
   final String description;
-  final Widget icon;
-  final Widget selectedIcon;
+  final IxIconData icon;
+  final IxIconData selectedIcon;
   final Widget Function(BuildContext context) builder;
 }
 
@@ -181,8 +187,8 @@ final List<_NavigationSpec> _navigationSpecs = [
     title: 'Snack bar guidance',
     description:
         'Use snack bars for transient status or undo affordances. Buttons below trigger different severities.',
-    icon: IxIcon(IxIconsData.notification),
-    selectedIcon: IxIcon(IxIconsData.notificationFilled),
+    icon: IxIconsData.notification,
+    selectedIcon: IxIconsData.notificationFilled,
     builder: (context) => const _SnackBarExamples(),
   ),
   _NavigationSpec(
@@ -190,8 +196,8 @@ final List<_NavigationSpec> _navigationSpecs = [
     title: 'Dialog walkthrough',
     description:
         'Dialogs pause the flow for confirmations, warnings, or detail review. Explore the alert and form dialogs here.',
-    icon: IxIcon(IxIconsData.warning),
-    selectedIcon: IxIcon(IxIconsData.warningFilled),
+    icon: IxIconsData.warning,
+    selectedIcon: IxIconsData.warningFilled,
     builder: (context) => const _DialogExamples(),
   ),
   _NavigationSpec(
@@ -199,8 +205,8 @@ final List<_NavigationSpec> _navigationSpecs = [
     title: 'Breadcrumb navigation',
     description:
         'Breadcrumbs expose deep information architecture and offer shortcuts back to previous levels.',
-    icon: IxIcon(IxIconsData.folder),
-    selectedIcon: IxIcon(IxIconsData.folderFilled),
+    icon: IxIconsData.folder,
+    selectedIcon: IxIconsData.folderFilled,
     builder: (context) => const _BreadcrumbExamples(),
   ),
 ];
@@ -220,9 +226,10 @@ class _SnackBarExamples extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IconTheme.merge(
-              data: IconThemeData(color: colorScheme.primary, size: 48),
-              child: IxIcon(IxIconsData.notification),
+            IxIcon(
+              IxIconsData.notification,
+              size: IxIconSize.s32,
+              color: colorScheme.primary,
             ),
             const SizedBox(height: 16),
             Text(
@@ -304,9 +311,10 @@ class _DialogExamples extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IconTheme.merge(
-              data: IconThemeData(color: colorScheme.secondary, size: 48),
-              child: IxIcon(IxIconsData.warning),
+            IxIcon(
+              IxIconsData.warning,
+              size: IxIconSize.s32,
+              color: colorScheme.secondary,
             ),
             const SizedBox(height: 16),
             Text(
@@ -422,7 +430,10 @@ class _BreadcrumbExamplesState extends State<_BreadcrumbExamples> {
   bool _showHomeLabel = false;
 
   List<IxBreadcrumbItemData> get _demoItems => [
-    IxBreadcrumbItemData(label: 'Home', icon: IxIcon(IxIconsData.home)),
+    IxBreadcrumbItemData(
+      label: 'Home',
+      icon: IxIcon(IxIconsData.home, size: IxIconSize.s16),
+    ),
     const IxBreadcrumbItemData(label: 'Manufacturing'),
     const IxBreadcrumbItemData(label: 'Lines'),
     const IxBreadcrumbItemData(label: 'Line 04'),

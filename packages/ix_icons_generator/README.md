@@ -87,6 +87,20 @@ getters (`IxIcons.home`) so existing code keeps compiling. They are removed in
 generator 2.0 — migrate to `IxIcon(IxIconsData.home)`, or generate without them
 using `--no-legacy-getters`.
 
+> **Migration note — icon size.** The deprecated getters render a fixed 24 px
+> `IxIcon` and no longer honour an ambient `IconTheme.size`. Wherever a call
+> site sized its icon through an enclosing `IconTheme`/`IconTheme.merge` — or
+> through a Material slot that does so, such as `FilledButton.icon` (18 px) or
+> `InputDecoration.prefixIcon` — pass `size:` explicitly when migrating:
+>
+> ```dart
+> // 1.x: 16px, taken from the surrounding IconTheme
+> IconTheme.merge(data: const IconThemeData(size: 16), child: IxIcons.home)
+>
+> // 2.x: the size belongs to the icon
+> const IxIcon(IxIconsData.home, size: IxIconSize.s16)
+> ```
+
 The generated file is not run through `dart format`; if your project checks
 formatting, run `dart format lib/ix_icons.dart` after generating.
 

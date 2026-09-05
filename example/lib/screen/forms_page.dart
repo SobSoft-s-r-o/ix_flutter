@@ -126,7 +126,7 @@ class _FormsPageState extends State<FormsPage> {
             TextField(
               controller: _searchController,
               decoration: InputDecoration(
-                prefixIcon: _FormIcon(child: IxIcon(IxIconsData.search)),
+                prefixIcon: _FormIcon(icon: IxIconsData.search),
                 suffixIcon: _searchController.text.isEmpty
                     ? null
                     : IconButton(
@@ -169,8 +169,8 @@ class _FormsPageState extends State<FormsPage> {
                 helperText: 'Validation errors pick up alarm borders.',
                 errorText: 'Please enter a valid email',
                 suffixIcon: _FormIcon(
+                  icon: IxIconsData.alarm,
                   color: ixFields?.error.icon,
-                  child: IxIcon(IxIconsData.alarm),
                 ),
               ),
             ),
@@ -206,7 +206,7 @@ class _FormsPageState extends State<FormsPage> {
                 setState(() => _selectedStatus = value);
               },
               dropdownMenuEntries: _statusEntries,
-              leadingIcon: _FormIcon(child: IxIcon(IxIconsData.layers)),
+              leadingIcon: _FormIcon(icon: IxIconsData.layers),
               trailingIcon: IxIcon(IxIconsData.chevronDownSmall),
               selectedTrailingIcon: IxIcon(IxIconsData.chevronUpSmall),
             ),
@@ -241,7 +241,7 @@ class _FormsPageState extends State<FormsPage> {
                   decoration: InputDecoration(
                     helperText:
                         'Tap to open showDatePicker themed by IX tokens.',
-                    suffixIcon: _FormIcon(child: IxIcon(IxIconsData.calendar)),
+                    suffixIcon: _FormIcon(icon: IxIconsData.calendar),
                   ),
                 ),
               ),
@@ -431,21 +431,21 @@ class _FormsPageState extends State<FormsPage> {
                 message:
                     'Surface subtle hints or descriptions near related inputs.',
                 colors: ixFields.info,
-                icon: IxIcon(IxIconsData.infoFeed),
+                icon: IxIconsData.infoFeed,
               ),
               const SizedBox(height: 12),
               _SemanticBanner(
                 label: 'Warning state',
                 message: 'Use when downstream inputs have limited validity.',
                 colors: ixFields.warning,
-                icon: IxIcon(IxIconsData.maintenanceWarning),
+                icon: IxIconsData.maintenanceWarning,
               ),
               const SizedBox(height: 12),
               _SemanticBanner(
                 label: 'Error state',
                 message: 'Reserve for blocking issues that prevent submission.',
                 colors: ixFields.error,
-                icon: IxIcon(IxIconsData.alarmBell),
+                icon: IxIconsData.alarmBell,
               ),
             ],
           ),
@@ -507,20 +507,23 @@ class _FieldLabel extends StatelessWidget {
 }
 
 class _FormIcon extends StatelessWidget {
-  const _FormIcon({required this.child, this.color});
+  const _FormIcon({required this.icon, this.color});
 
-  final Widget child;
+  final IxIconData icon;
   final Color? color;
+
+  /// [IxIcon] renders at a fixed box size and ignores an ambient
+  /// [IconTheme] size, so the 20px this slot used to request has to be passed
+  /// explicitly. `s16` keeps the glyph inside the field's tight leading and
+  /// trailing box.
+  static const _iconSize = IxIconSize.s16;
 
   @override
   Widget build(BuildContext context) {
     final resolved = color ?? _resolveDecorationIconColor(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: IconTheme.merge(
-        data: IconTheme.of(context).copyWith(color: resolved, size: 20),
-        child: child,
-      ),
+      child: IxIcon(icon, size: _iconSize, color: resolved),
     );
   }
 }
@@ -549,7 +552,13 @@ class _SemanticBanner extends StatelessWidget {
   final String label;
   final String message;
   final IxFormFieldSemanticColors colors;
-  final Widget icon;
+  final IxIconData icon;
+
+  /// [IxIcon] renders at a fixed box size and ignores an ambient [IconTheme]
+  /// size, so this banner's 24px glyph size is passed explicitly. It happens
+  /// to match [IxIcon]'s default, but leaving it implicit would hide the
+  /// intent.
+  static const _iconSize = IxIconSize.s24;
 
   @override
   Widget build(BuildContext context) {
@@ -564,10 +573,7 @@ class _SemanticBanner extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconTheme(
-            data: IconTheme.of(context).copyWith(color: colors.icon, size: 24),
-            child: icon,
-          ),
+          IxIcon(icon, size: _iconSize, color: colors.icon),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -697,16 +703,18 @@ class _UploadDropzoneTile extends StatelessWidget {
           ),
         );
       case IxUploadSurfaceState.dragOver:
-        return IconTheme(
-          data: IconTheme.of(context).copyWith(color: textColor, size: 20),
-          child: IxIcon(IxIconsData.cloudUpload),
+        return IxIcon(
+          IxIconsData.cloudUpload,
+          size: IxIconSize.s16,
+          color: textColor,
         );
       case IxUploadSurfaceState.disabled:
         return Icon(Icons.block, size: 20, color: textColor);
       case IxUploadSurfaceState.idle:
-        return IconTheme(
-          data: IconTheme.of(context).copyWith(color: textColor, size: 20),
-          child: IxIcon(IxIconsData.upload),
+        return IxIcon(
+          IxIconsData.upload,
+          size: IxIconSize.s16,
+          color: textColor,
         );
     }
   }

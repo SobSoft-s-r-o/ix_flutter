@@ -215,7 +215,7 @@ class _TabLabel extends StatefulWidget {
   final String label;
   final IxTabsTheme ixTabs;
   final int? count;
-  final Widget? leading;
+  final IxIconData? leading;
 
   @override
   State<_TabLabel> createState() => _TabLabelState();
@@ -278,14 +278,14 @@ class _TabLabelState extends State<_TabLabel> {
         if (widget.leading != null)
           Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: IconTheme.merge(
-              data: IconThemeData(
-                color: _selected
-                    ? widget.ixTabs.tab.foreground.selected
-                    : widget.ixTabs.tab.foreground.base,
-                size: 16,
-              ),
-              child: widget.leading!,
+            // [IxIcon] renders at a fixed box size and ignores an ambient
+            // [IconTheme] size, so the tab's 16px glyph size is explicit.
+            child: IxIcon(
+              widget.leading!,
+              size: IxIconSize.s16,
+              color: _selected
+                  ? widget.ixTabs.tab.foreground.selected
+                  : widget.ixTabs.tab.foreground.base,
             ),
           ),
         Text(widget.label, style: _labelStyle(context)),
@@ -358,7 +358,7 @@ class _TabPanel extends StatelessWidget {
 
   final String title;
   final String body;
-  final Widget icon;
+  final IxIconData icon;
 
   @override
   Widget build(BuildContext context) {
@@ -368,9 +368,11 @@ class _TabPanel extends StatelessWidget {
       children: [
         Row(
           children: [
-            IconTheme.merge(
-              data: IconThemeData(color: theme.colorScheme.primary, size: 28),
-              child: icon,
+            // 28px is not a fixed [IxIconSize]; s32 is the nearest.
+            IxIcon(
+              icon,
+              size: IxIconSize.s32,
+              color: theme.colorScheme.primary,
             ),
             const SizedBox(width: 12),
             Text(title, style: theme.textTheme.titleMedium),
@@ -428,9 +430,10 @@ class _CircleTab extends StatelessWidget {
               ),
               child: Padding(
                 padding: const EdgeInsets.all(8),
-                child: IconTheme.merge(
-                  data: IconThemeData(color: iconColor, size: 16),
-                  child: spec.icon,
+                child: IxIcon(
+                  spec.icon,
+                  size: IxIconSize.s16,
+                  color: iconColor,
                 ),
               ),
             ),
@@ -500,9 +503,9 @@ class _TextTabSpec {
   final String label;
   final String panelTitle;
   final String panelBody;
-  final Widget icon;
+  final IxIconData icon;
   final int? count;
-  final Widget? leading;
+  final IxIconData? leading;
 }
 
 class _CircleTabSpec {
@@ -513,7 +516,7 @@ class _CircleTabSpec {
   });
 
   final String label;
-  final Widget icon;
+  final IxIconData icon;
   final bool disabled;
 }
 
@@ -524,7 +527,7 @@ final List<_TextTabSpec> _textTabs = [
     panelBody:
         'Track live KPIs for turbines and connected lines. '
         'Tab copy inherits IxTypography.label with bold weight.',
-    icon: IxIcon(IxIconsData.dashboard),
+    icon: IxIconsData.dashboard,
     count: 4,
   ),
   _TextTabSpec(
@@ -533,26 +536,22 @@ final List<_TextTabSpec> _textTabs = [
     panelBody:
         'Use a badge to highlight open alerts. '
         'Indicator height stays at 0.125rem per IX Flutter tokens.',
-    icon: IxIcon(IxIconsData.warning),
+    icon: IxIconsData.warning,
     count: 8,
-    leading: IxIcon(IxIconsData.warning),
+    leading: IxIconsData.warning,
   ),
   _TextTabSpec(
     label: 'Insights',
     panelTitle: 'Data insights',
     panelBody:
         'Tabs align to the ghost surface tokens, keeping text legible on dashboards.',
-    icon: IxIcon(IxIconsData.ai),
+    icon: IxIconsData.ai,
   ),
 ];
 
 final List<_CircleTabSpec> _circleTabs = [
-  _CircleTabSpec(label: 'Devices', icon: IxIcon(IxIconsData.layers)),
-  _CircleTabSpec(label: 'Logbook', icon: IxIcon(IxIconsData.appMenu)),
-  _CircleTabSpec(label: 'Analytics', icon: IxIcon(IxIconsData.analysis)),
-  _CircleTabSpec(
-    label: 'Disabled',
-    icon: IxIcon(IxIconsData.close),
-    disabled: true,
-  ),
+  _CircleTabSpec(label: 'Devices', icon: IxIconsData.layers),
+  _CircleTabSpec(label: 'Logbook', icon: IxIconsData.appMenu),
+  _CircleTabSpec(label: 'Analytics', icon: IxIconsData.analysis),
+  _CircleTabSpec(label: 'Disabled', icon: IxIconsData.close, disabled: true),
 ];

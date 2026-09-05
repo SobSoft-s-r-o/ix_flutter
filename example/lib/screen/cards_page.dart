@@ -24,19 +24,19 @@ class CardsPage extends StatelessWidget {
         variant: IxCardVariant.filled,
         title: 'Analytics overview',
         subtitle: 'High-level KPIs and quick filters tuned for dashboards.',
-        icon: IxIcon(IxIconsData.dashboard),
+        icon: IxIconsData.dashboard,
       ),
       _CardDemo(
         variant: IxCardVariant.outline,
         title: 'Experiment rollout',
         subtitle: 'Outline treatment for filters and supporting tools.',
-        icon: IxIcon(IxIconsData.appMenu),
+        icon: IxIconsData.appMenu,
       ),
       _CardDemo(
         variant: IxCardVariant.primary,
         title: 'Initiate workflow',
         subtitle: 'Highlighted action cards meant for primary flows.',
-        icon: IxIcon(IxIconsData.rocket),
+        icon: IxIconsData.rocket,
       ),
     ];
 
@@ -45,37 +45,37 @@ class CardsPage extends StatelessWidget {
         variant: IxCardVariant.alarm,
         title: 'Alarm condition',
         subtitle: 'Notify operators when thresholds exceed safe ranges.',
-        icon: IxIcon(IxIconsData.alarmBell),
+        icon: IxIconsData.alarmBell,
       ),
       _CardDemo(
         variant: IxCardVariant.critical,
         title: 'Critical outage',
         subtitle: 'Escalate incidents that block production entirely.',
-        icon: IxIcon(IxIconsData.warning),
+        icon: IxIconsData.warning,
       ),
       _CardDemo(
         variant: IxCardVariant.warning,
         title: 'Maintenance soon',
         subtitle: 'Warn teams about upcoming maintenance windows.',
-        icon: IxIcon(IxIconsData.warning),
+        icon: IxIconsData.warning,
       ),
       _CardDemo(
         variant: IxCardVariant.success,
         title: 'Inspection cleared',
         subtitle: 'Celebrate a green status after QA handoff.',
-        icon: IxIcon(IxIconsData.check),
+        icon: IxIconsData.check,
       ),
       _CardDemo(
         variant: IxCardVariant.info,
         title: 'Documentation update',
         subtitle: 'Share product changes or release notes with teams.',
-        icon: IxIcon(IxIconsData.info),
+        icon: IxIconsData.info,
       ),
       _CardDemo(
         variant: IxCardVariant.neutral,
         title: 'Backlog summary',
         subtitle: 'Neutral information blocks for supporting content.',
-        icon: IxIcon(IxIconsData.folder),
+        icon: IxIconsData.folder,
       ),
     ];
 
@@ -188,7 +188,7 @@ class _CardExample extends StatelessWidget {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  _CardIcon(style: style, child: demo.icon),
+                  _CardIcon(style: style, icon: demo.icon),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
@@ -216,10 +216,15 @@ class _CardExample extends StatelessWidget {
 }
 
 class _CardIcon extends StatelessWidget {
-  const _CardIcon({required this.style, required this.child});
+  const _CardIcon({required this.style, required this.icon});
 
   final IxCardStyle style;
-  final Widget child;
+  final IxIconData icon;
+
+  /// [IxIcon] renders at a fixed box size and ignores an ambient [IconTheme]
+  /// size, so the 22px this badge used to request has to be passed
+  /// explicitly; `s24` is the nearest fixed size.
+  static const _iconSize = IxIconSize.s24;
 
   @override
   Widget build(BuildContext context) {
@@ -230,10 +235,7 @@ class _CardIcon extends StatelessWidget {
       ),
       child: Padding(
         padding: const EdgeInsets.all(10),
-        child: IconTheme.merge(
-          data: IconThemeData(color: style.foreground, size: 22),
-          child: child,
-        ),
+        child: IxIcon(icon, size: _iconSize, color: style.foreground),
       ),
     );
   }
@@ -250,7 +252,7 @@ class _CardDemo {
   final IxCardVariant variant;
   final String title;
   final String subtitle;
-  final Widget icon;
+  final IxIconData icon;
 }
 
 String _variantLabel(IxCardVariant variant) {

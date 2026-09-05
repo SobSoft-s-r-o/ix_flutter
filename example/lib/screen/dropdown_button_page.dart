@@ -88,7 +88,7 @@ class IxDropdownButtonExampleIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return IxDropdownButton<String>(
       label: 'Dropdown with Icon',
-      icon: IxIcon(IxIconsData.star),
+      icon: IxIcon(IxIconsData.star, size: IxIconSize.s16),
       items: const [
         IxDropdownMenuItem(
           label: 'Action 1',
