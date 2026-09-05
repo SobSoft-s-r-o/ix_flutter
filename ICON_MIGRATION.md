@@ -237,7 +237,7 @@ dart run ix_icons_generator:generate_icons --package my_library_name
 
 ### Q: Why doesn't the library bundle the full icon catalogue?
 
-**A:** `ix_flutter` bundles a small internal set (28 icons) for its own widgets — see `doc/ix_icons.md`. The full 1 479-icon catalogue stays optional and generated, so the library package itself stays small; the generator downloads it from the official Siemens source on demand.
+**A:** The library's own widgets need only 28 icons, addressed by `IxIconKey`. Once the LEGAL REVIEW gate documented in `UPSTREAM.md` is passed, the library will bundle that minimal internal set; until then those widgets fall back to Material glyphs through `IxIconResolver.material()` — see `doc/ix_icons.md`. The full 1 479-icon catalogue stays optional and generated either way, so the library package itself stays small; the generator downloads it from the official Siemens source on demand.
 
 ### Q: Is this permanent?
 

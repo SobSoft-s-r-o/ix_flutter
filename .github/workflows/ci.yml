@@ -153,7 +153,14 @@ jobs:
       - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress --exclude-path wiki --exclude-path docs --exclude-path build './**/*.md'
+          # The repository's own blob/main URLs are remapped onto this
+          # checkout, so a link to a page that only exists on this branch is
+          # still verified (and a link to a page that exists nowhere fails).
+          # Single quotes keep the shell from eating `$1`.
+          args: >-
+            --no-progress --exclude-path wiki --exclude-path docs --exclude-path build
+            --remap 'https://github\.com/SobSoft-s-r-o/ix_flutter/blob/main/(.*) file://${{ github.workspace }}/$1'
+            './**/*.md'
           fail: true
 
   example_analyze_test:

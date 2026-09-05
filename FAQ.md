@@ -48,7 +48,15 @@ dart run ix_icons_generator:generate_icons            # default: @siemens/ix-ico
 
 ### Q: Why aren't icons included in the package?
 
-**A:** `ix_flutter` bundles a small internal set (28 icons) for its own widgets, with Material glyphs as today's fallback (see [doc/ix_icons.md](doc/ix_icons.md#fallback-policy)). The full 1 479-icon catalogue is optional and generated into your own app by `ix_icons_generator`, which downloads it from the official `@siemens/ix-icons` npm source.
+**A:** The library's own widgets need only a small, fixed set — 28 keys,
+enumerated in `IxIconKey`. Once the LEGAL REVIEW gate documented in
+[UPSTREAM.md](UPSTREAM.md) is passed, the library will bundle that minimal
+internal set; until then its widgets fall back to Material glyphs through
+`IxIconResolver.material()` (see
+[doc/ix_icons.md](doc/ix_icons.md#fallback-policy)). The full 1 479-icon
+catalogue is optional either way and generated into your own app by
+`ix_icons_generator`, which downloads it from the official `@siemens/ix-icons`
+npm source.
 
 ---
 

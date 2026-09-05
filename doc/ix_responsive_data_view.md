@@ -398,6 +398,8 @@ Widget dataViewWithStringsResolver(List<MyItem> items) =>
 | `mobileFields` | `List<IxMobileFieldDef<T>>` | Configuration for card fields (Mobile). |
 | `mobileItemBuilder` | `Widget Function(BuildContext, T)?` | Optional custom builder for mobile items, overriding `mobileFields`. |
 | `rowActions` | `List<IxRowAction<T>>` | List of actions available for each item. |
+| `rowKey` | `String Function(T item)?` | Stable identifier for an item. Accepted, but not read by the current rendering; it is the hook the 2.0 primitives split (`IxTable`/`IxDataCard`) will key rows by. |
+| `onRowTapDesktop` | `void Function(T item)?` | Called when a table row is activated on desktop. A row is only focusable and keyboard-activatable when this is set. |
 | `isLoading` | `bool` | Whether the initial data is loading (shows full spinner). |
 | `isPageLoading` | `bool` | Whether the next page is loading (shows bottom spinner). |
 | `pagination` | `IxPaginationConfig?` | Configuration for pagination behavior. |

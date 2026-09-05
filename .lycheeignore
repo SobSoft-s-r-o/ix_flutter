@@ -11,9 +11,7 @@ https://github.com/SobSoft-s-r-o/ix_flutter/wiki
 # through the registry API instead (see UPSTREAM.md for its checksum).
 https://www.npmjs.com/
 
-# Pages added in the 1.1.0 line: the package README and the notices link to
-# them absolutely (they ship to pub.dev, where relative links do not resolve),
-# so they only answer once this line is merged into main. Drop these two lines
-# with that merge.
-https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/UPSTREAM\.md
-https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/(theming|density|typography|tokens)\.md
+# This repository's own `blob/main` URLs (the package README and the notices
+# link absolutely, because they ship to pub.dev where relative links do not
+# resolve) are not ignored: CI remaps them onto the checkout with lychee's
+# `--remap`, so they are checked against the branch under test.

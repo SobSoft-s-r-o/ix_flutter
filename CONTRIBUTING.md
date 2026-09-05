@@ -195,9 +195,14 @@ When you make changes, update the relevant documentation:
 
 ### Code snippets in documentation
 
-Every ```dart block in the documentation is a verbatim copy of a declaration in
-[doc/snippets](doc/snippets), so a snippet can never drift away from the API it
-documents. When you change a snippet:
+Every ```dart block in the component pages (`doc/*.md`) and the hub documents
+(`README.md`, `packages/ix_flutter/README.md`, `GETTING_STARTED.md`, `FAQ.md`)
+is a verbatim copy of a declaration in [doc/snippets](doc/snippets), so a
+snippet can never drift away from the API it documents. Exempt are the test
+skeleton in this file and the before/after fragments in `ICON_MIGRATION.md`,
+whose "before" half deliberately shows code that no longer compiles.
+
+When you change a snippet:
 
 1. Edit the declaration in `doc/snippets/lib/<page>_snippets.dart`
 2. Run `cd doc/snippets && flutter pub get && flutter analyze`
@@ -232,10 +237,11 @@ CI regenerates it and fails if the committed file differs.
   direct counterpart exists (for example the width/text-scale and RTL
   matrices), the file instead carries a doc comment above `void main()` naming
   the finding ID and the task that resolves it.
-- Red matrices (`test/a11y`, `test/responsive`, `test/rtl`) use `skip: true`
-  with a trailing `// IXF-xxx - <plan/task>` comment (`skip` is `bool?` in
-  `flutter_test`, not `String`); the skip is removed by the task that fixes
-  the finding.
+- A matrix case in `test/a11y`, `test/responsive` or `test/rtl` that documents
+  an unfixed finding is marked `skip: true` with a trailing
+  `// IXF-xxx - <plan/task>` comment naming it (`skip` is `bool?` in
+  `flutter_test`, not `String`), and the task that fixes the finding un-skips
+  it. No test is skipped today -- the whole suite runs.
 - Goldens: see `packages/ix_flutter/test/golden/README.md`.
 
 ### Test Guidelines
@@ -316,12 +322,26 @@ When working with icons or design patterns:
 
 ## Release Process
 
-Maintainers handle releases. The process typically includes:
+Maintainers handle releases. The version bump itself is done by the **Version
+Bump (Manual)** workflow ([.github/workflows/version-bump.yml](.github/workflows/version-bump.yml)),
+which only runs on demand (`workflow_dispatch`):
 
-1. Bump version in pubspec.yaml
-2. Update CHANGELOG.md
-3. Tag release in Git
-4. Publish to pub.dev
+1. Land everything the release contains, with its entries under `[Unreleased]`
+   in `packages/<package>/CHANGELOG.md`
+2. Work through the [release checklist](#release-checklist) below; in
+   particular `dart pub publish --dry-run` must report 0 warnings
+3. Start **Version Bump (Manual)** from the Actions tab and choose the package
+   (`ix_flutter`, `ix_icons_generator` or `both`), the semver bump
+   (`patch`/`minor`/`major`) and, if needed, a prerelease identifier. The run
+   installs dependencies, analyzes and tests the package, bumps
+   `pubspec.yaml` and turns `[Unreleased]` into the new release section with
+   `cider bump` / `cider release`, and opens a `chore/release-…` pull request
+   labelled `release`
+4. Review that pull request: add the `Upstream:` line under the new release
+   header (see [UPSTREAM.md](UPSTREAM.md#release-header-format)), wait for CI,
+   then merge it
+5. Tag the merge commit on `main` as `v<version>` and push the tag
+6. Publish from the package directory: `dart pub publish`
 
 ### Release checklist
 
@@ -340,15 +360,18 @@ pub.dev:
       and the CHANGELOG release header agree with `IxUpstream`
 - [ ] CHANGELOG.md: the new release section is followed by its `Upstream:` line
       (see [UPSTREAM.md](UPSTREAM.md#release-header-format))
-- [ ] Version bumped in `packages/<package>/pubspec.yaml` and referenced
-      consistently in the documentation (`ix_flutter: ^<version>`)
+- [ ] The version the release will carry is referenced consistently in the
+      documentation (`ix_flutter: ^<version>`); the bump in
+      `packages/<package>/pubspec.yaml` itself is made by the Version Bump
+      workflow
 - [ ] Screenshots in `packages/ix_flutter/screenshots/` still match the current
       UI, and `pubspec.yaml`'s `screenshots:` entry points at a file that exists
 - [ ] `dart pub publish --dry-run` in `packages/ix_flutter` **and**
       `packages/ix_icons_generator`: 0 warnings, and the published file list
       contains `LICENSE`, `README.md`, `CHANGELOG.md`, `ICON_LICENSING.md` and
       `THIRD_PARTY_NOTICES.md` but no `tool/`
-- [ ] CI is green on `main`, including the `version-bump.yml` workflow
+- [ ] The **Version Bump (Manual)** run finished green and its release pull
+      request is CI-green before it is merged
 
 ## Recognition
 

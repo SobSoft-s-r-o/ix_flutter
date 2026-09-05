@@ -25,17 +25,19 @@ hand-written signature here to fall out of date.
 | `IxBreadcrumb`, `IxBreadcrumbItemData`, `IxBreadcrumbStrings` | [doc/ix_breadcrumb.md](doc/ix_breadcrumb.md) |
 | `IxDropdownButton`, `IxDropdownMenuItem` | [doc/ix_dropdown_button.md](doc/ix_dropdown_button.md) |
 | `IxEmptyState` | [doc/ix_empty_state.md](doc/ix_empty_state.md) |
-| `IxIcon`, `IxIconData`, `IxIconKey`, `IxIconResolver` | [doc/ix_icons.md](doc/ix_icons.md) |
+| `IxIcon`, `IxIconData`, `IxIconKey`, `IxIconSize`, `IxIconResolver` | [doc/ix_icons.md](doc/ix_icons.md) |
 | `IxIconButton` and the density policy (`IxDensity`, `IxDensityScope`) | [doc/density.md](doc/density.md) |
-| `IxResponsiveDataView`, `IxPaginationBar`, `IxPaginationStrings` | [doc/ix_responsive_data_view.md](doc/ix_responsive_data_view.md) |
+| `IxResponsiveDataView`, `IxResponsiveDataViewStrings`, `IxPaginationBar`, `IxPaginationStrings` | [doc/ix_responsive_data_view.md](doc/ix_responsive_data_view.md) |
 | `IxSpinner` | [doc/ix_spinner.md](doc/ix_spinner.md) |
-| `IxToastService`, `IxToastOverlay`, `IxToastType` | [doc/ix_toast.md](doc/ix_toast.md) |
+| `IxToastService`, `IxToastHandle`, `IxToastOverlay`, `IxToastType`, `IxToastPosition`, `IxToastStrings` | [doc/ix_toast.md](doc/ix_toast.md) |
 
 ## Theme and tokens
 
 | Topic | Guide |
 |---|---|
-| `IxThemeBuilder`, `IxThemeController`, `IxCustomPalette` | [doc/theming.md](doc/theming.md) |
+| `IxThemeBuilder`, `IxThemeName`, `IxColorSchema`, `IxCustomPalette` | [doc/theming.md](doc/theming.md) |
+| `IxThemeController` (runtime theme switching) | [doc/theming.md](doc/theming.md#switching-themes-at-runtime) |
+| Per-component theme extensions (`IxButtonTheme`, `IxBreadcrumbTheme`, `IxDropdownTheme`, `IxSpinnerTheme`, ...), registered by `IxThemeBuilder` | [doc/theming.md](doc/theming.md) |
 | `IxThemeColorToken` values with their light/dark colors | [doc/tokens.md](doc/tokens.md) |
 | `IxTypography`, `IxFonts` | [doc/typography.md](doc/typography.md) |
 
