@@ -1,12 +1,50 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
 import 'package:ix_flutter/src/ix_core/ix_motion.dart';
-import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon_key.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon_size.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_sidebar_theme.dart';
+import 'package:ix_flutter/src/widgets/i18n/ix_application_strings.dart';
+import 'package:ix_flutter/src/widgets/ix_icon_button.dart';
+import 'package:ix_flutter/src/widgets/ix_menu_flyout.dart';
+
+/// Identifies the navigation menu's `menuBar` landmark for widget tests.
+const Key _kMenuBarKey = Key('ix-menu-bar');
+
+/// Entry ids whose built-in bottom-bar behaviour is still honoured in 1.x.
+///
+/// Using one of them logs a one-time debug notice pointing at the
+/// [IxApplicationScaffold.settings], [IxApplicationScaffold.about] and
+/// [IxApplicationScaffold.enableToggleTheme] replacements; in 2.0 they
+/// become ordinary entries that simply report through `onNavigate`.
+const Set<String> _kReservedEntryIds = {
+  'settings',
+  'theme-toggle',
+  'about-legal',
+};
+
+/// Id of the built-in settings entry contributed by
+/// [IxApplicationScaffold.settings].
+const String _kSettingsEntryId = '__ix_settings';
+
+/// Id of the built-in theme toggle contributed by
+/// [IxApplicationScaffold.enableToggleTheme].
+const String _kThemeEntryId = '__ix_theme';
+
+/// Id of the built-in about entry contributed by
+/// [IxApplicationScaffold.about].
+const String _kAboutEntryId = '__ix_about';
+
+/// Resolves the focus node and traversal order assigned to the menu tile of
+/// a given entry id.
+typedef _TileFocusOf = ({FocusNode node, double order}) Function(String id);
 
 /// Describes the type of entry that can appear inside the Siemens IX application
 /// menu scaffold.
@@ -70,6 +108,22 @@ class IxMenuEntry {
 
 /// Scaffold that mirrors the Siemens IX application menu (AppBar + Drawer /
 /// permanent side navigation) while remaining idiomatic for Flutter layouts.
+///
+/// ## Keyboard
+///
+/// The menu is a `menuBar` landmark: `Tab` moves into it once (onto the
+/// sidebar toggle, then the first entry), `ArrowDown`/`ArrowUp` move between
+/// entries without wrapping, `Home`/`End` jump to the first/last entry, and
+/// `Enter`/`Space` activate the focused entry. A fly-out panel closes on
+/// `Escape` and hands focus back to the entry that opened it.
+///
+/// ## Built-in entries
+///
+/// Set [settings] and/or [about] to get the upstream `<ix-menu-settings>` /
+/// `<ix-menu-about>` entries at the bottom of the menu; their widget is
+/// shown in a fly-out panel next to the menu. [enableToggleTheme] adds the
+/// upstream theme toggle whenever [onThemeModeChanged] is set. Every string
+/// they render comes from [strings].
 class IxApplicationScaffold extends StatefulWidget {
   const IxApplicationScaffold({
     super.key,
@@ -89,6 +143,10 @@ class IxApplicationScaffold extends StatefulWidget {
     this.showAboutLegal = true,
     this.onOpenSettings,
     this.onOpenAboutLegal,
+    this.strings = const IxApplicationStrings(),
+    this.settings,
+    this.about,
+    this.enableToggleTheme = true,
   }) : assert(
          expandedWidth > collapsedWidth && collapsedWidth >= 56,
          'Expanded width must be larger than collapsed width.',
@@ -111,6 +169,29 @@ class IxApplicationScaffold extends StatefulWidget {
   final VoidCallback? onOpenSettings;
   final VoidCallback? onOpenAboutLegal;
 
+  /// Every user-facing string the menu renders, including the accessible
+  /// names of its buttons.
+  final IxApplicationStrings strings;
+
+  /// Content of the built-in settings panel (upstream `<ix-menu-settings>`).
+  ///
+  /// When set, a settings entry is appended to the bottom of the menu; it
+  /// opens this widget in a fly-out panel anchored to the menu.
+  final Widget? settings;
+
+  /// Content of the built-in about panel (upstream `<ix-menu-about>`).
+  ///
+  /// When set, an about entry is appended to the bottom of the menu; it
+  /// opens this widget in a fly-out panel anchored to the menu.
+  final Widget? about;
+
+  /// Whether the built-in theme toggle is shown (upstream
+  /// `ix-menu.enableToggleTheme`).
+  ///
+  /// The entry only appears when [onThemeModeChanged] is also set, since the
+  /// scaffold does not own the app's [ThemeMode].
+  final bool enableToggleTheme;
+
   @override
   State<IxApplicationScaffold> createState() => _IxApplicationScaffoldState();
 }
@@ -118,16 +199,82 @@ class IxApplicationScaffold extends StatefulWidget {
 class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
   static const double _mobileBreakpoint = 1024;
 
+  /// Reserved ids already reported by [_warnReservedIdOnce]. Static so an
+  /// app that rebuilds (or remounts) its scaffold is told exactly once.
+  static final Set<String> _warnedIds = <String>{};
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Map<String, bool> _categoryExpansion = <String, bool>{};
+
+  /// Anchors the fly-out panel to the menu rail.
+  final LayerLink _rootLink = LayerLink();
+  final OverlayPortalController _flyoutPortal = OverlayPortalController(
+    debugLabel: 'IxApplicationScaffold.flyout',
+  );
+
+  /// Shared tap group of the menu and its fly-out, so tapping a menu tile is
+  /// never a "tap outside" that would close the panel it just opened.
+  final Object _tapRegionGroupId = Object();
+
+  /// Focus nodes of the menu tiles, keyed by entry id. Owned here rather
+  /// than by the navigation panel so a fly-out can hand focus back to the
+  /// tile that opened it.
+  final Map<String, FocusNode> _tileNodes = <String, FocusNode>{};
+
   late bool _isExpanded;
+
+  /// Id of the tile whose fly-out is open (a category, or one of the
+  /// built-in settings/about entries), or `null` when no panel is open.
+  ///
+  /// The panel's title and content are derived from this id on every build,
+  /// so a rebuilt [IxApplicationScaffold.settings]/[IxApplicationScaffold.about]
+  /// widget reaches an already open panel.
+  String? _openFlyoutId;
+
+  IxApplicationStrings get _strings => widget.strings;
 
   @override
   void initState() {
     super.initState();
     _isExpanded = widget.initiallyExpanded;
     _syncCategoryExpansion(widget.entries);
+    // The overlay child stays mounted and renders nothing while no panel is
+    // open; toggling the controller instead would have to happen during
+    // build, where `show()`/`hide()` are forbidden.
+    _flyoutPortal.show();
   }
+
+  @override
+  void dispose() {
+    for (final node in _tileNodes.values) {
+      node.dispose();
+    }
+    _tileNodes.clear();
+    super.dispose();
+  }
+
+  /// Reports a menu entry that still relies on a reserved 1.x id, once per
+  /// id and only in debug builds.
+  void _warnReservedIdOnce(String id) {
+    assert(() {
+      if (_warnedIds.add(id)) {
+        debugPrint(
+          'IxApplicationScaffold: menu entry id "$id" is reserved in 1.x '
+          '(settings/theme-toggle/about-legal). Use the settings:, about: '
+          'and enableToggleTheme parameters instead; reserved ids become '
+          'ordinary menu entries in 2.0.',
+        );
+      }
+      return true;
+    }());
+  }
+
+  /// Returns the focus node of the tile rendering [id], creating it on first
+  /// use.
+  FocusNode _tileNode(String id) => _tileNodes.putIfAbsent(
+    id,
+    () => FocusNode(debugLabel: 'IxApplicationScaffold.tile[$id]'),
+  );
 
   @override
   void didUpdateWidget(covariant IxApplicationScaffold oldWidget) {
@@ -173,9 +320,53 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
   List<IxMenuEntry> get _topEntries =>
       widget.entries.where((entry) => !entry.isBottom).toList();
 
-  List<IxMenuEntry> get _bottomEntries => widget.entries
-      .where((entry) => entry.isBottom && _isBottomEntryVisible(entry))
-      .toList();
+  /// The app's own bottom entries -- reserved ids included, so 1.x apps keep
+  /// their built-in behaviour -- followed by the entries contributed by
+  /// [IxApplicationScaffold.settings], [IxApplicationScaffold.enableToggleTheme]
+  /// and [IxApplicationScaffold.about].
+  List<IxMenuEntry> get _bottomEntries {
+    final entries = <IxMenuEntry>[];
+    for (final entry in widget.entries) {
+      if (!entry.isBottom) {
+        continue;
+      }
+      if (_kReservedEntryIds.contains(entry.id)) {
+        _warnReservedIdOnce(entry.id);
+      }
+      if (_isBottomEntryVisible(entry)) {
+        entries.add(entry);
+      }
+    }
+    return entries..addAll(_builtInBottomEntries);
+  }
+
+  /// The built-in bottom entries, in the upstream `ix-menu` order.
+  List<IxMenuEntry> get _builtInBottomEntries => [
+    if (widget.settings != null)
+      IxMenuEntry(
+        id: _kSettingsEntryId,
+        type: IxMenuEntryType.item,
+        label: _strings.settings,
+        iconWidget: const IxIcon.key(IxIconKey.cogwheel),
+        isBottom: true,
+      ),
+    if (widget.enableToggleTheme && widget.onThemeModeChanged != null)
+      IxMenuEntry(
+        id: _kThemeEntryId,
+        type: IxMenuEntryType.custom,
+        label: _strings.toggleTheme,
+        iconWidget: const IxIcon.key(IxIconKey.lightDark),
+        isBottom: true,
+      ),
+    if (widget.about != null)
+      IxMenuEntry(
+        id: _kAboutEntryId,
+        type: IxMenuEntryType.item,
+        label: _strings.about,
+        iconWidget: const IxIcon.key(IxIconKey.about),
+        isBottom: true,
+      ),
+  ];
 
   bool _isBottomEntryVisible(IxMenuEntry entry) {
     switch (entry.id) {
@@ -204,10 +395,15 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    if (_useDrawerLayout) {
-      return _buildDrawerLayout();
-    }
-    return _buildSideNavigationLayout();
+    // A single portal for both layouts: only one of them is mounted at a
+    // time, and the fly-out has to escape the menu's own clip/width.
+    return OverlayPortal(
+      controller: _flyoutPortal,
+      overlayChildBuilder: _buildFlyout,
+      child: _useDrawerLayout
+          ? _buildDrawerLayout()
+          : _buildSideNavigationLayout(),
+    );
   }
 
   Widget _buildDrawerLayout() {
@@ -219,37 +415,45 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
             title: Text(widget.appTitle),
             leading: Builder(
               builder: (context) {
-                return IconButton(
-                  icon: IxIcons.appMenu,
+                return IxIconButton(
+                  icon: const IxIcon.key(IxIconKey.apps),
+                  tooltip: _strings.openMenu,
                   onPressed: () {
                     Scaffold.of(context).openDrawer();
                   },
-                  tooltip: MaterialLocalizations.of(
-                    context,
-                  ).openAppDrawerTooltip,
                 );
               },
             ),
           ),
       drawer: Drawer(
         child: SafeArea(
-          child: _NavigationPanel(
-            appTitle: widget.appTitle,
-            entries: _topEntries,
-            bottomEntries: _bottomEntries,
-            isExpanded: true,
-            showCollapseAction: false,
-            animationDuration: _effectiveAnimationDuration,
-            expandedWidth: widget.expandedWidth,
-            collapsedWidth: widget.collapsedWidth,
-            themeMode: widget.themeMode,
-            onThemeModeChanged: widget.onThemeModeChanged,
-            onEntryTap: (entry) => _handleEntryTap(entry, closeDrawer: true),
-            onBottomEntryTap: (entry) =>
-                _handleBottomEntryTap(entry, closeDrawer: true),
-            onToggleCollapse: _toggleExpandedState,
-            isCategoryExpanded: _isCategoryExpanded,
-            onCategoryExpansionChanged: _toggleCategory,
+          child: _menuTapRegion(
+            CompositedTransformTarget(
+              link: _rootLink,
+              child: _NavigationPanel(
+                appTitle: widget.appTitle,
+                entries: _topEntries,
+                bottomEntries: _bottomEntries,
+                isExpanded: true,
+                showCollapseAction: false,
+                animationDuration: _effectiveAnimationDuration,
+                expandedWidth: widget.expandedWidth,
+                collapsedWidth: widget.collapsedWidth,
+                themeMode: widget.themeMode,
+                onThemeModeChanged: widget.onThemeModeChanged,
+                strings: _strings,
+                openFlyoutId: _openFlyoutId,
+                focusNodeOf: _tileNode,
+                onEntryTap: (entry) =>
+                    _handleEntryTap(entry, closeDrawer: true),
+                onBottomEntryTap: (entry) =>
+                    _handleBottomEntryTap(entry, closeDrawer: true),
+                onToggleCollapse: _toggleExpandedState,
+                isCategoryExpanded: _isCategoryExpanded,
+                onCategoryExpansionChanged: _toggleCategory,
+                onOpenFlyout: (entry) => _toggleFlyout(entry.id),
+              ),
+            ),
           ),
         ),
       ),
@@ -263,25 +467,36 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       appBar: widget.appBar ?? AppBar(title: Text(widget.appTitle)),
       body: Row(
         children: [
-          AnimatedContainer(
-            duration: _effectiveAnimationDuration,
-            width: _isExpanded ? widget.expandedWidth : widget.collapsedWidth,
-            child: _NavigationPanel(
-              appTitle: widget.appTitle,
-              entries: _topEntries,
-              bottomEntries: _bottomEntries,
-              isExpanded: _isExpanded,
-              showCollapseAction: true,
-              animationDuration: _effectiveAnimationDuration,
-              expandedWidth: widget.expandedWidth,
-              collapsedWidth: widget.collapsedWidth,
-              themeMode: widget.themeMode,
-              onThemeModeChanged: widget.onThemeModeChanged,
-              onEntryTap: _handleEntryTap,
-              onBottomEntryTap: _handleBottomEntryTap,
-              onToggleCollapse: _toggleExpandedState,
-              isCategoryExpanded: _isCategoryExpanded,
-              onCategoryExpansionChanged: _toggleCategory,
+          _menuTapRegion(
+            CompositedTransformTarget(
+              link: _rootLink,
+              child: AnimatedContainer(
+                duration: _effectiveAnimationDuration,
+                width: _isExpanded
+                    ? widget.expandedWidth
+                    : widget.collapsedWidth,
+                child: _NavigationPanel(
+                  appTitle: widget.appTitle,
+                  entries: _topEntries,
+                  bottomEntries: _bottomEntries,
+                  isExpanded: _isExpanded,
+                  showCollapseAction: true,
+                  animationDuration: _effectiveAnimationDuration,
+                  expandedWidth: widget.expandedWidth,
+                  collapsedWidth: widget.collapsedWidth,
+                  themeMode: widget.themeMode,
+                  onThemeModeChanged: widget.onThemeModeChanged,
+                  strings: _strings,
+                  openFlyoutId: _openFlyoutId,
+                  focusNodeOf: _tileNode,
+                  onEntryTap: _handleEntryTap,
+                  onBottomEntryTap: _handleBottomEntryTap,
+                  onToggleCollapse: _toggleExpandedState,
+                  isCategoryExpanded: _isCategoryExpanded,
+                  onCategoryExpansionChanged: _toggleCategory,
+                  onOpenFlyout: (entry) => _toggleFlyout(entry.id),
+                ),
+              ),
             ),
           ),
           // const VerticalDivider(width: 1, thickness: 1),
@@ -291,8 +506,124 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     );
   }
 
+  /// Puts the menu in the same [TapRegion] group as its fly-out, so tapping
+  /// a menu tile never registers as a tap outside the panel.
+  Widget _menuTapRegion(Widget child) =>
+      TapRegion(groupId: _tapRegionGroupId, child: child);
+
+  /// Builds the fly-out overlay: the built-in settings/about panel when one
+  /// is open, otherwise the children of the open category.
+  Widget _buildFlyout(BuildContext context) {
+    final anchorId = _openFlyoutId;
+    if (anchorId == null) {
+      return const SizedBox.shrink();
+    }
+
+    final Widget? content;
+    final String title;
+    if (anchorId == _kSettingsEntryId) {
+      content = widget.settings;
+      title = _strings.settings;
+    } else if (anchorId == _kAboutEntryId) {
+      content = widget.about;
+      title = _strings.about;
+    } else {
+      final category = _findEntry(widget.entries, anchorId);
+      content = category == null ? null : _flyoutCategoryList(category);
+      title = category?.label ?? _strings.menuLabel;
+    }
+    if (content == null) {
+      return const SizedBox.shrink();
+    }
+
+    // The overlay lays its children out at the full overlay size; aligning
+    // first hands the panel loose constraints so it can size to its content
+    // before the follower layer moves it next to the menu.
+    return Align(
+      alignment: Alignment.topLeft,
+      child: IxMenuFlyout(
+        link: _rootLink,
+        title: title,
+        strings: _strings,
+        groupId: _tapRegionGroupId,
+        returnFocusTo: _tileNodes[anchorId],
+        onClose: _closeFlyout,
+        child: content,
+      ),
+    );
+  }
+
+  /// The rows of a category fly-out: the same tiles the menu renders when
+  /// it is expanded.
+  Widget _flyoutCategoryList(IxMenuEntry category) {
+    final theme = Theme.of(context);
+    final sidebarTheme = _resolveSidebarTheme(theme);
+    final appMenuTheme = theme.extension<IxAppMenuTheme>();
+    final duration = _effectiveAnimationDuration;
+
+    return ListView(
+      shrinkWrap: true,
+      padding: const EdgeInsets.fromLTRB(
+        IxCommonGeometry.space1,
+        0,
+        IxCommonGeometry.space1,
+        IxCommonGeometry.space1,
+      ),
+      children: [
+        for (var i = 0; i < category.children.length; i++)
+          _NavigationEntry(
+            entry: category.children[i],
+            depth: 0,
+            isExpanded: true,
+            sidebarTheme: sidebarTheme,
+            appMenuTheme: appMenuTheme,
+            animationDuration: duration,
+            strings: _strings,
+            isCategoryExpanded: _isCategoryExpanded(category.children[i].id),
+            openFlyoutId: _openFlyoutId,
+            focusOf: (id) => (node: _tileNode(id), order: i.toDouble()),
+            onCategoryExpansionChanged: _toggleCategory,
+            onEntryTap: _handleFlyoutEntryTap,
+            onOpenFlyout: (entry) => _toggleFlyout(entry.id),
+          ),
+      ],
+    );
+  }
+
+  /// Depth-first lookup of the entry carrying [id].
+  IxMenuEntry? _findEntry(List<IxMenuEntry> entries, String id) {
+    for (final entry in entries) {
+      if (entry.id == id) {
+        return entry;
+      }
+      final match = _findEntry(entry.children, id);
+      if (match != null) {
+        return match;
+      }
+    }
+    return null;
+  }
+
+  /// Opens the fly-out anchored to the tile of [anchorId], or closes it
+  /// again when it is already the open one.
+  void _toggleFlyout(String anchorId) {
+    setState(() => _openFlyoutId = _openFlyoutId == anchorId ? null : anchorId);
+  }
+
+  void _closeFlyout() {
+    if (_openFlyoutId == null) {
+      return;
+    }
+    setState(() => _openFlyoutId = null);
+  }
+
   void _toggleExpandedState() {
-    setState(() => _isExpanded = !_isExpanded);
+    setState(() {
+      _isExpanded = !_isExpanded;
+      // The panel is anchored to the rail whose width is about to change,
+      // and a collapsed category expands inline once the menu is open.
+      _openFlyoutId = null;
+    });
   }
 
   void _handleEntryTap(IxMenuEntry entry, {bool closeDrawer = false}) {
@@ -302,19 +633,45 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     }
   }
 
+  /// Navigating from inside a fly-out closes it and hands focus back to the
+  /// category tile that opened it.
+  void _handleFlyoutEntryTap(IxMenuEntry entry) {
+    final anchor = _openFlyoutId;
+    _closeFlyout();
+    widget.onNavigate(entry.id);
+    final node = anchor == null ? null : _tileNodes[anchor];
+    if (node != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (node.context != null) {
+          node.requestFocus();
+        }
+      });
+    }
+  }
+
   void _handleBottomEntryTap(IxMenuEntry entry, {bool closeDrawer = false}) {
     switch (entry.id) {
+      case _kSettingsEntryId:
+      case _kAboutEntryId:
+        // Built-in panels open next to the menu, so the drawer stays put.
+        _toggleFlyout(entry.id);
+        return;
+      case _kThemeEntryId:
+        widget.onThemeModeChanged?.call(_nextThemeMode(widget.themeMode));
+        return;
       case 'settings':
         if (widget.showSettings) {
           widget.onOpenSettings?.call();
         }
         break;
       case 'theme-toggle':
+        // Switching the theme never closes the drawer: the menu is where
+        // the switch lives, so 1.x users stay in it.
         if (widget.showThemeToggle) {
           final nextMode = _nextThemeMode(widget.themeMode);
           widget.onThemeModeChanged?.call(nextMode);
         }
-        break;
+        return;
       case 'about-legal':
         if (widget.showAboutLegal) {
           widget.onOpenAboutLegal?.call();
@@ -354,11 +711,15 @@ class _NavigationPanel extends StatefulWidget {
     required this.collapsedWidth,
     required this.themeMode,
     required this.onThemeModeChanged,
+    required this.strings,
+    required this.openFlyoutId,
+    required this.focusNodeOf,
     required this.onEntryTap,
     required this.onBottomEntryTap,
     required this.onToggleCollapse,
     required this.isCategoryExpanded,
     required this.onCategoryExpansionChanged,
+    required this.onOpenFlyout,
   });
 
   final String appTitle;
@@ -371,20 +732,44 @@ class _NavigationPanel extends StatefulWidget {
   final double collapsedWidth;
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode>? onThemeModeChanged;
+  final IxApplicationStrings strings;
+  final String? openFlyoutId;
+  final FocusNode Function(String id) focusNodeOf;
   final ValueChanged<IxMenuEntry> onEntryTap;
   final ValueChanged<IxMenuEntry> onBottomEntryTap;
   final VoidCallback onToggleCollapse;
   final bool Function(String id) isCategoryExpanded;
   final ValueChanged<String> onCategoryExpansionChanged;
+  final ValueChanged<IxMenuEntry> onOpenFlyout;
 
   @override
   State<_NavigationPanel> createState() => _NavigationPanelState();
+}
+
+/// Moves menu focus by [delta] entries.
+class _MoveFocusIntent extends Intent {
+  const _MoveFocusIntent(this.delta);
+
+  final int delta;
+}
+
+/// Moves menu focus to the first or last entry.
+class _JumpFocusIntent extends Intent {
+  const _JumpFocusIntent({required this.first});
+
+  final bool first;
 }
 
 class _NavigationPanelState extends State<_NavigationPanel> {
   late final ScrollController _scrollController;
   bool _showTopShadow = false;
   bool _showBottomShadow = false;
+
+  /// The focus nodes of every currently rendered tile, in visual order.
+  ///
+  /// Rebuilt on every build (expanding a category or collapsing the menu
+  /// changes which tiles exist) and read by the arrow-key actions below.
+  final List<FocusNode> _order = <FocusNode>[];
 
   @override
   void initState() {
@@ -414,6 +799,24 @@ class _NavigationPanelState extends State<_NavigationPanel> {
     }
   }
 
+  /// Moves focus [delta] tiles along [_order], clamped at both ends: the
+  /// upstream menu does not wrap around (`menu.ct.ts:412-457`).
+  void _move(int delta) {
+    final index = _order.indexWhere((node) => node.hasFocus);
+    if (index < 0) {
+      return;
+    }
+    _order[(index + delta).clamp(0, _order.length - 1)].requestFocus();
+  }
+
+  /// Moves focus to the first or last tile (`Home`/`End`).
+  void _jump({required bool first}) {
+    if (_order.isEmpty) {
+      return;
+    }
+    (first ? _order.first : _order.last).requestFocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -428,6 +831,36 @@ class _NavigationPanelState extends State<_NavigationPanel> {
             (!widget.showCollapseAction ||
                 constraints.maxWidth >= widget.expandedWidth - tolerance);
 
+        // The tiles that are actually on screen, in the order the eye (and
+        // therefore the arrow keys and Tab) walks them.
+        final visible = <IxMenuEntry>[];
+        void collect(List<IxMenuEntry> nodes) {
+          for (final entry in nodes) {
+            visible.add(entry);
+            if (entry.type == IxMenuEntryType.category &&
+                isPanelExpanded &&
+                widget.isCategoryExpanded(entry.id)) {
+              collect(entry.children);
+            }
+          }
+        }
+
+        collect(widget.entries);
+        visible.addAll(widget.bottomEntries);
+
+        // Traversal order 0 belongs to the sidebar toggle in the header, so
+        // the tiles start at 1.
+        final orderOf = <String, double>{};
+        _order.clear();
+        for (var i = 0; i < visible.length; i++) {
+          orderOf[visible[i].id] = i + 1.0;
+          _order.add(widget.focusNodeOf(visible[i].id));
+        }
+        ({FocusNode node, double order}) focusOf(String id) => (
+          node: widget.focusNodeOf(id),
+          order: orderOf[id] ?? visible.length + 1.0,
+        );
+
         return DecoratedBox(
           decoration: BoxDecoration(
             color: sidebarTheme.backgroundColor,
@@ -436,85 +869,131 @@ class _NavigationPanelState extends State<_NavigationPanel> {
             // ),
           ),
           child: SafeArea(
-            child: FocusTraversalGroup(
-              child: Column(
-                children: [
-                  _NavigationHeader(
-                    title: widget.appTitle,
-                    isExpanded: isPanelExpanded,
-                    showCollapseAction: widget.showCollapseAction,
-                    onToggleCollapse: widget.onToggleCollapse,
-                    animationDuration: widget.animationDuration,
-                    collapsedSlotWidth: widget.collapsedWidth,
-                  ),
-                  const SizedBox(height: 8),
-                  Expanded(
-                    child: Stack(
+            child: Semantics(
+              key: _kMenuBarKey,
+              container: true,
+              explicitChildNodes: true,
+              role: SemanticsRole.menuBar,
+              label: widget.strings.menuLabel,
+              child: FocusTraversalGroup(
+                policy: OrderedTraversalPolicy(),
+                child: Shortcuts(
+                  shortcuts: const <ShortcutActivator, Intent>{
+                    SingleActivator(LogicalKeyboardKey.arrowDown):
+                        _MoveFocusIntent(1),
+                    SingleActivator(LogicalKeyboardKey.arrowUp):
+                        _MoveFocusIntent(-1),
+                    SingleActivator(LogicalKeyboardKey.home): _JumpFocusIntent(
+                      first: true,
+                    ),
+                    SingleActivator(LogicalKeyboardKey.end): _JumpFocusIntent(
+                      first: false,
+                    ),
+                  },
+                  child: Actions(
+                    actions: <Type, Action<Intent>>{
+                      _MoveFocusIntent: CallbackAction<_MoveFocusIntent>(
+                        onInvoke: (intent) {
+                          _move(intent.delta);
+                          return null;
+                        },
+                      ),
+                      _JumpFocusIntent: CallbackAction<_JumpFocusIntent>(
+                        onInvoke: (intent) {
+                          _jump(first: intent.first);
+                          return null;
+                        },
+                      ),
+                    },
+                    child: Column(
                       children: [
-                        ListView(
-                          controller: _scrollController,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 4,
-                          ),
-                          children: [
-                            for (final entry in widget.entries)
-                              _NavigationEntry(
-                                entry: entry,
-                                depth: 0,
-                                isExpanded: isPanelExpanded,
-                                sidebarTheme: sidebarTheme,
-                                appMenuTheme: appMenuTheme,
-                                animationDuration: widget.animationDuration,
-                                isCategoryExpanded: widget.isCategoryExpanded(
-                                  entry.id,
+                        _NavigationHeader(
+                          title: widget.appTitle,
+                          isExpanded: isPanelExpanded,
+                          showCollapseAction: widget.showCollapseAction,
+                          onToggleCollapse: widget.onToggleCollapse,
+                          animationDuration: widget.animationDuration,
+                          collapsedSlotWidth: widget.collapsedWidth,
+                          strings: widget.strings,
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: Stack(
+                            children: [
+                              ListView(
+                                controller: _scrollController,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
                                 ),
-                                onCategoryExpansionChanged:
-                                    widget.onCategoryExpansionChanged,
-                                onEntryTap: widget.onEntryTap,
+                                children: [
+                                  for (final entry in widget.entries)
+                                    _NavigationEntry(
+                                      entry: entry,
+                                      depth: 0,
+                                      isExpanded: isPanelExpanded,
+                                      sidebarTheme: sidebarTheme,
+                                      appMenuTheme: appMenuTheme,
+                                      animationDuration:
+                                          widget.animationDuration,
+                                      strings: widget.strings,
+                                      isCategoryExpanded: widget
+                                          .isCategoryExpanded(entry.id),
+                                      openFlyoutId: widget.openFlyoutId,
+                                      focusOf: focusOf,
+                                      onCategoryExpansionChanged:
+                                          widget.onCategoryExpansionChanged,
+                                      onEntryTap: widget.onEntryTap,
+                                      onOpenFlyout: widget.onOpenFlyout,
+                                    ),
+                                ],
                               ),
-                          ],
+                              _ScrollShadow(
+                                showShadow: _showTopShadow,
+                                isTop: true,
+                                color: sidebarTheme.backgroundColor,
+                                animationDuration: widget.animationDuration,
+                              ),
+                              _ScrollShadow(
+                                showShadow: _showBottomShadow,
+                                isTop: false,
+                                color: sidebarTheme.backgroundColor,
+                                animationDuration: widget.animationDuration,
+                              ),
+                            ],
+                          ),
                         ),
-                        _ScrollShadow(
-                          showShadow: _showTopShadow,
-                          isTop: true,
-                          color: sidebarTheme.backgroundColor,
-                          animationDuration: widget.animationDuration,
-                        ),
-                        _ScrollShadow(
-                          showShadow: _showBottomShadow,
-                          isTop: false,
-                          color: sidebarTheme.backgroundColor,
-                          animationDuration: widget.animationDuration,
-                        ),
+                        if (widget.bottomEntries.isNotEmpty) ...[
+                          // const Divider(height: 1),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isPanelExpanded ? 12 : 8,
+                              vertical: 12,
+                            ),
+                            child: Column(
+                              children: [
+                                for (final entry in widget.bottomEntries)
+                                  _BottomNavigationEntry(
+                                    entry: entry,
+                                    isExpanded: isPanelExpanded,
+                                    sidebarTheme: sidebarTheme,
+                                    appMenuTheme: appMenuTheme,
+                                    animationDuration: widget.animationDuration,
+                                    themeMode: widget.themeMode,
+                                    onThemeModeChanged:
+                                        widget.onThemeModeChanged,
+                                    strings: widget.strings,
+                                    focusOf: focusOf,
+                                    onTap: widget.onBottomEntryTap,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                   ),
-                  if (widget.bottomEntries.isNotEmpty) ...[
-                    // const Divider(height: 1),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isPanelExpanded ? 12 : 8,
-                        vertical: 12,
-                      ),
-                      child: Column(
-                        children: [
-                          for (final entry in widget.bottomEntries)
-                            _BottomNavigationEntry(
-                              entry: entry,
-                              isExpanded: isPanelExpanded,
-                              sidebarTheme: sidebarTheme,
-                              appMenuTheme: appMenuTheme,
-                              animationDuration: widget.animationDuration,
-                              themeMode: widget.themeMode,
-                              onThemeModeChanged: widget.onThemeModeChanged,
-                              onTap: widget.onBottomEntryTap,
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ],
+                ),
               ),
             ),
           ),
@@ -532,6 +1011,7 @@ class _NavigationHeader extends StatelessWidget {
     required this.onToggleCollapse,
     required this.animationDuration,
     required this.collapsedSlotWidth,
+    required this.strings,
   });
 
   final String title;
@@ -540,21 +1020,26 @@ class _NavigationHeader extends StatelessWidget {
   final VoidCallback onToggleCollapse;
   final Duration animationDuration;
   final double collapsedSlotWidth;
+  final IxApplicationStrings strings;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final button = showCollapseAction
-        ? Tooltip(
-            message: isExpanded ? 'Collapse navigation' : 'Expand navigation',
-            child: IconButton(
-              onPressed: onToggleCollapse,
-              splashRadius: 20,
+        ? FocusTraversalOrder(
+            // The sidebar toggle is the menu's first stop, ahead of every
+            // tile (which are ordered from 1 upwards).
+            order: const NumericFocusOrder(0),
+            child: IxIconButton(
               icon: AnimatedRotation(
                 turns: isExpanded ? 0 : 0.5,
                 duration: animationDuration,
-                child: const Icon(Icons.keyboard_double_arrow_left),
+                child: const IxIcon.key(IxIconKey.doubleChevronLeft),
               ),
+              tooltip: isExpanded
+                  ? strings.collapseSidebar
+                  : strings.expandSidebar,
+              onPressed: onToggleCollapse,
             ),
           )
         : const SizedBox.shrink();
@@ -597,9 +1082,13 @@ class _NavigationEntry extends StatelessWidget {
     required this.sidebarTheme,
     required this.appMenuTheme,
     required this.animationDuration,
+    required this.strings,
     required this.isCategoryExpanded,
+    required this.openFlyoutId,
+    required this.focusOf,
     required this.onCategoryExpansionChanged,
     required this.onEntryTap,
+    required this.onOpenFlyout,
   });
 
   final IxMenuEntry entry;
@@ -608,14 +1097,26 @@ class _NavigationEntry extends StatelessWidget {
   final IxSidebarTheme sidebarTheme;
   final IxAppMenuTheme? appMenuTheme;
   final Duration animationDuration;
+  final IxApplicationStrings strings;
   final bool isCategoryExpanded;
+  final String? openFlyoutId;
+  final _TileFocusOf focusOf;
   final ValueChanged<String> onCategoryExpansionChanged;
   final ValueChanged<IxMenuEntry> onEntryTap;
+  final ValueChanged<IxMenuEntry> onOpenFlyout;
 
   @override
   Widget build(BuildContext context) {
+    final focus = focusOf(entry.id);
+
     if (entry.type == IxMenuEntryType.category) {
       final hasSelectedChild = entry.children.any((child) => child.selected);
+      // A collapsed menu has no room for inline children, so the category
+      // reveals them in a fly-out panel next to the rail instead.
+      final usesFlyout = !isExpanded;
+      final showChildren = isExpanded && isCategoryExpanded;
+      final isOpen = usesFlyout ? openFlyoutId == entry.id : isCategoryExpanded;
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -628,33 +1129,56 @@ class _NavigationEntry extends StatelessWidget {
             animationDuration: animationDuration,
             selected: hasSelectedChild || entry.selected,
             enabled: entry.enabled,
-            trailing: Icon(
-              isCategoryExpanded ? Icons.expand_less : Icons.expand_more,
+            expanded: isOpen,
+            focusNode: focus.node,
+            traversalOrder: focus.order,
+            trailing: AnimatedRotation(
+              turns: isOpen ? 0.5 : 0,
+              duration: animationDuration,
+              child: const IxIcon.key(
+                IxIconKey.chevronDownSmall,
+                size: IxIconSize.s16,
+              ),
             ),
-            onTap: () => onCategoryExpansionChanged(entry.id),
+            onTap: !entry.enabled
+                ? null
+                : usesFlyout
+                ? () => onOpenFlyout(entry)
+                : () => onCategoryExpansionChanged(entry.id),
           ),
-          AnimatedCrossFade(
+          AnimatedSize(
+            // See IxBlind: a zero-duration AnimatedSize asked to animate an
+            // actual size change re-enters layout, so under reduced motion
+            // every toggle gets a brand-new render object instead.
+            key: animationDuration == Duration.zero
+                ? ValueKey(showChildren)
+                : null,
             duration: animationDuration,
-            firstChild: const SizedBox.shrink(),
-            secondChild: Column(
-              children: [
-                for (final child in entry.children)
-                  _NavigationEntry(
-                    entry: child,
-                    depth: depth + 1,
-                    isExpanded: isExpanded,
-                    sidebarTheme: sidebarTheme,
-                    appMenuTheme: appMenuTheme,
-                    animationDuration: animationDuration,
-                    isCategoryExpanded: false,
-                    onCategoryExpansionChanged: onCategoryExpansionChanged,
-                    onEntryTap: onEntryTap,
-                  ),
-              ],
-            ),
-            crossFadeState: isExpanded && isCategoryExpanded
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+            alignment: Alignment.topCenter,
+            child: showChildren
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      for (final child in entry.children)
+                        _NavigationEntry(
+                          entry: child,
+                          depth: depth + 1,
+                          isExpanded: isExpanded,
+                          sidebarTheme: sidebarTheme,
+                          appMenuTheme: appMenuTheme,
+                          animationDuration: animationDuration,
+                          strings: strings,
+                          isCategoryExpanded: false,
+                          openFlyoutId: openFlyoutId,
+                          focusOf: focusOf,
+                          onCategoryExpansionChanged:
+                              onCategoryExpansionChanged,
+                          onEntryTap: onEntryTap,
+                          onOpenFlyout: onOpenFlyout,
+                        ),
+                    ],
+                  )
+                : const SizedBox(width: double.infinity, height: 0),
           ),
         ],
       );
@@ -669,6 +1193,8 @@ class _NavigationEntry extends StatelessWidget {
       animationDuration: animationDuration,
       selected: entry.selected,
       enabled: entry.enabled,
+      focusNode: focus.node,
+      traversalOrder: focus.order,
       onTap: entry.enabled ? () => onEntryTap(entry) : null,
     );
   }
@@ -683,6 +1209,8 @@ class _BottomNavigationEntry extends StatelessWidget {
     required this.animationDuration,
     required this.themeMode,
     required this.onThemeModeChanged,
+    required this.strings,
+    required this.focusOf,
     required this.onTap,
   });
 
@@ -693,11 +1221,22 @@ class _BottomNavigationEntry extends StatelessWidget {
   final Duration animationDuration;
   final ThemeMode themeMode;
   final ValueChanged<ThemeMode>? onThemeModeChanged;
+  final IxApplicationStrings strings;
+  final _TileFocusOf focusOf;
   final ValueChanged<IxMenuEntry> onTap;
+
+  /// Both the built-in toggle and the reserved 1.x `theme-toggle` entry
+  /// render the theme indicator.
+  bool get _isThemeToggle =>
+      entry.id == _kThemeEntryId ||
+      (entry.type == IxMenuEntryType.custom && entry.id == 'theme-toggle');
 
   @override
   Widget build(BuildContext context) {
-    if (entry.type == IxMenuEntryType.custom && entry.id == 'theme-toggle') {
+    final focus = focusOf(entry.id);
+
+    if (_isThemeToggle) {
+      final enabled = entry.enabled && onThemeModeChanged != null;
       return _NavigationTile(
         entry: entry,
         depth: 0,
@@ -706,15 +1245,18 @@ class _BottomNavigationEntry extends StatelessWidget {
         appMenuTheme: appMenuTheme,
         animationDuration: animationDuration,
         selected: false,
-        enabled: entry.enabled && onThemeModeChanged != null,
+        enabled: enabled,
+        toggled: themeMode == ThemeMode.dark,
+        value: _themeModeLabel(strings, themeMode),
+        focusNode: focus.node,
+        traversalOrder: focus.order,
         trailing: _ThemeModeIndicator(
           isExpanded: isExpanded,
           themeMode: themeMode,
           sidebarTheme: sidebarTheme,
+          strings: strings,
         ),
-        onTap: onThemeModeChanged == null
-            ? null
-            : () => onThemeModeChanged!(_nextThemeMode(themeMode)),
+        onTap: enabled ? () => onTap(entry) : null,
       );
     }
 
@@ -727,22 +1269,21 @@ class _BottomNavigationEntry extends StatelessWidget {
       animationDuration: animationDuration,
       selected: entry.selected,
       enabled: entry.enabled,
+      focusNode: focus.node,
+      traversalOrder: focus.order,
       onTap: entry.enabled ? () => onTap(entry) : null,
     );
   }
-
-  ThemeMode _nextThemeMode(ThemeMode current) {
-    switch (current) {
-      case ThemeMode.system:
-        return ThemeMode.light;
-      case ThemeMode.light:
-        return ThemeMode.dark;
-      case ThemeMode.dark:
-        return ThemeMode.system;
-    }
-  }
 }
 
+/// A single menu row.
+///
+/// Publishes exactly one semantics node -- its own -- so a screen reader
+/// announces the entry once, with the state that applies to it: `selected`
+/// for a plain entry, `expanded` for a category, `toggled` plus the theme
+/// name as `value` for the theme switch. The visible [Tooltip] is excluded
+/// from semantics for the same reason (it would otherwise duplicate the
+/// label), and the entry's own [IxMenuEntry.tooltip] is surfaced as a hint.
 class _NavigationTile extends StatefulWidget {
   const _NavigationTile({
     required this.entry,
@@ -753,6 +1294,11 @@ class _NavigationTile extends StatefulWidget {
     required this.animationDuration,
     required this.selected,
     required this.enabled,
+    this.expanded,
+    this.toggled,
+    this.value,
+    this.focusNode,
+    this.traversalOrder,
     this.trailing,
     this.onTap,
   });
@@ -765,6 +1311,22 @@ class _NavigationTile extends StatefulWidget {
   final Duration animationDuration;
   final bool selected;
   final bool enabled;
+
+  /// Expanded state of a category tile; `null` for every other tile.
+  final bool? expanded;
+
+  /// Toggled state of the theme switch; `null` for every other tile.
+  final bool? toggled;
+
+  /// Accessibility value, used by the theme switch for the active mode.
+  final String? value;
+
+  /// Focus node owned by the scaffold, so a fly-out can return focus here.
+  final FocusNode? focusNode;
+
+  /// Position of this tile in the menu's ordered traversal group.
+  final double? traversalOrder;
+
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -806,36 +1368,59 @@ class _NavigationTileState extends State<_NavigationTile> {
 
     final iconWidget =
         widget.entry.iconWidget ??
-        Icon(
-          widget.entry.icon ?? Icons.circle_outlined,
-          color: iconColor,
-          size: widget.isExpanded ? 22 : 18,
-        );
+        (widget.entry.icon != null
+            ? Icon(
+                widget.entry.icon,
+                color: iconColor,
+                size: widget.isExpanded ? 22 : 18,
+              )
+            : IxIcon.key(
+                IxIconKey.document,
+                size: widget.isExpanded ? IxIconSize.s24 : IxIconSize.s16,
+                color: iconColor,
+              ));
 
     final gap = widget.isExpanded ? 12.0 : 4.0;
 
-    return Tooltip(
-      message: widget.entry.tooltip ?? widget.entry.label,
-      // Interaction delays (this hover wait, and the toast auto-close
-      // delay in IxToastData) are deliberately not IxMotion tokens: they
-      // gate *when* something happens on user input timing, not how long a
-      // rendered transition takes, so reduced motion must not shorten them.
-      waitDuration: const Duration(milliseconds: 500),
-      child: Semantics(
-        button: widget.onTap != null,
-        enabled: widget.enabled,
-        selected: widget.selected,
-        label: widget.entry.label,
-        child: Padding(
-          padding: EdgeInsetsDirectional.only(start: widget.depth * 16.0),
-          child: IxFocusRing(
-            focused: _focused,
+    final Widget tile = Semantics(
+      container: true,
+      button: true,
+      enabled: widget.enabled,
+      // `aria-selected` only applies to a plain entry: a category is
+      // described by its expanded state and the theme switch by its
+      // toggled state, so those tiles must not claim a selected state too.
+      selected: widget.expanded == null && widget.toggled == null
+          ? widget.selected
+          : null,
+      expanded: widget.expanded,
+      toggled: widget.toggled,
+      // A disabled tile drops out of the traversal order, so it must not
+      // claim to be focusable either.
+      focusable: widget.enabled,
+      label: widget.entry.label,
+      value: widget.value,
+      hint: widget.entry.tooltip,
+      onTap: widget.enabled ? widget.onTap : null,
+      excludeSemantics: true,
+      child: Padding(
+        padding: EdgeInsetsDirectional.only(start: widget.depth * 16.0),
+        child: IxFocusRing(
+          focused: _focused,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            focusNode: widget.focusNode,
             borderRadius: BorderRadius.circular(12),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: widget.enabled ? widget.onTap : null,
-              focusColor: Colors.transparent,
-              onFocusChange: (focused) => setState(() => _focused = focused),
+            onTap: widget.enabled ? widget.onTap : null,
+            focusColor: Colors.transparent,
+            onFocusChange: (focused) => setState(() => _focused = focused),
+            child: Tooltip(
+              message: widget.entry.tooltip ?? widget.entry.label,
+              // Interaction delays (this hover wait, and the toast auto-close
+              // delay in IxToastData) are deliberately not IxMotion tokens: they
+              // gate *when* something happens on user input timing, not how long a
+              // rendered transition takes, so reduced motion must not shorten them.
+              waitDuration: const Duration(milliseconds: 500),
+              excludeFromSemantics: true,
               child: AnimatedContainer(
                 duration: widget.animationDuration,
                 padding: EdgeInsets.symmetric(
@@ -908,6 +1493,14 @@ class _NavigationTileState extends State<_NavigationTile> {
         ),
       ),
     );
+
+    if (widget.traversalOrder == null) {
+      return tile;
+    }
+    return FocusTraversalOrder(
+      order: NumericFocusOrder(widget.traversalOrder!),
+      child: tile,
+    );
   }
 }
 
@@ -916,22 +1509,28 @@ class _ThemeModeIndicator extends StatelessWidget {
     required this.isExpanded,
     required this.themeMode,
     required this.sidebarTheme,
+    required this.strings,
   });
 
   final bool isExpanded;
   final ThemeMode themeMode;
   final IxSidebarTheme sidebarTheme;
+  final IxApplicationStrings strings;
 
   @override
   Widget build(BuildContext context) {
-    final icon = _iconForMode(themeMode);
-    final label = _labelForMode(themeMode);
+    final label = _themeModeLabel(strings, themeMode);
     final color =
         sidebarTheme.itemForeground.resolve(<WidgetState>{}) ??
         Theme.of(context).colorScheme.onSurfaceVariant;
+    final icon = IxIcon.key(
+      _themeModeIconKey(themeMode),
+      size: IxIconSize.s16,
+      color: color,
+    );
 
     if (!isExpanded) {
-      return Icon(icon, size: 20, color: color);
+      return icon;
     }
 
     return AnimatedSwitcher(
@@ -940,34 +1539,36 @@ class _ThemeModeIndicator extends StatelessWidget {
         key: ValueKey(label),
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 20, color: color),
+          icon,
           const SizedBox(width: 6),
           Text(label, style: Theme.of(context).textTheme.bodySmall),
         ],
       ),
     );
   }
+}
 
-  IconData _iconForMode(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.system:
-        return Icons.auto_mode_outlined;
-      case ThemeMode.light:
-        return Icons.wb_sunny_outlined;
-      case ThemeMode.dark:
-        return Icons.nightlight_round_outlined;
-    }
+/// The [IxApplicationStrings] label describing [mode].
+String _themeModeLabel(IxApplicationStrings strings, ThemeMode mode) {
+  switch (mode) {
+    case ThemeMode.system:
+      return strings.themeSystem;
+    case ThemeMode.light:
+      return strings.themeLight;
+    case ThemeMode.dark:
+      return strings.themeDark;
   }
+}
 
-  String _labelForMode(ThemeMode mode) {
-    switch (mode) {
-      case ThemeMode.system:
-        return 'System';
-      case ThemeMode.light:
-        return 'Light';
-      case ThemeMode.dark:
-        return 'Dark';
-    }
+/// The icon describing [mode].
+IxIconKey _themeModeIconKey(ThemeMode mode) {
+  switch (mode) {
+    case ThemeMode.system:
+      return IxIconKey.lightDark;
+    case ThemeMode.light:
+      return IxIconKey.sun;
+    case ThemeMode.dark:
+      return IxIconKey.moon;
   }
 }
 

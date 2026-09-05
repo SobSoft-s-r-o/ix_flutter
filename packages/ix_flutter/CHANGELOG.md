@@ -19,12 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxToastService.showToast()` returning an `IxToastHandle` (`onClose`/`close`/`pause`/`resume`/`isPaused`), `IxToastType.error`, `IxToastPosition`, `IxToastStrings`, toast live region + labelled close, 280px width, safe-area aware overlay
 - `IxBreadcrumb` `breadcrumbKey` + `IxBreadcrumbClick` callbacks (`onItemClick`/`onNextClick`), navigation landmark, current-page state, `IxBreadcrumbStrings`
 - `IxPaginationStrings`, keyboard-focusable RDV headers/rows/cards with sort semantics, wrap-capable pagination bar with 32px chevrons and labelled page-size trigger
+- `IxApplicationStrings`, `IxApplicationScaffold` `settings`/`about`/`enableToggleTheme` API, menu keyboard navigation (Arrow/Home/End), `menuBar` landmark with a single semantics node per tile, and a category fly-out in the collapsed rail
 
 ### Changed
 - `ThemeData.focusColor` is transparent; Material widgets without an iX adapter no longer receive an opaque focus fill — wrap custom focusables in `IxFocusRing`
 - `IxSpinner`'s default variant is now `IxSpinnerVariant.secondary` (identical styling to the deprecated `standard`)
+- `IxApplicationScaffold` menu icons (drawer button, sidebar toggle, category chevron, theme indicator, entries without an `icon`) resolve through `IxIconResolver` instead of hard-coded Material glyphs
 
 ### Deprecated
+- reserved menu entry ids `settings`/`theme-toggle`/`about-legal` (with `showSettings`/`showThemeToggle`/`showAboutLegal`/`onOpenSettings`/`onOpenAboutLegal`); they still work and now log a one-time debug notice, and become ordinary entries in 2.0 -- use `settings:`, `about:` and `enableToggleTheme` instead
 - `IxFonts.robotoMono` as the default UI font (2.0 switches to Work Sans)
 - `IxSpinnerVariant.standard`
 - `IxButtonVariant.warning*`/`info*`/`success*` (not part of Siemens iX)

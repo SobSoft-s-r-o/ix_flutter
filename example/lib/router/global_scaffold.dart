@@ -51,8 +51,6 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
       onThemeModeChanged: (mode) {
         ThemeControllerScope.of(context).setMode(mode);
       },
-      showSettings: false,
-      showAboutLegal: false,
     );
   }
 
@@ -275,14 +273,9 @@ class _GlobalScaffoldState extends State<GlobalScaffold> {
         iconWidget: IxIcon(IxIconsData.list),
         selected: selectedId == 'responsive_data_view',
       ),
-      IxMenuEntry(
-        id: 'theme-toggle',
-        type: IxMenuEntryType.custom,
-        icon: Icons.brightness_6_outlined,
-        label: 'Theme',
-        tooltip: 'Switch between light, dark, and system',
-        isBottom: true,
-      ),
+      // The theme toggle is a built-in bottom entry: it appears on its own
+      // because `onThemeModeChanged` is set and `enableToggleTheme` defaults
+      // to true. The reserved id 'theme-toggle' is no longer needed.
     ];
   }
 }
