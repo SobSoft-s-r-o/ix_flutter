@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxBreadcrumb` `breadcrumbKey` + `IxBreadcrumbClick` callbacks (`onItemClick`/`onNextClick`), navigation landmark, current-page state, `IxBreadcrumbStrings`
 - `IxPaginationStrings`, keyboard-focusable RDV headers/rows/cards with sort semantics, wrap-capable pagination bar with 32px chevrons and labelled page-size trigger
 - `IxApplicationStrings`, `IxApplicationScaffold` `settings`/`about`/`enableToggleTheme` API, menu keyboard navigation (Arrow/Home/End), `menuBar` landmark with a single semantics node per tile, and a category fly-out in the collapsed rail
+- `IxThemeName` and `IxColorSchema` (the upstream `data-ix-theme`/`data-ix-color-schema` model), `IxThemeController` (resolves the `system` schema at runtime, `themeChanged` stream, `updatePlatformBrightness`), `IxThemeBuilder.light()`/`IxThemeBuilder.dark()` plus `IxThemeBuilder(theme:/brightness:)`, `IxTheme.themeName`/`IxTheme.colorSchema`, `IxCustomPalette.partial()`/`IxCustomPalette.copyWith()` -- see `doc/theming.md`
 
 ### Changed
 - `ThemeData.focusColor` is transparent; Material widgets without an iX adapter no longer receive an opaque focus fill — wrap custom focusables in `IxFocusRing`
@@ -36,6 +37,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxToastOverlay.position` (`Alignment`); use `placement` (`IxToastPosition`)
 - `IxBreadcrumbItemData`/`IxBreadcrumbMenuItem` label-only items (no `breadcrumbKey`); `breadcrumbKey` becomes required in 2.0
 - `IxBreadcrumbTheme.dropdownBackground`/`.dropdownBorderRadius` (still honoured for now; overflow menus are styled by `IxDropdownTheme` instead, removed in 2.0)
+- `IxThemeFamily.brand` (never a real palette in the OSS build -- it resolves to classic and now logs a debug notice; removed in 2.0)
+- `IxThemeBuilder.family`/`.mode`/`.systemBrightness` (use `theme:` + `brightness:`, `IxThemeBuilder.light()`/`.dark()`, or `IxThemeController` for the `system` schema)
+- `IxTheme.family`/`.mode` (use `IxTheme.themeName` / `IxTheme.colorSchema`)
 
 ### Fixed
 - `IxBlind` now honours `IxThemeBuilder(typography:)` instead of always falling back to the default typography

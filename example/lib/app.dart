@@ -44,8 +44,8 @@ class _IxDemoAppState extends State<IxDemoApp> {
             child: MaterialApp.router(
               title: 'ix_flutter Demo',
               routerConfig: router,
-              theme: _controller.buildTheme(ThemeMode.light),
-              darkTheme: _controller.buildTheme(ThemeMode.dark),
+              theme: _controller.light,
+              darkTheme: _controller.dark,
               themeMode: _controller.mode,
               debugShowCheckedModeBanner: false,
               builder: (context, child) {

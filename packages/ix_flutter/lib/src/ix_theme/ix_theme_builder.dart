@@ -24,7 +24,9 @@ import 'package:ix_flutter/src/ix_theme/components/ix_spinner_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_toggle_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_upload_theme.dart';
+import 'package:ix_flutter/src/ix_theme/ix_color_schema.dart';
 import 'package:ix_flutter/src/ix_theme/ix_custom_palette.dart';
+import 'package:ix_flutter/src/ix_theme/ix_theme_name.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icon_resolver.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
@@ -37,8 +39,8 @@ import 'package:ix_flutter/src/ix_icons/ix_icon_resolver.dart';
 ///
 /// ```dart
 /// void main() {
-///   final lightTheme = const IxThemeBuilder().build();
-///   final darkTheme = const IxThemeBuilder(mode: ThemeMode.dark).build();
+///   final lightTheme = const IxThemeBuilder.light().build();
+///   final darkTheme = const IxThemeBuilder.dark().build();
 ///
 ///   runApp(
 ///     MaterialApp(
@@ -49,25 +51,85 @@ import 'package:ix_flutter/src/ix_icons/ix_icon_resolver.dart';
 ///   );
 /// }
 /// ```
+///
+/// Use `IxThemeController` instead when the app has to resolve
+/// [IxColorSchema.system] at runtime.
 class IxThemeBuilder {
+  /// Creates a builder for a single [ThemeData] variant.
+  ///
+  /// Set [theme] and [brightness] (or use [IxThemeBuilder.light] /
+  /// [IxThemeBuilder.dark]); [family], [mode] and [systemBrightness] are the
+  /// deprecated 1.x spelling of the same configuration and stay functional
+  /// until 2.0.
   const IxThemeBuilder({
+    @Deprecated('Use theme: IxThemeName; brand is a classic alias')
     this.family = IxThemeFamily.classic,
+    @Deprecated('Use brightness: or IxThemeController')
     this.mode = ThemeMode.system,
+    @Deprecated('Use IxThemeController for system resolution')
     this.systemBrightness = Brightness.light,
+    this.theme,
+    this.brightness,
     this.typography,
     this.customPalette,
     this.icons,
     this.density = IxDensity.adaptive,
   });
 
+  /// Creates a builder for the light variant of [theme].
+  const IxThemeBuilder.light({
+    IxThemeName theme = IxThemeName.classic,
+    IxTypography? typography,
+    IxCustomPalette? customPalette,
+    IxIconResolver? icons,
+    IxDensity density = IxDensity.adaptive,
+  }) : this(
+         theme: theme,
+         brightness: Brightness.light,
+         typography: typography,
+         customPalette: customPalette,
+         icons: icons,
+         density: density,
+       );
+
+  /// Creates a builder for the dark variant of [theme].
+  const IxThemeBuilder.dark({
+    IxThemeName theme = IxThemeName.classic,
+    IxTypography? typography,
+    IxCustomPalette? customPalette,
+    IxIconResolver? icons,
+    IxDensity density = IxDensity.adaptive,
+  }) : this(
+         theme: theme,
+         brightness: Brightness.dark,
+         typography: typography,
+         customPalette: customPalette,
+         icons: icons,
+         density: density,
+       );
+
   /// Siemens IX visual family (classic vs. custom overrides).
+  @Deprecated('Use theme: IxThemeName; brand is a classic alias')
   final IxThemeFamily family;
 
   /// Material theme mode to resolve light/dark variants.
+  @Deprecated('Use brightness: or IxThemeController')
   final ThemeMode mode;
 
   /// Platform brightness hint used when [mode] is [ThemeMode.system].
+  @Deprecated('Use IxThemeController for system resolution')
   final Brightness systemBrightness;
+
+  /// Siemens iX theme identity (upstream `data-ix-theme`).
+  ///
+  /// Defaults to [IxThemeName.classic]; the deprecated [family] fills it in
+  /// when it is unset.
+  final IxThemeName? theme;
+
+  /// Brightness of the built [ThemeData].
+  ///
+  /// Takes precedence over the deprecated [mode]/[systemBrightness] pair.
+  final Brightness? brightness;
 
   /// Optional override for the Siemens IX type scale.
   final IxTypography? typography;
@@ -94,18 +156,37 @@ class IxThemeBuilder {
   /// typographic scale, component theme data) and custom Siemens IX extensions
   /// such as [IxTheme], [IxButtonTheme], and component-specific tokens.
   ThemeData build() {
-    final brightness = _resolveBrightness(mode, systemBrightness);
+    assert(
+      // ignore: deprecated_member_use_from_same_package
+      family != IxThemeFamily.custom || customPalette != null,
+      'IxThemeFamily.custom requires customPalette',
+    );
+    final resolvedBrightness =
+        brightness ??
+        // ignore: deprecated_member_use_from_same_package
+        _resolveBrightness(mode, systemBrightness);
+    final resolvedTheme =
+        theme ??
+        // ignore: deprecated_member_use_from_same_package
+        (family == IxThemeFamily.classic
+            ? IxThemeName.classic
+            // ignore: deprecated_member_use_from_same_package
+            : IxThemeName(family.name));
+    // Every bundled family resolves to the classic palette (`brand` is a
+    // deprecated alias, `custom` is served by `customPalette`), so the
+    // palette only depends on the resolved brightness.
     final Map<IxThemeColorToken, Color> palette = Map.unmodifiable(
-      customPalette?.resolve(brightness) ??
+      customPalette?.resolve(resolvedBrightness) ??
           IxColorPalette.resolve(
-            family: family,
-            mode: mode,
-            systemBrightness: systemBrightness,
+            family: IxThemeFamily.classic,
+            mode: resolvedBrightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
           ),
     );
 
     final typeScale = typography ?? IxTypography();
-    final colorScheme = _buildColorScheme(palette, brightness);
+    final colorScheme = _buildColorScheme(palette, resolvedBrightness);
     final textTheme = _buildTextTheme(typeScale, palette);
     final buttonTheme = IxButtonTheme.fromPalette(
       palette: palette,
@@ -169,19 +250,28 @@ class IxThemeBuilder {
     );
     final scrollbarTheme = IxScrollbarTheme.fromPalette(palette: palette);
     final ixThemeExtension = IxTheme(
+      themeName: resolvedTheme,
+      colorSchema: resolvedBrightness == Brightness.dark
+          ? IxColorSchema.dark
+          : IxColorSchema.light,
+      // ignore: deprecated_member_use_from_same_package
       family: family,
+      // ignore: deprecated_member_use_from_same_package
       mode: mode,
-      brightness: brightness,
+      brightness: resolvedBrightness,
       palette: palette,
       typography: typeScale,
       density: density,
     );
     final iconResolver = icons ?? IxIconResolver.material();
 
-    final theme = ThemeData(
+    // NOTE: named `themeData`, not `theme` -- `theme` is a field of this
+    // class and a local of that name would shadow it for the whole method
+    // body (including the `resolvedTheme` line above).
+    final themeData = ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      brightness: brightness,
+      brightness: resolvedBrightness,
       scaffoldBackgroundColor: palette[IxThemeColorToken.color1],
       canvasColor: palette[IxThemeColorToken.color1],
       dialogTheme: DialogThemeData(
@@ -253,7 +343,7 @@ class IxThemeBuilder {
       textTheme: textTheme,
       fontFamily: typeScale.fontFamily,
       visualDensity: VisualDensity.standard,
-      applyElevationOverlayColor: brightness == Brightness.dark,
+      applyElevationOverlayColor: resolvedBrightness == Brightness.dark,
       scrollbarTheme: scrollbarTheme.materialScrollbarTheme,
       extensions: [
         ixThemeExtension,
@@ -287,7 +377,7 @@ class IxThemeBuilder {
     // the static Material component tap-target sizing. `IxDensityScope`
     // re-adapts this live once a BuildContext exists.
     final adapted = IxDensityAdapter.apply(
-      theme,
+      themeData,
       density == IxDensity.adaptive ? IxDensity.comfortable : density,
     );
     if (density != IxDensity.adaptive) {
@@ -311,18 +401,27 @@ class IxThemeBuilder {
   /// Useful when you want to flip between light/dark or supply a custom
   /// [IxTypography] while reusing the remaining configuration.
   IxThemeBuilder copyWith({
+    @Deprecated('Use theme: IxThemeName; brand is a classic alias')
     IxThemeFamily? family,
-    ThemeMode? mode,
+    @Deprecated('Use brightness: or IxThemeController') ThemeMode? mode,
+    @Deprecated('Use IxThemeController for system resolution')
     Brightness? systemBrightness,
+    IxThemeName? theme,
+    Brightness? brightness,
     IxTypography? typography,
     IxCustomPalette? customPalette,
     IxIconResolver? icons,
     IxDensity? density,
   }) {
     return IxThemeBuilder(
+      // ignore: deprecated_member_use_from_same_package
       family: family ?? this.family,
+      // ignore: deprecated_member_use_from_same_package
       mode: mode ?? this.mode,
+      // ignore: deprecated_member_use_from_same_package
       systemBrightness: systemBrightness ?? this.systemBrightness,
+      theme: theme ?? this.theme,
+      brightness: brightness ?? this.brightness,
       typography: typography ?? this.typography,
       customPalette: customPalette ?? this.customPalette,
       icons: icons ?? this.icons,
@@ -423,14 +522,25 @@ TextTheme _buildTextTheme(
 /// Theme extension that surfaces Siemens IX tokens and typography helpers from
 /// the widget tree.
 class IxTheme extends ThemeExtension<IxTheme> {
+  /// Creates the Siemens iX theme extension.
+  ///
+  /// [colorSchema] defaults to the schema matching [brightness]; the
+  /// deprecated [family]/[mode] pair stays required so that 1.x call sites
+  /// keep compiling.
   const IxTheme({
+    this.themeName = IxThemeName.classic,
+    IxColorSchema? colorSchema,
     required this.family,
     required this.mode,
     required this.brightness,
     required this.palette,
     required this.typography,
     this.density = IxDensity.adaptive,
-  });
+  }) : colorSchema =
+           colorSchema ??
+           (brightness == Brightness.dark
+               ? IxColorSchema.dark
+               : IxColorSchema.light);
 
   /// Resolves the [IxTheme] registered on the closest [Theme], or `null` if
   /// the [ThemeData] wasn't built by [IxThemeBuilder].
@@ -460,10 +570,32 @@ class IxTheme extends ThemeExtension<IxTheme> {
     return theme;
   }
 
+  /// The Siemens iX theme identity this [ThemeData] was built for (upstream
+  /// `data-ix-theme`).
+  final IxThemeName themeName;
+
+  /// The color schema this [ThemeData] was built for.
+  ///
+  /// Always [IxColorSchema.light] or [IxColorSchema.dark] -- a built theme
+  /// has a resolved appearance. [IxColorSchema.system] only exists as the
+  /// *configured* schema on `IxThemeController`.
+  final IxColorSchema colorSchema;
+
+  /// The visual family this theme was built for.
+  @Deprecated('Use themeName')
   final IxThemeFamily family;
+
+  /// The [ThemeMode] this theme was built for.
+  @Deprecated('Use colorSchema / brightness')
   final ThemeMode mode;
+
+  /// The resolved brightness of this theme.
   final Brightness brightness;
+
+  /// The resolved Siemens iX color palette, keyed by token.
   final Map<IxThemeColorToken, Color> palette;
+
+  /// The Siemens iX type scale in effect for this theme.
   final IxTypography typography;
 
   /// The adaptive density policy in effect for this theme.
@@ -491,15 +623,21 @@ class IxTheme extends ThemeExtension<IxTheme> {
 
   @override
   IxTheme copyWith({
-    IxThemeFamily? family,
-    ThemeMode? mode,
+    IxThemeName? themeName,
+    IxColorSchema? colorSchema,
+    @Deprecated('Use themeName') IxThemeFamily? family,
+    @Deprecated('Use colorSchema / brightness') ThemeMode? mode,
     Brightness? brightness,
     Map<IxThemeColorToken, Color>? palette,
     IxTypography? typography,
     IxDensity? density,
   }) {
     return IxTheme(
+      themeName: themeName ?? this.themeName,
+      colorSchema: colorSchema ?? this.colorSchema,
+      // ignore: deprecated_member_use_from_same_package
       family: family ?? this.family,
+      // ignore: deprecated_member_use_from_same_package
       mode: mode ?? this.mode,
       brightness: brightness ?? this.brightness,
       palette: palette ?? this.palette,
@@ -522,7 +660,11 @@ class IxTheme extends ThemeExtension<IxTheme> {
     }
 
     return IxTheme(
+      themeName: t < 0.5 ? themeName : other.themeName,
+      colorSchema: t < 0.5 ? colorSchema : other.colorSchema,
+      // ignore: deprecated_member_use_from_same_package
       family: t < 0.5 ? family : other.family,
+      // ignore: deprecated_member_use_from_same_package
       mode: t < 0.5 ? mode : other.mode,
       brightness: t < 0.5 ? brightness : other.brightness,
       palette: Map.unmodifiable(blended),

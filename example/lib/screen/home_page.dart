@@ -133,7 +133,9 @@ class _ThemeSwitcherCard extends StatelessWidget {
             const SizedBox(height: 12),
             SegmentedButton<IxThemeFamily>(
               segments: IxThemeFamily.values
-                  // Brand family is not available in the OSS build.
+                  // Brand family is not available in the OSS build and is
+                  // deprecated (removed in 2.0).
+                  // ignore: deprecated_member_use
                   .where((family) => family != IxThemeFamily.brand)
                   .map(
                     (family) => ButtonSegment(
@@ -299,6 +301,7 @@ String _familyLabel(IxThemeFamily family) {
       return 'Custom';
     case IxThemeFamily.classic:
       return 'Classic';
+    // ignore: deprecated_member_use
     case IxThemeFamily.brand:
       return 'Brand';
   }
