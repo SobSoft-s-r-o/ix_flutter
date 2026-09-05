@@ -559,11 +559,14 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
                         else
                           label,
                         const SizedBox(width: IxCommonGeometry.space1),
+                        // 16px, the size 1.x rendered this glyph at: a
+                        // larger icon box would grow the trigger on every
+                        // existing call site.
                         IxIcon.key(
                           _isOpen
                               ? IxIconKey.chevronUpSmall
                               : IxIconKey.chevronDownSmall,
-                          size: IxIconSize.s24,
+                          size: IxIconSize.s16,
                           excludeFromSemantics: true,
                         ),
                       ],

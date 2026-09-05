@@ -342,6 +342,147 @@ void main() {
 
   checkedItemIsExposedAndReservesAColumn();
 
+  @Upstream(
+    'dropdown.tsx:166-180 the floating-ui flip() middleware moves '
+    'the menu to the other side of the trigger when it does not fit',
+  )
+  void placementFlipsWhenTheMenuDoesNotFit() {
+    testWidgets('the menu flips instead of covering its trigger', (
+      tester,
+    ) async {
+      // Each scenario gets its own key: without it the element (and its
+      // still-open state) would be reused across `pumpIx` calls, and the
+      // next tap would close the menu instead of opening it.
+      Widget dropdown(
+        String name,
+        IxDropdownPlacement placement,
+        String itemLabel,
+      ) {
+        return IxDropdownButton<int>(
+          key: ValueKey(name),
+          label: 'A',
+          placement: placement,
+          items: [
+            for (var i = 0; i < 5; i++)
+              IxDropdownMenuItem(label: '$itemLabel $i', value: i),
+          ],
+        );
+      }
+
+      Future<(Rect trigger, Rect menu)> open(WidgetTester tester) async {
+        await tester.tap(find.text('A'));
+        await tester.pump(const Duration(milliseconds: 200));
+        return (
+          tester.getRect(find.byType(ElevatedButton)),
+          tester.getRect(find.byKey(const Key('ix-dropdown-menu'))),
+        );
+      }
+
+      // A `bottomStart` trigger 400px down a 600px viewport: the gap below
+      // it is wide enough to *start* the menu but not to hold its ~208px,
+      // so the menu belongs above the trigger instead of clamped over it.
+      await pumpIx(
+        tester,
+        Column(
+          children: [
+            const SizedBox(height: 400),
+            dropdown(
+              'below-does-not-fit',
+              IxDropdownPlacement.bottomStart,
+              'Item',
+            ),
+          ],
+        ),
+        size: const Size(400, 600),
+      );
+      var (trigger, menu) = await open(tester);
+      expect(menu.height, greaterThan(600 - trigger.bottom));
+      expect(menu.bottom, lessThanOrEqualTo(trigger.top));
+      expect(menu.top, greaterThanOrEqualTo(8));
+
+      // Same on the horizontal axis: a `rightStart` trigger near the right
+      // edge opens to its left.
+      await pumpIx(
+        tester,
+        Row(
+          children: [
+            const SizedBox(width: 600),
+            dropdown(
+              'right-does-not-fit',
+              IxDropdownPlacement.rightStart,
+              'A considerably longer item',
+            ),
+          ],
+        ),
+        size: const Size(800, 600),
+      );
+      (trigger, menu) = await open(tester);
+      expect(menu.width, greaterThan(800 - trigger.right));
+      expect(menu.right, lessThanOrEqualTo(trigger.left));
+      expect(menu.left, greaterThanOrEqualTo(8));
+
+      // With room on the preferred side, the menu stays there.
+      await pumpIx(
+        tester,
+        Align(
+          alignment: Alignment.topLeft,
+          child: dropdown(
+            'below-fits',
+            IxDropdownPlacement.bottomStart,
+            'Item',
+          ),
+        ),
+        size: const Size(400, 600),
+      );
+      (trigger, menu) = await open(tester);
+      expect(menu.top, greaterThanOrEqualTo(trigger.bottom));
+      expect(menu.bottom, lessThanOrEqualTo(600 - 8));
+    });
+  }
+
+  placementFlipsWhenTheMenuDoesNotFit();
+
+  @Upstream('dropdown-button.tsx the trigger renders the small chevron glyph')
+  void triggerKeepsItsHeightWithA16pxChevron() {
+    testWidgets('the trigger chevron is 16px and does not grow the button', (
+      tester,
+    ) async {
+      await pumpIx(
+        tester,
+        IxDropdownButton<int>(
+          label: 'A',
+          items: const [IxDropdownMenuItem(label: 'One', value: 1)],
+        ),
+      );
+
+      // The visual button box (the button's Material, not the padded
+      // `MaterialTapTargetSize` box around it, which is a flat 48px either
+      // way). 41px is what the 1.x trigger measured: 12+12 vertical padding
+      // from IxButtonTheme around a 17px content row whose tallest item is
+      // the 14px/1.2 label line box, just above the 40px `minimumSize`. A
+      // 24px chevron box would make the content 24px and the trigger 48px,
+      // growing every existing dropdown button, so the glyph stays at 16px.
+      final visual = find
+          .descendant(
+            of: find.byType(ElevatedButton),
+            matching: find.byType(Material),
+          )
+          .first;
+      expect(tester.getSize(visual).height, 41.0);
+      expect(
+        tester.getSize(
+          find.descendant(
+            of: find.byType(ElevatedButton),
+            matching: find.byType(IxIcon),
+          ),
+        ),
+        const Size(16, 16),
+      );
+    });
+  }
+
+  triggerKeepsItsHeightWithA16pxChevron();
+
   @Upstream('dropdown.scss:16-24 the menu honours an explicit max height')
   void maxHeightOverridesTheViewportBudget() {
     testWidgets('maxHeight caps the menu height', (tester) async {

@@ -109,6 +109,12 @@ class _IxDropdownMenuLayout extends SingleChildLayoutDelegate {
 
   /// Resolves the position along the placement axis, flipping to the other
   /// side of the trigger when the preferred side cannot fit the menu.
+  ///
+  /// Both candidates are compared by the slack they leave against the
+  /// viewport margin — how much room is left over *after* the menu's own
+  /// [extent] is placed there. A non-negative slack means the menu fits on
+  /// that side; when neither side fits, the roomier one wins and [_clamp]
+  /// pushes the menu back into the viewport.
   double _resolveMain({
     required double extent,
     required double triggerStart,
@@ -117,12 +123,12 @@ class _IxDropdownMenuLayout extends SingleChildLayoutDelegate {
   }) {
     final after = triggerStart + triggerExtent + _kMenuGap;
     final before = triggerStart - _kMenuGap - extent;
-    final roomAfter = viewportExtent - _kViewportMargin - after;
-    final roomBefore = before - _kViewportMargin;
+    final slackAfter = viewportExtent - _kViewportMargin - after - extent;
+    final slackBefore = before - _kViewportMargin;
     if (_prefersAfter) {
-      return roomAfter >= 0 || roomBefore < roomAfter ? after : before;
+      return slackAfter >= 0 || slackBefore <= slackAfter ? after : before;
     }
-    return roomBefore >= 0 || roomAfter < roomBefore ? before : after;
+    return slackBefore >= 0 || slackAfter <= slackBefore ? before : after;
   }
 
   /// Resolves the position along the cross axis (`start`/`end` alignment).
