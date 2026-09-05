@@ -492,14 +492,32 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                             : widget.strings.sortedDescending);
                   return Expanded(
                     flex: col.flex,
+                    // `excludeSemantics` sits on the *inner* visual content
+                    // only (not on this whole `Semantics`/`InkWell` pair):
+                    // it suppresses the label `Text`'s own contribution (it
+                    // would otherwise duplicate `label: col.label` below),
+                    // while letting `InkWell`'s own focus semantics --
+                    // `isFocusable`/`isFocused`, the `focus` and `tap`
+                    // actions -- merge up into this node normally (same
+                    // pattern as `_DesktopRow`, which also leaves
+                    // `focusable`/`onTap` for `InkWell` alone to supply).
+                    // Redeclaring them here too, on the *ancestor*
+                    // `Semantics`, made the merge fail silently instead:
+                    // this node ended up with only `InkWell`'s own
+                    // `isFocusable`/`focus`/`tap` contribution and none of
+                    // `button`/`enabled`/`label`/`hint` below, dropping
+                    // exactly the properties a screen reader needs to
+                    // announce the header as a labelled, sortable button.
+                    // Excluding the whole subtree instead of just the
+                    // inner content would have the opposite problem: it
+                    // drops `isFocused`/`focus` too, so a screen reader
+                    // could tell a header is focusable but never that it
+                    // *is* focused (WCAG 2.4.7).
                     child: Semantics(
                       button: sortable,
                       enabled: sortable,
                       label: col.label,
                       hint: hint,
-                      focusable: sortable,
-                      onTap: sortable ? () => _onHeaderTap(col.sortKey!) : null,
-                      excludeSemantics: true,
                       child: InkWell(
                         key: sortable
                             ? Key('ix-rdv-header-${col.sortKey}')
@@ -510,30 +528,32 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                         onTap: sortable
                             ? () => _onHeaderTap(col.sortKey!)
                             : null,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          alignment: col.alignment,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  col.label,
-                                  style: labelStyle,
-                                  overflow: TextOverflow.ellipsis,
+                        child: ExcludeSemantics(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            alignment: col.alignment,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    col.label,
+                                    style: labelStyle,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                              if (sorted) ...[
-                                const SizedBox(width: 4),
-                                IxIcon.key(
-                                  _sortAscending
-                                      ? IxIconKey.chevronUp
-                                      : IxIconKey.chevronDown,
-                                  size: IxIconSize.s16,
-                                  excludeFromSemantics: true,
-                                ),
+                                if (sorted) ...[
+                                  const SizedBox(width: 4),
+                                  IxIcon.key(
+                                    _sortAscending
+                                        ? IxIconKey.chevronUp
+                                        : IxIconKey.chevronDown,
+                                    size: IxIconSize.s16,
+                                    excludeFromSemantics: true,
+                                  ),
+                                ],
                               ],
-                            ],
+                            ),
                           ),
                         ),
                       ),
@@ -1148,11 +1168,14 @@ class _SearchStatusHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            resultsLabelBuilder?.call(count) ?? strings.resultsCount(count),
-            style: theme?.textStyle(
-              IxTypographyVariant.label,
-              tone: IxThemeTextTone.soft,
+          Flexible(
+            child: Text(
+              resultsLabelBuilder?.call(count) ?? strings.resultsCount(count),
+              style: theme?.textStyle(
+                IxTypographyVariant.label,
+                tone: IxThemeTextTone.soft,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

@@ -23,6 +23,14 @@ class IxPaginationStrings {
   final String nextPage;
 
   /// Label preceding the page-size selector.
+  ///
+  /// This constructor's own default ("Items per page", no colon) only
+  /// applies when an [IxPaginationStrings] is constructed directly. An
+  /// [IxPaginationBar] with neither `paginationStrings:` nor `strings:`
+  /// set instead bridges from `IxResponsiveDataViewStrings.defaultsEn()`
+  /// (see [IxPaginationBar.paginationStrings]), whose matching
+  /// `rowsPerPageLabel` has always read "Items per page:" (with a
+  /// trailing colon) -- that visual default is unchanged by this class.
   final String rowsPerPage;
 
   /// Accessible name of the page-size selector trigger.

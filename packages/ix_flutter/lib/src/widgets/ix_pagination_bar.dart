@@ -51,6 +51,15 @@ class IxPaginationBar extends StatelessWidget {
   final IxResponsiveDataViewStrings? strings;
 
   /// Localizable strings for this bar, taking precedence over [strings].
+  ///
+  /// When neither this nor [strings] is set, the bar's strings are derived
+  /// from `IxResponsiveDataViewStrings.defaultsEn()` via
+  /// [IxPaginationStrings.fromDataView] -- so, for example, the page-size
+  /// label reads "Items per page:" (with the trailing colon
+  /// `IxResponsiveDataViewStrings.rowsPerPageLabel` has always used), not
+  /// the "Items per page" (no colon) shown in [IxPaginationStrings
+  /// .rowsPerPage]'s own default. Pass this parameter explicitly to opt
+  /// into [IxPaginationStrings]'s own defaults instead.
   final IxPaginationStrings? paginationStrings;
 
   @override
@@ -83,6 +92,15 @@ class IxPaginationBar extends StatelessWidget {
             ),
           ),
         ),
+        // Every label is a *direct* `Wrap` child, a sibling of whatever
+        // control it describes (rather than nested with it inside one
+        // `Row`) -- otherwise `Wrap` can only move the label+control pair
+        // as one indivisible unit, and at a narrow width the pair is
+        // wider than the viewport even though the label alone would fit
+        // its own run. `Flexible`/ellipsis is only needed on a label that
+        // still shares a `Row` with something else (none do here); a bare
+        // label softwraps within its own run instead, which never
+        // truncates it (WCAG 1.4.4 Resize text).
         child: Wrap(
           alignment: WrapAlignment.end,
           crossAxisAlignment: WrapCrossAlignment.center,
@@ -93,61 +111,44 @@ class IxPaginationBar extends StatelessWidget {
               Text(s.totalItems(totalItems!), style: softLabel),
             if (pageSizeOptions != null &&
                 onPageSizeChanged != null &&
-                pageSize != null)
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Flexible(
-                    child: Text(
-                      s.rowsPerPage,
-                      style: softLabel,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                pageSize != null) ...[
+              Text(s.rowsPerPage, style: softLabel),
+              // `IxDropdownButton`'s trigger sits behind an
+              // `OverlayPortal` (for the menu overlay), which always
+              // introduces its own semantics boundary at the trigger's
+              // position -- so a plain ancestor `Semantics` merges its
+              // `value` onto a *shallow* node next to, not into, the
+              // trigger's own button/label node. `MergeSemantics` forces
+              // both back into the one node `ix-pagination-size` is
+              // queried through.
+              MergeSemantics(
+                child: Semantics(
+                  value: '$pageSize',
+                  child: IxDropdownButton<int>(
+                    key: const Key('ix-pagination-size'),
+                    label: '$pageSize',
+                    semanticLabel: s.pageSelection,
+                    buttonVariant: IxButtonVariant.subtleTertiary,
+                    items: [
+                      for (final o in pageSizeOptions!)
+                        IxDropdownMenuItem(
+                          label: '$o',
+                          value: o,
+                          checked: o == pageSize,
+                        ),
+                    ],
+                    onItemSelected: onPageSizeChanged,
                   ),
-                  const SizedBox(width: 8),
-                  // `IxDropdownButton`'s trigger sits behind an
-                  // `OverlayPortal` (for the menu overlay), which always
-                  // introduces its own semantics boundary at the trigger's
-                  // position -- so a plain ancestor `Semantics` merges its
-                  // `value` onto a *shallow* node next to, not into, the
-                  // trigger's own button/label node. `MergeSemantics`
-                  // forces both back into the one node `ix-pagination-size`
-                  // is queried through.
-                  MergeSemantics(
-                    child: Semantics(
-                      value: '$pageSize',
-                      child: IxDropdownButton<int>(
-                        key: const Key('ix-pagination-size'),
-                        label: '$pageSize',
-                        semanticLabel: s.pageSelection,
-                        buttonVariant: IxButtonVariant.subtleTertiary,
-                        items: [
-                          for (final o in pageSizeOptions!)
-                            IxDropdownMenuItem(
-                              label: '$o',
-                              value: o,
-                              checked: o == pageSize,
-                            ),
-                        ],
-                        onItemSelected: onPageSizeChanged,
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
+            ],
+            Text(
+              totalPages != null ? s.pageOf(page, totalPages!) : s.page(page),
+              style: label,
+            ),
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Flexible(
-                  child: Text(
-                    totalPages != null
-                        ? s.pageOf(page, totalPages!)
-                        : s.page(page),
-                    style: label,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: 16),
                 IxIconButton(
                   key: const Key('ix-pagination-prev'),
                   icon: const IxIcon.key(IxIconKey.chevronLeftSmall),

@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 import 'helpers/pump_ix.dart';
-import 'helpers/upstream.dart';
 
 class TestItem {
   final int id;
@@ -362,72 +361,69 @@ void main() {
   });
 
   group('IxResponsiveDataView keyboard focus and sort semantics (A-4)', () {
-    // Metadata annotations can only precede a declaration, not a bare
-    // statement (see `test/a11y/semantics_matrix_test.dart`), so the
-    // @Upstream-tagged test is wrapped in a local function invoked right
-    // below it.
-    @Upstream('table.ct.ts sortable header buttons; WCAG 2.4.3 focus order')
-    void tabOrderClearHeadersRowsActionsPagination() {
-      testWidgets(
-        'Tab order: clear → headers → rows → row actions → pagination',
-        (tester) async {
-          await pumpIx(
-            tester,
-            IxResponsiveDataView<TestItem>(
-              items: testItems.take(2).toList(),
-              desktopColumns: sortableDesktopColumns,
-              mobileFields: mobileFields,
-              enableSorting: true,
-              onSortChanged: (_) {},
-              onRowTapDesktop: (_) {},
-              rowActions: [
-                IxRowAction<TestItem>(
-                  id: 'edit',
-                  label: 'Edit',
-                  icon: const Icon(Icons.edit),
-                  onSelected: (_) {},
-                ),
-              ],
-              searchQuery: 'Item',
-              onClearSearch: () {},
-              // `page: 2` (not 1): a disabled Material button is excluded
-              // from focus traversal, so page 1 would make "previous page"
-              // unreachable by Tab and contradict this test's own premise
-              // that it is one of the expected stops.
-              pagination: const IxPaginationConfig(
-                mode: IxPaginationMode.standard,
-                page: 2,
-                totalPages: 3,
-                pageSize: 10,
-                pageSizeOptions: [10, 20],
+    // No upstream counterpart: `@siemens/ix` has no table component (and
+    // therefore no `table.ct.ts`) -- `IxResponsiveDataView` is a
+    // Flutter-specific composite (see `doc/ix_responsive_data_view.md`,
+    // "Flutter-specific composite"). This guards WCAG 2.4.3 (focus order)
+    // per finding IXF-002 ("RDV focusability", spec
+    // `2026-09-04-ix-flutter-2-0-design.md`, task A-4).
+    testWidgets(
+      'Tab order: clear → headers → rows → row actions → pagination',
+      (tester) async {
+        await pumpIx(
+          tester,
+          IxResponsiveDataView<TestItem>(
+            items: testItems.take(2).toList(),
+            desktopColumns: sortableDesktopColumns,
+            mobileFields: mobileFields,
+            enableSorting: true,
+            onSortChanged: (_) {},
+            onRowTapDesktop: (_) {},
+            rowActions: [
+              IxRowAction<TestItem>(
+                id: 'edit',
+                label: 'Edit',
+                icon: const Icon(Icons.edit),
+                onSelected: (_) {},
               ),
-              onPageChanged: (_) {},
-              onPageSizeChanged: (_) {},
+            ],
+            searchQuery: 'Item',
+            onClearSearch: () {},
+            // `page: 2` (not 1): a disabled Material button is excluded
+            // from focus traversal, so page 1 would make "previous page"
+            // unreachable by Tab and contradict this test's own premise
+            // that it is one of the expected stops.
+            pagination: const IxPaginationConfig(
+              mode: IxPaginationMode.standard,
+              page: 2,
+              totalPages: 3,
+              pageSize: 10,
+              pageSizeOptions: [10, 20],
             ),
-            size: const Size(1024, 768),
-          );
-          final expected = <Key>[
-            const Key('ix-rdv-clear'),
-            const Key('ix-rdv-header-id'),
-            const Key('ix-rdv-header-name'),
-            const Key('ix-rdv-row-0'),
-            const Key('ix-rdv-row-actions-0'),
-            const Key('ix-rdv-row-1'),
-            const Key('ix-rdv-row-actions-1'),
-            const Key('ix-pagination-size'),
-            const Key('ix-pagination-prev'),
-            const Key('ix-pagination-next'),
-          ];
-          for (final key in expected) {
-            await tester.sendKeyEvent(LogicalKeyboardKey.tab);
-            await tester.pump();
-            expectFocusWithin(tester, key);
-          }
-        },
-      );
-    }
-
-    tabOrderClearHeadersRowsActionsPagination();
+            onPageChanged: (_) {},
+            onPageSizeChanged: (_) {},
+          ),
+          size: const Size(1024, 768),
+        );
+        final expected = <Key>[
+          const Key('ix-rdv-clear'),
+          const Key('ix-rdv-header-id'),
+          const Key('ix-rdv-header-name'),
+          const Key('ix-rdv-row-0'),
+          const Key('ix-rdv-row-actions-0'),
+          const Key('ix-rdv-row-1'),
+          const Key('ix-rdv-row-actions-1'),
+          const Key('ix-pagination-size'),
+          const Key('ix-pagination-prev'),
+          const Key('ix-pagination-next'),
+        ];
+        for (final key in expected) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.pump();
+          expectFocusWithin(tester, key);
+        }
+      },
+    );
 
     testWidgets(
       'sortable header is a button with sort hint and toggles on Enter',
@@ -452,9 +448,23 @@ void main() {
             isEnabled: true,
             isFocusable: true,
             hasTapAction: true,
+            hasFocusAction: true,
             label: 'Name',
             hint: 'Sort',
           ),
+        );
+        // One Tab reaches the first sortable header ("id", the leftmost
+        // column in `sortableDesktopColumns`). Its semantics node must
+        // report `isFocused` once actually focused -- InkWell's own focus
+        // state has to merge into the labelled node, not be swallowed by
+        // an `excludeSemantics` that spans the whole header (WCAG 2.4.7:
+        // a screen reader user must be able to tell the header is
+        // focused, not just that it is focusable).
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        expect(
+          tester.getSemantics(find.byKey(const Key('ix-rdv-header-id'))),
+          isSemantics(isFocused: true),
         );
         await tester.tap(find.byKey(const Key('ix-rdv-header-name')));
         await tester.pump();
@@ -485,5 +495,29 @@ void main() {
       );
       handle.dispose();
     });
+
+    testWidgets(
+      'search status header results label does not overflow with a long custom builder',
+      (tester) async {
+        await pumpIx(
+          tester,
+          IxResponsiveDataView<TestItem>(
+            items: testItems,
+            desktopColumns: desktopColumns,
+            mobileFields: mobileFields,
+            rowActions: const [],
+            searchQuery: 'q',
+            onClearSearch: () {},
+            strings: IxResponsiveDataViewStrings(
+              resultsCountBuilder: (c) =>
+                  'Insgesamt $c Ergebnisse in dieser Ansicht gefunden',
+            ),
+          ),
+          size: const Size(620, 800),
+          textScaler: const TextScaler.linear(2.0),
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }

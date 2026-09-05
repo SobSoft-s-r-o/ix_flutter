@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
@@ -15,6 +16,17 @@ Widget _bar({int page = 2}) => IxPaginationBar(
   onPageSizeChanged: (_) {},
 );
 
+/// 'chevrons are 32px IxIconButtons' and 'paginationStrings override wins
+/// over strings' below have no upstream counterpart: `pagination.tsx`
+/// (upstream `ix-pagination`) has no fixed pixel size for its chevrons --
+/// sizing is a Flutter-specific density/geometry concern (`IxIconButton`
+/// 32/24/16px sizes, findings IXF-020/IXF-047, task D-1) -- and no
+/// `IxPaginationStrings`-style bridging class, since upstream sets ARIA
+/// labels directly as component props rather than through a separate
+/// strings/localization object. `IxPaginationStrings` itself, and its
+/// precedence over the legacy `IxResponsiveDataViewStrings`, are additive
+/// Flutter API introduced by this task (findings IXF-002/IXF-024/IXF-031,
+/// task A-4, spec `2026-09-04-ix-flutter-2-0-design.md`).
 void main() {
   // Metadata annotations can only precede a declaration, not a bare
   // statement (see `test/a11y/semantics_matrix_test.dart`), so the
@@ -47,9 +59,10 @@ void main() {
             hasTapAction: true,
             // `IxDropdownButton`'s trigger is a `Focus` widget under the
             // hood, which contributes an explicit `focus` semantics action
-            // alongside `tap` -- real, additive assistive-tech behaviour
-            // (not asserted by the RDV header/row cases, which own their
-            // semantics outright via `excludeSemantics`).
+            // alongside `tap` -- real, additive assistive-tech behaviour,
+            // also asserted on the RDV sortable-header case (which merges
+            // its own `InkWell`'s native focus semantics rather than
+            // reconstructing them, see `ix_responsive_data_view_test.dart`).
             hasFocusAction: true,
             hasExpandedState: true,
             isExpanded: false,
@@ -74,6 +87,23 @@ void main() {
       const Size(32, 32),
     );
   });
+
+  testWidgets(
+    'page label gets its own Wrap run instead of being truncated at 320px × 2.0',
+    (tester) async {
+      await pumpIx(
+        tester,
+        _bar(),
+        size: const Size(320, 640),
+        textScaler: const TextScaler.linear(2.0),
+      );
+      expect(tester.takeException(), isNull);
+      final paragraph = tester.renderObject<RenderParagraph>(
+        find.text('Page 2 of 5'),
+      );
+      expect(paragraph.didExceedMaxLines, isFalse);
+    },
+  );
 
   testWidgets('paginationStrings override wins over strings', (tester) async {
     await pumpIx(
