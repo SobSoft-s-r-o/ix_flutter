@@ -245,25 +245,28 @@ MaterialApp(
 
 ## Icons
 
-### IxIcons
+### IxIcon
 
-Access to 1400+ Siemens iX icons.
+Renders an icon from an explicit `IxIconData` or, via `IxIcon.key`, from the app's registered `IxIconResolver`. Fixed square size (`IxIconSize`, default `s24`) — does not read an ambient `IconTheme.size`; pass `size:` explicitly.
 
 ```dart
+import 'package:ix_flutter/ix_flutter.dart';
 import 'package:your_app/ix_icons.dart';
 
-// Use icons in widgets
-Icon(IxIcons.home)
-Text('Home', style: TextStyle(fontFamily: IxIcons.fontFamily))
+// Full catalogue (generated)
+const IxIcon(IxIconsData.home)
+
+// Internal keys (no generator needed)
+const IxIcon.key(IxIconKey.close)
 ```
 
-**Icon Categories:**
+**Icon Categories (full catalogue):**
 - Navigation icons
 - Action icons
 - Status icons
-- And 1400+ more...
+- And 1 479 total in `@siemens/ix-icons` 3.5.0...
 
-**Complete Icon List:** [ix_icons.md](doc/ix_icons.md)
+**Complete Guide:** [ix_icons.md](doc/ix_icons.md)
 
 ---
 
@@ -271,30 +274,28 @@ Text('Home', style: TextStyle(fontFamily: IxIcons.fontFamily))
 
 ### Icon Generator Tool
 
-Command-line tool to generate icons from official Siemens source.
+Optional command-line tool that generates the full Siemens iX icon catalogue from the official npm source.
 
 ```bash
 # Basic usage
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
 
-# Custom paths
-dart run ix_flutter:generate_icons \
-  --output lib/generated \
-  --assets assets/icons
+# Custom paths, pinned version
+dart run ix_icons_generator:generate_icons --icons-version 3.5.0 -a assets/ix_icons
 
 # For library packages
-dart run ix_flutter:generate_icons \
-  --package my_library_name
+dart run ix_icons_generator:generate_icons --package my_library_name
 
 # See all options
-dart run ix_flutter:generate_icons --help
+dart run ix_icons_generator:generate_icons --help
 ```
 
 **Options:**
 - `--output` - Output directory for generated Dart file
 - `--assets` - Assets directory for icon SVGs
 - `--package` - Package name for icon references
-- `--verbose` - Verbose output
+- `--icons-version` - `@siemens/ix-icons` version to download — a pinned version, selectable with `--icons-version` (default `3.5.0`)
+- `--[no-]legacy-getters` - Emit deprecated `IxIcons` widget getters (default on)
 - `--help` - Show help message
 
 **Documentation:** [ix_icons.md](doc/ix_icons.md)

@@ -87,7 +87,7 @@ Detailed guides for each component:
 ```bash
 cd example
 flutter pub get
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 flutter run
 ```
 

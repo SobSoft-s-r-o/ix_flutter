@@ -130,10 +130,10 @@ flutter run -d chrome
 
 ```bash
 # Generate icons for development/testing
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 
 # Generate with custom output path
-dart run ix_flutter:generate_icons --output lib/generated --assets assets/icons
+dart run ix_icons_generator:generate_icons --output lib/generated --assets assets/icons
 ```
 
 ## Style Guidelines

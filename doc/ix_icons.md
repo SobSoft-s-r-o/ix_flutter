@@ -1,33 +1,161 @@
 # Siemens iX Icons
 
-Complete guide for using Siemens iX Design System icons in your Flutter application.
+Guide to using Siemens iX Design System icons in `ix_flutter`.
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [Quick Start](#quick-start)
-- [Installation and Setup](#installation-and-setup)
-  - [Generate Icons in Your Project](#generate-icons-in-your-project-required)
-- [Icon Generator Tool](#icon-generator-tool)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Command Line Options](#command-line-options)
-- [Using Icons in Your Code](#using-icons-in-your-code)
-  - [Basic Usage](#basic-usage)
-  - [Customizing Icon Size and Color](#customizing-icon-size-and-color)
-  - [Using IconTheme](#using-icontheme)
-- [Available Icons](#available-icons)
-- [Best Practices](#best-practices)
+- [Internal Icons](#internal-icons)
+- [Full Icon Catalogue](#full-icon-catalogue)
+- [API](#api)
+  - [IxIcon](#ixicon)
+  - [IxIconData](#ixicondata)
+  - [IxIconSize](#ixiconsize)
+  - [IxIconResolver](#ixiconresolver)
+  - [Overriding icons with IxThemeBuilder](#overriding-icons-with-ixthemebuilder)
+  - [Sizing: IxIcon ignores IconTheme](#sizing-ixicon-ignores-icontheme)
+- [Fallback Policy](#fallback-policy)
+- [Dependencies](#dependencies)
+- [License](#license)
+- [Version](#version)
 - [Troubleshooting](#troubleshooting)
 - [FAQ](#faq)
 
 ## Overview
 
-The Siemens iX Flutter package provides access to 1400+ icons from the Siemens iX Design System.
+`ix_flutter` renders every icon through one widget, `IxIcon`, backed by one of two sources:
 
-**⚠️ IMPORTANT: Due to licensing and distribution restrictions, icon SVG files are NOT included in the library package.**
+1. **Internal icons** — a small, fixed set of icons the library's own widgets need (chevrons, close, search, status glyphs, …), addressed by the semantic `IxIconKey` enum. No setup or generator required. See [Internal Icons](#internal-icons).
+2. **Full icon catalogue** — the complete `@siemens/ix-icons` set (1 479 icons in version 3.5.0), generated into your own app as `IxIconsData` constants by the optional `ix_icons_generator` tool. See [Full Icon Catalogue](#full-icon-catalogue).
 
-To use Siemens iX icons in your Flutter application, you **MUST** run the icon generator tool. The generator downloads icons directly from the official `@siemens/ix-icons` npm package, ensuring you always have properly licensed icons.
+Both sources render through the same `IxIcon` widget and share the same [fallback policy](#fallback-policy): a missing or corrupt SVG never crashes the UI or changes layout — it falls back to a Material glyph at the same size.
+
+## Internal Icons
+
+`ix_flutter`'s own widgets (pagination, dropdowns, toasts, the application scaffold, …) need a small, fixed set of icons — 28 keys, enumerated in `IxIconKey`. Library code never imports your generated `IxIcons`/`IxIconsData`; internal widgets always resolve icons through `IxIcon.key`:
+
+```dart
+const IxIcon.key(IxIconKey.home)
+```
+
+Once the LEGAL REVIEW gate documented in `UPSTREAM.md` is passed, the library will bundle these 28 icons as SVG assets under `packages/ix_flutter/assets/icons/internal/`, with the MIT notice in `packages/ix_flutter/assets/icons/internal/NOTICE`; until then library widgets fall back to Material glyphs through `IxIconResolver.material()` — see [Fallback Policy](#fallback-policy). This affects only the library's own internal rendering; it does not block using `IxIcon`/`IxIconData` or the full-catalogue generator in your own app today.
+
+## Full Icon Catalogue
+
+The complete Siemens iX icon set is optional. Generate it into your own app with `ix_icons_generator` — this is the only supported install/run path:
+
+```yaml
+dev_dependencies:
+  ix_icons_generator: ^1.1.0
+```
+
+```bash
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
+dart run ix_icons_generator:generate_icons --icons-version 3.5.0 -a assets/ix_icons
+```
+
+Running it:
+
+- Downloads the pinned `@siemens/ix-icons` release (1 479 icons in 3.5.0) from the official npm package.
+- Writes SVG assets into your assets directory (default `assets/svg/`; override with `-a`/`--assets`).
+- Generates `lib/ix_icons.dart` with `IxIconsData` constants for `IxIcon`, plus — by default — deprecated `IxIcons` widget getters kept for source compatibility (see `--no-legacy-getters`).
+- Updates your `pubspec.yaml` with the asset paths.
+
+Use the generated constants with `IxIcon`:
+
+```dart
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:your_app/ix_icons.dart';
+
+const IxIcon(IxIconsData.home)
+```
+
+Command line options (`dart run ix_icons_generator:generate_icons --help`):
+
+| Option | Short | Description | Default |
+|---|---|---|---|
+| `--project-root` | `-p` | Root directory of the Flutter project | current directory |
+| `--output` | `-o` | Output directory for generated Dart code | `lib` |
+| `--assets` | `-a` | Assets directory for SVG files | `assets/svg` |
+| `--package` | `-n` | Package name, for cross-package asset loading | none |
+| `--icons-version` |  | `@siemens/ix-icons` version to download — a pinned version, selectable with `--icons-version` | `3.5.0` |
+| `--[no-]legacy-getters` |  | Emit deprecated `IxIcons` widget getters | on |
+| `--help` | `-h` | Show help | |
+
+Building a library package that ships generated icons to its own consumers: pass `-n`/`--package` with your package name so the generated code loads assets from the right place.
+
+## API
+
+### IxIcon
+
+`IxIcon` is a `StatelessWidget` that renders one icon, from either an explicit `IxIconData` or — via `IxIcon.key` — whatever the ambient `IxIconResolver` maps an `IxIconKey` to:
+
+```dart
+const IxIcon(IxIconsData.home)     // explicit data (generated catalogue)
+const IxIcon.key(IxIconKey.home)   // resolver-driven (internal keys)
+```
+
+Constructor parameters: `size` (`IxIconSize`, default `s24`), `color`, `colorToken` (an `IxThemeColorToken`, used when `color` is unset), `semanticLabel`, and `excludeFromSemantics`.
+
+### IxIconData
+
+A sealed class describing where an icon's visual content comes from:
+
+- `IxIconData.packageAsset(name, {fallback, semanticLabel})` — bundled with `ix_flutter` itself.
+- `IxIconData.asset(assetPath, {package, fallback, semanticLabel})` — an SVG from your own (or another package's) assets; this is what the generator emits as `IxIconsData.*` constants.
+- `IxIconData.material(icon, {semanticLabel})` — a plain Material `IconData` glyph.
+- `IxIconData.widget(builder, {fallback, semanticLabel})` — a fully custom widget.
+
+`fallback` (a Material `IconData`) is only ever used if the primary source fails to load or decode.
+
+### IxIconSize
+
+A fixed set of square sizes: `s12`, `s16`, `s24` (the `IxIcon` default), `s32` — mirroring the Siemens iX `ix-icon` element's own size variants.
+
+### IxIconResolver
+
+A `ThemeExtension<IxIconResolver>` that maps every `IxIconKey` to concrete `IxIconData`. `IxIconResolver.material()` maps all 28 keys to Material glyphs and is the default `IxThemeBuilder` registers. `IxIconResolver.of(context)` resolves the ambient resolver, or `.material()` if none is registered.
+
+### Overriding icons with IxThemeBuilder
+
+Register a custom resolver — for example, once the bundled SVG set ships, or to swap in your own asset — with `IxThemeBuilder(icons:)`:
+
+```dart
+final theme = IxThemeBuilder(
+  icons: IxIconResolver.material().copyWith(
+    icons: {
+      IxIconKey.home: IxIconData.asset('assets/custom/home.svg'),
+    },
+  ),
+).build();
+```
+
+`copyWith` merges the given keys over `IxIconResolver.material()`'s full map, so the result always stays resolvable for every `IxIconKey`.
+
+### Sizing: IxIcon ignores IconTheme
+
+`IxIcon` always renders inside a fixed `size.px` square (`IxIconSize.s24` by default) — unlike the stock Flutter `Icon`, it does **not** read an ambient `IconTheme.size`. Pass `size:` explicitly, including when handing an `IxIcon` into a library widget's `icon:` slot:
+
+```dart
+// IxIconButton sizes its icon via a merged IconTheme — but IxIcon doesn't
+// read IconTheme.size, so the button's slot and the icon's own `size:`
+// must be set to match explicitly.
+IxIconButton(
+  icon: const IxIcon(IxIconsData.close, size: IxIconSize.s16), // s24 → 16px icon
+  size: IxIconButtonSize.s24,
+  onPressed: () {},
+)
+```
+
+## Fallback Policy
+
+`IxIcon` only ever falls back to a Material glyph in three cases:
+
+1. **No SVG set is bundled yet.** While the LEGAL REVIEW gate in `UPSTREAM.md` is open, `IxThemeBuilder` registers `IxIconResolver.material()` by default, so internal library icons render as Material glyphs.
+2. **The primary source fails.** A missing or corrupt SVG asset (package or app), or an SVG the decoder rejects. `IxIcon` swaps in `IxIconData.fallback` (or `Icons.broken_image` if none was given) at the same size, and — in debug builds — reports the failure through `FlutterError.reportError` under the `ix_flutter icons` library name, so it surfaces in your error console without crashing the UI.
+3. **An explicit request.** Code that constructs `IxIconResolver.material()` or `IxIconData.material(...)` directly.
+
+On the successful path, iX and Material glyphs are never mixed for the same icon. In every case, falling back never changes the icon's `SizedBox` dimension, hit area, or `Semantics` — only the glyph itself changes.
 
 ## Dependencies
 
@@ -35,488 +163,78 @@ To use Siemens iX icons in your Flutter application, you **MUST** run the icon g
 - Apps do **not** need to declare `flutter_svg`: generated icon code (generator ≥ 1.1.0) uses `IxIcon`/`IxIconData`.
 - If the icon runtime is extracted into a separate package in the future, `flutter_svg` moves with it.
 
-## Quick Start
+## License
 
-**Required steps to use Siemens iX icons:**
+`@siemens/ix-icons` is MIT-licensed (Copyright (c) 2022 Siemens AG); see `UPSTREAM.md` for the exact version, tag, commit and tarball checksum. `ix_flutter` itself (widgets, the `IxIcon`/`IxIconResolver` runtime, the generator) is also MIT — see `LICENSE`.
 
-1. Add library to dev_dependencies
-2. Run the generator to download icons from the official Siemens source
-3. Import and use the generated icons in your code
+- Once the LEGAL REVIEW gate documented in `UPSTREAM.md` is passed, the library will bundle a minimal internal set (28 icons) required by its own widgets, with the MIT notice in `packages/ix_flutter/assets/icons/internal/NOTICE`; until then library widgets fall back to Material glyphs through `IxIconResolver.material()`.
+- The full catalogue (1 479 icons in 3.5.0) is optional and generated into your app with `dart run ix_icons_generator:generate_icons`.
+- Redistribution keeps the MIT copyright/permission notice and `READMEOSS.html`. Siemens trademarks and brand guidelines are separate from the MIT copyright license — see `ICON_LICENSING.md`.
 
-## Installation and Setup
+## Version
 
-### Generate Icons in Your Project (Required)
+The library is verified against a single pinned `@siemens/ix-icons` release:
 
-**Step 1:** Add `ix_flutter` and `ix_icons_generator` to your `pubspec.yaml`:
+| | |
+|---|---|
+| Version | 3.5.0 |
+| Tag | `v3.5.0` |
+| Commit | `c46e1b13f7ccdaf66e4fcf2261f3765c55d45557` |
+| Tarball sha1 | `be50b3f933c8a5e210f980245a3df9825e8bcb7b` |
+| Icon count | 1 479 |
 
-```yaml
-dependencies:
-  ix_flutter: ^1.0.4
-
-dev_dependencies:
-  ix_icons_generator: ^1.0.0
-```
-
-**Step 2:** Run `flutter pub get`:
-
-```bash
-flutter pub get
-```
-
-**Step 3:** Generate icons by running the generator tool:
-
-```bash
-dart run ix_icons_generator:generate_icons
-```
-
-This command will:
-- ✅ Download all 1407 Siemens iX icons from the official `@siemens/ix-icons` npm package
-- ✅ Create `assets/svg/` directory in your project
-- ✅ Generate `lib/ix_icons.dart` file with all icon widgets
-- ✅ Automatically update your `pubspec.yaml` with asset paths
-
-**Step 4:** Import and use icons in your code:
-
-```dart
-import 'package:your_app/ix_icons.dart';  // Use your package name
-
-class MyWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return IxIcons.home;
-  }
-}
-```
-
-**Why is this required?**
-- 📜 **Licensing compliance**: Icons are downloaded from the official Siemens source, ensuring proper licensing
-- 🔄 **Latest version**: You always get the latest icons from Siemens iX Design System
-- ⚖️ **Distribution restrictions**: Patent and licensing restrictions prevent bundling icons in the library package
-
-## Icon Generator Tool
-
-The icon generator is available as a separate package `ix_icons_generator`.
-
-### Installation
-
-Add the generator to your dev dependencies:
-
-```yaml
-dev_dependencies:
-  ix_icons_generator: ^1.0.0
-```
-
-### Usage
-
-**Basic usage (recommended):**
-
-```bash
-dart run ix_icons_generator:generate_icons
-```
-
-This uses default settings:
-- Output: `lib/ix_icons.dart`
-- Assets: `assets/svg/`
-- Package: none (icons load from your app)
-
-**Custom output directory:**
-
-```bash
-dart run ix_icons_generator:generate_icons \
-  --output lib/icons \
-  --assets assets/ix_icons
-```
-
-**For library packages:**
-
-If you're building a library that will be used by other packages:
-
-```bash
-dart run ix_icons_generator:generate_icons \
-  --package my_library_name
-```
-
-This makes icons reference your library's assets.
-
-### Command Line Options
-
-| Option | Short | Description | Default |
-|--------|-------|-------------|---------|
-| `--project-root` | `-p` | Root directory of your Flutter project | Current directory |
-| `--output` | `-o` | Output directory for generated Dart code (relative to project root) | `lib` |
-| `--assets` | `-a` | Assets directory for SVG files (relative to project root) | `assets/svg` |
-| `--package` | `-n` | Package name for cross-package usage (leave empty for same package) | Empty (no package) |
-| `--help` | `-h` | Show help message | - |
-
-**Examples:**
-
-```bash
-# Generate in specific directories
-dart run ix_icons_generator:generate_icons \
-  --output lib/generated \
-  --assets assets/icons/ix
-
-# Generate for a library package
-dart run ix_icons_generator:generate_icons \
-  --package my_ui_library
-
-# Generate in a specific project
-dart run ix_icons_generator:generate_icons \
-  --project-root /path/to/my/project
-
-# Show help
-dart run ix_icons_generator:generate_icons --help
-```
-
-## Using Icons in Your Code
-
-### Basic Usage
-
-After generating icons, they are accessed as static getters on the `IxIcons` class:
-
-```dart
-import 'package:your_app/ix_icons.dart';  // Replace with your package name
-
-class MyScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IxIcons.menu,
-        title: Text('My App'),
-        actions: [
-          IxIcons.search,
-          IxIcons.settings,
-        ],
-      ),
-      body: Column(
-        children: [
-          IxIcons.home,
-          IxIcons.user,
-          IxIcons.calendar,
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: IxIcons.add,
-        onPressed: () {},
-      ),
-    );
-  }
-}
-```
-
-### Customizing Icon Size and Color
-
-Icons respect Flutter's `IconTheme` for sizing and coloring:
-
-```dart
-// Method 1: Using IconTheme
-IconTheme(
-  data: IconThemeData(
-    size: 32,
-    color: Colors.blue,
-  ),
-  child: IxIcons.home,
-)
-
-// Method 2: Wrap in a Container with specific size
-SizedBox(
-  width: 48,
-  height: 48,
-  child: IconTheme(
-    data: IconThemeData(color: Colors.red),
-    child: IxIcons.warning,
-  ),
-)
-```
-
-### Using IconTheme
-
-Apply icon styling to multiple icons at once:
-
-```dart
-class MyWidget extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return IconTheme(
-      data: IconThemeData(
-        size: 24,
-        color: Theme.of(context).primaryColor,
-      ),
-      child: Row(
-        children: [
-          IxIcons.home,
-          SizedBox(width: 8),
-          IxIcons.search,
-          SizedBox(width: 8),
-          IxIcons.settings,
-        ],
-      ),
-    );
-  }
-}
-```
-
-## Available Icons
-
-The package includes 1407 icons from the Siemens iX Design System. All icons follow a consistent naming pattern:
-
-**Common categories:**
-
-- **Navigation**: `home`, `menu`, `arrowLeft`, `arrowRight`, `chevronDown`, etc.
-- **Actions**: `add`, `edit`, `delete`, `save`, `close`, `search`, etc.
-- **Communication**: `mail`, `phone`, `notification`, `chat`, etc.
-- **Files**: `document`, `folder`, `download`, `upload`, etc.
-- **Status**: `success`, `error`, `warning`, `info`, etc.
-- **User**: `user`, `userGroup`, `profile`, etc.
-
-**Icon naming conventions:**
-
-- CamelCase: `aboutFilled`, `addCircle`, `alarmBell`
-- Descriptive: Icons are named after what they represent
-- Variants: Many icons have filled versions (e.g., `home` and `homeFilled`)
-
-**Finding icons:**
-
-Browse all available icons in the generated `ix_icons.dart` file or check the [Siemens iX Design System documentation](https://ix.siemens.io/docs/icon-library/).
-
-## Best Practices
-
-### 1. Use IconTheme for Consistent Styling
-
-```dart
-// Good: Define icon styling once
-IconTheme(
-  data: IconThemeData(size: 24, color: Colors.blue),
-  child: Column(
-    children: [
-      IxIcons.home,
-      IxIcons.search,
-      IxIcons.settings,
-    ],
-  ),
-)
-
-// Avoid: Wrapping each icon individually
-```
-
-### 2. Choose the Right Variant
-
-Many icons come in regular and filled variants:
-
-```dart
-// Regular - for outlined appearance
-IxIcons.heart
-
-// Filled - for solid appearance  
-IxIcons.heartFilled
-```
-
-### 3. Consider Accessibility
-
-Wrap icons in `Semantics` widgets for screen readers:
-
-```dart
-Semantics(
-  label: 'Home',
-  child: IconButton(
-    icon: IxIcons.home,
-    onPressed: () {},
-  ),
-)
-```
-
-### 4. Use Descriptive Icon Names
-
-```dart
-// Good: Clear what the icon represents
-IxIcons.userSettings
-IxIcons.documentDownload
-
-// Available: Search through ix_icons.dart for exact names
-```
-
-### 5. Keep Icons Consistent in Size
-
-```dart
-// Good: Consistent sizing within a context
-AppBar(
-  leading: IconTheme(
-    data: IconThemeData(size: 24),
-    child: IxIcons.menu,
-  ),
-  actions: [
-    IconTheme(
-      data: IconThemeData(size: 24),
-      child: IxIcons.search,
-    ),
-  ],
-)
-```
+This is a pinned version, selectable with `--icons-version` — the generator downloads whichever version you ask for, though only the default is verified against the internal-icon baseline. The same value is exposed at runtime as `IxUpstream.iconsVersion` (`packages/ix_flutter/lib/src/ix_core/ix_upstream.dart`) and recorded in `UPSTREAM.md`.
 
 ## Troubleshooting
 
-### Icons Not Showing Up
+### Full-catalogue icons don't show up
 
-**Problem:** Icons appear as blank or show an error.
+1. Confirm you ran the generator (see [Full Icon Catalogue](#full-icon-catalogue)) and that `pubspec.yaml` lists your assets directory under `flutter: assets:`.
+2. Run `flutter clean && flutter pub get` and rebuild.
+3. Check the import — `import 'package:your_app/ix_icons.dart';` (your app's package name, not `ix_flutter`).
+4. If a specific icon renders as a Material glyph instead of the iX glyph, check the debug console: `IxIcon` reports SVG decode failures there (see [Fallback Policy](#fallback-policy)) instead of failing silently.
 
-**Solutions:**
+### Generator fails to download icons
 
-1. **Did you run the generator?** Icons are NOT included in the library. You must run:
+1. Check your internet connection and access to `https://registry.npmjs.org`.
+2. Check proxy/firewall settings if you're behind one.
+3. Retry — network issues are often transient.
 
-```bash
-dart run ix_icons_generator:generate_icons
-```
+### Generated file has formatting or compile errors
 
-2. **Check asset configuration** - Make sure `pubspec.yaml` includes assets:
-
-```yaml
-flutter:
-  assets:
-    - assets/svg/
-```
-
-3. **Run flutter pub get** after generating icons:
-
-```bash
-flutter pub get
-```
-
-4. **Clean and rebuild:**
-
-```bash
-flutter clean
-flutter pub get
-flutter run
-```
-
-5. **Verify import path:**
-
-```dart
-import 'package:your_app/ix_icons.dart';  // Use your package name
-```
-
-### Generator Fails to Download Icons
-
-**Problem:** Icon generator fails with network error.
-
-**Solutions:**
-
-1. Check your internet connection
-2. Verify you can access npm registry: https://registry.npmjs.org
-3. Check for proxy settings if behind corporate firewall
-4. Try again - network issues may be temporary
-
-### Icons Are the Wrong Color
-
-**Problem:** Icons don't respect the color I set.
-
-**Solution:** Wrap icons in `IconTheme`:
-
-```dart
-IconTheme(
-  data: IconThemeData(color: Colors.red),
-  child: IxIcons.warning,
-)
-```
-
-### Generated File Has Errors
-
-**Problem:** After running generator, `ix_icons.dart` has compile errors.
-
-**Solutions:**
-
-1. Delete the file and regenerate:
-
-```bash
-rm lib/ix_icons.dart
-dart run ix_icons_generator:generate_icons
-```
-
-2. Check for manual edits - the file is auto-generated and shouldn't be modified
-3. Update the library:
-
-```bash
-flutter pub upgrade ix_flutter
-```
-
-### Cannot Find Specific Icon
-
-**Problem:** Looking for an icon but can't find it.
-
-**Solutions:**
-
-1. Check the generated `ix_icons.dart` file - all icons are listed there
-2. Search by description (e.g., search for "home" finds `home`, `homeFilled`)
-3. Visit [Siemens iX icon library](https://ix.siemens.io/docs/icon-library/)
-4. Icon names use camelCase, not kebab-case (e.g., `userProfile` not `user-profile`)
+- The generated file is not run through `dart format`; if your project checks formatting, run `dart format lib/ix_icons.dart` after generating.
+- Don't hand-edit the generated file — regenerate instead: `rm lib/ix_icons.dart && dart run ix_icons_generator:generate_icons`.
+- Make sure `ix_flutter` and `ix_icons_generator` are both up to date: `flutter pub upgrade ix_flutter ix_icons_generator`.
 
 ## FAQ
 
 ### Do I need to run the generator?
 
-**YES, absolutely!** Due to licensing and distribution restrictions, icon SVG files are NOT included in the `ix_flutter` library package. You MUST run the generator to download icons from the official Siemens source before you can use them in your application.
+No. `ix_flutter`'s own widgets render their icons from the internal `IxIconKey` set (falling back to Material glyphs today; see [Internal Icons](#internal-icons)) — no generator required. Run `ix_icons_generator` only if your own code wants icons from the full 1 479-icon catalogue.
 
-The generator is included with the library, so just run:
+### How do I update to a newer icon set?
 
-```bash
-dart run ix_icons_generator:generate_icons
-```
-
-### How do I update icons to the latest version?
-
-Run the generator again to download the latest icons from the official Siemens package:
-
-```bash
-dart run ix_icons_generator:generate_icons
-```
+Re-run the generator with `--icons-version`, e.g. `dart run ix_icons_generator:generate_icons --icons-version 3.5.0`. The default version only changes when `ix_icons_generator` itself is updated — see its `CHANGELOG.md`.
 
 ### Can I customize specific icons?
 
-**Yes**, after running the generator:
+Yes. After generating, edit any SVG file in your assets directory directly — your changes are used as-is until you regenerate. To swap an icon programmatically without editing files, see [Overriding icons with IxThemeBuilder](#overriding-icons-with-ixthemebuilder).
 
-1. Icons are downloaded to your `assets/svg/` directory
-2. You can edit any SVG file in that directory
-3. Your modified icons will be used in your app
+### How large is the generated catalogue?
 
-⚠️ Don't modify the generated `lib/ix_icons.dart` file - it will be overwritten if you regenerate. Only modify the SVG files in the assets folder.
+The generator writes 1 479 SVG files to your project. Flutter's build system only bundles the assets your code actually references, so your shipped app size reflects only the icons you use.
 
-### How large is the icon package?
+### Why did an icon render as a Material glyph instead of the iX glyph?
 
-The generator downloads ~1400 SVG files (~1.5 MB) to your project. However, Flutter's build system only includes icons that your code actually references, so your final app size will be much smaller.
-
-### Can I contribute new icons?
-
-Icons are maintained by the Siemens iX Design System team. To request new icons:
-
-1. Contact the [Siemens iX Design System](https://ix.siemens.io) team
-2. Once added to the official `@siemens/ix-icons` npm package, they'll automatically be available
-3. Run the generator again to download the latest icons:
-
-```bash
-dart run ix_icons_generator:generate_icons
-```
+Either you used `IxIcon.key(...)` and the LEGAL REVIEW gate for the internal set hasn't passed yet (see [Fallback Policy](#fallback-policy)), or the underlying SVG asset failed to load — check the debug console for a reported error.
 
 ### Do icons work on all platforms?
 
-**Yes!** Icons are SVG-based and work on:
-- ✅ Android
-- ✅ iOS  
-- ✅ Web
-- ✅ macOS
-- ✅ Windows
-- ✅ Linux
+Yes. `IxIcon` renders SVGs through `flutter_svg` (a direct `ix_flutter` dependency; see [Dependencies](#dependencies)) and Material glyphs through the framework, both of which support Android, iOS, web, macOS, Windows and Linux.
 
-### What's the difference between `home` and `homeFilled`?
+### What's the difference between `IxIcon` and the deprecated `IxIcons.<name>` getters?
 
-- **Regular** (e.g., `home`): Outlined/stroke version of the icon
-- **Filled** (e.g., `homeFilled`): Solid/filled version of the icon
-
-Choose based on your design needs. Many Material Design apps use filled icons for active states and outlined for inactive states.
-
-### Why can't the library bundle icons?
-
-Due to patent and distribution licensing restrictions, we cannot include Siemens iX icon SVG files directly in the library package. The icon generator ensures you download icons from the official Siemens source (`@siemens/ix-icons` npm package), maintaining proper licensing compliance while giving you access to all icons.
+`IxIcons.<name>` getters are generated for backward compatibility (pass `--no-legacy-getters` to skip them) and are removed in `ix_icons_generator` 2.0. They render a fixed 24px `IxIcon` and do not honor an ambient `IconTheme.size` — migrate to `IxIcon(IxIconsData.<name>)` and pass `size:` explicitly. See `ICON_MIGRATION.md` and `packages/ix_icons_generator/CHANGELOG.md`.
 
 ---
 
@@ -524,11 +242,4 @@ Due to patent and distribution licensing restrictions, we cannot include Siemens
 
 - **Siemens iX Design System:** https://ix.siemens.io
 - **Icon Library:** https://ix.siemens.io/docs/icon-library/
-- **Flutter SVG Package:** https://pub.dev/packages/flutter_svg
 - **Package Issues:** [GitHub Issues](https://github.com/SobSoft-s-r-o/ix_flutter/issues)
-
----
-
-**Last Updated:** January 2026  
-**Package Version:** 1.0.0  
-**Icons Version:** @siemens/ix-icons 3.2.0

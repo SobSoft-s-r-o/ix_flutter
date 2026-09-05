@@ -36,48 +36,39 @@ This package brings the design patterns, components, and visual language from [S
 
 - 🎨 **Siemens iX Theme System** - Complete theming support with light/dark modes
 - 🧩 **UI Components** - Pre-built widgets following iX design patterns
-- 🎯 **1400+ Icons** - Access to the complete Siemens iX icon library
+- 🎯 **1 479 Icons** - Full Siemens iX icon catalogue via the optional `ix_icons_generator`
 - 📱 **Responsive Design** - Components adapt to different screen sizes
 - ♿ **Accessibility** - Built with accessibility in mind
 
-## Important: Using Siemens iX Icons
+## Using Siemens iX Icons
 
-**⚠️ Due to licensing and distribution restrictions, icon SVG files are NOT included in this library package.**
-
-To use Siemens iX icons, you **MUST** run the icon generator tool to download icons from the official Siemens source.
+`ix_flutter` widgets render their own icons out of the box (falling back to Material glyphs today; see [doc/ix_icons.md](packages/ix_flutter/doc/ix_icons.md#fallback-policy)) — no generator required. The optional `ix_icons_generator` tool adds the full 1 479-icon Siemens iX catalogue to your own app.
 
 ### Quick Icon Setup
 
-1. Add the packages to your `pubspec.yaml`:
+1. Add the generator to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
   ix_flutter: ^1.0.2
 
 dev_dependencies:
-  ix_icons_generator: ^1.0.0
+  ix_icons_generator: ^1.1.0
 ```
 
-2. Get dependencies:
+2. Generate icons:
 
 ```bash
-flutter pub get
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
 ```
 
-3. Generate icons:
-
-```bash
-dart run ix_icons_generator:generate_icons
-```
-
-4. Use icons in your code:
+3. Use icons in your code:
 
 ```dart
+import 'package:ix_flutter/ix_flutter.dart';
 import 'package:your_app/ix_icons.dart';
 
-Widget build(BuildContext context) {
-  return IxIcons.home;
-}
+const IxIcon(IxIconsData.home)
 ```
 
 **See [doc/ix_icons.md](packages/ix_flutter/doc/ix_icons.md) for complete icon documentation.**
@@ -148,7 +139,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('My App'),
-        leading: IxIcons.menu,
+        leading: IxIcon(IxIconsData.menu),
       ),
       body: Column(
         children: [
@@ -209,37 +200,25 @@ flutter run
 
 ## Icon Generator Tool
 
-The icon generator is integrated with this package and downloads Siemens iX icons from the official source.
-
-### Why Generator is Required
-
-Due to licensing and distribution restrictions on Siemens iX Design System icons, SVG files cannot be bundled in the library. The generator ensures:
-
-- ✅ Legal compliance with Siemens licensing
-- ✅ Icons are from the official `@siemens/ix-icons` source
-- ✅ Latest icon versions available
-- ✅ Proper attribution and licensing
+`ix_icons_generator` is an optional dev dependency that downloads the full Siemens iX icon catalogue (1 479 icons in the pinned `3.5.0` release) from the official `@siemens/ix-icons` npm package and generates `IxIconsData` constants for `ix_flutter`'s `IxIcon` widget.
 
 ### Generator Usage
 
 ```bash
-# Basic usage
-dart run ix_icons_generator:generate_icons
+# Basic usage: dart run ix_icons_generator:generate_icons
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
 
-# Custom paths
-dart run ix_icons_generator:generate_icons \
-  --output lib/generated \
-  --assets assets/icons
+# Custom paths, pinned version
+dart run ix_icons_generator:generate_icons --icons-version 3.5.0 -a assets/ix_icons
 
 # For library packages
-dart run ix_icons_generator:generate_icons \
-  --package my_library_name
+dart run ix_icons_generator:generate_icons --package my_library_name
 
 # Show help
 dart run ix_icons_generator:generate_icons --help
 ```
 
-See [ix_icons_generator](packages/ix_icons_generator/) for complete generator documentation.
+See [ix_icons_generator](packages/ix_icons_generator/) for complete generator documentation, and [doc/ix_icons.md](packages/ix_flutter/doc/ix_icons.md) for the full icon guide (internal icons, fallback policy, licensing).
 
 ## Platform Support
 
@@ -274,13 +253,11 @@ For official Siemens iX resources, visit: https://ix.siemens.io
 
 ### Icon Licensing
 
-The Siemens iX icons are subject to Siemens' licensing terms. This library does NOT include the icon files due to distribution restrictions. Users must:
+`@siemens/ix-icons` is MIT-licensed (Copyright (c) 2022 Siemens AG); see [UPSTREAM.md](UPSTREAM.md) for the exact version, tag, commit and tarball checksum:
 
-1. Download icons using the provided generator tool
-2. Icons are sourced from the official `@siemens/ix-icons` npm package
-3. Ensure compliance with Siemens iX Design System licensing terms
-
-**By using the icon generator, you agree to comply with Siemens iX Design System licensing terms.**
+1. Once the LEGAL REVIEW gate documented in `UPSTREAM.md` is passed, the library will bundle a minimal internal set (28 icons) required by its own widgets; until then library widgets fall back to Material glyphs through `IxIconResolver.material()`.
+2. The full catalogue is optional and generated into your app from the official `@siemens/ix-icons` npm package with the `ix_icons_generator` tool.
+3. Redistribution keeps the MIT copyright/permission notice and `READMEOSS.html`; Siemens trademarks and brand guidelines are separate from the MIT copyright license.
 
 ### Icon Licensing Details
 

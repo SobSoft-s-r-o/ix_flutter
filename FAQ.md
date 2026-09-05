@@ -31,13 +31,16 @@ Run `flutter --version` and `dart --version` to check your versions.
 
 ### Q: Do I need any additional setup?
 
-**A:** Yes, you must generate icons before using them:
+**A:** No. `ix_flutter` widgets render their own icons out of the box (falling back to Material glyphs today; see [doc/ix_icons.md](doc/ix_icons.md#fallback-policy)). Only add the optional `ix_icons_generator` dev dependency if your own code needs the full Siemens iX icon catalogue:
 
-```bash
-dart run ix_flutter:generate_icons
+```yaml
+dev_dependencies:
+  ix_icons_generator: ^1.1.0
 ```
 
-This downloads icons from the official Siemens source.
+```bash
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
+```
 
 ---
 
@@ -45,7 +48,7 @@ This downloads icons from the official Siemens source.
 
 ### Q: Why aren't icons included in the package?
 
-**A:** Due to licensing and distribution restrictions on Siemens iX Design System icons, SVG files cannot be bundled. The generator ensures legal compliance by downloading icons from the official source.
+**A:** `ix_flutter` bundles a small internal set (28 icons) for its own widgets, with Material glyphs as today's fallback (see [doc/ix_icons.md](doc/ix_icons.md#fallback-policy)). The full 1 479-icon catalogue is optional and generated into your own app by `ix_icons_generator`, which downloads it from the official `@siemens/ix-icons` npm source.
 
 ---
 
@@ -54,7 +57,7 @@ This downloads icons from the official Siemens source.
 **A:** Run:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 This creates an `ix_icons.dart` file in your `lib/` directory.
@@ -65,22 +68,11 @@ This creates an `ix_icons.dart` file in your `lib/` directory.
 
 **A:** Check these common issues:
 
-1. **Node.js/npm not installed**
-   ```bash
-   node --version
-   npm --version
-   ```
+1. **Network connectivity**
+   - Check your internet connection and access to `https://registry.npmjs.org`
+   - Check proxy/firewall settings if you're behind one
 
-2. **Network connectivity**
-   - Check your internet connection
-   - The generator downloads from npm
-
-3. **Permissions issue**
-   ```bash
-   sudo dart run ix_flutter:generate_icons  # macOS/Linux
-   ```
-
-4. **Invalid project structure**
+2. **Invalid project structure**
    - Make sure you're in your app directory
    - Check that `lib/` folder exists
 
@@ -111,12 +103,13 @@ The generated files are static assets.
 
 ### Q: How do I use icons in my app?
 
-**A:** Import the generated file and use the icons:
+**A:** Import the generated file and pass its constants to `IxIcon`:
 
 ```dart
+import 'package:ix_flutter/ix_flutter.dart';
 import 'package:your_app/ix_icons.dart';
 
-Icon(IxIcons.home)
+const IxIcon(IxIconsData.home)
 ```
 
 See [doc/ix_icons.md](doc/ix_icons.md) for complete usage.
@@ -293,7 +286,7 @@ Icons have separate licensing. See [ICON_LICENSING.md](ICON_LICENSING.md).
 ### Q: Icons aren't showing up
 
 **A:**
-1. Generate icons: `dart run ix_flutter:generate_icons`
+1. Generate icons: `dart run ix_icons_generator:generate_icons`
 2. Make sure you import the generated file:
    ```dart
    import 'package:your_app/ix_icons.dart';
@@ -333,8 +326,8 @@ flutter build web  # or android, ios, etc.
 
 **A:**
 ```bash
-flutter pub upgrade ix_flutter
-dart run ix_flutter:generate_icons  # Regenerate icons if needed
+flutter pub upgrade ix_flutter ix_icons_generator
+dart run ix_icons_generator:generate_icons  # Regenerate icons if needed
 ```
 
 ---
@@ -369,7 +362,7 @@ For large data sets, use pagination (IxPaginationBar).
 **A:** Yes, but:
 1. Generate icons with `--package` flag:
    ```bash
-   dart run ix_flutter:generate_icons --package my_library_name
+   dart run ix_icons_generator:generate_icons --package my_library_name
    ```
 2. Include generated files in your library
 3. Document icon usage for library consumers
@@ -395,7 +388,7 @@ For large data sets, use pagination (IxPaginationBar).
 ```bash
 cd example
 flutter pub get
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 flutter run
 ```
 

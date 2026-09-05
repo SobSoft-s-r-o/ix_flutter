@@ -67,7 +67,7 @@ When using ix_flutter:
    ```
 
 4. **Run Icon Generation Safely**
-   - Only run `dart run ix_flutter:generate_icons` on trusted machines
+   - Only run `dart run ix_icons_generator:generate_icons` on trusted machines
    - The generator downloads icons from official npm source
    - Verify icon files before use in production
 

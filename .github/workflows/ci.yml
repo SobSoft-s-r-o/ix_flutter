@@ -90,6 +90,9 @@ jobs:
       - name: Run analyzer
         run: dart analyze
 
+      - name: Run tests
+        run: dart test
+
   format:
     name: dart format check
     runs-on: ubuntu-latest
@@ -110,9 +113,10 @@ jobs:
         working-directory: packages/ix_flutter
         run: dart run tool/upstream_check.dart
       - run: tool/check_svg_imports.sh
+      - run: tool/check_docs.sh
       - name: Format ix_icons_generator
         working-directory: packages/ix_icons_generator
-        run: dart format --output=none --set-exit-if-changed lib bin
+        run: dart format --output=none --set-exit-if-changed lib bin test
       - name: Format example
         working-directory: example
         run: dart format --output=none --set-exit-if-changed lib test

@@ -22,7 +22,7 @@ Add `ix_flutter` to your `pubspec.yaml`:
 dependencies:
   flutter:
     sdk: flutter
-  ix_flutter: ^1.0.0  # Latest version
+  ix_flutter: ^1.0.2
 ```
 
 ### Step 2: Get Dependencies
@@ -88,22 +88,29 @@ class HomePage extends StatelessWidget {
 
 ## Icon Setup
 
-### Important: Icon Generation Required
+### Icons Work Out of the Box
 
-**⚠️ Icons are NOT bundled with this package.** You must generate them separately.
+`ix_flutter` widgets render their own icons without any setup (falling back to Material glyphs today — see [doc/ix_icons.md](doc/ix_icons.md#fallback-policy)). The steps below are only needed if your own code wants icons from the full 1 479-icon Siemens iX catalogue.
 
-### Step 1: Generate Icons
+### Step 1: Add the Generator
+
+```yaml
+dev_dependencies:
+  ix_icons_generator: ^1.1.0
+```
+
+### Step 2: Generate Icons
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
 ```
 
 This command:
-- Downloads icons from the official Siemens source
-- Converts them to Flutter-compatible format
-- Generates an `ix_icons.dart` file in your app
+- Downloads the pinned `@siemens/ix-icons` release from the official npm package
+- Writes SVG assets into your assets directory (default `assets/svg/`)
+- Generates an `ix_icons.dart` file with `IxIconsData` constants in your app
 
-### Step 2: Verify Generation
+### Step 3: Verify Generation
 
 Check that `lib/ix_icons.dart` was created:
 
@@ -111,19 +118,16 @@ Check that `lib/ix_icons.dart` was created:
 ls lib/ix_icons.dart  # Should exist
 ```
 
-### Step 3: Use Icons in Your App
+### Step 4: Use Icons in Your App
 
 ```dart
+import 'package:ix_flutter/ix_flutter.dart';
 import 'package:your_app/ix_icons.dart';  // Generated file
-import 'package:flutter/material.dart';
 
 class MyIconWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      IxIcons.home,
-      size: 24.0,
-    );
+    return const IxIcon(IxIconsData.home, size: IxIconSize.s24);
   }
 }
 ```
@@ -134,23 +138,13 @@ class MyIconWidget extends StatelessWidget {
 ```bash
 # Make sure you're in the app directory
 cd my_app
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
-**Problem**: Permission denied
+**Problem**: Generator fails to download icons
 ```bash
-# On Linux/Mac, you may need sudo
-sudo dart run ix_flutter:generate_icons
-```
-
-**Problem**: Icons not found
-```bash
-# Check if Node.js and npm are installed
-node --version
-npm --version
-
-# Verify npm package is available
-npm view @siemens/ix-icons
+# Check your internet connection and access to the npm registry
+curl -I https://registry.npmjs.org
 ```
 
 See [doc/ix_icons.md](doc/ix_icons.md) for more troubleshooting.
@@ -446,7 +440,7 @@ class LoadingExample extends StatelessWidget {
 
 ### Best Practices
 
-- ✅ Always generate icons before using them
+- ✅ Only run the icon generator if you need the full iX icon catalogue
 - ✅ Use appropriate theme colors from `IxTheme`
 - ✅ Follow Siemens iX design guidelines
 - ✅ Test on multiple screen sizes
