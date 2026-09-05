@@ -1,10 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 import '../helpers/pump_ix.dart';
 import '../helpers/upstream.dart';
+
+/// Enables semantics for a test and returns the callback that releases the
+/// handle again.
+///
+/// Flutter verifies that every [SemanticsHandle] is disposed *before*
+/// `addTearDown` callbacks run, so the handle has to be released at the end
+/// of the test body; the tear-down is the guard that still releases it when
+/// the body throws first. Releasing twice would decrement the binding's
+/// handle count twice, hence the latch.
+VoidCallback ensureSemantics(WidgetTester tester) {
+  final handle = tester.ensureSemantics();
+  var released = false;
+  void release() {
+    if (released) {
+      return;
+    }
+    released = true;
+    handle.dispose();
+  }
+
+  addTearDown(release);
+  return release;
+}
 
 /// Accessibility contract of the [IxApplicationScaffold] navigation menu:
 /// exactly one semantics node per tile, the upstream `aria-selected` /
@@ -15,13 +39,17 @@ import '../helpers/upstream.dart';
 /// that is invoked immediately below it.
 
 void main() {
-  @Upstream('menu-item.tsx aria-selected/aria-expanded; menu.tsx role')
+  @Upstream(
+    'menu.tsx:975-978 role="menubar" + i18nAriaLabelMenu; menu-item.tsx:350 '
+    'aria-current="page"; menu-category.tsx:491 aria-expanded; '
+    'menu.tsx:1061-1063 role="menuitemcheckbox" + aria-checked',
+  )
   void menuSemantics() {
     testWidgets(
       'menu bar role, one node per tile, category expanded state, theme '
       'toggle toggled state',
       (tester) async {
-        final handle = tester.ensureSemantics();
+        final releaseSemantics = ensureSemantics(tester);
         await pumpIx(
           tester,
           IxApplicationScaffold(
@@ -109,10 +137,72 @@ void main() {
           tester.getSemantics(find.byKey(const Key('ix-menu-bar'))).role,
           SemanticsRole.menuBar,
         );
-        handle.dispose();
+        releaseSemantics();
       },
     );
   }
 
   menuSemantics();
+
+  @Upstream(
+    'menu.tsx:842-911 handleMenuKeyDown calls focus() on the menu item it '
+    'moves to, so assistive technology follows it',
+  )
+  void focusedTilePublishesFocus() {
+    testWidgets('the focused tile publishes its focused state', (tester) async {
+      final releaseSemantics = ensureSemantics(tester);
+      await pumpIx(
+        tester,
+        IxApplicationScaffold(
+          appTitle: 'App',
+          initiallyExpanded: true,
+          entries: const [
+            IxMenuEntry(id: 'home', type: IxMenuEntryType.item, label: 'Home'),
+            IxMenuEntry(
+              id: 'profile',
+              type: IxMenuEntryType.item,
+              label: 'Profile',
+            ),
+          ],
+          onNavigate: (_) {},
+          body: const SizedBox(),
+        ),
+        size: const Size(1440, 900),
+      );
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab); // sidebar toggle
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab); // first entry
+      await tester.pump();
+
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Home')),
+        matchesSemantics(
+          isButton: true,
+          hasSelectedState: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          isFocusable: true,
+          isFocused: true,
+          hasTapAction: true,
+          label: 'Home',
+        ),
+      );
+      expect(
+        tester.getSemantics(find.bySemanticsLabel('Profile')),
+        matchesSemantics(
+          isButton: true,
+          hasSelectedState: true,
+          hasEnabledState: true,
+          isEnabled: true,
+          isFocusable: true,
+          hasTapAction: true,
+          label: 'Profile',
+        ),
+        reason: 'an unfocused tile keeps reporting isFocused: false',
+      );
+      releaseSemantics();
+    });
+  }
+
+  focusedTilePublishesFocus();
 }

@@ -7,9 +7,10 @@ import '../helpers/pump_ix.dart';
 import '../helpers/upstream.dart';
 
 /// Keyboard model of the [IxApplicationScaffold] navigation menu, mirroring
-/// the upstream `menu.ct.ts` arrow-key contract (move between items, no
-/// wrapping) extended with the Home/End jumps the WAI-ARIA menu pattern
-/// mandates.
+/// the upstream key set handled by `menu.tsx:842-911` (`ArrowDown`,
+/// `ArrowUp`, `Home`, `End`). Upstream wraps around at both ends; this
+/// library clamps instead, as `global-constraints.md` prescribes for the
+/// 1.x menu.
 ///
 /// Metadata annotations can only precede a declaration, not a bare
 /// statement, so each `@Upstream`-tagged test is wrapped in a local function
@@ -44,6 +45,25 @@ Widget _app({List<String>? navigated}) => IxApplicationScaffold(
   onNavigate: (id) => navigated?.add(id),
   body: const Text('body'),
 );
+
+/// Asserts that the focused tile is inside the menu's scroll viewport, so
+/// the focus ring the arrow keys move is actually on screen.
+void expectFocusedTileVisible(WidgetTester tester) {
+  final ctx = FocusManager.instance.primaryFocus?.context;
+  expect(ctx, isNotNull);
+  final tile = tester.getRect(find.byWidget(ctx!.widget));
+  final viewport = tester.getRect(find.byType(Scrollable));
+  expect(
+    tile.top,
+    greaterThanOrEqualTo(viewport.top - 0.5),
+    reason: 'focused tile $tile is above the menu viewport $viewport',
+  );
+  expect(
+    tile.bottom,
+    lessThanOrEqualTo(viewport.bottom + 0.5),
+    reason: 'focused tile $tile is below the menu viewport $viewport',
+  );
+}
 
 /// Asserts that the widget owning the primary focus renders [label].
 void expectFocusOn(WidgetTester tester, String label) {
@@ -107,4 +127,61 @@ void main() {
   }
 
   arrowKeysMoveFocusBetweenMenuItems();
+
+  @Upstream(
+    'menu.tsx:842-911 handleMenuKeyDown walks every focusable menu item and '
+    'calls focus() on it',
+  )
+  void arrowKeysReachEveryEntryOfAScrollingMenu() {
+    testWidgets(
+      'Arrow/Home/End reach every entry of a scrolling menu and keep the '
+      'focused tile on screen',
+      (tester) async {
+        await pumpIx(
+          tester,
+          IxApplicationScaffold(
+            appTitle: 'App',
+            entries: [
+              for (var i = 1; i <= 20; i++)
+                IxMenuEntry(
+                  id: 'e$i',
+                  type: IxMenuEntryType.item,
+                  label: 'Entry $i',
+                ),
+            ],
+            initiallyExpanded: true,
+            onNavigate: (_) {},
+            body: const Text('body'),
+          ),
+          // Far shorter than the 20 entries need, so the menu scrolls.
+          size: const Size(1440, 400),
+        );
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab); // sidebar toggle
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab); // first entry
+        await tester.pump();
+        expectFocusOn(tester, 'Entry 1');
+        expectFocusedTileVisible(tester);
+
+        for (var i = 2; i <= 20; i++) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+          await tester.pump();
+          expectFocusOn(tester, 'Entry $i');
+          expectFocusedTileVisible(tester);
+        }
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.home);
+        await tester.pump();
+        expectFocusOn(tester, 'Entry 1');
+        expectFocusedTileVisible(tester);
+
+        await tester.sendKeyEvent(LogicalKeyboardKey.end);
+        await tester.pump();
+        expectFocusOn(tester, 'Entry 20');
+        expectFocusedTileVisible(tester);
+      },
+    );
+  }
+
+  arrowKeysReachEveryEntryOfAScrollingMenu();
 }

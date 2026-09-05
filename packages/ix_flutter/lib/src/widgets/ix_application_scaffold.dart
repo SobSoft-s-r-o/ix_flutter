@@ -42,6 +42,13 @@ const String _kThemeEntryId = '__ix_theme';
 /// [IxApplicationScaffold.about].
 const String _kAboutEntryId = '__ix_about';
 
+/// Width the fly-out panel prefers, before it is clamped to the room left
+/// beside the menu.
+const double _kFlyoutWidth = 320;
+
+/// Gap kept between the fly-out panel and the viewport edges.
+const double _kFlyoutMargin = IxCommonGeometry.space1;
+
 /// Resolves the focus node and traversal order assigned to the menu tile of
 /// a given entry id.
 typedef _TileFocusOf = ({FocusNode node, double order}) Function(String id);
@@ -192,6 +199,14 @@ class IxApplicationScaffold extends StatefulWidget {
   /// scaffold does not own the app's [ThemeMode].
   final bool enableToggleTheme;
 
+  /// Forgets which reserved menu entry ids have already been reported, so a
+  /// test that asserts on the one-time debug notice starts from a clean
+  /// slate. Call it from `addTearDown`.
+  @visibleForTesting
+  static void debugResetReservedIdWarnings() {
+    _IxApplicationScaffoldState._warnedIds.clear();
+  }
+
   @override
   State<IxApplicationScaffold> createState() => _IxApplicationScaffoldState();
 }
@@ -208,6 +223,12 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
 
   /// Anchors the fly-out panel to the menu rail.
   final LayerLink _rootLink = LayerLink();
+
+  /// Measures the menu rail, so the fly-out can be clamped to the room left
+  /// beside it.
+  final GlobalKey _menuKey = GlobalKey(
+    debugLabel: 'IxApplicationScaffold.menu',
+  );
   final OverlayPortalController _flyoutPortal = OverlayPortalController(
     debugLabel: 'IxApplicationScaffold.flyout',
   );
@@ -222,6 +243,10 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
   final Map<String, FocusNode> _tileNodes = <String, FocusNode>{};
 
   late bool _isExpanded;
+
+  /// The entry hosting this scaffold when it is built without an [Overlay]
+  /// ancestor; created once so it survives rebuilds.
+  OverlayEntry? _selfHostedEntry;
 
   /// Id of the tile whose fly-out is open (a category, or one of the
   /// built-in settings/about entries), or `null` when no panel is open.
@@ -238,10 +263,6 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     super.initState();
     _isExpanded = widget.initiallyExpanded;
     _syncCategoryExpansion(widget.entries);
-    // The overlay child stays mounted and renders nothing while no panel is
-    // open; toggling the controller instead would have to happen during
-    // build, where `show()`/`hide()` are forbidden.
-    _flyoutPortal.show();
   }
 
   @override
@@ -340,33 +361,50 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     return entries..addAll(_builtInBottomEntries);
   }
 
-  /// The built-in bottom entries, in the upstream `ix-menu` order.
-  List<IxMenuEntry> get _builtInBottomEntries => [
-    if (widget.settings != null)
-      IxMenuEntry(
-        id: _kSettingsEntryId,
-        type: IxMenuEntryType.item,
-        label: _strings.settings,
-        iconWidget: const IxIcon.key(IxIconKey.cogwheel),
-        isBottom: true,
-      ),
-    if (widget.enableToggleTheme && widget.onThemeModeChanged != null)
-      IxMenuEntry(
-        id: _kThemeEntryId,
-        type: IxMenuEntryType.custom,
-        label: _strings.toggleTheme,
-        iconWidget: const IxIcon.key(IxIconKey.lightDark),
-        isBottom: true,
-      ),
-    if (widget.about != null)
-      IxMenuEntry(
-        id: _kAboutEntryId,
-        type: IxMenuEntryType.item,
-        label: _strings.about,
-        iconWidget: const IxIcon.key(IxIconKey.about),
-        isBottom: true,
-      ),
-  ];
+  /// The built-in bottom entries, in the upstream `ix-menu` order
+  /// (`menu.tsx:1038-1082`).
+  ///
+  /// Each one is suppressed when its 1.x `show*` opt-out is `false` or when
+  /// the app still supplies the reserved entry that fills the same role, so
+  /// a menu never shows two settings, theme or about rows.
+  List<IxMenuEntry> get _builtInBottomEntries {
+    bool hasReserved(String id) =>
+        widget.entries.any((entry) => entry.isBottom && entry.id == id);
+
+    return [
+      if (widget.settings != null &&
+          widget.showSettings &&
+          !hasReserved('settings'))
+        IxMenuEntry(
+          id: _kSettingsEntryId,
+          type: IxMenuEntryType.item,
+          label: _strings.settings,
+          iconWidget: const IxIcon.key(IxIconKey.cogwheel),
+          isBottom: true,
+        ),
+      if (widget.enableToggleTheme &&
+          widget.showThemeToggle &&
+          widget.onThemeModeChanged != null &&
+          !hasReserved('theme-toggle'))
+        IxMenuEntry(
+          id: _kThemeEntryId,
+          type: IxMenuEntryType.custom,
+          label: _strings.toggleTheme,
+          iconWidget: const IxIcon.key(IxIconKey.lightDark),
+          isBottom: true,
+        ),
+      if (widget.about != null &&
+          widget.showAboutLegal &&
+          !hasReserved('about-legal'))
+        IxMenuEntry(
+          id: _kAboutEntryId,
+          type: IxMenuEntryType.item,
+          label: _strings.about,
+          iconWidget: const IxIcon.key(IxIconKey.about),
+          isBottom: true,
+        ),
+    ];
+  }
 
   bool _isBottomEntryVisible(IxMenuEntry entry) {
     switch (entry.id) {
@@ -395,8 +433,23 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    // A single portal for both layouts: only one of them is mounted at a
-    // time, and the fly-out has to escape the menu's own clip/width.
+    // Placed above the Navigator (a persistent shell in
+    // `MaterialApp.builder`) there is no Overlay to host the fly-out, so the
+    // scaffold brings its own. The lookup is only reached on a rebuild of
+    // this widget, and the answer is stable for a given placement.
+    if (Overlay.maybeOf(context) == null) {
+      return Overlay(
+        initialEntries: [
+          _selfHostedEntry ??= OverlayEntry(builder: (_) => _buildPortal()),
+        ],
+      );
+    }
+    return _buildPortal();
+  }
+
+  /// A single portal for both layouts: only one of them is mounted at a
+  /// time, and the fly-out has to escape the menu's own clip and width.
+  Widget _buildPortal() {
     return OverlayPortal(
       controller: _flyoutPortal,
       overlayChildBuilder: _buildFlyout,
@@ -429,29 +482,12 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         child: SafeArea(
           child: _menuTapRegion(
             CompositedTransformTarget(
+              key: _menuKey,
               link: _rootLink,
-              child: _NavigationPanel(
-                appTitle: widget.appTitle,
-                entries: _topEntries,
-                bottomEntries: _bottomEntries,
+              child: _buildNavigationPanel(
                 isExpanded: true,
                 showCollapseAction: false,
-                animationDuration: _effectiveAnimationDuration,
-                expandedWidth: widget.expandedWidth,
-                collapsedWidth: widget.collapsedWidth,
-                themeMode: widget.themeMode,
-                onThemeModeChanged: widget.onThemeModeChanged,
-                strings: _strings,
-                openFlyoutId: _openFlyoutId,
-                focusNodeOf: _tileNode,
-                onEntryTap: (entry) =>
-                    _handleEntryTap(entry, closeDrawer: true),
-                onBottomEntryTap: (entry) =>
-                    _handleBottomEntryTap(entry, closeDrawer: true),
-                onToggleCollapse: _toggleExpandedState,
-                isCategoryExpanded: _isCategoryExpanded,
-                onCategoryExpansionChanged: _toggleCategory,
-                onOpenFlyout: (entry) => _toggleFlyout(entry.id),
+                closeDrawer: true,
               ),
             ),
           ),
@@ -469,32 +505,17 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         children: [
           _menuTapRegion(
             CompositedTransformTarget(
+              key: _menuKey,
               link: _rootLink,
               child: AnimatedContainer(
                 duration: _effectiveAnimationDuration,
                 width: _isExpanded
                     ? widget.expandedWidth
                     : widget.collapsedWidth,
-                child: _NavigationPanel(
-                  appTitle: widget.appTitle,
-                  entries: _topEntries,
-                  bottomEntries: _bottomEntries,
+                child: _buildNavigationPanel(
                   isExpanded: _isExpanded,
                   showCollapseAction: true,
-                  animationDuration: _effectiveAnimationDuration,
-                  expandedWidth: widget.expandedWidth,
-                  collapsedWidth: widget.collapsedWidth,
-                  themeMode: widget.themeMode,
-                  onThemeModeChanged: widget.onThemeModeChanged,
-                  strings: _strings,
-                  openFlyoutId: _openFlyoutId,
-                  focusNodeOf: _tileNode,
-                  onEntryTap: _handleEntryTap,
-                  onBottomEntryTap: _handleBottomEntryTap,
-                  onToggleCollapse: _toggleExpandedState,
-                  isCategoryExpanded: _isCategoryExpanded,
-                  onCategoryExpansionChanged: _toggleCategory,
-                  onOpenFlyout: (entry) => _toggleFlyout(entry.id),
+                  closeDrawer: false,
                 ),
               ),
             ),
@@ -503,6 +524,38 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
           Expanded(child: widget.body),
         ],
       ),
+    );
+  }
+
+  /// The navigation panel both layouts render; they differ only in whether
+  /// the menu can be collapsed and whether tapping an entry also closes the
+  /// drawer.
+  Widget _buildNavigationPanel({
+    required bool isExpanded,
+    required bool showCollapseAction,
+    required bool closeDrawer,
+  }) {
+    return _NavigationPanel(
+      appTitle: widget.appTitle,
+      entries: _topEntries,
+      bottomEntries: _bottomEntries,
+      isExpanded: isExpanded,
+      showCollapseAction: showCollapseAction,
+      animationDuration: _effectiveAnimationDuration,
+      expandedWidth: widget.expandedWidth,
+      collapsedWidth: widget.collapsedWidth,
+      themeMode: widget.themeMode,
+      onThemeModeChanged: widget.onThemeModeChanged,
+      strings: _strings,
+      openFlyoutId: _openFlyoutId,
+      focusNodeOf: _tileNode,
+      onEntryTap: (entry) => _handleEntryTap(entry, closeDrawer: closeDrawer),
+      onBottomEntryTap: (entry) =>
+          _handleBottomEntryTap(entry, closeDrawer: closeDrawer),
+      onToggleCollapse: _toggleExpandedState,
+      isCategoryExpanded: _isCategoryExpanded,
+      onCategoryExpansionChanged: _toggleCategory,
+      onOpenFlyout: (entry) => _toggleFlyout(entry.id),
     );
   }
 
@@ -536,6 +589,21 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       return const SizedBox.shrink();
     }
 
+    // The panel is anchored to the menu's trailing edge, so it has to be
+    // clamped to what is left of the viewport: a Drawer in particular
+    // starts at the very top and leaves less room than the side rail.
+    // (Flipping to the other side is B-5's redesign, not this clamp.)
+    final viewport = MediaQuery.sizeOf(context);
+    final anchor = _menuRect;
+    final appBarBottom =
+        (widget.appBar?.preferredSize.height ?? kToolbarHeight) +
+        MediaQuery.paddingOf(context).top;
+    final anchorTop = anchor?.top ?? appBarBottom;
+    final top = math.max(anchorTop, appBarBottom);
+    final available = anchor == null
+        ? _kFlyoutWidth
+        : viewport.width - anchor.right - _kFlyoutMargin;
+
     // The overlay lays its children out at the full overlay size; aligning
     // first hands the panel loose constraints so it can size to its content
     // before the follower layer moves it next to the menu.
@@ -546,6 +614,11 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         title: title,
         strings: _strings,
         groupId: _tapRegionGroupId,
+        width: available <= 0
+            ? _kFlyoutWidth
+            : math.min(_kFlyoutWidth, available),
+        maxHeight: math.max(0.0, viewport.height - top - _kFlyoutMargin),
+        offset: Offset(0, top - anchorTop),
         returnFocusTo: _tileNodes[anchorId],
         onClose: _closeFlyout,
         child: content,
@@ -590,6 +663,16 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     );
   }
 
+  /// The menu rail's rect in global coordinates, as of the frame already on
+  /// screen; `null` before the menu has been laid out once.
+  Rect? get _menuRect {
+    final box = _menuKey.currentContext?.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) {
+      return null;
+    }
+    return box.localToGlobal(Offset.zero) & box.size;
+  }
+
   /// Depth-first lookup of the entry carrying [id].
   IxMenuEntry? _findEntry(List<IxMenuEntry> entries, String id) {
     for (final entry in entries) {
@@ -606,8 +689,25 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
 
   /// Opens the fly-out anchored to the tile of [anchorId], or closes it
   /// again when it is already the open one.
+  ///
+  /// The [OverlayPortal] is only shown while a panel is open: a hidden
+  /// portal never resolves an [Overlay], so a scaffold that shows no
+  /// fly-out works anywhere -- including above the `Navigator`, in
+  /// `MaterialApp.builder`.
   void _toggleFlyout(String anchorId) {
     setState(() => _openFlyoutId = _openFlyoutId == anchorId ? null : anchorId);
+    if (_openFlyoutId == null) {
+      _hideFlyoutPortal();
+    } else {
+      _flyoutPortal.show();
+    }
+  }
+
+  /// Hides the portal, if it is showing at all.
+  void _hideFlyoutPortal() {
+    if (_flyoutPortal.isShowing) {
+      _flyoutPortal.hide();
+    }
   }
 
   void _closeFlyout() {
@@ -615,6 +715,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       return;
     }
     setState(() => _openFlyoutId = null);
+    _hideFlyoutPortal();
   }
 
   void _toggleExpandedState() {
@@ -624,6 +725,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       // and a collapsed category expands inline once the menu is open.
       _openFlyoutId = null;
     });
+    _hideFlyoutPortal();
   }
 
   void _handleEntryTap(IxMenuEntry entry, {bool closeDrawer = false}) {
@@ -799,22 +901,48 @@ class _NavigationPanelState extends State<_NavigationPanel> {
     }
   }
 
-  /// Moves focus [delta] tiles along [_order], clamped at both ends: the
-  /// upstream menu does not wrap around (`menu.ct.ts:412-457`).
+  /// Focuses [node] and scrolls the menu just far enough to show it.
+  ///
+  /// Every tile is built (see the list's `cacheExtent`), so the node always
+  /// has a context to reveal -- without this a tile below the fold would
+  /// take focus while staying off screen, which is exactly what the focus
+  /// ring is there to prevent.
+  void _focusTile(FocusNode node, {required bool forward}) {
+    node.requestFocus();
+    final context = node.context;
+    if (context == null) {
+      return;
+    }
+    Scrollable.ensureVisible(
+      context,
+      alignment: forward ? 1.0 : 0.0,
+      alignmentPolicy: forward
+          ? ScrollPositionAlignmentPolicy.keepVisibleAtEnd
+          : ScrollPositionAlignmentPolicy.keepVisibleAtStart,
+      duration: IxMotion.of(context, IxMotion.defaultTime),
+    );
+  }
+
+  /// Moves focus [delta] tiles along [_order], clamped at both ends.
+  ///
+  /// Upstream's `menu.tsx:887-899` wraps around; `global-constraints.md`
+  /// prescribes clamping for the 1.x menu instead.
   void _move(int delta) {
     final index = _order.indexWhere((node) => node.hasFocus);
     if (index < 0) {
       return;
     }
-    _order[(index + delta).clamp(0, _order.length - 1)].requestFocus();
+    final target = (index + delta).clamp(0, _order.length - 1);
+    _focusTile(_order[target], forward: target >= index);
   }
 
-  /// Moves focus to the first or last tile (`Home`/`End`).
+  /// Moves focus to the first or last tile (`Home`/`End`,
+  /// `menu.tsx:901-910`).
   void _jump({required bool first}) {
     if (_order.isEmpty) {
       return;
     }
-    (first ? _order.first : _order.last).requestFocus();
+    _focusTile(first ? _order.first : _order.last, forward: !first);
   }
 
   @override
@@ -920,33 +1048,45 @@ class _NavigationPanelState extends State<_NavigationPanel> {
                         Expanded(
                           child: Stack(
                             children: [
-                              ListView(
+                              // Eager children rather than a lazy
+                              // `ListView`: every entry belongs to the
+                              // menu's ordered traversal, so every tile's
+                              // focus node has to be attached -- a lazily
+                              // built one can be neither focused nor
+                              // revealed. (`cacheExtent: double.infinity`
+                              // would do the same but trips the
+                              // framework's `value.isFinite` assertion.)
+                              SingleChildScrollView(
                                 controller: _scrollController,
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 12,
                                   vertical: 4,
                                 ),
-                                children: [
-                                  for (final entry in widget.entries)
-                                    _NavigationEntry(
-                                      entry: entry,
-                                      depth: 0,
-                                      isExpanded: isPanelExpanded,
-                                      sidebarTheme: sidebarTheme,
-                                      appMenuTheme: appMenuTheme,
-                                      animationDuration:
-                                          widget.animationDuration,
-                                      strings: widget.strings,
-                                      isCategoryExpanded: widget
-                                          .isCategoryExpanded(entry.id),
-                                      openFlyoutId: widget.openFlyoutId,
-                                      focusOf: focusOf,
-                                      onCategoryExpansionChanged:
-                                          widget.onCategoryExpansionChanged,
-                                      onEntryTap: widget.onEntryTap,
-                                      onOpenFlyout: widget.onOpenFlyout,
-                                    ),
-                                ],
+                                child: Column(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    for (final entry in widget.entries)
+                                      _NavigationEntry(
+                                        entry: entry,
+                                        depth: 0,
+                                        isExpanded: isPanelExpanded,
+                                        sidebarTheme: sidebarTheme,
+                                        appMenuTheme: appMenuTheme,
+                                        animationDuration:
+                                            widget.animationDuration,
+                                        strings: widget.strings,
+                                        isCategoryExpanded: widget
+                                            .isCategoryExpanded(entry.id),
+                                        openFlyoutId: widget.openFlyoutId,
+                                        focusOf: focusOf,
+                                        onCategoryExpansionChanged:
+                                            widget.onCategoryExpansionChanged,
+                                        onEntryTap: widget.onEntryTap,
+                                        onOpenFlyout: widget.onOpenFlyout,
+                                      ),
+                                  ],
+                                ),
                               ),
                               _ScrollShadow(
                                 showShadow: _showTopShadow,
@@ -1397,6 +1537,10 @@ class _NavigationTileState extends State<_NavigationTile> {
       // A disabled tile drops out of the traversal order, so it must not
       // claim to be focusable either.
       focusable: widget.enabled,
+      // `excludeSemantics` drops the InkWell's own focused flag, so the
+      // state the focus ring already tracks is republished here -- without
+      // it assistive technology cannot follow the arrow keys.
+      focused: _focused,
       label: widget.entry.label,
       value: widget.value,
       hint: widget.entry.tooltip,

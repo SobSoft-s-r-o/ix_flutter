@@ -117,7 +117,7 @@ defaults mirror the upstream `menu.tsx` English strings.
 | Property | Default | Used for |
 |---|---|---|
 | `menuLabel` | `Main navigation` | Accessible name of the `menuBar` landmark |
-| `openMenu` | `Open menu` | Tooltip of the app bar drawer button (small screens) |
+| `openMenu` | `Open menu` | Tooltip of the app bar drawer button (small screens); replaces Flutter's automatically localized `MaterialLocalizations.openAppDrawerTooltip`, so a localized app should set it |
 | `expandSidebar` / `collapseSidebar` | `Expand sidebar` / `Collapse sidebar` | Tooltip of the sidebar toggle |
 | `settings` | `Settings` | Label of the built-in settings entry |
 | `about` | `About & legal information` | Label of the built-in about entry |

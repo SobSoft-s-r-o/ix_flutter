@@ -1,10 +1,16 @@
 /// Localizable strings rendered by `IxApplicationScaffold`.
 ///
-/// Defaults mirror the upstream Siemens iX web component's English copy in
-/// `menu.tsx` (`i18nToggleTheme`, `i18nSettings`, `i18nLegal`,
-/// `i18nExpandSidebar`, `i18nCollapseSidebar`). Pass an instance to
-/// `IxApplicationScaffold.strings` to localize the navigation menu without
-/// forking the widget:
+/// [settings], [about] and [toggleTheme] repeat the upstream Siemens iX
+/// English copy verbatim (`menu.tsx:144 i18nSettings`, `:139 i18nLegal`,
+/// `:149 i18nToggleTheme`). [menuLabel], [expandSidebar] and
+/// [collapseSidebar] fill the roles of `menu.tsx:125 i18nAriaLabelMenu`
+/// ('Application Navigation'), `:154 i18nExpand` ('Expand') and `:159
+/// i18nCollapse` ('Collapse') with wording of our own; the rest
+/// ([openMenu], the theme names and [closePanel]) label parts that only
+/// exist in this Flutter port and have no upstream counterpart.
+///
+/// Pass an instance to `IxApplicationScaffold.strings` to localize the
+/// navigation menu without forking the widget:
 ///
 /// ```dart
 /// IxApplicationScaffold(
@@ -32,30 +38,38 @@ class IxApplicationStrings {
     this.closePanel = 'Close',
   });
 
-  /// Accessible name of the navigation menu's `menuBar` landmark.
+  /// Accessible name of the navigation menu's `menuBar` landmark
+  /// (upstream `menu.tsx:125 i18nAriaLabelMenu`, 'Application Navigation').
   final String menuLabel;
 
   /// Tooltip and accessible name of the app bar button that opens the
   /// navigation drawer on small screens.
+  ///
+  /// This replaces `MaterialLocalizations.openAppDrawerTooltip`, which
+  /// Flutter localizes automatically -- a localized app should therefore set
+  /// this string along with the rest.
   final String openMenu;
 
   /// Tooltip of the sidebar toggle while the menu is collapsed
-  /// (upstream `i18nExpandSidebar`).
+  /// (upstream `menu.tsx:154 i18nExpand`, 'Expand').
   final String expandSidebar;
 
   /// Tooltip of the sidebar toggle while the menu is expanded
-  /// (upstream `i18nCollapseSidebar`).
+  /// (upstream `menu.tsx:159 i18nCollapse`, 'Collapse').
   final String collapseSidebar;
 
   /// Label of the built-in settings entry shown when
-  /// `IxApplicationScaffold.settings` is set (upstream `i18nSettings`).
+  /// `IxApplicationScaffold.settings` is set
+  /// (upstream `menu.tsx:144 i18nSettings`).
   final String settings;
 
   /// Label of the built-in about entry shown when
-  /// `IxApplicationScaffold.about` is set (upstream `i18nLegal`).
+  /// `IxApplicationScaffold.about` is set
+  /// (upstream `menu.tsx:139 i18nLegal`).
   final String about;
 
-  /// Label of the built-in theme-toggle entry (upstream `i18nToggleTheme`).
+  /// Label of the built-in theme-toggle entry
+  /// (upstream `menu.tsx:149 i18nToggleTheme`).
   final String toggleTheme;
 
   /// Accessibility value and trailing label of the theme toggle while

@@ -10,6 +10,9 @@ import '../ix_theme/ix_theme_builder.dart';
 import 'i18n/ix_application_strings.dart';
 import 'ix_icon_button.dart';
 
+/// Identifies the fly-out surface so widget tests can measure it.
+const Key kIxMenuFlyoutKey = Key('ix-menu-flyout');
+
 /// Internal overlay panel anchored to the trailing edge of the application
 /// menu, used for the fly-out of a category in a collapsed menu and for the
 /// built-in settings/about panels.
@@ -30,6 +33,8 @@ class IxMenuFlyout extends StatefulWidget {
     required this.onClose,
     required this.child,
     this.width = 320,
+    this.maxHeight,
+    this.offset = Offset.zero,
     this.returnFocusTo,
     this.strings = const IxApplicationStrings(),
     this.groupId,
@@ -50,7 +55,17 @@ class IxMenuFlyout extends StatefulWidget {
   final Widget child;
 
   /// Fixed width of the panel in logical pixels.
+  ///
+  /// The owner clamps this to the room left beside the menu, so the panel
+  /// never runs off the viewport.
   final double width;
+
+  /// Upper bound for the panel's height; the content scrolls beyond it.
+  final double? maxHeight;
+
+  /// Shifts the panel away from the anchor's top corner -- used to keep it
+  /// below the app bar when the menu itself starts at the top of the screen.
+  final Offset offset;
 
   /// Focus node that regains focus once the panel closes.
   final FocusNode? returnFocusTo;
@@ -103,6 +118,7 @@ class _IxMenuFlyoutState extends State<IxMenuFlyout> {
 
     return CompositedTransformFollower(
       link: widget.link,
+      offset: widget.offset,
       targetAnchor: isRtl ? Alignment.topLeft : Alignment.topRight,
       followerAnchor: isRtl ? Alignment.topRight : Alignment.topLeft,
       child: TapRegion(
@@ -125,46 +141,52 @@ class _IxMenuFlyoutState extends State<IxMenuFlyout> {
               node: _scope,
               autofocus: true,
               child: Material(
+                key: kIxMenuFlyoutKey,
                 color: bg,
                 elevation: 8,
                 borderRadius: BorderRadius.circular(
                   IxCommonGeometry.defaultBorderRadius,
                 ),
                 clipBehavior: Clip.antiAlias,
-                child: SizedBox(
-                  width: widget.width,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(
-                          IxCommonGeometry.space3,
-                          IxCommonGeometry.space1,
-                          IxCommonGeometry.space1,
-                          IxCommonGeometry.space1,
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                widget.title,
-                                style: ix?.textStyle(
-                                  IxTypographyVariant.labelLg,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: widget.maxHeight ?? double.infinity,
+                  ),
+                  child: SizedBox(
+                    width: widget.width,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            IxCommonGeometry.space3,
+                            IxCommonGeometry.space1,
+                            IxCommonGeometry.space1,
+                            IxCommonGeometry.space1,
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  widget.title,
+                                  style: ix?.textStyle(
+                                    IxTypographyVariant.labelLg,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                            IxIconButton(
-                              icon: const IxIcon.key(IxIconKey.close),
-                              tooltip: widget.strings.closePanel,
-                              onPressed: _close,
-                            ),
-                          ],
+                              IxIconButton(
+                                icon: const IxIcon.key(IxIconKey.close),
+                                tooltip: widget.strings.closePanel,
+                                onPressed: _close,
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                      Flexible(child: widget.child),
-                    ],
+                        Flexible(child: widget.child),
+                      ],
+                    ),
                   ),
                 ),
               ),
