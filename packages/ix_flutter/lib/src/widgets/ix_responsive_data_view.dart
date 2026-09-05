@@ -88,6 +88,14 @@ class IxSortSpec {
 
   final String key;
   final bool ascending;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is IxSortSpec && other.key == key && other.ascending == ascending);
+
+  @override
+  int get hashCode => Object.hash(key, ascending);
 }
 
 /// A responsive widget that renders a data table on desktop/tablet and a
@@ -222,8 +230,10 @@ class IxResponsiveDataView<T> extends StatelessWidget {
 
     final content = LayoutBuilder(
       builder: (context, constraints) {
-        // Siemens IX breakpoint for mobile is typically < 600 or similar.
-        // Using 600 as requested.
+        // Desktop/mobile breakpoint. Stays at 600 in 1.x for backward
+        // compatibility; B-9 (2.0, "RDV primitives") moves this to 768
+        // alongside splitting this widget into IxTable/IxDataCard/
+        // IxRowActions primitives.
         if (constraints.maxWidth < 600) {
           return _MobileView<T>(
             items: items,
@@ -412,7 +422,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
     }
   }
 
-  void _handleSort(String key) {
+  void _onHeaderTap(String key) {
     if (!widget.enableSorting) return;
 
     final newAscending = _sortKey == key ? !_sortAscending : true;
@@ -428,8 +438,13 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
-    final color1 = theme?.color(IxThemeColorToken.color1) ?? Colors.grey[100]!;
-    final stdText = theme?.color(IxThemeColorToken.stdText) ?? Colors.black;
+    final cs = Theme.of(context).colorScheme;
+    final color1 =
+        theme?.color(IxThemeColorToken.color1) ?? cs.surfaceContainerHighest;
+    final ghostHover =
+        theme?.color(IxThemeColorToken.ghostHover) ??
+        cs.surfaceContainerHighest;
+    final labelStyle = theme?.textStyle(IxTypographyVariant.label);
 
     return Column(
       children: [
@@ -457,23 +472,44 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
               color: color1,
               border: Border(
                 bottom: BorderSide(
-                  color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
+                  color:
+                      theme?.color(IxThemeColorToken.softBdr) ??
+                      cs.outlineVariant,
                 ),
               ),
             ),
             child: Row(
               children: [
                 ...widget.columns.map((col) {
+                  final sortable = widget.enableSorting && col.sortKey != null;
+                  final sorted = sortable && _sortKey == col.sortKey;
+                  final hint = !sortable
+                      ? null
+                      : !sorted
+                      ? widget.strings.sortHint
+                      : (_sortAscending
+                            ? widget.strings.sortedAscending
+                            : widget.strings.sortedDescending);
                   return Expanded(
                     flex: col.flex,
-                    child: GestureDetector(
-                      onTap: (widget.enableSorting && col.sortKey != null)
-                          ? () => _handleSort(col.sortKey!)
-                          : null,
-                      child: MouseRegion(
-                        cursor: (widget.enableSorting && col.sortKey != null)
-                            ? SystemMouseCursors.click
-                            : SystemMouseCursors.basic,
+                    child: Semantics(
+                      button: sortable,
+                      enabled: sortable,
+                      label: col.label,
+                      hint: hint,
+                      focusable: sortable,
+                      onTap: sortable ? () => _onHeaderTap(col.sortKey!) : null,
+                      excludeSemantics: true,
+                      child: InkWell(
+                        key: sortable
+                            ? Key('ix-rdv-header-${col.sortKey}')
+                            : null,
+                        canRequestFocus: sortable,
+                        focusColor: Colors.transparent,
+                        hoverColor: ghostHover,
+                        onTap: sortable
+                            ? () => _onHeaderTap(col.sortKey!)
+                            : null,
                         child: Container(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           alignment: col.alignment,
@@ -483,21 +519,18 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                               Flexible(
                                 child: Text(
                                   col.label,
-                                  style: theme?.textStyle(
-                                    IxTypographyVariant.label,
-                                  ),
+                                  style: labelStyle,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               ),
-                              if (widget.enableSorting &&
-                                  col.sortKey != null &&
-                                  _sortKey == col.sortKey) ...[
+                              if (sorted) ...[
                                 const SizedBox(width: 4),
-                                IconTheme(
-                                  data: IconThemeData(size: 16, color: stdText),
-                                  child: _sortAscending
-                                      ? IxIcons.chevronUp
-                                      : IxIcons.chevronDown,
+                                IxIcon.key(
+                                  _sortAscending
+                                      ? IxIconKey.chevronUp
+                                      : IxIconKey.chevronDown,
+                                  size: IxIconSize.s16,
+                                  excludeFromSemantics: true,
                                 ),
                               ],
                             ],
@@ -513,7 +546,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                   child: Center(
                     child: Text(
                       widget.strings.toolsColumnHeader,
-                      style: theme?.textStyle(IxTypographyVariant.label),
+                      style: labelStyle,
                     ),
                   ),
                 ), // Fixed width for tools
@@ -541,6 +574,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                 }
                 final item = widget.items[index];
                 return _DesktopRow<T>(
+                  index: index,
                   item: item,
                   columns: widget.columns,
                   actions: widget.actions,
@@ -570,8 +604,9 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   }
 }
 
-class _DesktopRow<T> extends StatefulWidget {
+class _DesktopRow<T> extends StatelessWidget {
   const _DesktopRow({
+    required this.index,
     required this.item,
     required this.columns,
     required this.actions,
@@ -580,6 +615,9 @@ class _DesktopRow<T> extends StatefulWidget {
     required this.strings,
   });
 
+  /// The row's position in the list, used for its stable `ix-rdv-row-<index>`
+  /// / `ix-rdv-row-actions-<index>` keys.
+  final int index;
   final T item;
   final List<IxColumnDef<T>> columns;
   final List<IxRowAction<T>> actions;
@@ -588,44 +626,39 @@ class _DesktopRow<T> extends StatefulWidget {
   final IxResponsiveDataViewStrings strings;
 
   @override
-  State<_DesktopRow<T>> createState() => _DesktopRowState<T>();
-}
-
-class _DesktopRowState<T> extends State<_DesktopRow<T>> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    final color0 =
-        widget.theme?.color(IxThemeColorToken.color0) ?? Colors.white;
-    final color1Hover =
-        widget.theme?.color(IxThemeColorToken.color1Hover) ?? Colors.grey[200]!;
+    final cs = Theme.of(context).colorScheme;
+    final color0 = theme?.color(IxThemeColorToken.color0) ?? cs.surface;
+    final ghostHover =
+        theme?.color(IxThemeColorToken.ghostHover) ??
+        cs.surfaceContainerHighest;
     final borderColor =
-        widget.theme?.color(IxThemeColorToken.color4) ?? Colors.grey[300]!;
+        theme?.color(IxThemeColorToken.softBdr) ?? cs.outlineVariant;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: widget.onTap != null
-          ? SystemMouseCursors.click
-          : SystemMouseCursors.basic,
-      child: GestureDetector(
-        onTap: widget.onTap != null ? () => widget.onTap!(widget.item) : null,
+    return Semantics(
+      button: onTap != null,
+      label: null,
+      child: InkWell(
+        key: Key('ix-rdv-row-$index'),
+        canRequestFocus: onTap != null,
+        focusColor: Colors.transparent,
+        hoverColor: ghostHover,
+        onTap: onTap != null ? () => onTap!(item) : null,
         child: Container(
           height: 56, // Standard row height
           decoration: BoxDecoration(
-            color: _isHovered ? color1Hover : color0,
+            color: color0,
             border: Border(bottom: BorderSide(color: borderColor)),
           ),
           child: Row(
             children: [
-              ...widget.columns.map((col) {
+              ...columns.map((col) {
                 return Expanded(
                   flex: col.flex,
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     alignment: col.alignment,
-                    child: col.cellBuilder(context, widget.item),
+                    child: col.cellBuilder(context, item),
                   ),
                 );
               }),
@@ -634,15 +667,16 @@ class _DesktopRowState<T> extends State<_DesktopRow<T>> {
                 width: 48,
                 child: Center(
                   child: PopupMenuButton<IxRowAction<T>>(
-                    icon: IxIcons.moreMenu,
-                    tooltip: widget.strings.rowActionsTooltip,
-                    onSelected: (action) => action.onSelected(widget.item),
+                    key: Key('ix-rdv-row-actions-$index'),
+                    icon: const IxIcon.key(IxIconKey.moreMenu),
+                    tooltip: strings.rowActionsTooltip,
+                    onSelected: (action) => action.onSelected(item),
                     itemBuilder: (context) {
-                      return widget.actions
-                          .where((a) => a.isVisible?.call(widget.item) ?? true)
+                      return actions
+                          .where((a) => a.isVisible?.call(item) ?? true)
                           .map((action) {
                             final enabled =
-                                action.isEnabled?.call(widget.item) ?? true;
+                                action.isEnabled?.call(item) ?? true;
                             return PopupMenuItem<IxRowAction<T>>(
                               value: action,
                               enabled: enabled,
@@ -651,10 +685,10 @@ class _DesktopRowState<T> extends State<_DesktopRow<T>> {
                                   IconTheme(
                                     data: IconThemeData(
                                       color: action.destructive
-                                          ? widget.theme?.color(
+                                          ? theme?.color(
                                               IxThemeColorToken.alarm,
                                             )
-                                          : widget.theme?.color(
+                                          : theme?.color(
                                               IxThemeColorToken.stdText,
                                             ),
                                       size: 20,
@@ -666,7 +700,7 @@ class _DesktopRowState<T> extends State<_DesktopRow<T>> {
                                     action.label,
                                     style: TextStyle(
                                       color: action.destructive
-                                          ? widget.theme?.color(
+                                          ? theme?.color(
                                               IxThemeColorToken.alarm,
                                             )
                                           : null,
@@ -837,6 +871,7 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
                 item: item,
                 fields: widget.fields,
                 onTap: () => _showDetail(context, item),
+                strings: widget.strings,
               );
             },
           ),
@@ -862,59 +897,78 @@ class _MobileCard<T> extends StatelessWidget {
     required this.item,
     required this.fields,
     required this.onTap,
+    required this.strings,
   });
 
   final T item;
   final List<IxMobileFieldDef<T>> fields;
   final VoidCallback onTap;
+  final IxResponsiveDataViewStrings strings;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
+    final cs = Theme.of(context).colorScheme;
     final cardTheme = Theme.of(context).extension<IxCardTheme>();
     final cardStyle = cardTheme?.style(IxCardVariant.filled);
 
     final cardColor =
         cardStyle?.background ??
         theme?.color(IxThemeColorToken.color0) ??
-        Colors.white;
+        cs.surface;
     final borderColor =
         cardStyle?.borderColor ??
-        theme?.color(IxThemeColorToken.color4) ??
-        Colors.grey;
+        theme?.color(IxThemeColorToken.weakBdr) ??
+        cs.outlineVariant;
+    final ghostHover =
+        theme?.color(IxThemeColorToken.ghostHover) ??
+        cs.surfaceContainerHighest;
 
-    return GestureDetector(
-      onTap: onTap,
+    // `label: null` (like `_DesktopRow`) so the field label/value texts
+    // below merge into this button's accessible name automatically instead
+    // of it announcing just a single hand-picked field.
+    return Semantics(
+      button: true,
+      label: null,
+      hint: strings.rowHint,
       child: Container(
-        padding: const EdgeInsets.all(16),
+        clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
           color: cardColor,
           border: Border.all(color: borderColor),
           borderRadius: BorderRadius.circular(4), // IX Card radius
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: fields.map((field) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: Text(
-                      field.label,
-                      style: theme?.textStyle(
-                        IxTypographyVariant.label,
-                        tone: IxThemeTextTone.soft,
+        child: InkWell(
+          onTap: onTap,
+          focusColor: Colors.transparent,
+          hoverColor: ghostHover,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: fields.map((field) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 100,
+                        child: Text(
+                          field.label,
+                          style: theme?.textStyle(
+                            IxTypographyVariant.label,
+                            tone: IxThemeTextTone.soft,
+                          ),
+                        ),
                       ),
-                    ),
+                      Expanded(child: field.valueBuilder(context, item)),
+                    ],
                   ),
-                  Expanded(child: field.valueBuilder(context, item)),
-                ],
-              ),
-            );
-          }).toList(),
+                );
+              }).toList(),
+            ),
+          ),
         ),
       ),
     );
@@ -1036,57 +1090,64 @@ class _SearchStatusHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
-    final color1 = theme?.color(IxThemeColorToken.color1) ?? Colors.grey[100]!;
-    final stdText = theme?.color(IxThemeColorToken.stdText) ?? Colors.black;
+    final cs = Theme.of(context).colorScheme;
+    final color1 =
+        theme?.color(IxThemeColorToken.color1) ?? cs.surfaceContainerHighest;
+    final weakBdr =
+        theme?.color(IxThemeColorToken.weakBdr) ?? cs.outlineVariant;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: color1,
-        border: Border(
-          bottom: BorderSide(
-            color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: weakBdr)),
       ),
+      // `spaceBetween` + a `Flexible` chip (instead of a fixed-width chip
+      // plus `Spacer`) keeps the results label flush right in the common
+      // case while letting the chip's own label ellipsize -- rather than
+      // overflow -- when a long query and the results label don't both fit
+      // (WCAG 1.4.4 Resize text).
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: theme?.color(IxThemeColorToken.component1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color:
+                    theme?.color(IxThemeColorToken.component1) ??
+                    cs.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: weakBdr),
               ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${strings.searchChipLabel}: "$query"',
-                  style: theme?.textStyle(IxTypographyVariant.label),
-                ),
-                if (onClear != null) ...[
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: onClear,
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Tooltip(
-                        message: strings.clearSearchTooltip,
-                        child: IconTheme(
-                          data: IconThemeData(size: 16, color: stdText),
-                          child: IxIcons.closeSmall,
-                        ),
-                      ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      '${strings.searchChipLabel}: "$query"',
+                      style: theme?.textStyle(IxTypographyVariant.label),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (onClear != null) ...[
+                    const SizedBox(width: 8),
+                    IxIconButton(
+                      key: const Key('ix-rdv-clear'),
+                      size: IxIconButtonSize.s24,
+                      icon: const IxIcon.key(
+                        IxIconKey.closeSmall,
+                        size: IxIconSize.s16,
+                      ),
+                      tooltip: strings.clearSearchTooltip,
+                      onPressed: onClear,
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 8),
           Text(
             resultsLabelBuilder?.call(count) ?? strings.resultsCount(count),
             style: theme?.textStyle(

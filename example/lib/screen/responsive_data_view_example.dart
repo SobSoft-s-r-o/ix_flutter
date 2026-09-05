@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 import 'package:example/ix_icons.dart';
@@ -38,6 +40,13 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
   IxSortSpec? _currentSort = const IxSortSpec(key: 'name', ascending: true);
   bool _useSlovak = false;
 
+  // Backs the simulated network delay below with a cancelable `Timer`
+  // (instead of a bare `Future.delayed`, whose underlying timer cannot be
+  // cancelled) so `dispose()` can stop it outright -- otherwise a pending
+  // timer outliving the widget trips flutter_test's "Timer is still
+  // pending" invariant when a test navigates away before the delay fires.
+  Timer? _loadTimer;
+
   @override
   void initState() {
     super.initState();
@@ -49,6 +58,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
 
   @override
   void dispose() {
+    _loadTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -60,9 +70,14 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
       setState(() => _isPageLoading = true);
     }
 
-    await Future.delayed(
-      const Duration(milliseconds: 1500),
-    ); // Simulate network
+    _loadTimer?.cancel();
+    final completer = Completer<void>();
+    _loadTimer = Timer(
+      const Duration(milliseconds: 1500), // Simulate network
+      completer.complete,
+    );
+    await completer.future;
+    if (!mounted) return;
 
     // Filter by search query
     final filteredItems = _allItems.where((item) {
@@ -159,33 +174,46 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Row(
+          // `Wrap` (not `Row`): this toolbar has a lot of controls, and a
+          // plain `Row` overflows once density/text scale changes push
+          // their combined width past a narrower window -- see A-4
+          // (density-data-view plan), which applies the same fix inside
+          // IxResponsiveDataView/IxPaginationBar itself.
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Text('Pagination Mode: '),
-              const SizedBox(width: 8),
-              IxDropdownButton<IxPaginationMode>(
-                label: _paginationMode.name.toUpperCase(),
-                buttonVariant: IxButtonVariant.subtleSecondary,
-                items: IxPaginationMode.values
-                    .map(
-                      (mode) => IxDropdownMenuItem<IxPaginationMode>(
-                        label: mode.name.toUpperCase(),
-                        value: mode,
-                      ),
-                    )
-                    .toList(),
-                onItemSelected: (mode) {
-                  setState(() {
-                    _paginationMode = mode;
-                    _page = 1;
-                    _displayedItems = [];
-                    _hasMore = true;
-                  });
-                  _loadData();
-                },
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Pagination Mode: '),
+                  const SizedBox(width: 8),
+                  IxDropdownButton<IxPaginationMode>(
+                    label: _paginationMode.name.toUpperCase(),
+                    buttonVariant: IxButtonVariant.subtleSecondary,
+                    items: IxPaginationMode.values
+                        .map(
+                          (mode) => IxDropdownMenuItem<IxPaginationMode>(
+                            label: mode.name.toUpperCase(),
+                            value: mode,
+                          ),
+                        )
+                        .toList(),
+                    onItemSelected: (mode) {
+                      setState(() {
+                        _paginationMode = mode;
+                        _page = 1;
+                        _displayedItems = [];
+                        _hasMore = true;
+                      });
+                      _loadData();
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(width: 16),
-              Expanded(
+              SizedBox(
+                width: 220,
                 child: TextField(
                   controller: _searchController,
                   decoration: const InputDecoration(
@@ -200,7 +228,6 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                 icon: const Icon(Icons.search),
                 onPressed: () => _handleSearch(_searchController.text),
               ),
-              const SizedBox(width: 8),
               IconButton(
                 icon: const Icon(Icons.sort_by_alpha),
                 tooltip: 'Toggle Sort (Name)',
@@ -209,8 +236,8 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                   _handleSort(IxSortSpec(key: 'name', ascending: newAscending));
                 },
               ),
-              const SizedBox(width: 16),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text('Language: '),
                   Switch(

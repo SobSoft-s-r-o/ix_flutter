@@ -19,6 +19,10 @@ class IxResponsiveDataViewStrings {
     this.detailsTitle = 'Details',
     this.actionsTitle = 'Actions',
     this.rowActionsTooltip = 'Actions',
+    this.sortHint = 'Sort',
+    this.sortedAscending = 'Sorted ascending',
+    this.sortedDescending = 'Sorted descending',
+    this.rowHint = 'Open row',
   });
 
   final String toolsColumnHeader;
@@ -39,6 +43,19 @@ class IxResponsiveDataViewStrings {
   final String detailsTitle;
   final String actionsTitle;
   final String rowActionsTooltip;
+
+  /// Semantics hint on a sortable column header that is not currently
+  /// sorted (announced by screen readers, e.g. "Sort").
+  final String sortHint;
+
+  /// Semantics hint on a column header currently sorted ascending.
+  final String sortedAscending;
+
+  /// Semantics hint on a column header currently sorted descending.
+  final String sortedDescending;
+
+  /// Semantics hint on a mobile card, announcing what activating it does.
+  final String rowHint;
 
   /// English defaults
   factory IxResponsiveDataViewStrings.defaultsEn() {

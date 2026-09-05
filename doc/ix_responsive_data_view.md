@@ -2,6 +2,57 @@
 
 The `IxResponsiveDataView<T>` widget is a powerful, responsive data presentation component that automatically switches between a data table layout on desktop/tablet and a card-based list layout on mobile devices. It adheres to the Siemens iX design system and supports sorting, row actions, and advanced pagination modes.
 
+## Flutter-specific composite
+
+`IxResponsiveDataView` is a **Flutter-specific composite**, not a 1:1 port of a
+single upstream `@siemens/ix` web component: it combines a table, a card
+list, a search status bar and pagination into one widget. Upstream's closest
+equivalent, `.ix-table`, is a utility style (not a component) that was moved
+from `src/components/table/table.scss` to `scss/utilities/_table.scss` in
+[PR #2632](https://github.com/siemens/ix/pull/2632) (commit
+`0c952102075ef40aa5768488efe0198af143719a`), targeting the upcoming v6 -- it
+was relocated, not deleted. This widget mirrors that utility's tokens
+(`color-0`/`soft-bdr`/`weak-bdr`/`ghost-hover`) for its table/row/card
+surfaces, and its own `IxPaginationBar` mirrors `ix-pagination`
+(`pagination.tsx`).
+
+A 2.0 milestone (internally tracked as "B-9") splits this composite into
+smaller primitives -- `IxTable`, `IxDataCard`, `IxRowActions` and friends --
+and moves the desktop/mobile breakpoint from 600px to 768px. Until then,
+`IxResponsiveDataView` stays as the single entry point, and the breakpoint
+stays at 600px for 1.x compatibility.
+
+## Keyboard and screen reader
+
+Every interactive part of `IxResponsiveDataView` is reachable by keyboard,
+in this order:
+
+1. The search status bar's clear button (`ix-rdv-clear`), when a search
+   query is shown.
+2. Each sortable column header (`ix-rdv-header-<sortKey>`), left to right.
+3. Each row (`ix-rdv-row-<index>`) -- only focusable when
+   `onRowTapDesktop` is set -- followed by that row's actions trigger
+   (`ix-rdv-row-actions-<index>`).
+4. The pagination bar's page-size selector (`ix-pagination-size`, when
+   shown), then the previous/next chevrons (`ix-pagination-prev` /
+   `ix-pagination-next`).
+
+A sortable column header is a real button: `Enter`/`Space` toggle its sort
+direction exactly like a tap, and it exposes a semantics hint so a screen
+reader announces what activating it does -- `IxResponsiveDataViewStrings
+.sortHint` ("Sort") when the column isn't the active sort key, or
+`.sortedAscending`/`.sortedDescending` ("Sorted ascending"/"Sorted
+descending") once it is. A mobile card (which always opens a details sheet
+on tap) similarly exposes `.rowHint` ("Open row"). All four strings default
+to English and can be overridden the same way as every other
+`IxResponsiveDataViewStrings` field.
+
+`IxPaginationBar`'s own controls -- including the pagination bar
+`IxResponsiveDataView` renders internally -- are labelled through
+[`IxPaginationStrings`](#ixpaginationstrings) (below): the previous/next
+chevrons and the page-size selector all carry an accessible name, and the
+selector additionally exposes its current value and expanded state.
+
 ## Features
 
 *   **Responsive Layout**: Automatically renders a table on screens >= 600px and a card list on smaller screens.
@@ -104,6 +155,41 @@ IxResponsiveDataView<MyItem>(
   // ...
 )
 ```
+
+The pagination bar lays its controls out with a `Wrap` instead of a plain
+`Row`, so at a narrow width or a large text scale the page-size selector and
+the prev/next controls drop to their own line instead of overflowing (WCAG
+1.4.4 Resize text); it never shrinks below a 56px minimum height. Its
+chevrons are 32px `IxIconButton`s.
+
+##### IxPaginationStrings
+
+`IxPaginationBar` (and the pagination bar `IxResponsiveDataView` renders
+internally) can be localized directly through `paginationStrings`, without
+touching `IxResponsiveDataViewStrings`:
+
+```dart
+IxPaginationBar(
+  page: page,
+  totalPages: totalPages,
+  onPageChanged: onPageChanged,
+  paginationStrings: const IxPaginationStrings(
+    previousPage: 'Predchádzajúca strana',
+    nextPage: 'Ďalšia strana',
+    rowsPerPage: 'Položiek na stranu',
+    pageSelection: 'Výber strany',
+  ),
+)
+```
+
+`paginationStrings` takes precedence over the legacy `strings:`
+(`IxResponsiveDataViewStrings`) parameter, which is still accepted and
+bridged via `IxPaginationStrings.fromDataView` for 1.x callers that never
+migrated. When `IxResponsiveDataView` renders its own pagination bar, it
+still only exposes `strings:` -- pass an `IxResponsiveDataViewStrings` with
+the matching fields overridden (`paginationPrevTooltip`,
+`paginationNextTooltip`, `rowsPerPageLabel`, `pageOfBuilder`, `pageBuilder`,
+`totalItemsBuilder`) to localize it from there.
 
 #### 2. Infinite Scroll
 
