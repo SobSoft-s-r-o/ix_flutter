@@ -4,86 +4,96 @@ Complete navigation guide to all ix_flutter documentation.
 
 ## Quick Navigation
 
-### 🚀 Getting Started
-- **[README.md](README.md)** - Main package overview and features
-- **[GETTING_STARTED.md](GETTING_STARTED.md)** - Step-by-step setup guide
-- **[FAQ.md](FAQ.md)** - Frequently asked questions
+### 🚀 Getting started
+- **[README.md](README.md)** - repository and package overview
+- **[GETTING_STARTED.md](GETTING_STARTED.md)** - step-by-step setup guide
+- **[FAQ.md](FAQ.md)** - frequently asked questions
 
-### 📚 Documentation
-- **[API_REFERENCE.md](API_REFERENCE.md)** - Complete API documentation
-- **[ICON_LICENSING.md](ICON_LICENSING.md)** - Icon licensing and compliance
-- **[Component Guides](doc/)** - Detailed component documentation
+### 📚 Reference
+- **[API_REFERENCE.md](API_REFERENCE.md)** - API index and `dart doc`
+- **[doc/](doc/)** - component guides
+- **[doc/tokens.md](doc/tokens.md)** - generated color-token table
+- **[UPSTREAM.md](UPSTREAM.md)** - the pinned `@siemens/ix` baseline
 
-### 🤝 Contributing & Community
-- **[CONTRIBUTING.md](CONTRIBUTING.md)** - How to contribute
-- **[SECURITY.md](SECURITY.md)** - Security policies and reporting
-- **[CHANGELOG.md](CHANGELOG.md)** - Version history and updates
+### 🤝 Contributing & community
+- **[CONTRIBUTING.md](CONTRIBUTING.md)** - how to contribute, plus the release checklist
+- **[SECURITY.md](SECURITY.md)** - security policy and reporting
+- **[packages/ix_flutter/CHANGELOG.md](packages/ix_flutter/CHANGELOG.md)** - version history
 
 ### ⚖️ Legal
-- **[LICENSE](LICENSE)** - MIT License
-- **[ICON_MIGRATION.md](ICON_MIGRATION.md)** - Migration guide
+- **[packages/ix_flutter/LICENSE](packages/ix_flutter/LICENSE)** - MIT License
+- **[packages/ix_flutter/ICON_LICENSING.md](packages/ix_flutter/ICON_LICENSING.md)** - icon licensing and compliance
+- **[packages/ix_flutter/THIRD_PARTY_NOTICES.md](packages/ix_flutter/THIRD_PARTY_NOTICES.md)** - bundled third-party assets
+- **[ICON_MIGRATION.md](ICON_MIGRATION.md)** - migrating off the deprecated `IxIcons` getters
 
 ---
 
-## Documentation by Topic
+## Component documentation
 
-### Installation & Setup
-1. Read [README.md](README.md) overview
-2. Follow [GETTING_STARTED.md](GETTING_STARTED.md) tutorial
+| Page | Covers |
+|---|---|
+| [doc/ix_application_scaffold.md](doc/ix_application_scaffold.md) | `IxApplicationScaffold`, `IxMenuEntry`, `IxApplicationStrings` |
+| [doc/ix_blind.md](doc/ix_blind.md) | `IxBlind`, `IxBlindAccordion` |
+| [doc/ix_breadcrumb.md](doc/ix_breadcrumb.md) | `IxBreadcrumb`, stable keys, `IxBreadcrumbStrings` |
+| [doc/ix_dropdown_button.md](doc/ix_dropdown_button.md) | `IxDropdownButton`, placements, keyboard model |
+| [doc/ix_empty_state.md](doc/ix_empty_state.md) | `IxEmptyState` layouts and types |
+| [doc/ix_icons.md](doc/ix_icons.md) | `IxIcon`, `IxIconKey`, `IxIconResolver`, the generator |
+| [doc/ix_responsive_data_view.md](doc/ix_responsive_data_view.md) | `IxResponsiveDataView`, `IxPaginationBar` |
+| [doc/ix_spinner.md](doc/ix_spinner.md) | `IxSpinner` sizes and variants |
+| [doc/ix_toast.md](doc/ix_toast.md) | `IxToastService`, `IxToastOverlay`, `IxToastHandle` |
+
+## Theme documentation
+
+| Page | Covers |
+|---|---|
+| [doc/theming.md](doc/theming.md) | `IxThemeBuilder`, `IxThemeController`, `IxCustomPalette` |
+| [doc/tokens.md](doc/tokens.md) | every `IxThemeColorToken` with its light/dark value |
+| [doc/typography.md](doc/typography.md) | `IxTypography`, `IxFonts`, the type scale |
+| [doc/density.md](doc/density.md) | `IxDensity`, `IxDensityScope`, `IxIconButton` |
+
+---
+
+## Documentation by topic
+
+### Installation & setup
+1. Read the [README.md](README.md) overview
+2. Follow the [GETTING_STARTED.md](GETTING_STARTED.md) tutorial
 3. Check [FAQ.md](FAQ.md) for common issues
 
-### Using Components
-1. Review [API_REFERENCE.md](API_REFERENCE.md) for available components
-2. Read component-specific docs in [doc/](doc/) folder
+### Using components
+1. Find the component in [API_REFERENCE.md](API_REFERENCE.md)
+2. Read its page in [doc/](doc/)
 3. Check [example/](example/) for working code
 
-### Icons & Icon Generation
-1. Read [GETTING_STARTED.md#Icon-Setup](GETTING_STARTED.md#icon-setup)
-2. Follow [doc/ix_icons.md](doc/ix_icons.md) complete guide
-3. Check [ICON_LICENSING.md](ICON_LICENSING.md) for compliance
+### Icons & icon generation
+1. Read [GETTING_STARTED.md#icon-setup](GETTING_STARTED.md#icon-setup)
+2. Follow the complete guide in [doc/ix_icons.md](doc/ix_icons.md)
+3. Check [packages/ix_flutter/ICON_LICENSING.md](packages/ix_flutter/ICON_LICENSING.md) for compliance
 
-### Theme & Styling
-1. Review [doc/copilot_colors.md](doc/copilot_colors.md)
-2. Check [GETTING_STARTED.md#Theming](GETTING_STARTED.md#theming)
-3. See component docs for customization options
+### Theme & styling
+1. Review [doc/theming.md](doc/theming.md)
+2. Look up colors in [doc/tokens.md](doc/tokens.md)
+3. See the component pages for per-component theme extensions
 
 ### Contributing
-1. Read [CONTRIBUTING.md](CONTRIBUTING.md) guidelines
-2. Follow development setup instructions
-3. Review code style and testing requirements
+1. Read the [CONTRIBUTING.md](CONTRIBUTING.md) guidelines
+2. Follow the development setup instructions
+3. Review the code style, test conventions and release checklist
 
-### Security & Compliance
-1. Check [SECURITY.md](SECURITY.md) for security policies
-2. Review [LICENSE](LICENSE) for legal terms
-3. See [ICON_LICENSING.md](ICON_LICENSING.md) for icon compliance
-
----
-
-## Component Documentation
-
-Detailed guides for each component:
-
-- **[ix_application_scaffold.md](doc/ix_application_scaffold.md)** - Main app container
-- **[ix_blind.md](doc/ix_blind.md)** - Sliding drawer/panel
-- **[ix_dropdown_button.md](doc/ix_dropdown_button.md)** - Dropdown selection
-- **[ix_empty_state.md](doc/ix_empty_state.md)** - Empty state placeholder
-- **[ix_icons.md](doc/ix_icons.md)** - Icon integration guide
-- **[ix_responsive_data_view.md](doc/ix_responsive_data_view.md)** - Data table
-- **[ix_toast.md](doc/ix_toast.md)** - Toast notifications
-- **[copilot_colors.md](doc/copilot_colors.md)** - Color system
+### Security & compliance
+1. Check [SECURITY.md](SECURITY.md) for the security policy
+2. Review the [LICENSE](packages/ix_flutter/LICENSE) for legal terms
+3. See [ICON_LICENSING.md](packages/ix_flutter/ICON_LICENSING.md) for icon compliance
 
 ---
 
 ## Examples
 
-### Quick Examples
-- [GETTING_STARTED.md](GETTING_STARTED.md#using-components) - Code examples
+### Complete example app
+- [example/](example/) - full working Flutter app
+- [example/lib/screen/](example/lib/screen/) - individual screen examples
 
-### Complete Example App
-- [example/](example/) - Full working Flutter app
-- [example/lib/screen/](example/lib/screen/) - Individual screen examples
-
-### Running Examples
+### Running the example
 ```bash
 cd example
 flutter pub get
@@ -91,16 +101,26 @@ dart run ix_icons_generator:generate_icons
 flutter run
 ```
 
+### Documentation snippets
+Every Dart snippet in the documentation is compiled in
+[doc/snippets](doc/snippets):
+
+```bash
+cd doc/snippets
+flutter pub get
+flutter analyze
+```
+
 ---
 
-## Frequently Searched Topics
+## Frequently searched topics
 
 ### Installation
 - How to install? → [GETTING_STARTED.md](GETTING_STARTED.md#installation)
-- What are requirements? → [GETTING_STARTED.md](GETTING_STARTED.md#basic-setup)
+- What are the requirements? → [README.md](README.md#requirements)
 
 ### Icons
-- Why no icons? → [FAQ.md#why-arent-icons-included](FAQ.md#q-why-arent-icons-included-in-the-package)
+- Why no icons? → [FAQ.md](FAQ.md#q-why-arent-icons-included-in-the-package)
 - How to generate? → [GETTING_STARTED.md#icon-setup](GETTING_STARTED.md#icon-setup)
 - Troubleshooting? → [doc/ix_icons.md](doc/ix_icons.md#troubleshooting)
 
@@ -113,122 +133,67 @@ flutter run
 - Set up development? → [CONTRIBUTING.md](CONTRIBUTING.md#development-setup)
 - Code style? → [CONTRIBUTING.md](CONTRIBUTING.md#style-guidelines)
 - Testing? → [CONTRIBUTING.md](CONTRIBUTING.md#testing-requirements)
+- Releasing? → [CONTRIBUTING.md](CONTRIBUTING.md#release-checklist)
 
-### Help & Support
-- Get help → [FAQ.md#getting-help](FAQ.md#getting-help)
+### Help & support
+- Get help → [FAQ.md](FAQ.md#getting-help)
 - Report bugs → [CONTRIBUTING.md](CONTRIBUTING.md#reporting-bugs)
 - Request features → [CONTRIBUTING.md](CONTRIBUTING.md#suggesting-enhancements)
 - Security issues → [SECURITY.md](SECURITY.md)
 
 ---
 
-## Documentation Files Overview
+## Documentation files overview
 
 | File | Purpose | Audience |
 | ---- | ------- | -------- |
-| [README.md](README.md) | Package overview | Everyone |
+| [README.md](README.md) | Repository overview | Everyone |
+| [packages/ix_flutter/README.md](packages/ix_flutter/README.md) | The README published to pub.dev | Package users |
 | [GETTING_STARTED.md](GETTING_STARTED.md) | Setup tutorial | New users |
 | [FAQ.md](FAQ.md) | Common questions | All users |
-| [API_REFERENCE.md](API_REFERENCE.md) | Complete API docs | Developers |
+| [API_REFERENCE.md](API_REFERENCE.md) | API index | Developers |
 | [doc/](doc/) | Component guides | Component users |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guide | Contributors |
-| [SECURITY.md](SECURITY.md) | Security info | Security team |
-| [ICON_LICENSING.md](ICON_LICENSING.md) | Icon compliance | Legal team |
-| [CHANGELOG.md](CHANGELOG.md) | Version history | All users |
-| [LICENSE](LICENSE) | Legal terms | Legal team |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guide and release checklist | Contributors |
+| [SECURITY.md](SECURITY.md) | Security policy | Security team |
+| [UPSTREAM.md](UPSTREAM.md) | Pinned upstream baseline | Maintainers |
+| [packages/ix_flutter/ICON_LICENSING.md](packages/ix_flutter/ICON_LICENSING.md) | Icon compliance | Legal team |
+| [packages/ix_flutter/THIRD_PARTY_NOTICES.md](packages/ix_flutter/THIRD_PARTY_NOTICES.md) | Bundled third-party assets | Legal team |
+| [packages/ix_flutter/CHANGELOG.md](packages/ix_flutter/CHANGELOG.md) | Version history | All users |
+| [packages/ix_flutter/LICENSE](packages/ix_flutter/LICENSE) | Legal terms | Legal team |
 
 ---
 
 ## Resources
 
-### Official Resources
+### Official resources
 - **Siemens iX**: https://ix.siemens.io
 - **Icon Library**: https://www.npmjs.com/package/@siemens/ix-icons
-- **Design Guidelines**: https://ix.siemens.io/docs/guidelines/
+- **Design Guidelines**: https://ix.siemens.io/docs/guidelines/overview
 
-### This Package
+### This package
 - **GitHub**: https://github.com/SobSoft-s-r-o/ix_flutter
-- **Pub.dev**: https://pub.dev/packages/ix_flutter
-- **Issue Tracker**: https://github.com/SobSoft-s-r-o/ix_flutter/issues
+- **pub.dev**: https://pub.dev/packages/ix_flutter
+- **API docs**: https://pub.dev/documentation/ix_flutter/latest/
+- **Issue tracker**: https://github.com/SobSoft-s-r-o/ix_flutter/issues
 - **Discussions**: https://github.com/SobSoft-s-r-o/ix_flutter/discussions
 
 ---
 
-## Reading Guide by Role
+## Feedback & contributions
 
-### 👤 End Users
-1. Start: [README.md](README.md)
-2. Setup: [GETTING_STARTED.md](GETTING_STARTED.md)
-3. Build: [API_REFERENCE.md](API_REFERENCE.md) + [doc/](doc/)
-4. Issues: [FAQ.md](FAQ.md)
+### Found an error?
+- Report it on [GitHub Issues](https://github.com/SobSoft-s-r-o/ix_flutter/issues)
+- Include the documentation link and a description
 
-### 👨‍💼 Project Managers
-1. Overview: [README.md](README.md)
-2. Features: [API_REFERENCE.md](API_REFERENCE.md)
-3. Status: [CHANGELOG.md](CHANGELOG.md)
-4. License: [LICENSE](LICENSE)
-
-### 👨‍💻 Developers
-1. Setup: [GETTING_STARTED.md](GETTING_STARTED.md)
-2. API: [API_REFERENCE.md](API_REFERENCE.md)
-3. Components: [doc/](doc/)
-4. Examples: [example/](example/)
-
-### 🤝 Contributors
-1. Contribution: [CONTRIBUTING.md](CONTRIBUTING.md)
-2. Style: [CONTRIBUTING.md#style-guidelines](CONTRIBUTING.md#style-guidelines)
-3. Testing: [CONTRIBUTING.md#testing-requirements](CONTRIBUTING.md#testing-requirements)
-4. Security: [SECURITY.md](SECURITY.md)
-
-### ⚖️ Legal/Compliance
-1. License: [LICENSE](LICENSE)
-2. Icons: [ICON_LICENSING.md](ICON_LICENSING.md)
-3. Security: [SECURITY.md](SECURITY.md)
-
----
-
-## Search Tips
-
-### Finding Documentation
-- **Components**: Check [doc/](doc/) folder
-- **API**: See [API_REFERENCE.md](API_REFERENCE.md)
-- **Examples**: Browse [example/](example/)
-- **How-to**: Read [GETTING_STARTED.md](GETTING_STARTED.md)
-
-### Common Searches
-- "How do I...?" → Check [FAQ.md](FAQ.md)
-- "Where do I...?" → Check [GETTING_STARTED.md](GETTING_STARTED.md)
-- "What is...?" → Check [API_REFERENCE.md](API_REFERENCE.md)
-- "Can I...?" → Check [LICENSE](LICENSE) and [ICON_LICENSING.md](ICON_LICENSING.md)
-
----
-
-## Keeping Updated
-
-- **Version Updates**: See [CHANGELOG.md](CHANGELOG.md)
-- **Security Updates**: See [SECURITY.md](SECURITY.md)
-- **Breaking Changes**: See [ICON_MIGRATION.md](ICON_MIGRATION.md)
-- **Feature Updates**: Check GitHub Releases
-
----
-
-## Feedback & Contributions
-
-### Found an Error?
-- Report issue on [GitHub Issues](https://github.com/SobSoft-s-r-o/ix_flutter/issues)
-- Include documentation link and description
-
-### Want to Improve Docs?
+### Want to improve the docs?
 - See [CONTRIBUTING.md](CONTRIBUTING.md)
-- Submit pull request with improvements
+- Remember that Dart snippets live in [doc/snippets](doc/snippets) and must
+  keep analyzing cleanly
 
-### Have Questions?
+### Have questions?
 - Check [FAQ.md](FAQ.md) first
-- Open discussion on [GitHub Discussions](https://github.com/SobSoft-s-r-o/ix_flutter/discussions)
+- Open a discussion on [GitHub Discussions](https://github.com/SobSoft-s-r-o/ix_flutter/discussions)
 
 ---
 
-**Last Updated**: January 2026
-**Package Version**: 1.0.0
-
-📍 **Pro Tip**: Use this index as a navigation hub. Click links to dive into specific documentation!
+📍 **Pro tip**: Use this index as a navigation hub. Click links to dive into specific documentation!

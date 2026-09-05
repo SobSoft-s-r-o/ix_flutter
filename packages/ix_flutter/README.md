@@ -7,7 +7,7 @@
 [![Dart](https://img.shields.io/badge/Dart-3.10.0+-blue.svg)](https://dart.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-A comprehensive Flutter component library based on the Siemens iX Design System.
+A Flutter component library that implements the Siemens iX Design System.
 
 > ⚠️ **Important Disclaimer**: This is an **independent, community-maintained** adaptation of the Siemens iX Design System for Flutter. It is **NOT** developed, maintained, or endorsed by Siemens AG. See [LICENSE](LICENSE), [ICON_LICENSING.md](ICON_LICENSING.md), and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for complete legal information.
 
@@ -25,44 +25,11 @@ This package brings the design patterns, components, and visual language from [S
 
 ## Features
 
-- 🎨 **Siemens iX Theme System** - Complete theming support with light/dark modes
-- 🧩 **UI Components** - Pre-built widgets following iX design patterns
-- 🎯 **1 479 Icons** - Full Siemens iX icon catalogue via the optional `ix_icons_generator`
-- 📱 **Responsive Design** - Components adapt to different screen sizes
-- ♿ **Accessibility** - Built with accessibility in mind
-
-## Using Siemens iX Icons
-
-`ix_flutter` widgets render their own icons out of the box (falling back to Material glyphs today; see [doc/ix_icons.md](doc/ix_icons.md#fallback-policy)) — no generator required. The optional `ix_icons_generator` tool adds the full 1 479-icon Siemens iX catalogue to your own app.
-
-### Quick Icon Setup
-
-1. Add the generator to your `pubspec.yaml`:
-
-```yaml
-dependencies:
-  ix_flutter: ^1.0.2
-
-dev_dependencies:
-  ix_icons_generator: ^1.1.0
-```
-
-2. Generate icons:
-
-```bash
-dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
-```
-
-3. Use icons in your code:
-
-```dart
-import 'package:ix_flutter/ix_flutter.dart';
-import 'package:your_app/ix_icons.dart';
-
-const IxIcon(IxIconsData.home)
-```
-
-**See [doc/ix_icons.md](doc/ix_icons.md) for complete icon documentation.**
+- 🎨 **Siemens iX theme system** - `IxThemeBuilder` and `IxThemeController` for light, dark and system color schemas
+- 🧩 **UI components** - application shell, breadcrumb, blind, dropdown, data view, toasts, spinner, empty state
+- 🎯 **1 479 icons** - full Siemens iX icon catalogue via the optional `ix_icons_generator`
+- 📱 **Responsive design** - components adapt to different screen sizes
+- ♿ **Accessibility** - semantics, keyboard navigation and WCAG-sized hit areas
 
 ## Installation
 
@@ -70,7 +37,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  ix_flutter: ^1.0.2
+  ix_flutter: ^1.1.0
 ```
 
 Then run:
@@ -79,38 +46,51 @@ Then run:
 flutter pub get
 ```
 
-## Getting Started
+## Using Siemens iX icons
 
-### 1. Build Your Theme with IxThemeBuilder
+`ix_flutter` widgets render their own icons out of the box (falling back to Material glyphs today; see [doc/ix_icons.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_icons.md#fallback-policy)) — no generator required. The optional `ix_icons_generator` tool adds the full 1 479-icon Siemens iX catalogue to your own app.
+
+1. Add the generator to your `pubspec.yaml`:
+
+```yaml
+dev_dependencies:
+  ix_icons_generator: ^1.1.0
+```
+
+2. Generate the icons:
+
+```bash
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
+```
+
+3. Use them in your code:
+
+```dart
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:your_app/ix_icons.dart';
+
+Widget catalogueIcon() => const IxIcon(IxIconsData.home);
+```
+
+**See [doc/ix_icons.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_icons.md) for the complete icon guide** (internal icons, fallback policy, licensing).
+
+## Getting started
+
+### 1. Build your theme
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-void main() {
-  // Build Siemens iX themes
-  final lightTheme = const IxThemeBuilder(mode: ThemeMode.light).build();
-  final darkTheme = const IxThemeBuilder(mode: ThemeMode.dark).build();
-
-  runApp(MyApp(lightTheme: lightTheme, darkTheme: darkTheme));
-}
-
 class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-    required this.lightTheme,
-    required this.darkTheme,
-  });
-
-  final ThemeData lightTheme;
-  final ThemeData darkTheme;
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Siemens iX Demo',
-      theme: lightTheme,
-      darkTheme: darkTheme,
+      theme: const IxThemeBuilder.light().build(),
+      darkTheme: const IxThemeBuilder.dark().build(),
       themeMode: ThemeMode.system,
       home: const HomeScreen(),
     );
@@ -118,29 +98,39 @@ class MyApp extends StatelessWidget {
 }
 ```
 
-### 2. Use iX Components
+To switch themes at runtime, use `IxThemeController` — see [doc/theming.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/theming.md).
+
+### 2. Use iX components
+
+Material buttons pick up the iX styling from the theme; `IxButtonTheme.style(...)` selects a Siemens iX button variant.
 
 ```dart
+import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
-import 'package:your_app/ix_icons.dart';  // Generated icons
+import 'package:your_app/ix_icons.dart';
 
 class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
+    final buttons = Theme.of(context).extension<IxButtonTheme>();
     return Scaffold(
       appBar: AppBar(
-        title: Text('My App'),
-        leading: IxIcon(IxIconsData.menu),
+        title: const Text('My App'),
+        leading: const IxIcon(IxIconsData.menu),
       ),
       body: Column(
         children: [
-          IxButton.primary(
+          FilledButton(
+            style: buttons?.style(IxButtonVariant.primary),
             onPressed: () {},
-            child: Text('Primary Action'),
+            child: const Text('Primary Action'),
           ),
-          IxButton.secondary(
+          FilledButton(
+            style: buttons?.style(IxButtonVariant.secondary),
             onPressed: () {},
-            child: Text('Secondary Action'),
+            child: const Text('Secondary Action'),
           ),
         ],
       ),
@@ -149,35 +139,50 @@ class HomeScreen extends StatelessWidget {
 }
 ```
 
-## Available Components
+## Components
 
-- **Buttons**: Primary, secondary, ghost, icon buttons
-- **Application Scaffold**: Complete app structure with navigation
-- **Dropdown**: Dropdown buttons and menus
-- **Empty State**: Placeholder components for empty data
-- **Toast Notifications**: Temporary notifications and alerts
-- **Blind/Drawer**: Sliding panels and drawers
-- **Responsive Data View**: Responsive tables and data grids
-- **Theme System**: Complete theming with color tokens
+| Component | Purpose |
+|---|---|
+| `IxApplicationScaffold` | Application shell with a responsive, collapsible menu |
+| `IxBreadcrumb` | Hierarchical navigation with overflow handling |
+| `IxBlind` / `IxBlindAccordion` | Collapsible panels |
+| `IxDropdownButton` | Button that opens a Siemens iX menu |
+| `IxEmptyState` | Empty, error and "no results" states |
+| `IxResponsiveDataView` | Table on desktop, cards on mobile, with sorting and pagination |
+| `IxPaginationBar` | Standalone pagination controls |
+| `IxToastService` / `IxToastOverlay` | Toast notifications |
+| `IxSpinner` | Loading indicator |
+| `IxIcon` / `IxIconButton` | Icon rendering and icon-only buttons |
 
 ## Documentation
 
-- **[Icons Documentation](doc/ix_icons.md)** - Complete guide for using Siemens iX icons
-- **[Application Scaffold](doc/ix_application_scaffold.md)** - App structure and navigation
-- **[Blind/Drawer](doc/ix_blind.md)** - Sliding panel documentation
-- **[Breadcrumb](doc/ix_breadcrumb.md)** - Hierarchical navigation breadcrumb
-- **[Dropdown Button](doc/ix_dropdown_button.md)** - Dropdown component guide
-- **[Empty State](doc/ix_empty_state.md)** - Empty state placeholder docs
-- **[Responsive Data View](doc/ix_responsive_data_view.md)** - Data table documentation
-- **[Spinner](doc/ix_spinner.md)** - Animated loading spinner component
-- **[Toast](doc/ix_toast.md)** - Notification system docs
-- **[Colors](doc/copilot_colors.md)** - Color token reference
+The full documentation lives in the repository:
+
+| Topic | Page |
+|---|---|
+| Getting started | [GETTING_STARTED.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/GETTING_STARTED.md) |
+| API index | [API_REFERENCE.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/API_REFERENCE.md) |
+| Themes and color schemas | [doc/theming.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/theming.md) |
+| Color tokens | [doc/tokens.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/tokens.md) |
+| Typography | [doc/typography.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/typography.md) |
+| Density and `IxIconButton` | [doc/density.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/density.md) |
+| Icons | [doc/ix_icons.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_icons.md) |
+| Application scaffold | [doc/ix_application_scaffold.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_application_scaffold.md) |
+| Blind | [doc/ix_blind.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_blind.md) |
+| Breadcrumb | [doc/ix_breadcrumb.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_breadcrumb.md) |
+| Dropdown button | [doc/ix_dropdown_button.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_dropdown_button.md) |
+| Empty state | [doc/ix_empty_state.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_empty_state.md) |
+| Responsive data view | [doc/ix_responsive_data_view.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_responsive_data_view.md) |
+| Spinner | [doc/ix_spinner.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_spinner.md) |
+| Toasts | [doc/ix_toast.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_toast.md) |
+
+The generated Dart API reference is on
+[pub.dev](https://pub.dev/documentation/ix_flutter/latest/).
 
 ## Example
 
-Check out the [example](example/) directory for a complete working application demonstrating all components.
-
-To run the example:
+A complete demo application lives in
+[example/](https://github.com/SobSoft-s-r-o/ix_flutter/tree/main/example):
 
 ```bash
 cd example
@@ -189,14 +194,12 @@ dart run ix_icons_generator:generate_icons
 flutter run
 ```
 
-## Icon Generator Tool
+## Icon generator tool
 
 `ix_icons_generator` is an optional dev dependency that downloads the full Siemens iX icon catalogue (1 479 icons in the pinned `3.5.0` release) from the official `@siemens/ix-icons` npm package and generates `IxIconsData` constants for `ix_flutter`'s `IxIcon` widget.
 
-### Generator Usage
-
 ```bash
-# Basic usage: dart run ix_icons_generator:generate_icons
+# Basic usage
 dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
 
 # Custom paths, pinned version
@@ -209,9 +212,9 @@ dart run ix_icons_generator:generate_icons --package my_library_name
 dart run ix_icons_generator:generate_icons --help
 ```
 
-See [../ix_icons_generator](../ix_icons_generator/) for complete generator documentation, and [doc/ix_icons.md](doc/ix_icons.md) for the full icon guide (internal icons, fallback policy, licensing).
+See [ix_icons_generator](https://pub.dev/packages/ix_icons_generator) for complete generator documentation.
 
-## Platform Support
+## Platform support
 
 | Platform | Supported |
 |----------|-----------|
@@ -227,13 +230,9 @@ See [../ix_icons_generator](../ix_icons_generator/) for complete generator docum
 - Flutter SDK: >=3.10.0
 - Dart SDK: >=3.10.0
 
-## License
+## Important legal notice
 
-This package is licensed under the MIT License. See [LICENSE](LICENSE) file for details.
-
-## Important Legal Notice
-
-### Trademark and Attribution
+### Trademark and attribution
 
 - **Siemens iX Design System** is owned and maintained by Siemens AG
 - This package is an **independent community adaptation**, not an official Siemens product
@@ -242,130 +241,21 @@ This package is licensed under the MIT License. See [LICENSE](LICENSE) file for 
 
 For official Siemens iX resources, visit: https://ix.siemens.io
 
-### Icon Licensing
+### Icon licensing
 
-`@siemens/ix-icons` is MIT-licensed (Copyright (c) 2022 Siemens AG); see [UPSTREAM.md](../../UPSTREAM.md) for the exact version, tag, commit and tarball checksum:
+`@siemens/ix-icons` is MIT-licensed (Copyright (c) 2022 Siemens AG); see [UPSTREAM.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/UPSTREAM.md) for the exact version, tag, commit and tarball checksum:
 
 1. Once the LEGAL REVIEW gate documented in `UPSTREAM.md` is passed, the library will bundle a minimal internal set (28 icons) required by its own widgets; until then library widgets fall back to Material glyphs through `IxIconResolver.material()`.
 2. The full catalogue is optional and generated into your app from the official `@siemens/ix-icons` npm package with the `ix_icons_generator` tool.
 3. Redistribution keeps the MIT copyright/permission notice and `READMEOSS.html`; Siemens trademarks and brand guidelines are separate from the MIT copyright license.
 
-### Icon Licensing Details
+See [ICON_LICENSING.md](ICON_LICENSING.md) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for the complete licensing information.
 
-See [ICON_LICENSING.md](ICON_LICENSING.md) for complete licensing information.
+## License
 
-## Documentation
+This package is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
-Complete documentation is available in the [doc/](doc/) folder:
-
-- **[Icon Integration Guide](doc/ix_icons.md)** - Complete guide to using Siemens iX icons
-- **[Application Scaffold](doc/ix_application_scaffold.md)** - Main application container component
-- **[Blind/Drawer](doc/ix_blind.md)** - Sliding panel component
-- **[Dropdown Button](doc/ix_dropdown_button.md)** - Dropdown selection component  
-- **[Empty State](doc/ix_empty_state.md)** - Empty state placeholder component
-- **[Responsive Data View](doc/ix_responsive_data_view.md)** - Responsive data table component
-- **[Toast Notifications](doc/ix_toast.md)** - Notification system component
-- **[Color Tokens](doc/copilot_colors.md)** - Color system reference
-
-## Quick Start Example
-
-```dart
-import 'package:flutter/material.dart';
-import 'package:ix_flutter/ix_flutter.dart';
-
-void main() {
-  // Build Siemens iX themes
-  final lightTheme = const IxThemeBuilder(mode: ThemeMode.light).build();
-  final darkTheme = const IxThemeBuilder(mode: ThemeMode.dark).build();
-
-  runApp(MyApp(lightTheme: lightTheme, darkTheme: darkTheme));
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({
-    super.key,
-    required this.lightTheme,
-    required this.darkTheme,
-  });
-
-  final ThemeData lightTheme;
-  final ThemeData darkTheme;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ix_flutter Demo',
-      theme: lightTheme,
-      darkTheme: darkTheme,
-      themeMode: ThemeMode.system,
-      home: Scaffold(
-        appBar: AppBar(title: const Text('ix_flutter Components')),
-        body: const Center(
-          child: Text('Build beautiful apps with ix_flutter'),
-        ),
-      ),
-    );
-  }
-}
-```
-
-## Available Components
-
-- **IxApplicationScaffold** - Main application shell with sidebar navigation
-- **IxBreadcrumb** - Navigation breadcrumb component
-- **IxBlind** - Sliding drawer/panel component
-- **IxDropdownButton** - Advanced dropdown selection
-- **IxEmptyState** - Empty state with icon and message
-- **IxResponsiveDataView** - Responsive data table/list
-- **IxToast** - Toast notification system
-- **IxPaginationBar** - Pagination controls
-- **And many more...**
-
-See [example/](example/) folder for complete working examples.
-
-## Contributing
-
-Contributions are welcome! Please follow these guidelines:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-### Development Setup
-
-```bash
-# Clone repository
-git clone https://github.com/SobSoft-s-r-o/ix_flutter.git
-cd ix_flutter
-
-# Install dependencies
-flutter pub get
-
-# Run tests
-flutter test
-
-# Generate icons for development
-dart run ix_icons_generator:generate_icons
-
-# Run example app
-cd example
-flutter run
-```
-
-## Resources
-
-### Official Siemens iX Design System
-- **Website**: https://ix.siemens.io
-- **Documentation**: https://ix.siemens.io/docs/
-- **Icon Library**: https://ix.siemens.io/docs/icon-library/
-- **Design Guidelines**: https://ix.siemens.io/docs/guidelines/
-
-### This Package
-- **Icon Licensing**: See [ICON_LICENSING.md](ICON_LICENSING.md)
-- **License**: See [LICENSE](LICENSE)
-- **Example App**: See [example/](example/) folder
+**Important**: Icons and design patterns are subject to separate licensing terms. See [ICON_LICENSING.md](ICON_LICENSING.md) for details.
 
 ## Changelog
 
@@ -373,9 +263,10 @@ See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 
 ## Support
 
-- **Documentation**: Check [doc/](doc/) folder for detailed component guides
 - **Issues**: [Report a bug](https://github.com/SobSoft-s-r-o/ix_flutter/issues)
 - **Discussions**: [Ask a question](https://github.com/SobSoft-s-r-o/ix_flutter/discussions)
+- **Contributing**: [CONTRIBUTING.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/CONTRIBUTING.md)
+- **Security**: [SECURITY.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/SECURITY.md)
 - **Maintainer**: SobSoft (https://sobsoft.sk)
 
 ### Sponsorship
@@ -386,7 +277,7 @@ Support the development of this package! ❤️
 
 Your sponsorship helps maintain and improve ix_flutter. [Become a sponsor](https://github.com/sponsors/SobSoft-s-r-o) or use the **Sponsor** button at the top of the repository.
 
-### Commercial Support
+### Commercial support
 
 For paid support, consulting, or custom development services, contact SobSoft:
 
@@ -398,17 +289,9 @@ We offer professional services including:
 - Integration support
 - Training and consulting
 
-## License
-
-This package is licensed under the MIT License. See [LICENSE](LICENSE) for details.
-
-**Important**: Icons and design patterns are subject to separate licensing terms. See [ICON_LICENSING.md](ICON_LICENSING.md) for details.
-
 ---
 
 **Community Project Notice**: This package is maintained by the community and is not affiliated with Siemens. For official Siemens iX resources, visit https://ix.siemens.io
-
-**Version**: 1.0.0 | **Dart**: >=3.10.0 | **Flutter**: >=3.10.0
 
 **Disclaimer**: This is not an official Siemens product. This library is developed independently and provides Flutter implementations of Siemens iX Design System patterns. Always ensure compliance with Siemens licensing terms when using iX design assets.
 

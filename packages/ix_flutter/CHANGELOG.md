@@ -191,7 +191,7 @@ We follow [Semantic Versioning](https://semver.org/):
 
 ## Migration Guides
 
-For migration from previous versions, see [ICON_MIGRATION.md](ICON_MIGRATION.md).
+For migration from previous versions, see [ICON_MIGRATION.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/ICON_MIGRATION.md).
 
 ## Contributors
 
@@ -206,5 +206,5 @@ Icons are subject to Siemens iX Design System licensing - See [ICON_LICENSING.md
 ---
 
 **How to Report Issues**: [GitHub Issues](https://github.com/SobSoft-s-r-o/ix_flutter/issues)
-**How to Contribute**: [CONTRIBUTING.md](CONTRIBUTING.md)
-**Security Issues**: [SECURITY.md](SECURITY.md)
+**How to Contribute**: [CONTRIBUTING.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/CONTRIBUTING.md)
+**Security Issues**: [SECURITY.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/SECURITY.md)

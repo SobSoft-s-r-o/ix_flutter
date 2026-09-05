@@ -1,39 +1,16 @@
-# Mirrors .gitignore plus publish-only exclusions
+# Publish-only exclusions, relative to this package root. Patterns that name
+# paths outside the package (the repository's .github/, doc/images/, ...) would
+# never match here, so only what actually exists in the package is listed.
 
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# Flutter/Dart/Pub related
+# Libraries should not include pubspec.lock, per
+# https://dart.dev/guides/libraries/private-files#pubspeclock.
 /pubspec.lock
+
+# Generated API documentation and build output
 **/doc/api/
 .dart_tool/
-.flutter-plugins-dependencies
 /build/
 /coverage/
 
-# Exclude wiki submodule from published package
-/wiki/
-
-# Exclude GitHub metadata
-/.github/
-
-# Exclude repo-only wiki setup guide
-/WIKI_SETUP.md
-
-# Exclude documentation images from package (but keep screenshots for pub.dev)
-/doc/images/
+# Repository tooling: not part of the published library
+/tool/

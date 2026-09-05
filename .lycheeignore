@@ -1,0 +1,19 @@
+# Links the link checker must not fail on. Each line is a regular expression
+# matched against the URL.
+
+# The generated Dart API reference only exists once 1.1.0 is published.
+https://pub.dev/documentation/ix_flutter/latest/
+
+# The wiki is a one-way sync target; it may not exist yet.
+https://github.com/SobSoft-s-r-o/ix_flutter/wiki
+
+# npmjs.com answers 403 to non-browser clients; the package itself is verified
+# through the registry API instead (see UPSTREAM.md for its checksum).
+https://www.npmjs.com/
+
+# Pages added in the 1.1.0 line: the package README and the notices link to
+# them absolutely (they ship to pub.dev, where relative links do not resolve),
+# so they only answer once this line is merged into main. Drop these two lines
+# with that merge.
+https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/UPSTREAM\.md
+https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/(theming|density|typography|tokens)\.md

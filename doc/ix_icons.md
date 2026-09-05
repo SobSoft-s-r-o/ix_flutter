@@ -35,7 +35,7 @@ Both sources render through the same `IxIcon` widget and share the same [fallbac
 `ix_flutter`'s own widgets (pagination, dropdowns, toasts, the application scaffold, …) need a small, fixed set of icons — 28 keys, enumerated in `IxIconKey`. Library code never imports your generated `IxIcons`/`IxIconsData`; internal widgets always resolve icons through `IxIcon.key`:
 
 ```dart
-const IxIcon.key(IxIconKey.home)
+Widget internalKeyIcon() => const IxIcon.key(IxIconKey.home);
 ```
 
 Once the LEGAL REVIEW gate documented in `UPSTREAM.md` is passed, the library will bundle these 28 icons as SVG assets under `packages/ix_flutter/assets/icons/internal/`, with the MIT notice in `packages/ix_flutter/assets/icons/internal/NOTICE`; until then library widgets fall back to Material glyphs through `IxIconResolver.material()` — see [Fallback Policy](#fallback-policy). This affects only the library's own internal rendering; it does not block using `IxIcon`/`IxIconData` or the full-catalogue generator in your own app today.
@@ -67,7 +67,7 @@ Use the generated constants with `IxIcon`:
 import 'package:ix_flutter/ix_flutter.dart';
 import 'package:your_app/ix_icons.dart';
 
-const IxIcon(IxIconsData.home)
+Widget catalogueIcon() => const IxIcon(IxIconsData.home);
 ```
 
 Command line options (`dart run ix_icons_generator:generate_icons --help`):
@@ -91,8 +91,12 @@ Building a library package that ships generated icons to its own consumers: pass
 `IxIcon` is a `StatelessWidget` that renders one icon, from either an explicit `IxIconData` or — via `IxIcon.key` — whatever the ambient `IxIconResolver` maps an `IxIconKey` to:
 
 ```dart
-const IxIcon(IxIconsData.home)     // explicit data (generated catalogue)
-const IxIcon.key(IxIconKey.home)   // resolver-driven (internal keys)
+Widget bothIconSources() => const Row(
+  children: [
+    IxIcon(IxIconsData.home), // explicit data (generated catalogue)
+    IxIcon.key(IxIconKey.home), // resolver-driven (internal keys)
+  ],
+);
 ```
 
 Constructor parameters: `size` (`IxIconSize`, default `s24`), `color`, `colorToken` (an `IxThemeColorToken`, used when `color` is unset), `semanticLabel`, and `excludeFromSemantics`.
@@ -121,11 +125,9 @@ A `ThemeExtension<IxIconResolver>` that maps every `IxIconKey` to concrete `IxIc
 Register a custom resolver — for example, once the bundled SVG set ships, or to swap in your own asset — with `IxThemeBuilder(icons:)`:
 
 ```dart
-final theme = IxThemeBuilder(
+ThemeData themeWithCustomIcon() => IxThemeBuilder(
   icons: IxIconResolver.material().copyWith(
-    icons: {
-      IxIconKey.home: IxIconData.asset('assets/custom/home.svg'),
-    },
+    icons: {IxIconKey.home: const IxIconData.asset('assets/custom/home.svg')},
   ),
 ).build();
 ```
@@ -140,11 +142,11 @@ final theme = IxThemeBuilder(
 // IxIconButton sizes its icon via a merged IconTheme — but IxIcon doesn't
 // read IconTheme.size, so the button's slot and the icon's own `size:`
 // must be set to match explicitly.
-IxIconButton(
-  icon: const IxIcon(IxIconsData.close, size: IxIconSize.s16), // s24 → 16px icon
+Widget closeButtonWithCatalogueIcon(VoidCallback onPressed) => IxIconButton(
+  icon: const IxIcon(IxIconsData.close, size: IxIconSize.s16), // s24 → 16px
   size: IxIconButtonSize.s24,
-  onPressed: () {},
-)
+  onPressed: onPressed,
+);
 ```
 
 ## Fallback Policy
@@ -241,5 +243,5 @@ Yes. `IxIcon` renders SVGs through `flutter_svg` (a direct `ix_flutter` dependen
 ## Need Help?
 
 - **Siemens iX Design System:** https://ix.siemens.io
-- **Icon Library:** https://ix.siemens.io/docs/icon-library/
+- **Icon Library:** https://ix.siemens.io/docs/icons/icon-library
 - **Package Issues:** [GitHub Issues](https://github.com/SobSoft-s-r-o/ix_flutter/issues)

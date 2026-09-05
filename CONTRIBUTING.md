@@ -178,16 +178,41 @@ When you make changes, update the relevant documentation:
 
 1. **Component Documentation**: Update files in [doc/](doc/) folder
 2. **Main README**: Update [README.md](README.md) if adding features
-3. **Changelog**: Add entry to [CHANGELOG.md](CHANGELOG.md)
+3. **Changelog**: Add entry to [packages/ix_flutter/CHANGELOG.md](packages/ix_flutter/CHANGELOG.md)
 4. **Inline Comments**: Add/update code comments and doc strings
 
 ### Documentation Structure
 
 - **doc/**: Component-specific documentation
-- **README.md**: Main package documentation
-- **CHANGELOG.md**: Version history
-- **LICENSE**: License terms
-- **ICON_LICENSING.md**: Icon licensing specifics
+- **doc/snippets/**: the compiled sources of every Dart snippet in the
+  documentation (see below)
+- **doc/tokens.md**: generated color-token table -- never edit it by hand
+- **README.md**: repository overview
+- **packages/ix_flutter/README.md**: the README published to pub.dev
+- **packages/ix_flutter/CHANGELOG.md**: version history
+- **packages/ix_flutter/LICENSE**: license terms
+- **packages/ix_flutter/ICON_LICENSING.md**: icon licensing specifics
+
+### Code snippets in documentation
+
+Every ```dart block in the documentation is a verbatim copy of a declaration in
+[doc/snippets](doc/snippets), so a snippet can never drift away from the API it
+documents. When you change a snippet:
+
+1. Edit the declaration in `doc/snippets/lib/<page>_snippets.dart`
+2. Run `cd doc/snippets && flutter pub get && flutter analyze`
+3. Copy the declaration into the matching block in the documentation page
+
+### Regenerating the token table
+
+`doc/tokens.md` is generated from the classic palettes:
+
+```bash
+cd packages/ix_flutter
+dart run tool/gen_token_table.dart
+```
+
+CI regenerates it and fails if the committed file differs.
 
 ## Testing Requirements
 
@@ -197,6 +222,21 @@ When you make changes, update the relevant documentation:
 - Maintain or improve overall test coverage
 - Test edge cases and error conditions
 - Include integration tests where appropriate
+
+### Repository test conventions
+
+- `pumpIx()` (`packages/ix_flutter/test/helpers/pump_ix.dart`) is the standard
+  wrapper: IxTheme, viewport, text scale, `disableAnimations: true`.
+- A test that mirrors a specific upstream `.ct.ts` test or scss/tsx source
+  cites it with `@Upstream('...')` (`test/helpers/upstream.dart`). Where no
+  direct counterpart exists (for example the width/text-scale and RTL
+  matrices), the file instead carries a doc comment above `void main()` naming
+  the finding ID and the task that resolves it.
+- Red matrices (`test/a11y`, `test/responsive`, `test/rtl`) use `skip: true`
+  with a trailing `// IXF-xxx - <plan/task>` comment (`skip` is `bool?` in
+  `flutter_test`, not `String`); the skip is removed by the task that fixes
+  the finding.
+- Goldens: see `packages/ix_flutter/test/golden/README.md`.
 
 ### Test Guidelines
 
@@ -283,6 +323,33 @@ Maintainers handle releases. The process typically includes:
 3. Tag release in Git
 4. Publish to pub.dev
 
+### Release checklist
+
+Run through this before publishing `ix_flutter` or `ix_icons_generator` to
+pub.dev:
+
+- [ ] `packages/ix_flutter`: `flutter analyze`, `flutter test`,
+      `dart format --output=none --set-exit-if-changed lib test example`
+- [ ] `example`: `flutter analyze`, `flutter test`
+- [ ] `tool/check_docs.sh` passes (no stale API names, versions or claims)
+- [ ] `doc/snippets`: `flutter pub get && flutter analyze` -- every snippet in
+      the documentation still compiles
+- [ ] `packages/ix_flutter`: `dart run tool/gen_token_table.dart` leaves
+      `doc/tokens.md` unchanged
+- [ ] `packages/ix_flutter`: `dart run tool/upstream_check.dart` -- `UPSTREAM.md`
+      and the CHANGELOG release header agree with `IxUpstream`
+- [ ] CHANGELOG.md: the new release section is followed by its `Upstream:` line
+      (see [UPSTREAM.md](UPSTREAM.md#release-header-format))
+- [ ] Version bumped in `packages/<package>/pubspec.yaml` and referenced
+      consistently in the documentation (`ix_flutter: ^<version>`)
+- [ ] Screenshots in `packages/ix_flutter/screenshots/` still match the current
+      UI, and `pubspec.yaml`'s `screenshots:` entry points at a file that exists
+- [ ] `dart pub publish --dry-run` in `packages/ix_flutter` **and**
+      `packages/ix_icons_generator`: 0 warnings, and the published file list
+      contains `LICENSE`, `README.md`, `CHANGELOG.md`, `ICON_LICENSING.md` and
+      `THIRD_PARTY_NOTICES.md` but no `tool/`
+- [ ] CI is green on `main`, including the `version-bump.yml` workflow
+
 ## Recognition
 
 Contributors are recognized in:
@@ -310,12 +377,4 @@ Thank you for contributing to ix_flutter! 🎉
 
 ---
 
-**Last Updated**: January 2026
 **License**: MIT
-
-## Testing
-
-- `pumpIx()` (`packages/ix_flutter/test/helpers/pump_ix.dart`) je štandardný wrapper: IxTheme, viewport, text scale, `disableAnimations: true`.
-- Testy, ktoré zrkadlia konkrétny upstream `.ct.ts` test alebo scss/tsx zdroj, ho citujú cez `@Upstream('...')` (`test/helpers/upstream.dart`); ak priamy náprotivok neexistuje (napr. matice šírky/text scale a RTL), súbor namiesto toho nesie doc-komentár nad `void main()` s ID nálezu a úlohou, ktorá ho rieši.
-- Červené matice (`test/a11y`, `test/responsive`, `test/rtl`) používajú `skip: true` s trailing komentárom `// IXF-xxx – <plán/úloha>` (`skip` je v `flutter_test` typu `bool?`, nie `String`); skip sa odstraňuje v úlohe, ktorá nález opravuje.
-- Goldeny: pozri `packages/ix_flutter/test/golden/README.md`.

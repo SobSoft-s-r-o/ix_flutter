@@ -14,32 +14,37 @@ The `IxBlind` widget is a collapsible container that mirrors the Siemens iX `<ix
 
 ## Expanded state
 
-`IxBlind` supports two ways of driving its expanded state:
+`IxBlind` supports two ways of driving its expanded state.
 
-*   **Uncontrolled** (`expanded` left `null`, the default): the blind manages its own state internally, starting from `initiallyExpanded`, and flips it on every header tap. Nothing else is required:
+### Uncontrolled (default)
 
-    ```dart
-    const IxBlind(
-      title: 'Details',
-      initiallyExpanded: true, // optional; defaults to false in 1.x
-      child: Text('Content...'),
-    )
-    ```
+With `expanded` left `null` the blind manages its own state internally, starting from `initiallyExpanded`, and flips it on every header tap. Nothing else is required:
 
-*   **Controlled** (`expanded` set): the blind always renders exactly the value you pass and never changes it on its own. Update `expanded` from `onExpandedChanged` to make the header respond to taps -- this is the pre-2.0 contract and keeps working unchanged.
+```dart
+Widget uncontrolledBlind() => const IxBlind(
+  title: 'Details',
+  initiallyExpanded: true, // optional; defaults to false in 1.x
+  child: Text('Content...'),
+);
+```
 
-    ```dart
-    IxBlind(
-      title: 'Details',
-      expanded: _open,
-      onExpandedChanged: (value) => setState(() => _open = value),
-      child: const Text('Content...'),
-    )
-    ```
+### Controlled
 
-    `initiallyExpanded` is ignored once `expanded` is set.
+With `expanded` set, the blind always renders exactly the value you pass and never changes it on its own. Update `expanded` from `onExpandedChanged` to make the header respond to taps -- this is the pre-2.0 contract and keeps working unchanged.
 
-`initiallyExpanded` defaults to `false` for 1.x source compatibility; the iX Flutter 2.0 breaking-changes plan flips that default to `true`.
+```dart
+Widget controlledBlind({
+  required bool expanded,
+  required ValueChanged<bool> onExpandedChanged,
+}) => IxBlind(
+  title: 'Details',
+  expanded: expanded,
+  onExpandedChanged: onExpandedChanged,
+  child: const Text('Content...'),
+);
+```
+
+`initiallyExpanded` is ignored once `expanded` is set. It defaults to `false` for 1.x source compatibility; the iX Flutter 2.0 breaking-changes plan flips that default to `true`.
 
 ## Accessibility
 
@@ -68,7 +73,7 @@ class _MyBlindExampleState extends State<MyBlindExample> {
     return IxBlind(
       title: 'Basic Blind',
       subtitle: 'Optional subtitle',
-      icon: IxIcons.info, // Optional leading icon
+      icon: const IxIcon.key(IxIconKey.info), // Optional leading icon
       expanded: _expanded,
       onExpandedChanged: (value) {
         setState(() {
@@ -89,23 +94,26 @@ class _MyBlindExampleState extends State<MyBlindExample> {
 You can add widgets to the right side of the header using the `headerActions` property.
 
 ```dart
-IxBlind(
+Widget blindWithHeaderActions({
+  required bool expanded,
+  required ValueChanged<bool> onExpandedChanged,
+  required VoidCallback onDelete,
+}) => IxBlind(
   title: 'Blind with Actions',
-  expanded: _expanded,
-  onExpandedChanged: (val) => setState(() => _expanded = val),
+  expanded: expanded,
+  onExpandedChanged: onExpandedChanged,
   headerActions: Row(
     mainAxisSize: MainAxisSize.min,
     children: [
       IconButton(
         icon: const Icon(Icons.delete),
-        onPressed: () {
-          // Handle delete action
-        },
+        tooltip: 'Delete',
+        onPressed: onDelete,
       ),
     ],
   ),
   child: const Text('Content...'),
-)
+);
 ```
 
 ### Accordion
@@ -113,22 +121,27 @@ IxBlind(
 Use `IxBlindAccordion` to group multiple blinds vertically with the correct spacing.
 
 ```dart
-IxBlindAccordion(
+Widget blindAccordion({
+  required bool firstExpanded,
+  required ValueChanged<bool> onFirstExpandedChanged,
+  required bool secondExpanded,
+  required ValueChanged<bool> onSecondExpandedChanged,
+}) => IxBlindAccordion(
   children: [
     IxBlind(
       title: 'First Blind',
-      expanded: _expanded1,
-      onExpandedChanged: (v) => setState(() => _expanded1 = v),
+      expanded: firstExpanded,
+      onExpandedChanged: onFirstExpandedChanged,
       child: const Text('Content 1'),
     ),
     IxBlind(
       title: 'Second Blind',
-      expanded: _expanded2,
-      onExpandedChanged: (v) => setState(() => _expanded2 = v),
+      expanded: secondExpanded,
+      onExpandedChanged: onSecondExpandedChanged,
       child: const Text('Content 2'),
     ),
   ],
-)
+);
 ```
 
 ## Variants

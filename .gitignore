@@ -24,6 +24,9 @@ migrate_working_dir/
 # Flutter/Dart/Pub related
 # Libraries should not include pubspec.lock, per https://dart.dev/guides/libraries/private-files#pubspeclock.
 /pubspec.lock
+# doc/snippets is a local-only workspace that compiles the documentation
+# snippets against the package sources; its lockfile is not part of the repo.
+/doc/snippets/pubspec.lock
 **/doc/api/
 .dart_tool/
 .flutter-plugins-dependencies

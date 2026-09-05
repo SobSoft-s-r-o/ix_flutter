@@ -17,8 +17,8 @@ the classic palette unless you supply your own colors through
 `IxThemeBuilder` builds one `ThemeData` for one resolved brightness:
 
 ```dart
-final light = const IxThemeBuilder.light().build();
-final dark = const IxThemeBuilder.dark().build();
+(ThemeData light, ThemeData dark) buildBothBrightnesses() =>
+    (const IxThemeBuilder.light().build(), const IxThemeBuilder.dark().build());
 ```
 
 Both named constructors accept `theme:`, `typography:`, `customPalette:`,
@@ -26,17 +26,21 @@ Both named constructors accept `theme:`, `typography:`, `customPalette:`,
 `brightness:` instead:
 
 ```dart
-final theme = IxThemeBuilder(
+ThemeData buildDarkClassic() => IxThemeBuilder(
   theme: IxThemeName.classic,
   brightness: Brightness.dark,
-  typography: IxTypography(fontFamily: IxFonts.workSans, package: IxFonts.packageName),
+  typography: IxTypography(
+    fontFamily: IxFonts.workSans,
+    package: IxFonts.packageName,
+  ),
 ).build();
 ```
 
 Every built theme carries an `IxTheme` extension; read it with
 `IxTheme.of(context)`. It reports the configuration it was built from
-(`themeName`, `colorSchema`, `brightness`), the resolved `palette` and the
-`typography`. `colorSchema` on a built theme is always `light` or `dark` --
+(`themeName`, `colorSchema`, `brightness`), the resolved `palette` (every
+token's light and dark value is listed in [tokens.md](tokens.md)) and the
+`typography` (see [typography.md](typography.md)). `colorSchema` on a built theme is always `light` or `dark` --
 a `ThemeData` has a resolved appearance; `IxColorSchema.system` only exists
 as the *configured* schema on `IxThemeController`.
 
@@ -49,7 +53,14 @@ brightness, and notifies both as a `ChangeNotifier` and on the
 `themeChanged` stream:
 
 ```dart
-class _AppState extends State<App> {
+class ThemedApp extends StatefulWidget {
+  const ThemedApp({super.key});
+
+  @override
+  State<ThemedApp> createState() => _ThemedAppState();
+}
+
+class _ThemedAppState extends State<ThemedApp> {
   final _theme = IxThemeController(); // defaults to classic + system
 
   @override
@@ -60,14 +71,14 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: _theme,
-        builder: (context, _) => MaterialApp(
-          theme: _theme.light,
-          darkTheme: _theme.dark,
-          themeMode: _theme.themeMode,
-          home: const Home(),
-        ),
-      );
+    animation: _theme,
+    builder: (context, _) => MaterialApp(
+      theme: _theme.light,
+      darkTheme: _theme.dark,
+      themeMode: _theme.themeMode,
+      home: const Placeholder(),
+    ),
+  );
 }
 ```
 
@@ -114,12 +125,14 @@ controllers can coexist, and the framework's own handling (for example
 in from the classic palette:
 
 ```dart
-final palette = IxCustomPalette.partial(
-  light: {IxThemeColorToken.primary: const Color(0xFF0050F5)},
-  dark: {IxThemeColorToken.primary: const Color(0xFF82A0FF)},
-);
+IxThemeController controllerWithBrandPrimary() {
+  final palette = IxCustomPalette.partial(
+    light: {IxThemeColorToken.primary: const Color(0xFF0050F5)},
+    dark: {IxThemeColorToken.primary: const Color(0xFF82A0FF)},
+  );
 
-final controller = IxThemeController(customPalette: palette);
+  return IxThemeController(customPalette: palette);
+}
 ```
 
 `copyWith` merges further overrides on top of an existing palette, token by

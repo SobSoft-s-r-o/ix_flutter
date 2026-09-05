@@ -1,0 +1,12 @@
+name: ix_flutter_doc_snippets
+description: "Compiled sources for the Dart snippets in doc/*.md. Never published."
+publish_to: none
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  ix_flutter:
+    path: ../../packages/ix_flutter
+dev_dependencies:
+  flutter_lints: ^6.0.0

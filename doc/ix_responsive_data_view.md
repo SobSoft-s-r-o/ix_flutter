@@ -71,10 +71,18 @@ selector additionally exposes its current value and expanded state.
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-class MyDataView extends StatelessWidget {
-  final List<MyItem> items;
+/// The row model every example on this page uses.
+class MyItem {
+  const MyItem({required this.name, required this.status});
 
+  final String name;
+  final String status;
+}
+
+class MyDataView extends StatelessWidget {
   const MyDataView({super.key, required this.items});
+
+  final List<MyItem> items;
 
   @override
   Widget build(BuildContext context) {
@@ -111,20 +119,61 @@ class MyDataView extends StatelessWidget {
         IxRowAction(
           id: 'edit',
           label: 'Edit',
-          icon: IxIcons.pen,
-          onSelected: (item) => print('Edit ${item.name}'),
+          icon: const Icon(Icons.edit),
+          onSelected: (item) => debugPrint('Edit ${item.name}'),
         ),
         IxRowAction(
           id: 'delete',
           label: 'Delete',
-          icon: IxIcons.trashcan,
+          icon: const Icon(Icons.delete),
           destructive: true,
-          onSelected: (item) => print('Delete ${item.name}'),
+          onSelected: (item) => debugPrint('Delete ${item.name}'),
         ),
       ],
     );
   }
 }
+```
+
+### Shared definitions
+
+Every example below reuses the same column, field and action definitions:
+
+```dart
+/// The column, field and action definitions from [MyDataView], reused by the
+/// examples below.
+List<IxColumnDef<MyItem>> demoColumns() => [
+  IxColumnDef(
+    label: 'Name',
+    sortKey: 'name', // Key reported through onSortChanged
+    cellBuilder: (context, item) => Text(item.name),
+  ),
+  IxColumnDef(
+    label: 'Status',
+    sortKey: 'status',
+    cellBuilder: (context, item) => Text(item.status),
+  ),
+];
+
+List<IxMobileFieldDef<MyItem>> demoMobileFields() => [
+  IxMobileFieldDef(
+    label: 'Name',
+    valueBuilder: (context, item) => Text(item.name),
+  ),
+  IxMobileFieldDef(
+    label: 'Status',
+    valueBuilder: (context, item) => Text(item.status),
+  ),
+];
+
+List<IxRowAction<MyItem>> demoRowActions() => [
+  IxRowAction(
+    id: 'edit',
+    label: 'Edit',
+    icon: const Icon(Icons.edit),
+    onSelected: (item) => debugPrint('Edit ${item.name}'),
+  ),
+];
 ```
 
 ### Pagination
@@ -136,24 +185,27 @@ The widget supports two pagination modes via the `pagination` parameter.
 Displays a pagination bar at the bottom of the table with page controls and optional page size selector.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget standardPagination({
+  required List<MyItem> currentItems,
+  required int currentPage,
+  required ValueChanged<int> onPageChanged,
+  required ValueChanged<int> onPageSizeChanged,
+}) => IxResponsiveDataView<MyItem>(
   items: currentItems,
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
   pagination: IxPaginationConfig(
     mode: IxPaginationMode.standard,
-    page: currentPage,       // Current page number (1-based)
-    pageSize: 20,            // Items per page
-    totalItems: 100,         // Total items in dataset
-    totalPages: 5,           // Total pages
-    pageSizeOptions: [10, 20, 50], // Options for dropdown
+    page: currentPage, // Current page number (1-based)
+    pageSize: 20, // Items per page
+    totalItems: 100, // Total items in dataset
+    totalPages: 5, // Total pages
+    pageSizeOptions: const [10, 20, 50], // Options for dropdown
   ),
-  onPageChanged: (newPage) {
-    // Fetch new page and update state
-  },
-  onPageSizeChanged: (newSize) {
-    // Update page size and reset to page 1
-  },
-  // ...
-)
+  onPageChanged: onPageChanged,
+  onPageSizeChanged: onPageSizeChanged,
+);
 ```
 
 The pagination bar lays its controls out with a `Wrap` instead of a plain
@@ -169,7 +221,11 @@ internally) can be localized directly through `paginationStrings`, without
 touching `IxResponsiveDataViewStrings`:
 
 ```dart
-IxPaginationBar(
+Widget localizedPaginationBar({
+  required int page,
+  required int totalPages,
+  required ValueChanged<int> onPageChanged,
+}) => IxPaginationBar(
   page: page,
   totalPages: totalPages,
   onPageChanged: onPageChanged,
@@ -179,7 +235,7 @@ IxPaginationBar(
     rowsPerPage: 'Položiek na stranu',
     pageSelection: 'Výber strany',
   ),
-)
+);
 ```
 
 `paginationStrings` takes precedence over the legacy `strings:`
@@ -196,10 +252,17 @@ the matching fields overridden (`paginationPrevTooltip`,
 Automatically triggers a callback when the user scrolls near the bottom of the list.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget infiniteScroll({
+  required List<MyItem> currentItems,
+  required bool isFetchingMore,
+  required Future<void> Function() fetchMoreItems,
+}) => IxResponsiveDataView<MyItem>(
   items: currentItems,
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
   isPageLoading: isFetchingMore, // Show bottom spinner while loading
-  pagination: IxPaginationConfig(
+  pagination: const IxPaginationConfig(
     mode: IxPaginationMode.infinite,
     hasMore: true, // Set to false when no more data
   ),
@@ -207,8 +270,7 @@ IxResponsiveDataView<MyItem>(
     // Fetch next batch of items and append to list
     await fetchMoreItems();
   },
-  // ...
-)
+);
 ```
 
 ### Sorting
@@ -216,25 +278,19 @@ IxResponsiveDataView<MyItem>(
 Enable sorting by setting `enableSorting: true` and providing `sortKey` in `IxColumnDef`. You can also set the initial sort state using `initialSortKey` and `initialSortAscending`.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget sortableDataView({
+  required List<MyItem> items,
+  required ValueChanged<IxSortSpec> onSortChanged,
+}) => IxResponsiveDataView<MyItem>(
   items: items,
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
   enableSorting: true,
   initialSortKey: 'name', // Initial sort column
   initialSortAscending: true, // Initial sort direction
-  onSortChanged: (IxSortSpec sortSpec) {
-    // Perform sorting logic here based on sortSpec.key and sortSpec.ascending
-    // e.g. items.sort(...) or fetchSortedData(...)
-  },
-  desktopColumns: [
-    IxColumnDef(
-      label: 'Name',
-      sortKey: 'name', // Key passed to onSortChanged
-      cellBuilder: (context, item) => Text(item.name),
-    ),
-    // ...
-  ],
-  // ...
-)
+  onSortChanged: onSortChanged,
+);
 ```
 
 ### Search / Filtering
@@ -242,22 +298,24 @@ IxResponsiveDataView<MyItem>(
 The widget provides a built-in search status bar and empty state handling for search results.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget searchableDataView({
+  required List<MyItem> filteredItems,
+  required String currentSearchQuery,
+  required VoidCallback onClearSearch,
+  required VoidCallback onResetPagination,
+}) => IxResponsiveDataView<MyItem>(
   items: filteredItems,
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
   searchQuery: currentSearchQuery, // The current search string
-  onClearSearch: () {
-    // Clear the search query in your state
-    setState(() => currentSearchQuery = '');
-  },
+  onClearSearch: onClearSearch,
   // Optional: Customize the "No results" text
   noResultsTextBuilder: (query) => 'No items found for "$query"',
-  // Optional: Reset pagination when search changes (if handled internally)
+  // Optional: Reset pagination when the search changes
   searchAffectsPagination: true,
-  onSearchChangedRequestResetPagination: () {
-     // Reset to page 1
-  },
-  // ...
-)
+  onSearchChangedRequestResetPagination: onResetPagination,
+);
 ```
 
 ### Custom Mobile Card
@@ -265,17 +323,19 @@ IxResponsiveDataView<MyItem>(
 By default, `IxResponsiveDataView` generates a card layout for mobile using `mobileFields`. You can override this by providing a `mobileItemBuilder`.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget customMobileCard(List<MyItem> items) => IxResponsiveDataView<MyItem>(
   items: items,
-  desktopColumns: [...],
-  mobileFields: [], // Can be empty if mobileItemBuilder is used
+  desktopColumns: demoColumns(),
+  mobileFields: const [], // Can be empty if mobileItemBuilder is used
+  rowActions: demoRowActions(),
   mobileItemBuilder: (context, item) {
     return Card(
       child: ListTile(
         title: Text(item.name),
         subtitle: Text(item.status),
         trailing: IconButton(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
+          tooltip: 'Actions',
           onPressed: () {
             // Show actions
           },
@@ -283,8 +343,7 @@ IxResponsiveDataView<MyItem>(
       ),
     );
   },
-  // ...
-)
+);
 ```
 
 ### Localization
@@ -294,15 +353,16 @@ All user-visible strings in the widget can be localized. You can provide a `IxRe
 #### 1. Per-widget Override
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget dataViewWithStrings(List<MyItem> items) => IxResponsiveDataView<MyItem>(
   items: items,
-  strings: IxResponsiveDataViewStrings(
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
+  strings: const IxResponsiveDataViewStrings(
     emptyTitle: 'No data found',
     toolsColumnHeader: 'Actions',
-    // ... other strings
   ),
-  // ...
-)
+);
 ```
 
 #### 2. Context-based Resolver (Recommended)
@@ -310,19 +370,21 @@ IxResponsiveDataView<MyItem>(
 This approach allows you to integrate with `AppLocalizations` or any other localization solution.
 
 ```dart
-IxResponsiveDataView<MyItem>(
-  items: items,
-  stringsResolver: (context) {
-    // Example: Fetch from AppLocalizations
-    // final l10n = AppLocalizations.of(context);
-    return IxResponsiveDataViewStrings(
-      emptyTitle: 'Localized Empty Title', // l10n.emptyTitle
-      pageOfBuilder: (page, total) => 'Page $page / $total',
-      // ... map other strings
+Widget dataViewWithStringsResolver(List<MyItem> items) =>
+    IxResponsiveDataView<MyItem>(
+      items: items,
+      desktopColumns: demoColumns(),
+      mobileFields: demoMobileFields(),
+      rowActions: demoRowActions(),
+      stringsResolver: (context) {
+        // Example: fetch from AppLocalizations
+        // final l10n = AppLocalizations.of(context);
+        return IxResponsiveDataViewStrings(
+          emptyTitle: 'Localized Empty Title', // l10n.emptyTitle
+          pageOfBuilder: (page, total) => 'Page $page / $total',
+        );
+      },
     );
-  },
-  // ...
-)
 ```
 
 ## API Reference

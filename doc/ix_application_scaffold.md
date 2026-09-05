@@ -74,9 +74,7 @@ class _MyHomePageState extends State<MyHomePage> {
           _currentRoute = id;
         });
       },
-      body: Center(
-        child: Text('Current Route: $_currentRoute'),
-      ),
+      body: Center(child: Text('Current Route: $_currentRoute')),
     );
   }
 }
@@ -126,26 +124,42 @@ defaults mirror the upstream `menu.tsx` English strings.
 | `closePanel` | `Close` | Tooltip of the fly-out panel's close button |
 
 ```dart
-IxApplicationScaffold(
+Widget localizedScaffold({
+  required List<IxMenuEntry> entries,
+  required ValueChanged<String> onNavigate,
+  required Widget body,
+}) => IxApplicationScaffold(
+  appTitle: 'My App',
   strings: const IxApplicationStrings(
     settings: 'Einstellungen',
     toggleTheme: 'Design wechseln',
   ),
-  // ...
-)
+  entries: entries,
+  onNavigate: onNavigate,
+  body: body,
+);
 ```
 
 ### Built-in bottom entries
 
 ```dart
-IxApplicationScaffold(
-  // ...
+Widget scaffoldWithBottomEntries({
+  required List<IxMenuEntry> entries,
+  required ValueChanged<String> onNavigate,
+  required Widget body,
+  required ThemeMode themeMode,
+  required ValueChanged<ThemeMode> onThemeModeChanged,
+}) => IxApplicationScaffold(
+  appTitle: 'My App',
+  entries: entries,
+  onNavigate: onNavigate,
+  body: body,
   themeMode: themeMode,
-  onThemeModeChanged: (mode) => setState(() => themeMode = mode),
-  settings: const SettingsPanel(),   // upstream <ix-menu-settings>
-  about: const AboutLegalPanel(),    // upstream <ix-menu-about>
-  enableToggleTheme: true,           // default
-)
+  onThemeModeChanged: onThemeModeChanged,
+  settings: const SettingsPanel(), // upstream <ix-menu-settings>
+  about: const AboutLegalPanel(), // upstream <ix-menu-about>
+  enableToggleTheme: true, // default
+);
 ```
 
 `settings` and `about` are opened in a fly-out panel anchored to the trailing
@@ -172,7 +186,7 @@ Data model for defining items in the navigation menu.
 | `type` | `IxMenuEntryType` | Type of entry: `item`, `category`, or `custom`. |
 | `label` | `String` | Display text for the entry. |
 | `icon` | `IconData?` | Icon to display (Material IconData). |
-| `iconWidget` | `Widget?` | Custom widget to use as an icon (e.g., `IxIcons.home`). Takes precedence over `icon`. |
+| `iconWidget` | `Widget?` | Custom widget to use as an icon (e.g., `IxIcon.key(IxIconKey.home)`). Takes precedence over `icon`. |
 | `tooltip` | `String?` | Tooltip text. Defaults to `label` if null. |
 | `notificationCount` | `int?` | Number to display in a notification badge. |
 | `selected` | `bool` | Whether the entry is currently selected/active. |

@@ -113,13 +113,48 @@ jobs:
         working-directory: packages/ix_flutter
         run: dart run tool/upstream_check.dart
       - run: tool/check_svg_imports.sh
-      - run: tool/check_docs.sh
       - name: Format ix_icons_generator
         working-directory: packages/ix_icons_generator
         run: dart format --output=none --set-exit-if-changed lib bin test
       - name: Format example
         working-directory: example
         run: dart format --output=none --set-exit-if-changed lib test
+
+  docs:
+    name: documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Check documentation claims, names and versions
+        run: tool/check_docs.sh
+
+      - name: Compile documentation snippets
+        working-directory: doc/snippets
+        run: |
+          flutter pub get
+          flutter analyze
+
+      - name: Install ix_flutter dependencies
+        working-directory: packages/ix_flutter
+        run: flutter pub get
+
+      - name: Check the generated token table is up to date
+        working-directory: packages/ix_flutter
+        run: |
+          dart run tool/gen_token_table.dart
+          git diff --exit-code ../../doc/tokens.md
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --no-progress --exclude-path wiki --exclude-path docs --exclude-path build './**/*.md'
+          fail: true
 
   example_analyze_test:
     name: example analyze + test

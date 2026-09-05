@@ -44,26 +44,25 @@ class MyDropdownExample extends StatelessWidget {
 ### With Icon and Variant
 
 ```dart
-IxDropdownButton<String>(
-  label: 'Settings',
-  icon: IxIcon.key(IxIconKey.cogwheel, size: IxIconSize.s16),
-  buttonVariant: IxButtonVariant.secondary,
-  items: const [
-    IxDropdownMenuItem(
-      label: 'Profile',
-      value: 'profile',
-      icon: Icon(Icons.person, size: 16),
-    ),
-    IxDropdownMenuItem(
-      label: 'Logout',
-      value: 'logout',
-      icon: Icon(Icons.logout, size: 16),
-    ),
-  ],
-  onItemSelected: (value) {
-    // Handle selection
-  },
-)
+Widget dropdownWithIconAndVariant(ValueChanged<String> onItemSelected) =>
+    IxDropdownButton<String>(
+      label: 'Settings',
+      icon: const IxIcon.key(IxIconKey.cogwheel, size: IxIconSize.s16),
+      buttonVariant: IxButtonVariant.secondary,
+      items: const [
+        IxDropdownMenuItem(
+          label: 'Profile',
+          value: 'profile',
+          icon: Icon(Icons.person, size: 16),
+        ),
+        IxDropdownMenuItem(
+          label: 'Logout',
+          value: 'logout',
+          icon: Icon(Icons.logout, size: 16),
+        ),
+      ],
+      onItemSelected: onItemSelected,
+    );
 ```
 
 ### Checked items
@@ -71,13 +70,13 @@ IxDropdownButton<String>(
 A menu that contains at least one `checked` item reserves a leading checkmark column for every row, so all labels stay aligned. The checked state is exposed to screen readers.
 
 ```dart
-IxDropdownButton<String>(
+Widget dropdownWithCheckedItem() => const IxDropdownButton<String>(
   label: 'Sort by',
-  items: const [
+  items: [
     IxDropdownMenuItem(label: 'Name', value: 'name', checked: true),
     IxDropdownMenuItem(label: 'Date', value: 'date'),
   ],
-)
+);
 ```
 
 ### Controlled open state
@@ -85,24 +84,28 @@ IxDropdownButton<String>(
 Passing `isOpen` makes the widget controlled: it never opens or closes on its own, it only reports the requested state through `onOpenChanged` and renders whatever `isOpen` says. Leave `isOpen` unset for the uncontrolled default.
 
 ```dart
-bool _open = false;
-
-IxDropdownButton<String>(
+Widget controlledDropdown({
+  required bool isOpen,
+  required ValueChanged<bool> onOpenChanged,
+}) => IxDropdownButton<String>(
   label: 'Actions',
-  isOpen: _open,
-  onOpenChanged: (open) => setState(() => _open = open),
+  isOpen: isOpen,
+  onOpenChanged: onOpenChanged,
   items: const [IxDropdownMenuItem(label: 'Edit', value: 'edit')],
-)
+);
 ```
 
 `onWillOpen` vetoes an open request before it happens (and before `onOpenChanged` fires), which is useful for lazily loading the items or blocking the menu while a form is invalid:
 
 ```dart
-IxDropdownButton<String>(
+Widget dropdownWithOpenVeto({
+  required bool formIsValid,
+  required List<IxDropdownMenuItem<String>> items,
+}) => IxDropdownButton<String>(
   label: 'Actions',
-  onWillOpen: () => _formIsValid,
-  items: _items,
-)
+  onWillOpen: () => formIsValid,
+  items: items,
+);
 ```
 
 ### Close behaviour
@@ -123,11 +126,12 @@ IxDropdownButton<String>(
 You can control the preferred placement of the dropdown menu using the `placement` parameter. The widget will attempt to respect this placement but will automatically adjust if there is insufficient space.
 
 ```dart
-IxDropdownButton<String>(
-  label: 'Top Start',
-  placement: IxDropdownPlacement.topStart,
-  items: const [/* ... */],
-)
+Widget dropdownWithPlacement(List<IxDropdownMenuItem<String>> items) =>
+    IxDropdownButton<String>(
+      label: 'Top Start',
+      placement: IxDropdownPlacement.topStart,
+      items: items,
+    );
 ```
 
 Supported placements:

@@ -17,19 +17,21 @@ Animated loading spinner component that follows the IX Design System specificati
 ## Basic Usage
 
 ```dart
+import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-// Default medium spinner
-const IxSpinner()
-
-// Custom size
-const IxSpinner(size: IxSpinnerSize.large)
-
-// Primary variant
-const IxSpinner(variant: IxSpinnerVariant.primary)
-
-// Without track (just the animated arc)
-const IxSpinner(hideTrack: true)
+Widget spinnerBasics() => const Column(
+  children: [
+    // Default medium spinner
+    IxSpinner(),
+    // Custom size
+    IxSpinner(size: IxSpinnerSize.large),
+    // Primary variant
+    IxSpinner(variant: IxSpinnerVariant.primary),
+    // Without track (just the animated arc)
+    IxSpinner(hideTrack: true),
+  ],
+);
 ```
 
 ## Sizes
@@ -47,19 +49,16 @@ The spinner comes with five size presets:
 ### Size Examples
 
 ```dart
-// Extra small for inline loading
-Row(
+Widget inlineSpinner() => const Row(
   children: [
-    const Text('Loading'),
-    const SizedBox(width: 8),
-    const IxSpinner(size: IxSpinnerSize.xSmall),
+    Text('Loading'),
+    SizedBox(width: 8),
+    IxSpinner(size: IxSpinnerSize.xSmall),
   ],
-)
+);
 
-// Large for full-page loading
-Center(
-  child: const IxSpinner(size: IxSpinnerSize.large),
-)
+Widget fullPageSpinner() =>
+    const Center(child: IxSpinner(size: IxSpinnerSize.large));
 ```
 
 ## Variants
@@ -68,7 +67,8 @@ Center(
 Uses the muted "soft" UI colors from the theme for subtle loading indicators.
 
 ```dart
-const IxSpinner(variant: IxSpinnerVariant.secondary)
+Widget secondarySpinner() =>
+    const IxSpinner(variant: IxSpinnerVariant.secondary);
 ```
 
 `IxSpinnerVariant.standard` is a deprecated alias of `secondary` (same colors, kept for source compatibility) and will be removed in a future major version. Use `secondary` in new code.
@@ -77,7 +77,7 @@ const IxSpinner(variant: IxSpinnerVariant.secondary)
 Uses the primary brand color for emphasized loading states.
 
 ```dart
-const IxSpinner(variant: IxSpinnerVariant.primary)
+Widget primarySpinner() => const IxSpinner(variant: IxSpinnerVariant.primary);
 ```
 
 ## Properties
@@ -94,53 +94,53 @@ const IxSpinner(variant: IxSpinnerVariant.primary)
 ### Loading Button Content
 
 ```dart
-ElevatedButton(
-  onPressed: isLoading ? null : _handleSubmit,
+Widget submitButton({
+  required bool isLoading,
+  required VoidCallback onSubmit,
+}) => FilledButton(
+  onPressed: isLoading ? null : onSubmit,
   child: isLoading
-      ? const IxSpinner(
-          size: IxSpinnerSize.small,
-          hideTrack: true,
-        )
+      ? const IxSpinner(size: IxSpinnerSize.small, hideTrack: true)
       : const Text('Submit'),
-)
+);
 ```
 
 ### Loading Overlay
 
 ```dart
-Stack(
-  children: [
-    // Your content
-    MyContent(),
-    
-    // Loading overlay
-    if (isLoading)
-      Container(
-        color: Colors.black54,
-        child: const Center(
-          child: IxSpinner(
-            size: IxSpinnerSize.large,
-            variant: IxSpinnerVariant.primary,
+Widget loadingOverlay({required bool isLoading, required Widget content}) =>
+    Stack(
+      children: [
+        content,
+        if (isLoading)
+          const ColoredBox(
+            color: Colors.black54,
+            child: Center(
+              child: IxSpinner(
+                size: IxSpinnerSize.large,
+                variant: IxSpinnerVariant.primary,
+              ),
+            ),
           ),
-        ),
-      ),
-  ],
-)
+      ],
+    );
 ```
 
 ### Loading List Item
 
 ```dart
-ListTile(
-  title: const Text('Processing...'),
-  trailing: const IxSpinner(size: IxSpinnerSize.small),
-)
+Widget loadingListItem() => const ListTile(
+  title: Text('Processing...'),
+  trailing: IxSpinner(size: IxSpinnerSize.small),
+);
 ```
 
 ### Full-Screen Loading
 
 ```dart
 class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -153,10 +153,7 @@ class LoadingScreen extends StatelessWidget {
               variant: IxSpinnerVariant.primary,
             ),
             const SizedBox(height: 24),
-            Text(
-              'Loading...',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
+            Text('Loading...', style: Theme.of(context).textTheme.titleMedium),
           ],
         ),
       ),
@@ -170,16 +167,20 @@ class LoadingScreen extends StatelessWidget {
 The spinner respects the `IxSpinnerTheme` extension in your theme. You can customize the appearance globally:
 
 ```dart
-ThemeData(
-  extensions: [
-    IxSpinnerTheme(
-      rotationDuration: Duration(seconds: 2),
-      maskDuration: Duration(seconds: 3),
-      ringInsetFraction: 0.0833,
-      // Customize sizes and colors...
-    ),
-  ],
-)
+ThemeData withSpinnerOverrides(ThemeData base) {
+  final spinner = base.extension<IxSpinnerTheme>();
+  if (spinner == null) return base; // not an IxThemeBuilder theme
+  return base.copyWith(
+    extensions: <ThemeExtension<dynamic>>[
+      ...base.extensions.values,
+      spinner.copyWith(
+        rotationDuration: const Duration(seconds: 2),
+        maskDuration: const Duration(seconds: 3),
+        ringInsetFraction: 0.0833,
+      ),
+    ],
+  );
+}
 ```
 
 ### Theme Properties
@@ -195,16 +196,11 @@ ThemeData(
 `IxSpinner` exposes a `SemanticsRole.status` node labelled `'Loading'` by default, so assistive technologies announce the loading state without any extra wrapping. Override the announced text with `semanticLabel`:
 
 ```dart
-const IxSpinner(semanticLabel: 'Loading content')
+Widget labelledSpinner() => const IxSpinner(semanticLabel: 'Loading content');
 
-// Or pair it with a visible text label
-Column(
-  children: [
-    const IxSpinner(),
-    const SizedBox(height: 8),
-    const Text('Loading...'),
-  ],
-)
+Widget spinnerWithVisibleLabel() => const Column(
+  children: [IxSpinner(), SizedBox(height: 8), Text('Loading...')],
+);
 ```
 
 When the platform's reduced-motion accessibility setting is enabled (`MediaQuery.disableAnimations`), the spinner stops its repeating rotation/sweep animation entirely instead of just slowing it down.
@@ -220,5 +216,5 @@ When the platform's reduced-motion accessibility setting is enabled (`MediaQuery
 ## See Also
 
 - [IxEmptyState](ix_empty_state.md) - For empty/loading states with messages
-- [IxButton](ix_button.md) - Buttons with loading states
-- [Theme System](copilot_colors.md) - Customizing spinner colors
+- [Density](density.md) - Hit areas and `IxIconButton`
+- [Color tokens](tokens.md) - Every classic-theme color token

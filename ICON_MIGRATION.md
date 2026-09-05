@@ -276,7 +276,7 @@ dart run ix_icons_generator:generate_icons --icons-version 3.5.0
 - **Generator Tool Docs**: [packages/ix_icons_generator/README.md](packages/ix_icons_generator/README.md)
 - **Example Project**: [example/](example/)
 - **Siemens iX Design System**: https://ix.siemens.io
-- **Icon Library**: https://ix.siemens.io/docs/icon-library/
+- **Icon Library**: https://ix.siemens.io/docs/icons/icon-library
 
 ## Need Help?
 

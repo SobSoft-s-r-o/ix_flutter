@@ -34,13 +34,15 @@ class ToastProvider extends InheritedWidget {
   final IxToastService service;
 
   static IxToastService of(BuildContext context) {
-    final provider = context.dependOnInheritedWidgetOfExactType<ToastProvider>();
+    final provider = context
+        .dependOnInheritedWidgetOfExactType<ToastProvider>();
     if (provider == null) throw FlutterError('ToastProvider not found');
     return provider.service;
   }
 
   @override
-  bool updateShouldNotify(ToastProvider oldWidget) => service != oldWidget.service;
+  bool updateShouldNotify(ToastProvider oldWidget) =>
+      service != oldWidget.service;
 }
 
 void main() {
@@ -72,7 +74,7 @@ class _MyAppState extends State<MyApp> {
         builder: (context, child) {
           return Stack(
             children: [
-              if (child != null) child,
+              ?child,
               // Place the overlay on top
               IxToastOverlay(service: _toastService),
             ],
@@ -102,9 +104,9 @@ class HomePage extends StatelessWidget {
           children: [
             FilledButton(
               onPressed: () {
-                ToastProvider.of(context).show(
-                  message: 'This is a basic toast message.',
-                );
+                ToastProvider.of(
+                  context,
+                ).show(message: 'This is a basic toast message.');
               },
               child: const Text('Show Toast'),
             ),
@@ -132,14 +134,11 @@ class HomePage extends StatelessWidget {
 You can add an action button to the toast.
 
 ```dart
-ToastProvider.of(context).show(
-  message: 'Item deleted.',
-  actionLabel: 'Undo',
-  onAction: () {
-    // Handle undo action
-    print('Undo clicked');
-  },
-);
+void showToastWithAction(BuildContext context, {required VoidCallback onUndo}) {
+  ToastProvider.of(
+    context,
+  ).show(message: 'Item deleted.', actionLabel: 'Undo', onAction: onUndo);
+}
 ```
 
 ### 4. `showToast()` and `IxToastHandle`
@@ -147,24 +146,30 @@ ToastProvider.of(context).show(
 `showToast()` returns an `IxToastHandle` you can hold onto to pause/resume the auto-close countdown, close the toast early with an optional result, and find out how/when it closed:
 
 ```dart
-final handle = ToastProvider.of(context).showToast(
-  type: IxToastType.warning,
-  title: 'Uploading',
-  message: 'This may take a moment.',
-  actionLabel: 'Cancel',
-  onAction: () => cancelUpload(),
-  // showToast()'s default is true (same as show()); pass false here so
-  // tapping the action keeps the toast open until you close it yourself
-  // (e.g. once the upload finishes). A planned 2.0 release flips
-  // showToast()'s own default to false.
-  dismissOnAction: false,
-);
+Future<Object?> showUploadToast(
+  BuildContext context, {
+  required VoidCallback cancelUpload,
+}) async {
+  final handle = ToastProvider.of(context).showToast(
+    type: IxToastType.warning,
+    title: 'Uploading',
+    message: 'This may take a moment.',
+    actionLabel: 'Cancel',
+    onAction: cancelUpload,
+    // showToast()'s default is true (same as show()); pass false here so
+    // tapping the action keeps the toast open until you close it yourself
+    // (e.g. once the upload finishes). A planned 2.0 release flips
+    // showToast()'s own default to false.
+    dismissOnAction: false,
+  );
 
-handle.pause(); // e.g. while the app is backgrounded
-handle.resume();
+  handle.pause(); // e.g. while the app is backgrounded
+  handle.resume();
 
-final result = await handle.onClose; // null unless closed with a result
-handle.close('done'); // completes onClose with 'done'
+  final result = await handle.onClose; // null unless closed with a result
+  handle.close('done'); // completes onClose with 'done'
+  return result;
+}
 ```
 
 `show()` is kept as a 1.x-compatible wrapper: it calls `showToast()` internally and returns just the created `IxToastData` (`showToast(...).data`), with `dismissOnAction` fixed to `true` to match `IxToast`'s original behaviour.
@@ -172,11 +177,11 @@ handle.close('done'); // completes onClose with 'done'
 ### 5. Positioning and strings
 
 ```dart
-IxToastOverlay(
-  service: _toastService,
+Widget bottomRightToastOverlay(IxToastService service) => IxToastOverlay(
+  service: service,
   placement: IxToastPosition.bottomRight,
   strings: const IxToastStrings(closeToast: 'Zavrieť'),
-)
+);
 ```
 
 ## API Reference

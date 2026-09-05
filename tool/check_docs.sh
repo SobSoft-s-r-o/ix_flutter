@@ -13,4 +13,6 @@ check() { # $1 = regex, $2 = description
 }
 check 'licensing restrictions|distribution restrictions|cannot be bundled' 'unsubstantiated icon licensing claim (see UPSTREAM.md)'
 check 'ix_flutter:generate_icons' 'stale generator command (use dart run ix_icons_generator:generate_icons)'
+check 'IxButton\b|IxTheme\.lightTheme|\bToastType\b|\bBreadcrumbItem\b|\bDataColumn\b' 'stale API name in docs'
+check 'ix_flutter: \^1\.0\.|ix_icons_generator: \^1\.0\.|\*\*Version\*\*: 1\.0\.0' 'stale version reference'
 exit $fail

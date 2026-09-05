@@ -45,12 +45,12 @@ Wrap the app once, below `MaterialApp.builder`, so every descendant shares
 the same resolved density and re-themed Material component tap targets:
 
 ```dart
-MaterialApp(
+Widget densityScopedApp() => MaterialApp(
   theme: const IxThemeBuilder().build(),
   builder: (context, child) =>
       IxDensityScope(child: child ?? const SizedBox.shrink()),
-  home: const MyHome(),
-)
+  home: const Placeholder(),
+);
 ```
 
 `IxDensityScope` listens to `RendererBinding.instance.mouseTracker`, so it
@@ -64,10 +64,10 @@ Pin a subtree to a specific density regardless of input modality by
 nesting another `IxDensityScope`:
 
 ```dart
-IxDensityScope(
+Widget compactSubtree(Widget toolbar) => IxDensityScope(
   density: IxDensity.compact, // e.g. a dense data-table toolbar
-  child: MyToolbar(),
-)
+  child: toolbar,
+);
 ```
 
 ### Choosing a static default without `IxDensityScope`
@@ -93,11 +93,11 @@ visual sizes, each with a matching icon size:
 | `s16` | 16x16 | 12 |
 
 ```dart
-IxIconButton(
+Widget closeButton(VoidCallback onPressed) => IxIconButton(
   icon: const Icon(Icons.close),
-  onPressed: () {},
+  onPressed: onPressed,
   tooltip: 'Close',
-)
+);
 ```
 
 Like the other Siemens IX controls, its hit area grows to 48x48 in
