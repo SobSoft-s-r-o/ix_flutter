@@ -816,7 +816,11 @@ class _NavigationTileState extends State<_NavigationTile> {
 
     return Tooltip(
       message: widget.entry.tooltip ?? widget.entry.label,
-      waitDuration: IxMotion.of(context, IxMotion.slow),
+      // Interaction delays (this hover wait, and the toast auto-close
+      // delay in IxToastData) are deliberately not IxMotion tokens: they
+      // gate *when* something happens on user input timing, not how long a
+      // rendered transition takes, so reduced motion must not shorten them.
+      waitDuration: const Duration(milliseconds: 500),
       child: Semantics(
         button: widget.onTap != null,
         enabled: widget.enabled,

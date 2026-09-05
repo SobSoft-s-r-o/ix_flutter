@@ -42,6 +42,93 @@ void main() {
               .duration,
           Duration.zero,
         );
+
+        // IxDropdownButton: the overlay's fade-in AnimationController is
+        // constructed with a Duration.zero duration under reduced motion.
+        // AnimationController.forward() has a synchronous fast path for a
+        // Duration.zero animation (see animation_controller.dart's
+        // `_animateToInternal`: `if (simulationDuration == Duration.zero)`
+        // sets the value and completes without ever starting a ticker), so
+        // the menu is already fully opaque by the single pump that first
+        // builds the overlay. (transientCallbackCount is not asserted here:
+        // tester.tap's own Material ink-splash animation on the trigger
+        // button legitimately keeps ticking for a moment afterwards --
+        // that is unrelated real-time Material feedback, not something
+        // IxMotion drives, so it is not a reliable zero-duration signal
+        // for this specific interaction.)
+        await pumpIx(
+          tester,
+          IxDropdownButton<int>(
+            label: 'Actions',
+            items: const [IxDropdownMenuItem(label: 'Edit', value: 1)],
+          ),
+          disableAnimations: true,
+        );
+        await tester.tap(find.text('Actions'));
+        await tester.pump();
+        expect(find.text('Edit'), findsOneWidget);
+        // MaterialApp's own route transition (Material 3's default
+        // ZoomPageTransitionsBuilder) already contributes FadeTransition
+        // widgets to the tree, so find.byType(FadeTransition) alone is not
+        // unique here -- narrow to the one that is an ancestor of the menu
+        // item text.
+        final dropdownFade = tester.widget<FadeTransition>(
+          find.ancestor(
+            of: find.text('Edit'),
+            matching: find.byType(FadeTransition),
+          ),
+        );
+        expect(dropdownFade.opacity.value, 1.0);
+        // Let the trigger button's Material ink-splash (started by the tap
+        // above, and unrelated to IxMotion) fully settle before moving on,
+        // so it cannot leave a stray ticker that would pollute the toast
+        // section's own transientCallbackCount assertions below.
+        await tester.pumpAndSettle();
+
+        // IxToastOverlay: AnimatedList.insertItem/removeItem durations are
+        // Duration.zero under reduced motion, so both the enter and exit
+        // transitions resolve through the same synchronous fast path.
+        // autoClose is disabled so the toast's own (intentionally
+        // real-time, not motion-token-driven) auto-close progress bar
+        // never starts a ticker of its own, keeping this assertion focused
+        // on the enter/exit transition only.
+        final service = IxToastService();
+        addTearDown(service.dispose);
+        await pumpIx(
+          tester,
+          Stack(children: [IxToastOverlay(service: service)]),
+          disableAnimations: true,
+        );
+        // Every pumpIx() call builds a brand-new IxThemeBuilder ThemeData,
+        // and this is not the first pumpIx() in this test, so Material's
+        // own AnimatedTheme cross-fade (kThemeAnimationDuration, ~200ms --
+        // also unrelated to IxMotion) is mid-flight here; settle it before
+        // measuring the toast's own transition, for the same reason as the
+        // pumpAndSettle above.
+        await tester.pumpAndSettle();
+        final toast = service.show(message: 'Saved', autoClose: false);
+        await tester.pump();
+        expect(find.text('Saved'), findsOneWidget);
+        // Unlike the dropdown (rendered into a plain Overlay entry outside
+        // any route's own transition subtree), this Stack is pumped as
+        // ordinary route content, so it also sits under MaterialApp's own
+        // route-transition FadeTransition -- narrow to the nearest match,
+        // which is the toast item's own.
+        final toastFade = tester.widget<FadeTransition>(
+          find
+              .ancestor(
+                of: find.text('Saved'),
+                matching: find.byType(FadeTransition),
+              )
+              .first,
+        );
+        expect(toastFade.opacity.value, 1.0);
+        expect(tester.binding.transientCallbackCount, 0);
+
+        service.dismiss(toast.id);
+        await tester.pump();
+        expect(find.text('Saved'), findsNothing);
+        expect(tester.binding.transientCallbackCount, 0);
       },
     );
   }
