@@ -955,10 +955,11 @@ class _NavigationPanelState extends State<_NavigationPanel> {
 
   /// Focuses [node] and scrolls the menu just far enough to show it.
   ///
-  /// Every tile is built (see the list's `cacheExtent`), so the node always
-  /// has a context to reveal -- without this a tile below the fold would
-  /// take focus while staying off screen, which is exactly what the focus
-  /// ring is there to prevent.
+  /// Every tile is built eagerly (the menu uses a `SingleChildScrollView`,
+  /// not a lazy list -- see the comment at its construction), so the node
+  /// always has a context to reveal; without this a tile below the fold
+  /// would take focus while staying off screen, which is exactly what the
+  /// focus ring is there to prevent.
   void _focusTile(FocusNode node, {required bool forward}) {
     node.requestFocus();
     final context = node.context;
@@ -977,8 +978,8 @@ class _NavigationPanelState extends State<_NavigationPanel> {
 
   /// Moves focus [delta] tiles along [_order], clamped at both ends.
   ///
-  /// Upstream's `menu.tsx:887-899` wraps around; `global-constraints.md`
-  /// prescribes clamping for the 1.x menu instead.
+  /// Upstream's `menu.tsx:887-899` wraps around; the programme constraints
+  /// prescribe clamping for the 1.x menu instead.
   void _move(int delta) {
     final index = _order.indexWhere((node) => node.hasFocus);
     if (index < 0) {

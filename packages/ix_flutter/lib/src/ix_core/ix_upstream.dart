@@ -1,4 +1,10 @@
-/// Pinnutá upstream referencia (jediný baseline parity).
+/// The single pinned upstream baseline every parity claim is measured
+/// against: the `@siemens/ix` release (and the `@siemens/ix-icons`
+/// release its icons come from) this package ports.
+///
+/// `tool/upstream_check.dart` cross-checks these constants against
+/// `UPSTREAM.md` and the CHANGELOG's `Upstream:` line, so they never
+/// drift apart.
 abstract final class IxUpstream {
   static const String version = '5.2.1';
   static const String tag = '@siemens/ix@5.2.1';

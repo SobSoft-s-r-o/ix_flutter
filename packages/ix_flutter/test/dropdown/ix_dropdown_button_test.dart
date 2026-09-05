@@ -144,7 +144,7 @@ void main() {
 
   itemFocusRingStaysInsideTheRow();
 
-  @Upstream('dropdown-controller.ts:154-158 closeBehavior')
+  @Upstream('dropdown-controller.ts:20,55 closeBehavior')
   void closeBehaviorGovernsOutsideAndInsideDismissal() {
     testWidgets('closeBehavior governs outside taps and item selection', (
       tester,

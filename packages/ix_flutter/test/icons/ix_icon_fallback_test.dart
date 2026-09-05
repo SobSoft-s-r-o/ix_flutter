@@ -44,8 +44,8 @@ Future<void> _ignoringSvgCacheBookkeepingErrors(
 /// upstream `.ct.ts`/scss counterpart to cite via `@Upstream`.
 ///
 /// The plan's fallback policy
-/// (`docs/superpowers/plans/2026-09-04-ix-flutter-2-0-icons-runtime.md`,
-/// mirrored in this wave's `global-constraints.md`) states that Material
+/// (`docs/superpowers/plans/2026-09-04-ix-flutter-2-0-icons-runtime.md`)
+/// states that Material
 /// glyphs remain an emergency fallback only — a missing asset, a corrupt
 /// SVG, or an explicit `IxIconResolver.material()` — that iX and Material
 /// glyphs are never mixed on the success path, and that the fallback never

@@ -29,7 +29,7 @@ class IxIconResolver extends ThemeExtension<IxIconResolver> {
   /// This is the default resolver `IxThemeBuilder` registers when no
   /// `icons:` override is supplied, and the fallback branch used while the
   /// bundled Siemens iX SVG set is pending legal review (see
-  /// `global-constraints.md`).
+  /// `UPSTREAM.md`).
   factory IxIconResolver.material() {
     IxIconData glyph(IconData icon) => IxIconData.material(icon);
     return IxIconResolver(

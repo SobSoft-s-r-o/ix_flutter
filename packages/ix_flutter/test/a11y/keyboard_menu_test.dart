@@ -9,7 +9,7 @@ import '../helpers/upstream.dart';
 /// Keyboard model of the [IxApplicationScaffold] navigation menu, mirroring
 /// the upstream key set handled by `menu.tsx:842-911` (`ArrowDown`,
 /// `ArrowUp`, `Home`, `End`). Upstream wraps around at both ends; this
-/// library clamps instead, as `global-constraints.md` prescribes for the
+/// library clamps instead, as the programme constraints prescribe for the
 /// 1.x menu.
 ///
 /// Metadata annotations can only precede a declaration, not a bare

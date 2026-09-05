@@ -2,7 +2,8 @@
 class IxFonts {
   IxFonts._();
 
-  /// Názov balíka pre `TextStyle.package` pri fontoch dodaných knižnicou.
+  /// The package name to pass as `TextStyle.package` for the fonts this
+  /// library bundles, so their family names resolve package-prefixed.
   static const String packageName = 'ix_flutter';
 
   /// Work Sans, the SIL Open Font License substitute for the proprietary

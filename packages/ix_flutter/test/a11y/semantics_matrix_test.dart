@@ -6,7 +6,7 @@ import '../helpers/pump_ix.dart';
 import '../helpers/upstream.dart';
 
 void main() {
-  group('semantics matrix (red until the referenced task lands)', () {
+  group('semantics matrix', () {
     // Metadata annotations can only precede a declaration, not a bare
     // statement, so each @Upstream-tagged test is wrapped in a local
     // function that is invoked immediately below it. This keeps the

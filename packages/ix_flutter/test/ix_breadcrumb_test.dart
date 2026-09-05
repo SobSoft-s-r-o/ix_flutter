@@ -19,6 +19,32 @@ import 'helpers/upstream.dart';
 /// regression tests at the bottom -- assert plain rendering/callback/theme
 /// mechanics native to this Flutter port, with no single upstream
 /// `.ct.ts`/`.tsx` counterpart of their own.
+/// Captures `debugPrint` so the one-time `breadcrumbKey` notice never leaks
+/// into the suite log, and returns the captured lines plus the callback that
+/// puts `debugPrint` back.
+///
+/// Flutter asserts that no foundation debug variable is still overridden
+/// *before* `addTearDown` callbacks run, so the test body has to call
+/// `restore` itself; the tear-down is the guard for a body that throws
+/// first, latched so it can never clobber a later override. Same pattern as
+/// `test/scaffold/ix_menu_flyout_test.dart`.
+({List<String> logs, VoidCallback restore}) _captureDebugPrint() {
+  final logs = <String>[];
+  final previous = debugPrint;
+  var restored = false;
+  void restore() {
+    if (restored) {
+      return;
+    }
+    restored = true;
+    debugPrint = previous;
+  }
+
+  addTearDown(restore);
+  debugPrint = (String? message, {int? wrapWidth}) => logs.add(message ?? '');
+  return (logs: logs, restore: restore);
+}
+
 void main() {
   testWidgets('breadcrumbs render and trigger callbacks', (tester) async {
     final pressed = <String>[];
@@ -164,6 +190,7 @@ void main() {
     'effectiveKey falls back to label without throwing when breadcrumbKey '
     'is omitted',
     (tester) async {
+      final capture = _captureDebugPrint();
       final clicks = <String>[];
       await pumpIx(
         tester,
@@ -178,7 +205,16 @@ void main() {
       );
       await tester.tap(find.text('Legacy'));
       await tester.pumpAndSettle();
+      capture.restore();
       expect(clicks, ['Legacy']);
+      // The notice is emitted once per unique label, and other tests in this
+      // suite may have already used these labels, so only assert that it
+      // never reached the suite log.
+      expect(
+        capture.logs.where((l) => l.contains('breadcrumbKey')),
+        isNotEmpty,
+        reason: 'the deprecation notice should still be emitted',
+      );
     },
   );
 
