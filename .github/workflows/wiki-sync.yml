@@ -6,6 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       dry_run: { description: 'Print actions only', type: boolean, default: true }
+permissions:
+  contents: read
 jobs:
   sync:
     runs-on: ubuntu-latest

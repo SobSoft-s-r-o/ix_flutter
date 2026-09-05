@@ -8,7 +8,7 @@ The [`wiki-sync.yml`](.github/workflows/wiki-sync.yml) workflow performs a **one
 
 1. A `push` to `main` touching `doc/**`, a root `*.md`, `packages/ix_flutter/*.md`, or `tool/wiki_sync*` triggers the workflow.
 2. The workflow checks out this repository and, separately, `SobSoft-s-r-o/ix_flutter.wiki` (into `wiki-checkout`).
-3. `tool/wiki_sync.sh wiki-checkout` copies every file listed in the mapping below into the wiki checkout, rewriting in-repo relative links (`doc/x.md`, `X.md`) to wiki-style link targets (`x`, `X`).
+3. `tool/wiki_sync.sh wiki-checkout` copies every file listed in the mapping below into the wiki checkout. Local links are rewritten so they still work on the wiki: a link to another synced document (e.g. `doc/theming.md`, `GETTING_STARTED.md`, `#anchor` included) becomes a bare wiki page name (`theming`, `Getting-Started`); a link to anything else in the repository (source under `packages/`, `example/`, `.github/`, images, directories, `UPSTREAM.md`, `DOCUMENTATION.md`, …) becomes an absolute `https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/…` (or `tree/main/…` for a directory) URL instead of a dead relative path.
 4. If the wiki checkout changed, the workflow commits and pushes it as `github-actions[bot]`.
 
 ## Mapping
@@ -26,6 +26,10 @@ To publish a new canonical document to the wiki, add a line to that file — the
 ## Manual edits are overwritten
 
 **Do not edit wiki pages directly.** Any push to `main` that touches a synced source file overwrites the corresponding wiki page on the next sync. Edit the canonical document in this repository instead (see the mapping above) and let the workflow publish it.
+
+## Orphaned pages
+
+The sync only ever writes the pages listed in `tool/wiki_sync_map.txt`; it never deletes a wiki page. Any existing wiki page that is not a sync destination — currently `Installation.md` (superseded; its unique steps are now in [`GETTING_STARTED.md`](GETTING_STARTED.md)) and `copilot_colors.md` (no canonical source in this repository) — is left untouched by every run and will keep drifting out of date. Delete pages like these from the wiki by hand once their replacement content has synced.
 
 ## Secret
 
