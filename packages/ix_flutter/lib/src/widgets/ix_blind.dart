@@ -294,6 +294,15 @@ class _IxBlindHeader extends StatelessWidget {
     // set explicitly right here instead of being assembled from several
     // descendants. `headerActions` (below) stays outside this node so it
     // keeps its own accessible name.
+    //
+    // The padding and 48px minimum height live *inside* the `InkWell`
+    // (wrapping its content `Row`), not on an ancestor `Container`: a
+    // `Row` only ever passes its children a *loose* max-height, never its
+    // own enforced `minHeight` -- an `InkWell` sized by an ancestor
+    // `Container`'s `minHeight` instead would still shrink to the
+    // intrinsic height of the chevron/title content, leaving the padding
+    // margins untappable and the interactive element itself under the
+    // 48px touch-target minimum.
     final semanticHeader = Semantics(
       button: true,
       enabled: !disabled,
@@ -312,85 +321,100 @@ class _IxBlindHeader extends StatelessWidget {
           hoverColor: style.hoverBackground.withValues(
             alpha: style.hoverBackground.a * 0.1,
           ), // Use a subtle overlay
-          child: Row(
-            children: [
-              // Chevron
-              AnimatedRotation(
-                turns: expanded ? 0.25 : 0.0,
-                duration: IxMotion.of(context, IxMotion.defaultTime),
-                child: IconTheme(
-                  data: IconThemeData(color: foregroundColor, size: 24),
-                  child: IxIcons.chevronRight,
+          child: Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: IxCommonGeometry.space3, // 1rem
+              vertical: IxCommonGeometry.space1, // 0.5rem
+            ),
+            constraints: const BoxConstraints(minHeight: 48.0), // 3rem
+            child: Row(
+              children: [
+                // Chevron
+                AnimatedRotation(
+                  turns: expanded ? 0.25 : 0.0,
+                  duration: IxMotion.of(context, IxMotion.defaultTime),
+                  child: IconTheme(
+                    data: IconThemeData(color: foregroundColor, size: 24),
+                    child: IxIcons.chevronRight,
+                  ),
                 ),
-              ),
-              const SizedBox(width: IxCommonGeometry.space1), // 0.5rem
-              // Optional Icon
-              if (icon != null) ...[
-                IconTheme(
-                  data: IconThemeData(color: foregroundColor, size: 24),
-                  child: icon!,
-                ),
-                const SizedBox(width: IxCommonGeometry.space1),
-              ],
+                const SizedBox(width: IxCommonGeometry.space1), // 0.5rem
+                // Optional Icon
+                if (icon != null) ...[
+                  IconTheme(
+                    data: IconThemeData(color: foregroundColor, size: 24),
+                    child: icon!,
+                  ),
+                  const SizedBox(width: IxCommonGeometry.space1),
+                ],
 
-              // Title and Subtitle
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      style: ixTypography.label.copyWith(
-                        color: foregroundColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (subtitle != null)
+                // Title and Subtitle
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
                       Text(
-                        subtitle!,
-                        style: ixTypography.bodySm.copyWith(
-                          color: foregroundColor.withValues(
-                            alpha: foregroundColor.a * 0.8,
-                          ), // Slightly lighter
+                        title,
+                        style: ixTypography.label.copyWith(
+                          color: foregroundColor,
+                          fontWeight: FontWeight.bold,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                  ],
+                      if (subtitle != null)
+                        Text(
+                          subtitle!,
+                          style: ixTypography.bodySm.copyWith(
+                            color: foregroundColor.withValues(
+                              alpha: foregroundColor.a * 0.8,
+                            ), // Slightly lighter
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
 
-    // The padding lives on this outer Container -- wrapping *both* the
-    // semantic header and `headerActions` -- rather than inside the
-    // `InkWell`'s own content, so `headerActions` keeps the same 16px
-    // margin from the blind's right edge that plain header content gets
-    // (matching the pre-existing, single-Row layout this replaces).
-    // `headerActions` is a sibling of `semanticHeader` here, not nested
-    // inside it, so it stays outside the `excludeSemantics` boundary above
-    // and outside the `InkWell`'s tap target.
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: IxCommonGeometry.space3, // 1rem
-        vertical: IxCommonGeometry.space1, // 0.5rem
-      ),
-      constraints: const BoxConstraints(minHeight: 48.0), // 3rem
-      child: Row(
-        children: [
-          Expanded(child: semanticHeader),
-          if (headerActions != null) ...[
-            const SizedBox(width: IxCommonGeometry.space1),
-            headerActions!,
-          ],
-        ],
-      ),
+    if (headerActions == null) {
+      return semanticHeader;
+    }
+    // `headerActions` is a sibling of `semanticHeader`, not a descendant --
+    // it stays outside the `excludeSemantics` boundary above (so it keeps
+    // its own accessible name) and outside the `InkWell`'s tap target.
+    // `Center` keeps it aligned with the header content's own vertical
+    // centreline even when a subtitle makes the header taller than
+    // `headerActions`'s own natural height; the trailing-edge-only padding
+    // gives it the same 16px margin from the blind's border that the
+    // header's own content gets from its `Container`'s padding above.
+    //
+    // Deliberately *not* `crossAxisAlignment: CrossAxisAlignment.stretch`:
+    // this Row sits inside the blind's `mainAxisSize.min` Column, which in
+    // turn can receive an unbounded height from its own ancestor (e.g. a
+    // bare `Scaffold` body in a widget test) -- `stretch` would then ask
+    // this Row's children to be infinitely tall ("BoxConstraints forces an
+    // infinite height"), reproducible by pumping any `IxBlind` at all.
+    // `Center` already gives `headerActions` the vertical alignment
+    // `stretch` was meant to provide, without requiring a bounded row
+    // height to do it.
+    return Row(
+      children: [
+        Expanded(child: semanticHeader),
+        Padding(
+          padding: const EdgeInsetsDirectional.only(
+            end: IxCommonGeometry.space3,
+          ),
+          child: Center(child: headerActions!),
+        ),
+      ],
     );
   }
 }

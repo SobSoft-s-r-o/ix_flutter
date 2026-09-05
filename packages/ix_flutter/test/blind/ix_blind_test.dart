@@ -114,6 +114,45 @@ void main() {
     },
   );
 
+  testWidgets('tapping inside the header padding (not on the title) toggles an '
+      'uncontrolled blind', (tester) async {
+    await pumpIx(tester, const IxBlind(title: 'T', child: Text('body')));
+    expect(find.text('body'), findsNothing);
+    // 4px from the InkWell's own left edge, vertically centred: inside
+    // the header's horizontal `space3` (16px) padding and well clear of
+    // the chevron/title, but still on the interactive element itself.
+    // Regression guard: when the padded `Container` sat *outside* the
+    // `InkWell` instead of wrapping its content, the `InkWell` shrank to
+    // the chevron/title's intrinsic size and this tap landed on inert
+    // padding instead.
+    final headerRect = tester.getRect(find.byType(InkWell));
+    await tester.tapAt(Offset(headerRect.left + 4, headerRect.center.dy));
+    await tester.pumpAndSettle();
+    expect(find.text('body'), findsOneWidget);
+  });
+
+  testWidgets(
+    "the header's InkWell is at least 48px tall for a title-only blind",
+    (tester) async {
+      await pumpIx(
+        tester,
+        IxBlind(
+          title: 'T',
+          expanded: false,
+          onExpandedChanged: (_) {},
+          child: const Text('body'),
+        ),
+      );
+      // The 48px touch-target minimum (WCAG 2.5.5) must reach the
+      // interactive `InkWell` itself, not just the header's overall visual
+      // band -- a `Row` only ever passes its children a loose max-height,
+      // never its own enforced `minHeight`, so an ancestor `Container`'s
+      // `minHeight: 48` alone does not guarantee this.
+      final inkWellHeight = tester.getRect(find.byType(InkWell)).height;
+      expect(inkWellHeight, greaterThanOrEqualTo(48.0));
+    },
+  );
+
   testWidgets('uncontrolled blind toggles on tap without a callback', (
     tester,
   ) async {
