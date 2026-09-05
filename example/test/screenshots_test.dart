@@ -37,9 +37,15 @@ Future<void> _shoot(
   // HomePage reads ThemeControllerScope (the demo-only theme family/mode
   // switcher); ButtonsPage only reads Theme extensions built by
   // IxThemeBuilder and ignores the scope. Providing it unconditionally keeps
-  // a single _shoot code path instead of branching on the page type.
+  // a single _shoot code path instead of branching on the page type. The
+  // controller's own mode is synced to the captured theme's brightness so
+  // HomePage's "Current configuration"/"Theme mode" demo controls agree with
+  // what the screenshot actually shows, instead of always reporting "Light".
   final controller = ThemeController();
   addTearDown(controller.dispose);
+  controller.setMode(
+    theme.brightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light,
+  );
 
   await tester.pumpWidget(
     MaterialApp(
