@@ -4,11 +4,13 @@ The `IxToast` component provides non-intrusive notifications to the user. It mir
 
 ## Features
 
-*   **Toast Types**: Supports `info`, `success`, `warning`, `critical`, `alarm`, and `neutral` types with appropriate styling and icons.
-*   **Auto-close**: Configurable duration and auto-close behavior.
+*   **Toast Types**: Supports `info`, `success`, `warning` and `error` types with appropriate styling and icons (`critical`, `alarm` and `neutral` are deprecated aliases -- see [Deprecations](#deprecations)).
+*   **Accessibility**: the message (and title) is a live region with `alert`/`status` role so assistive technology announces it as it appears; the close button has an accessible name (`IxToastStrings.closeToast`); every toast control is reachable by keyboard (Tab).
+*   **Auto-close**: Configurable duration and auto-close behavior, pausable/resumable.
 *   **Progress Bar**: Visual indicator for auto-closing toasts.
-*   **Hover Pause**: Pauses the auto-close timer when the mouse hovers over the toast.
-*   **Actions**: Supports an optional action button.
+*   **Hover/touch pause**: Pauses the auto-close timer when the mouse hovers, or the toast is touched.
+*   **Actions**: Supports an optional action button (`actionLabel`/`onAction`) or a fully custom `action` widget.
+*   **Safe-area aware layout**: fixed 280px width (shrinks to fit narrower viewports with a 16px margin), positioned via `IxToastPosition`, safe-area padding added on top of its own margin.
 *   **Theming**: Fully integrated with `IxTheme` for consistent styling.
 
 ## Usage
@@ -85,7 +87,7 @@ class _MyAppState extends State<MyApp> {
 
 ### 2. Showing Toasts
 
-Access the service and call `show()` to display a toast.
+Access the service and call `show()` to display a toast (kept for 1.x compatibility) or `showToast()` to get back a live `IxToastHandle`.
 
 ```dart
 class HomePage extends StatelessWidget {
@@ -140,24 +142,95 @@ ToastProvider.of(context).show(
 );
 ```
 
+### 4. `showToast()` and `IxToastHandle`
+
+`showToast()` returns an `IxToastHandle` you can hold onto to pause/resume the auto-close countdown, close the toast early with an optional result, and find out how/when it closed:
+
+```dart
+final handle = ToastProvider.of(context).showToast(
+  type: IxToastType.warning,
+  title: 'Uploading',
+  message: 'This may take a moment.',
+  actionLabel: 'Cancel',
+  onAction: () => cancelUpload(),
+  // showToast()'s default is false: tapping the action keeps the toast
+  // open until you close it yourself (e.g. once the upload finishes).
+  dismissOnAction: false,
+);
+
+handle.pause(); // e.g. while the app is backgrounded
+handle.resume();
+
+final result = await handle.onClose; // null unless closed with a result
+handle.close('done'); // completes onClose with 'done'
+```
+
+`show()` is kept as a 1.x-compatible wrapper: it calls `showToast()` internally and returns just the created `IxToastData` (`showToast(...).data`), with `dismissOnAction` fixed to `true` to match `IxToast`'s original behaviour.
+
+### 5. Positioning and strings
+
+```dart
+IxToastOverlay(
+  service: _toastService,
+  position: IxToastPosition.bottomRight,
+  strings: const IxToastStrings(closeToast: 'Zavrieť'),
+)
+```
+
 ## API Reference
 
 ### IxToastService
 
-*   `show({IxToastType type, required String message, String? title, Duration? duration, bool autoClose, String? actionLabel, VoidCallback? onAction})`: Shows a new toast.
-*   `dismiss(String id)`: Dismisses a specific toast.
+*   `show({IxToastType type, required String message, String? title, Duration? duration, bool autoClose, String? actionLabel, VoidCallback? onAction, Widget? icon, Color? iconColor})`: Shows a new toast; returns `IxToastData`. 1.x-compatible; internally calls `showToast()`.
+*   `showToast({IxToastType type, required String message, String? title, Duration? autoCloseDelay, bool autoClose, String? actionLabel, VoidCallback? onAction, Widget? action, Widget? icon, Color? iconColor, bool hideIcon, bool dismissOnAction})`: Shows a new toast; returns a live `IxToastHandle`.
+*   `dismiss(String id, [Object? result])`: Dismisses a specific toast, completing its handle's `onClose` with `result`.
 *   `dismissAll()`: Dismisses all active toasts.
+*   `pauseTimer(String id)` / `resumeTimer(String id)`: Pause/resume a toast's auto-close countdown.
+*   `isPaused(String id)`: Whether a toast's countdown is currently paused.
+
+### IxToastHandle
+
+*   `data`: the `IxToastData` the toast was created with.
+*   `onClose`: a `Future<Object?>` that completes once the toast is removed, with the `result` passed to `close()` (or `null` otherwise).
+*   `isPaused`: whether the auto-close countdown is currently paused.
+*   `close([Object? result])`: closes the toast, completing `onClose` with `result`.
+*   `pause()` / `resume()`: pause/resume the auto-close countdown (same effect as hover/touch).
 
 ### IxToastType
 
 *   `info` (default)
 *   `success`
 *   `warning`
-*   `critical`
-*   `alarm`
-*   `neutral`
+*   `error`
+
+### IxToastPosition
+
+*   `topRight` -- `IxToastOverlay`'s 1.x-compatible default.
+*   `bottomRight` -- the 2.0 default.
+
+### IxToastStrings
+
+*   `closeToast` (default `'Close toast'`): accessible label and tooltip for the close button.
 
 ### IxToastOverlay
 
 *   `service`: The `IxToastService` instance to listen to.
-*   `position`: The alignment of the toast stack (default: `Alignment.topRight`).
+*   `position`: An `IxToastPosition` -- which corner the toast stack anchors to (default: `IxToastPosition.topRight`; 2.0 default: `IxToastPosition.bottomRight`).
+*   `strings`: `IxToastStrings`, forwarded to every toast.
+*   `width`: target card width in logical pixels (default `280`); shrinks to fit narrower viewports with a 16px margin instead of overflowing.
+
+### IxToastData (additions)
+
+*   `action`: a fully custom action widget, shown under the message instead of the default `actionLabel`/`onAction` text button.
+*   `hideIcon`: hides the type icon entirely.
+*   `dismissOnAction`: whether tapping the default action button also closes the toast (default `true`; `showToast()`'s own default is `false`).
+
+## Deprecations
+
+*   `IxToastType.critical` / `.alarm` -- use `IxToastType.error` (both now render with the same styling as `error`).
+*   `IxToastType.neutral` -- use `IxToastType.info`.
+*   `IxToastOverlay.alignment` -- use `position`. When set, its vertical (`y`) axis is still honoured for 1.x callers; toasts are always right-aligned regardless of `alignment`'s `x` axis.
+
+## 2.0 default changes
+
+`IxToastOverlay`'s `position` currently defaults to `IxToastPosition.topRight` and `IxToastService.showToast()`'s `dismissOnAction` currently defaults to `true`, both to preserve 1.x behaviour. The planned 2.0 release changes these defaults to `IxToastPosition.bottomRight` and `dismissOnAction: false` respectively -- `show()`'s behaviour (`dismissOnAction: true`, unaffected by `showToast()`'s default) does not change.

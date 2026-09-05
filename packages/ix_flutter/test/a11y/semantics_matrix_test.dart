@@ -50,26 +50,33 @@ void main() {
       'toast.ct.ts:33-53 sets live-region attributes for screen reader announcements',
     )
     void ixToastIsLiveRegionAndCloseButtonIsLabelled() {
-      testWidgets(
-        'IxToast is a live region and close button is labelled',
-        (tester) async {
-          final handle = tester.ensureSemantics();
-          final service = IxToastService();
-          await pumpIx(
-            tester,
-            Stack(children: [IxToastOverlay(service: service)]),
-          );
-          service.show(message: 'Saved');
-          await tester.pump(const Duration(milliseconds: 400));
-          expect(
-            tester.getSemantics(find.text('Saved')),
-            matchesSemantics(isLiveRegion: true, label: 'Saved'),
-          );
-          expect(find.bySemanticsLabel('Close toast'), findsOneWidget);
-          handle.dispose();
-        },
-        skip: true,
-      ); // IXF-003 – implemented by accessibility-interaction Task 3 (A-3)
+      testWidgets('IxToast is a live region and close button is labelled', (
+        tester,
+      ) async {
+        final handle = tester.ensureSemantics();
+        final service = IxToastService();
+        await pumpIx(
+          tester,
+          Stack(children: [IxToastOverlay(service: service)]),
+        );
+        service.show(message: 'Saved');
+        await tester.pump(const Duration(milliseconds: 400));
+        expect(
+          tester.getSemantics(find.text('Saved')),
+          matchesSemantics(isLiveRegion: true, label: 'Saved'),
+        );
+        expect(find.bySemanticsLabel('Close toast'), findsOneWidget);
+        // flutter_test's AutomatedTestWidgetsFlutterBinding runs every
+        // testWidgets body inside a FakeAsync zone and fails the test
+        // with "A Timer is still pending even after the widget tree was
+        // disposed" unless every Timer started during the test has fired
+        // or been cancelled by the time it ends (verified empirically) --
+        // the default 5s auto-close timer from service.show() above is
+        // still pending here. Clearing the service is the smallest fix
+        // that doesn't disturb the assertions above.
+        service.dismissAll();
+        handle.dispose();
+      });
     }
 
     ixToastIsLiveRegionAndCloseButtonIsLabelled();

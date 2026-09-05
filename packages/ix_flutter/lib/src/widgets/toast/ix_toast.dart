@@ -1,6 +1,16 @@
+import 'dart:ui' show SemanticsRole;
+
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
-import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
+
+/// Fixed card width, in logical pixels, a toast tries to render at.
+///
+/// Upstream `toast.scss:20-22` (`17.5rem` at the web component's 16px root
+/// font size). [IxToastOverlay] is the one that actually enforces this --
+/// shrinking it on narrow viewports -- via its own `width`; this constant
+/// only keeps a lone [IxToast] (rendered outside an [IxToastOverlay], e.g.
+/// in a test or a custom host) from growing unbounded.
+const double _kToastWidth = 280;
 
 /// A widget that displays a single toast notification.
 class IxToast extends StatefulWidget {
@@ -10,12 +20,17 @@ class IxToast extends StatefulWidget {
     required this.onDismiss,
     this.onEnter,
     this.onExit,
+    this.strings = const IxToastStrings(),
   });
 
   final IxToastData data;
   final VoidCallback onDismiss;
   final VoidCallback? onEnter;
   final VoidCallback? onExit;
+
+  /// Localizable strings for this toast's chrome (currently just the close
+  /// button's accessible name/tooltip).
+  final IxToastStrings strings;
 
   @override
   State<IxToast> createState() => _IxToastState();
@@ -43,64 +58,74 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
+  /// Maps deprecated [IxToastType] values onto the type that now owns their
+  /// styling: `critical`/`alarm` render as [IxToastType.error],  `neutral`
+  /// as [IxToastType.info].
+  IxToastType _effectiveType(IxToastType type) => switch (type) {
+    // ignore: deprecated_member_use_from_same_package
+    IxToastType.critical || IxToastType.alarm => IxToastType.error,
+    // ignore: deprecated_member_use_from_same_package
+    IxToastType.neutral => IxToastType.info,
+    _ => type,
+  };
+
   Color _getColor(IxTheme theme, IxToastType type) {
-    switch (type) {
+    switch (_effectiveType(type)) {
       case IxToastType.info:
         return theme.color(IxThemeColorToken.info);
       case IxToastType.success:
         return theme.color(IxThemeColorToken.success);
       case IxToastType.warning:
         return theme.color(IxThemeColorToken.warning);
-      case IxToastType.critical:
-        return theme.color(IxThemeColorToken.critical);
-      case IxToastType.alarm:
+      default:
         return theme.color(IxThemeColorToken.alarm);
-      case IxToastType.neutral:
-        return theme.color(IxThemeColorToken.neutral);
     }
   }
 
   Color _getIconColor(IxTheme theme, IxToastType type) {
-    // Based on iX design, icons usually have specific colors.
-    // For filled toasts, it might be contrast color.
-    // But iX toasts are usually white background with colored border/icon.
-    // Let's check the web component styles again.
-    // The web component has `toast-icon` with `color-std-text` for info, `color-alarm` for error, etc.
-
-    switch (type) {
+    switch (_effectiveType(type)) {
       case IxToastType.info:
-        return theme.color(IxThemeColorToken.stdText); // or info?
+        return theme.color(IxThemeColorToken.stdText);
       case IxToastType.success:
         return theme.color(IxThemeColorToken.success);
       case IxToastType.warning:
-        return theme.color(IxThemeColorToken.warningText); // or warning?
-      case IxToastType.critical:
-        return theme.color(IxThemeColorToken.critical);
-      case IxToastType.alarm:
-        return theme.color(IxThemeColorToken.alarmText); // or alarm?
-      case IxToastType.neutral:
-        return theme.color(IxThemeColorToken.stdText);
+        return theme.color(IxThemeColorToken.warningText);
+      default:
+        return theme.color(IxThemeColorToken.alarmText);
     }
   }
 
-  Widget _getIcon(IxTheme? theme) {
+  Widget _getIcon(IxToastType type) {
     if (widget.data.icon != null) {
       return widget.data.icon!;
     }
 
-    switch (widget.data.type) {
-      case IxToastType.info:
-        return IxIcons.info;
-      case IxToastType.success:
-        return IxIcons.success;
-      case IxToastType.warning:
-        return IxIcons.warning;
-      case IxToastType.critical:
-        return IxIcons.error; // Critical maps to error icon usually
-      case IxToastType.alarm:
-        return IxIcons.alarm;
-      case IxToastType.neutral:
-        return IxIcons.info; // Fallback
+    final iconKey = switch (_effectiveType(type)) {
+      IxToastType.info => IxIconKey.info,
+      IxToastType.success => IxIconKey.success,
+      IxToastType.warning => IxIconKey.warning,
+      _ => IxIconKey.error,
+    };
+    // Redundant with the type icon's meaning already carried by the live
+    // region's role/color -- excluded so it doesn't add a second, competing
+    // label next to the announced title/message.
+    return IxIcon.key(
+      iconKey,
+      size: IxIconSize.s24,
+      excludeFromSemantics: true,
+    );
+  }
+
+  void _handleAction() {
+    widget.data.onAction?.call();
+    if (widget.data.dismissOnAction) {
+      widget.onDismiss();
+    }
+  }
+
+  void _pauseIfAutoClosing() {
+    if (widget.data.autoClose && widget.data.duration != null) {
+      widget.onEnter?.call();
     }
   }
 
@@ -129,137 +154,190 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
     final titleStyle = theme?.typography.h5 ?? IxTypography().h5;
     final bodyStyle = theme?.typography.body ?? IxTypography().body;
 
-    return MouseRegion(
-      onEnter: (_) {
-        if (widget.data.autoClose && widget.data.duration != null) {
-          _progressController.stop();
-          widget.onEnter?.call();
-        }
-      },
-      onExit: (_) {
-        if (widget.data.autoClose && widget.data.duration != null) {
-          // Only resume if we haven't completed yet.
-          // If we stopped at 1.0 (completed), we shouldn't restart unless we reset.
-          // But usually we stop *before* completion.
-          // However, if the user hovers, we want to keep it open.
-          // When they leave, we resume the countdown.
-          _progressController.forward();
-          widget.onExit?.call();
-        }
-      },
-      child: Material(
-        type: MaterialType.transparency,
-        child: Container(
-          width: 320, // Standard width for toasts
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            border: Border.all(color: outerBorderColor),
-            borderRadius: BorderRadius.circular(4), // Standard radius
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(
-                  alpha: 0.16,
-                ), // shadow-2 approximation
-                blurRadius: 8,
-                offset: const Offset(0, 4),
+    final effectiveAction =
+        widget.data.action ??
+        (widget.data.actionLabel != null
+            ? TextButton(
+                // Material 3's default TextButton sizing (a 40px minimum
+                // tap target) is meant for a standalone button, not an
+                // inline link under a message inside a fixed-height card --
+                // shrink it to its text's own intrinsic size so it doesn't
+                // blow the toast's height budget (upstream toast.tsx has no
+                // equivalent min-height on its `<button>` action slot).
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  visualDensity: VisualDensity.compact,
+                ),
+                onPressed: _handleAction,
+                child: Text(widget.data.actionLabel!),
+              )
+            : null);
+
+    // A node can't carry both an explicit `role` and `liveRegion: true` --
+    // Flutter treats `SemanticsRole.alert`/`.status` as already implying
+    // live-region behaviour and asserts against the redundant combination
+    // (verified empirically: "A node can not have SemanticsRole.status and
+    // be live region at the same time"). So the role (`_toastRole` below)
+    // is applied to the toast's outer wrapper instead, one boundary node up
+    // from this one -- toast.ct.ts:33-53 (live region) and
+    // toast.tsx:53-58 (role) both still apply, just to two different nodes.
+    final content = Semantics(
+      container: true,
+      liveRegion: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.data.title != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 4.0),
+              child: Text(widget.data.title!, style: titleStyle),
+            ),
+          Text(widget.data.message, style: bodyStyle),
+        ],
+      ),
+    );
+
+    final toastRole =
+        widget.data.type == IxToastType.error ||
+            widget.data.type == IxToastType.warning
+        ? SemanticsRole.alert
+        : SemanticsRole.status;
+
+    return Listener(
+      onPointerDown: (_) => _pauseIfAutoClosing(),
+      child: MouseRegion(
+        onEnter: (_) => _pauseIfAutoClosing(),
+        onExit: (_) {
+          if (widget.data.autoClose && widget.data.duration != null) {
+            // Only resume if we haven't completed yet.
+            // If we stopped at 1.0 (completed), we shouldn't restart unless we reset.
+            // But usually we stop *before* completion.
+            // However, if the user hovers, we want to keep it open.
+            // When they leave, we resume the countdown.
+            _progressController.forward();
+            widget.onExit?.call();
+          }
+        },
+        child: Material(
+          type: MaterialType.transparency,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: _kToastWidth),
+            child: Container(
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                border: Border.all(color: outerBorderColor),
+                borderRadius: BorderRadius.circular(4), // Standard radius
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(
+                      alpha: 0.16,
+                    ), // shadow-2 approximation
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Left border strip
-                    Container(width: 4, color: borderColor),
-                    // Content
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Icon
-                            IconTheme(
-                              data: IconThemeData(color: iconColor, size: 24),
-                              child: _getIcon(theme),
-                            ),
-                            const SizedBox(width: 16),
-                            // Text
-                            Expanded(
-                              child: Column(
+              clipBehavior: Clip.antiAlias,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IntrinsicHeight(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Left border strip
+                        Container(width: 4, color: borderColor),
+                        // Content
+                        Expanded(
+                          child: Semantics(
+                            container: true,
+                            role: toastRole,
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
+                              child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  if (widget.data.title != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: 4.0,
-                                      ),
-                                      child: Text(
-                                        widget.data.title!,
-                                        style: titleStyle,
+                                  if (!widget.data.hideIcon) ...[
+                                    IconTheme(
+                                      data: IconThemeData(color: iconColor),
+                                      child: _getIcon(widget.data.type),
+                                    ),
+                                    const SizedBox(width: 12),
+                                  ],
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        content,
+                                        if (effectiveAction != null)
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                              top: 8.0,
+                                            ),
+                                            child: effectiveAction,
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  IconButton(
+                                    iconSize: 16,
+                                    constraints: const BoxConstraints.tightFor(
+                                      width: 24,
+                                      height: 24,
+                                    ),
+                                    padding: EdgeInsets.zero,
+                                    tooltip: widget.strings.closeToast,
+                                    onPressed: widget.onDismiss,
+                                    color: closeButtonColor,
+                                    // IconButton's own `tooltip:` only sets
+                                    // SemanticsData.tooltip, not `.label` (see
+                                    // IxIconButton's doc comment) -- merge an
+                                    // explicit label into the icon (a
+                                    // non-boundary descendant of the button's
+                                    // own Semantics(container: true, button:
+                                    // true) node) so the button still has a
+                                    // spoken accessible name.
+                                    icon: Semantics(
+                                      label: widget.strings.closeToast,
+                                      excludeSemantics: true,
+                                      child: IxIcon.key(
+                                        IxIconKey.close,
+                                        size: IxIconSize.s16,
                                       ),
                                     ),
-                                  Text(widget.data.message, style: bodyStyle),
+                                  ),
                                 ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Action & Close
-                    if (widget.data.actionLabel != null ||
-                        true) // Always show close button
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              if (widget.data.actionLabel != null)
-                                TextButton(
-                                  onPressed: () {
-                                    widget.data.onAction?.call();
-                                    // Should action close the toast? Usually yes.
-                                    widget.onDismiss();
-                                  },
-                                  child: Text(widget.data.actionLabel!),
-                                ),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.close,
-                                  size: 20,
-                                ), // Use IxIcons.close if available
-                                onPressed: widget.onDismiss,
-                                color: closeButtonColor,
-                              ),
-                              const SizedBox(width: 8),
-                            ],
                           ),
-                        ],
-                      ),
-                  ],
-                ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Progress Bar
+                  if (widget.data.autoClose && widget.data.duration != null)
+                    AnimatedBuilder(
+                      animation: _progressController,
+                      builder: (context, child) {
+                        return LinearProgressIndicator(
+                          value: 1.0 - _progressController.value,
+                          backgroundColor: Colors.transparent,
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            progressColor,
+                          ),
+                          minHeight: 2,
+                        );
+                      },
+                    ),
+                ],
               ),
-              // Progress Bar
-              if (widget.data.autoClose && widget.data.duration != null)
-                AnimatedBuilder(
-                  animation: _progressController,
-                  builder: (context, child) {
-                    return LinearProgressIndicator(
-                      value: 1.0 - _progressController.value,
-                      backgroundColor: Colors.transparent,
-                      valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-                      minHeight: 2,
-                    );
-                  },
-                ),
-            ],
+            ),
           ),
         ),
       ),

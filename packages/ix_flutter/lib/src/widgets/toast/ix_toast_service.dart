@@ -1,15 +1,19 @@
 import 'dart:async';
 
+import 'package:clock/clock.dart';
 import 'package:flutter/widgets.dart';
 
 import 'ix_toast_data.dart';
+import 'ix_toast_handle.dart';
 
 /// Service to manage toast notifications.
 class IxToastService extends ChangeNotifier {
   final List<IxToastData> _toasts = [];
+  final Map<String, IxToastHandle> _handles = {};
   final Map<String, Timer> _timers = {};
   final Map<String, DateTime> _startTimes = {};
   final Map<String, Duration> _remainingTimes = {};
+  final Set<String> _pausedIds = {};
   int _counter = 0;
 
   /// Current list of active toasts.
@@ -17,7 +21,13 @@ class IxToastService extends ChangeNotifier {
 
   /// Shows a new toast notification.
   ///
-  /// Returns the created [IxToastData].
+  /// Returns the created [IxToastData]. Kept for 1.x compatibility --
+  /// prefer [showToast], which returns an [IxToastHandle] that can be
+  /// paused, resumed and awaited for its close result. Internally this
+  /// just calls [showToast] and returns its [IxToastHandle.data].
+  ///
+  /// This overload's defaults (`dismissOnAction: true`) match `IxToast`'s
+  /// 1.x behaviour; [showToast] defaults `dismissOnAction` to `false`.
   IxToastData show({
     IxToastType type = IxToastType.info,
     required String message,
@@ -29,6 +39,41 @@ class IxToastService extends ChangeNotifier {
     Widget? icon,
     Color? iconColor,
   }) {
+    return showToast(
+      type: type,
+      message: message,
+      title: title,
+      autoCloseDelay: duration,
+      autoClose: autoClose,
+      actionLabel: actionLabel,
+      onAction: onAction,
+      icon: icon,
+      iconColor: iconColor,
+      dismissOnAction: true,
+    ).data;
+  }
+
+  /// Shows a new toast notification and returns a live [IxToastHandle] for
+  /// it.
+  ///
+  /// The handle can [IxToastHandle.pause]/[IxToastHandle.resume] the
+  /// auto-close countdown, [IxToastHandle.close] the toast early with an
+  /// optional result, and await [IxToastHandle.onClose] to learn when and
+  /// how it was closed.
+  IxToastHandle showToast({
+    IxToastType type = IxToastType.info,
+    required String message,
+    String? title,
+    Duration? autoCloseDelay = const Duration(seconds: 5),
+    bool autoClose = true,
+    String? actionLabel,
+    VoidCallback? onAction,
+    Widget? action,
+    Widget? icon,
+    Color? iconColor,
+    bool hideIcon = false,
+    bool dismissOnAction = true,
+  }) {
     _counter++;
     final id = '${DateTime.now().millisecondsSinceEpoch}-$_counter';
     final toast = IxToastData(
@@ -36,26 +81,31 @@ class IxToastService extends ChangeNotifier {
       type: type,
       message: message,
       title: title,
-      duration: duration,
+      duration: autoCloseDelay,
       autoClose: autoClose,
       actionLabel: actionLabel,
       onAction: onAction,
+      action: action,
       icon: icon,
       iconColor: iconColor,
+      hideIcon: hideIcon,
+      dismissOnAction: dismissOnAction,
     );
+    final handle = IxToastHandle(this, toast);
+    _handles[id] = handle;
 
     _toasts.add(toast);
     notifyListeners();
 
-    if (autoClose && duration != null) {
-      _startTimer(id, duration);
+    if (autoClose && autoCloseDelay != null) {
+      _startTimer(id, autoCloseDelay);
     }
 
-    return toast;
+    return handle;
   }
 
   void _startTimer(String id, Duration duration) {
-    _startTimes[id] = DateTime.now();
+    _startTimes[id] = clock.now();
     _remainingTimes[id] = duration;
     _timers[id] = Timer(duration, () {
       dismiss(id);
@@ -68,12 +118,13 @@ class IxToastService extends ChangeNotifier {
     if (timer != null && timer.isActive) {
       timer.cancel();
       _timers.remove(id);
+      _pausedIds.add(id);
 
       final startTime = _startTimes[id];
       final initialDuration = _remainingTimes[id];
 
       if (startTime != null && initialDuration != null) {
-        final elapsed = DateTime.now().difference(startTime);
+        final elapsed = clock.now().difference(startTime);
         final remaining = initialDuration - elapsed;
         if (remaining > Duration.zero) {
           _remainingTimes[id] = remaining;
@@ -87,6 +138,7 @@ class IxToastService extends ChangeNotifier {
 
   /// Resumes the auto-close timer for a toast.
   void resumeTimer(String id) {
+    _pausedIds.remove(id);
     // Only resume if it's in the list (not dismissed) and has remaining time
     if (_toasts.any((t) => t.id == id) && _remainingTimes.containsKey(id)) {
       final remaining = _remainingTimes[id]!;
@@ -94,14 +146,22 @@ class IxToastService extends ChangeNotifier {
     }
   }
 
-  /// Dismisses a toast by its ID.
-  void dismiss(String id) {
+  /// Whether the auto-close countdown for toast [id] is currently paused
+  /// (via [pauseTimer]/[IxToastHandle.pause], or by the toast widget's own
+  /// hover/touch handling).
+  bool isPaused(String id) => _pausedIds.contains(id);
+
+  /// Dismisses a toast by its ID, completing its [IxToastHandle.onClose]
+  /// with [result].
+  void dismiss(String id, [Object? result]) {
     _timers[id]?.cancel();
     _timers.remove(id);
     _startTimes.remove(id);
     _remainingTimes.remove(id);
+    _pausedIds.remove(id);
     _toasts.removeWhere((t) => t.id == id);
     notifyListeners();
+    _handles.remove(id)?.notifyClosed(result);
   }
 
   /// Dismisses all active toasts.
@@ -112,8 +172,13 @@ class IxToastService extends ChangeNotifier {
     _timers.clear();
     _startTimes.clear();
     _remainingTimes.clear();
+    _pausedIds.clear();
+    final closed = List<IxToastData>.from(_toasts);
     _toasts.clear();
     notifyListeners();
+    for (final toast in closed) {
+      _handles.remove(toast.id)?.notifyClosed(null);
+    }
   }
 
   @override

@@ -26,11 +26,13 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_svg: ^2.2.3 # direct dependency: renders bundled internal iX icons (lib/src/ix_icons)
+  clock: ^1.1.2 # direct dependency: IxToastService reads clock.now() so fakeAsync tests can control its pause/resume timing deterministically
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  fake_async: ^1.3.3 # direct dev dependency: test/toast/ix_toast_service_test.dart drives timers deterministically
 
 topics:
   - flutter
