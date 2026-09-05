@@ -1339,45 +1339,30 @@ class _NavigationEntry extends StatelessWidget {
                 ? () => onOpenFlyout(entry)
                 : () => onCategoryExpansionChanged(entry.id),
           ),
-          AnimatedSize(
-            // A zero-duration AnimatedSize asked to animate an actual size
-            // change re-enters layout from its own performLayout ("A
-            // RenderObject must not re-dirty itself while still being laid
-            // out"), so under reduced motion every toggle gets a brand-new
-            // render object -- a first layout adopts the child's size
-            // outright and never runs that path. (IxBlind drives its own
-            // expansion controller instead; this menu's children are a
-            // fixed list that cannot resize itself while open, which is the
-            // case the re-key does not cover.)
-            key: animationDuration == Duration.zero
-                ? ValueKey(showChildren)
-                : null,
+          _CategoryChildren(
+            expanded: showChildren,
             duration: animationDuration,
-            alignment: Alignment.topCenter,
-            child: showChildren
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      for (final child in entry.children)
-                        _NavigationEntry(
-                          entry: child,
-                          depth: depth + 1,
-                          isExpanded: isExpanded,
-                          sidebarTheme: sidebarTheme,
-                          appMenuTheme: appMenuTheme,
-                          animationDuration: animationDuration,
-                          strings: strings,
-                          isCategoryExpanded: false,
-                          openFlyoutId: openFlyoutId,
-                          focusOf: focusOf,
-                          onCategoryExpansionChanged:
-                              onCategoryExpansionChanged,
-                          onEntryTap: onEntryTap,
-                          onOpenFlyout: onOpenFlyout,
-                        ),
-                    ],
-                  )
-                : const SizedBox(width: double.infinity, height: 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                for (final child in entry.children)
+                  _NavigationEntry(
+                    entry: child,
+                    depth: depth + 1,
+                    isExpanded: isExpanded,
+                    sidebarTheme: sidebarTheme,
+                    appMenuTheme: appMenuTheme,
+                    animationDuration: animationDuration,
+                    strings: strings,
+                    isCategoryExpanded: false,
+                    openFlyoutId: openFlyoutId,
+                    focusOf: focusOf,
+                    onCategoryExpansionChanged: onCategoryExpansionChanged,
+                    onEntryTap: onEntryTap,
+                    onOpenFlyout: onOpenFlyout,
+                  ),
+              ],
+            ),
           ),
         ],
       );
@@ -1471,6 +1456,131 @@ class _BottomNavigationEntry extends StatelessWidget {
       focusNode: focus.node,
       traversalOrder: focus.order,
       onTap: entry.enabled ? () => onTap(entry) : null,
+    );
+  }
+}
+
+/// The animated container for an expanded category's child entries.
+///
+/// Drives the reveal with its own [AnimationController] and a
+/// [SizeTransition] rather than an `AnimatedSize`, for the same two reasons
+/// `IxBlind` does (see `ix_blind.dart`): under reduced motion the duration
+/// is [Duration.zero], and a zero-duration `RenderAnimatedSize` asked to
+/// animate an actual size change re-dirties itself from inside its own
+/// `performLayout()`. That is reachable here through public API --
+/// [IxMenuEntry.children] and each child's [IxMenuEntry.iconWidget] are
+/// consumer-supplied, so an open category *can* change height on its own --
+/// and the alternative workaround (re-keying while the duration is zero)
+/// remounts the whole child subtree whenever the platform's reduce-motion
+/// setting flips, destroying any state those widgets hold.
+///
+/// A controller keeps the subtree's shape and elements identical whatever
+/// the duration is, and snaps synchronously *outside* layout when the
+/// duration is zero.
+class _CategoryChildren extends StatefulWidget {
+  const _CategoryChildren({
+    required this.expanded,
+    required this.duration,
+    required this.child,
+  });
+
+  /// Whether the category is currently open. The state is owned by the
+  /// scaffold, so this widget is purely controlled.
+  final bool expanded;
+
+  /// The scaffold's [IxApplicationScaffold.animationDuration], already
+  /// resolved against the ambient reduced-motion preference by
+  /// `_IxApplicationScaffoldState._effectiveAnimationDuration`.
+  final Duration duration;
+
+  /// The child entries, built unconditionally by the caller: this widget
+  /// decides when they are in the tree.
+  final Widget child;
+
+  @override
+  State<_CategoryChildren> createState() => _CategoryChildrenState();
+}
+
+class _CategoryChildrenState extends State<_CategoryChildren>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _expansion;
+  late final CurvedAnimation _heightFactor;
+
+  @override
+  void initState() {
+    super.initState();
+    _expansion = AnimationController(
+      vsync: this,
+      value: widget.expanded ? 1.0 : 0.0,
+    );
+    _heightFactor = CurvedAnimation(
+      parent: _expansion,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // The duration arrives as a widget property rather than being read from
+    // `MediaQuery` here, so that a consumer's own
+    // `IxApplicationScaffold.animationDuration` keeps working; the scaffold
+    // has already run it through `IxMotion.of`, and it rebuilds (passing a
+    // new one down to `didUpdateWidget` below) when reduced motion flips.
+    _expansion.duration = widget.duration;
+  }
+
+  @override
+  void didUpdateWidget(covariant _CategoryChildren oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.duration != oldWidget.duration) {
+      _expansion.duration = widget.duration;
+    }
+    if (widget.expanded == oldWidget.expanded) {
+      return;
+    }
+    if (widget.expanded) {
+      _expansion.forward();
+    } else {
+      _expansion.reverse().whenComplete(() {
+        if (!mounted) {
+          return;
+        }
+        // Rebuild so the now fully collapsed children leave the tree; the
+        // controller alone only repaints the transition.
+        setState(() {});
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _heightFactor.dispose();
+    _expansion.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Collapsed children stay out of the tree, but only once the collapse
+    // has actually finished -- otherwise there would be nothing to shrink.
+    final hasChildren = widget.expanded || !_expansion.isDismissed;
+    return SizeTransition(
+      sizeFactor: _heightFactor,
+      alignment: Alignment.topCenter,
+      // A *collapsing* subtree is still mounted (it is what the transition
+      // shrinks) and still painted, clipped, until the last frame. Until it
+      // is fully open again it must not be announced or reachable by Tab,
+      // or the focus would land on an entry that is about to be unmounted.
+      child: ExcludeFocus(
+        excluding: !widget.expanded,
+        child: ExcludeSemantics(
+          excluding: !widget.expanded,
+          child: hasChildren
+              ? widget.child
+              : const SizedBox(width: double.infinity, height: 0),
+        ),
+      ),
     );
   }
 }
