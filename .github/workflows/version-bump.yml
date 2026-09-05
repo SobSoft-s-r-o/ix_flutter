@@ -43,10 +43,9 @@ jobs:
         with:
           channel: ${{ env.FLUTTER_VERSION }}
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
+      # No `dart-lang/setup-dart` here: `subosito/flutter-action` above puts
+      # the Flutter SDK's own `dart` on PATH, which runs `dart pub get`,
+      # `dart pub global activate cider` and cider itself.
 
       - name: Cache pub
         uses: actions/cache@v4
