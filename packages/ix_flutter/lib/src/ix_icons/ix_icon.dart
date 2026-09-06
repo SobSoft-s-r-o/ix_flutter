@@ -142,8 +142,22 @@ class IxIcon extends StatelessWidget {
         data: IconThemeData(size: resolvedSize, color: resolvedColor),
         child: Builder(builder: builder),
       ),
-      IxPackageIconData() ||
-      IxAssetIconData() => _svg(context, resolved, resolvedColor, resolvedSize),
+      IxPackageIconData(assetPath: final path) => _svg(
+        context,
+        resolved,
+        path,
+        'ix_flutter',
+        resolvedColor,
+        resolvedSize,
+      ),
+      IxAssetIconData(assetPath: final path, package: final package) => _svg(
+        context,
+        resolved,
+        path,
+        package,
+        resolvedColor,
+        resolvedSize,
+      ),
     };
     child = SizedBox.square(
       dimension: resolvedSize,
@@ -168,14 +182,11 @@ class IxIcon extends StatelessWidget {
   Widget _svg(
     BuildContext context,
     IxIconData data,
+    String path,
+    String? package,
     Color color,
     double sizePx,
   ) {
-    final (path, package) = switch (data) {
-      IxPackageIconData(assetPath: final p) => (p, 'ix_flutter'),
-      IxAssetIconData(assetPath: final p, package: final pk) => (p, pk),
-      _ => throw StateError('not an asset icon'),
-    };
     return _IxSvgIcon(
       loader: _IxGuardedSvgLoader(SvgAssetLoader(path, packageName: package)),
       fallback: data.fallback ?? Icons.broken_image,

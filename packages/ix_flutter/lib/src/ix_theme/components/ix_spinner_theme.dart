@@ -180,11 +180,16 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
     Map<IxSpinnerVariant, IxSpinnerVariantStyle> variants,
     IxSpinnerVariant variant,
   ) {
+    // standard/secondary name the same style, so the alias is canonicalised
+    // once up front and the exact-key-then-alias fallback is then the same
+    // two-key lookup against both the caller's map and the built-in one,
+    // instead of a four-way chain that repeated it.
     final alias = _aliasOf(variant);
-    return variants[variant] ??
-        variants[alias] ??
-        _builtIn.variants[variant] ??
-        _builtIn.variants[alias] ??
+    IxSpinnerVariantStyle? lookup(
+      Map<IxSpinnerVariant, IxSpinnerVariantStyle> map,
+    ) => map[variant] ?? map[alias];
+    return lookup(variants) ??
+        lookup(_builtIn.variants) ??
         _builtIn.variants[IxSpinnerVariant.secondary]!;
   }
 

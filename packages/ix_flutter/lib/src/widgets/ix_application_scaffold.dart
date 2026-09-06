@@ -1866,8 +1866,8 @@ class _NavigationTile extends StatefulWidget {
     this.expanded,
     this.toggled,
     this.value,
-    this.focusNode,
-    this.traversalOrder,
+    required this.focusNode,
+    required this.traversalOrder,
     this.trailing,
     this.onTap,
   });
@@ -1891,10 +1891,17 @@ class _NavigationTile extends StatefulWidget {
   final String? value;
 
   /// Focus node owned by the scaffold, so a fly-out can return focus here.
-  final FocusNode? focusNode;
+  ///
+  /// Every call site sources this from the same `_tileNode(id)` map the
+  /// scaffold seeds on first use, so it is never actually absent.
+  final FocusNode focusNode;
 
   /// Position of this tile in the menu's ordered traversal group.
-  final double? traversalOrder;
+  ///
+  /// Every call site sources this from the same traversal-order computation
+  /// the panel builds for every rendered tile, so it is never actually
+  /// absent.
+  final double traversalOrder;
 
   final Widget? trailing;
   final VoidCallback? onTap;
@@ -1982,7 +1989,7 @@ class _NavigationTileState extends State<_NavigationTile> {
       // Same reason as `focused` above: `excludeSemantics` drops the
       // `InkWell`'s own `focus` action, leaving a tile that says it is
       // focusable but cannot be focused from assistive technology.
-      onFocus: widget.enabled ? widget.focusNode?.requestFocus : null,
+      onFocus: widget.enabled ? widget.focusNode.requestFocus : null,
       excludeSemantics: true,
       child: Padding(
         padding: EdgeInsetsDirectional.only(start: widget.depth * 16.0),
@@ -2076,11 +2083,8 @@ class _NavigationTileState extends State<_NavigationTile> {
       ),
     );
 
-    if (widget.traversalOrder == null) {
-      return tile;
-    }
     return FocusTraversalOrder(
-      order: NumericFocusOrder(widget.traversalOrder!),
+      order: NumericFocusOrder(widget.traversalOrder),
       child: tile,
     );
   }
