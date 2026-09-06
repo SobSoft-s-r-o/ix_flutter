@@ -6,6 +6,7 @@ import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_header_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_badge_theme.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_button_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_card_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_bottom_sheet_theme.dart';
@@ -342,6 +343,13 @@ class IxThemeBuilder {
       typography: typeScale,
     );
     final scrollbarTheme = IxScrollbarTheme.fromPalette(palette: palette);
+    // `IxBlindTheme.fromPalette` existed since the blind's own theme
+    // extension was introduced, but was never added below to `extensions:`
+    // -- every `IxBlind` therefore silently used `IxBlindTheme.fallback`'s
+    // generic Material-role approximation instead of the upstream-aligned
+    // per-variant colors this builds (manual-testing regression: dark
+    // `warning`/`success` rendered as the same unreadable cyan).
+    final blindTheme = IxBlindTheme.fromPalette(palette: palette);
     final ixThemeExtension = IxTheme(
       themeName: resolvedTheme,
       // ignore: deprecated_member_use_from_same_package
@@ -459,6 +467,7 @@ class IxThemeBuilder {
         scrollbarTheme,
         breadcrumbTheme,
         dropdownTheme,
+        blindTheme,
       ],
     );
 

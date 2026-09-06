@@ -34,6 +34,26 @@ void main() {
     );
   });
 
+  testWidgets('IxBlindTheme is wired into ThemeData', (tester) async {
+    // Manual-testing regression (Android, dark theme, Blind example page):
+    // `IxBlindTheme.fromPalette` existed but was never added to
+    // `IxThemeBuilder.build()`'s `extensions:` list, so every `IxBlind` in
+    // an `IxThemeBuilder`-themed app silently fell back to
+    // `IxBlindTheme.fallback(ThemeData)` -- a generic Material-role
+    // approximation never meant to be authoritative for an iX-themed app
+    // (see its own doc comment: "might not match exact iX specs").
+    await pumpIx(
+      tester,
+      Builder(
+        builder: (c) {
+          final ext = Theme.of(c).extension<IxBlindTheme>();
+          expect(ext, isNotNull);
+          return const SizedBox();
+        },
+      ),
+    );
+  });
+
   testWidgets(
     'IxTheme.of returns the extension; maybeOf is null without IxThemeBuilder',
     (tester) async {
