@@ -4,6 +4,14 @@ import 'package:example/ix_icons.dart';
 
 import '../edge_to_edge.dart';
 
+/// Demo page for the Material form controls the iX theme styles.
+///
+/// Tapping outside a focused field releases it and takes the soft keyboard
+/// down. That is not wired here: every route of this app is built inside the
+/// `IxApplicationScaffold` of `router/global_scaffold.dart`, whose
+/// `unfocusOnTapOutside` defaults to `true` and wraps the frame in
+/// `IxUnfocusOnTapOutside`. A screen that does not use the scaffold gets the
+/// same behaviour by wrapping itself in that widget.
 class FormsPage extends StatefulWidget {
   const FormsPage({super.key});
 

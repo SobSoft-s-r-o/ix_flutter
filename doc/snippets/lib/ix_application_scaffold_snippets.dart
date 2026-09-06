@@ -106,3 +106,24 @@ class AboutLegalPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) => const Placeholder();
 }
+
+Widget scaffoldWithoutKeyboardDismissal({
+  required List<IxMenuEntry> entries,
+  required ValueChanged<String> onNavigate,
+  required Widget body,
+}) => IxApplicationScaffold(
+  appTitle: 'My App',
+  entries: entries,
+  onNavigate: onNavigate,
+  body: body,
+  // Back to Flutter's own behaviour: on a touch screen a focused field
+  // survives a tap outside it.
+  unfocusOnTapOutside: false,
+);
+
+Widget formPage() => IxUnfocusOnTapOutside(
+  child: const Padding(
+    padding: EdgeInsets.all(16),
+    child: TextField(decoration: InputDecoration(labelText: 'Name')),
+  ),
+);

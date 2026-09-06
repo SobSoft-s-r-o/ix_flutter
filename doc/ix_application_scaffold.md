@@ -11,6 +11,7 @@ The `IxApplicationScaffold` is a responsive application shell widget designed to
 *   **Built-in Bottom Entries**: `settings:`, `about:` and `enableToggleTheme` add the upstream Settings, About & legal information and Toggle theme entries at the bottom of the menu.
 *   **Fly-out Panels**: A category in a collapsed menu -- and the built-in settings/about entries -- reveal their content in an overlay panel anchored to the menu.
 *   **Accessible**: The menu is a `menuBar` landmark with one semantics node per entry, full arrow-key navigation and a visible focus ring.
+*   **Keyboard dismissal**: A tap outside a focused text input releases it and takes the soft keyboard down, on every platform.
 *   **Localizable**: Every user-facing string comes from `IxApplicationStrings`.
 *   **Theming**: Integrates with `IxAppMenuTheme` and `IxSidebarTheme` for consistent styling.
 
@@ -106,6 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
 | `settings` | `Widget?` | Content of the built-in Settings panel (upstream `<ix-menu-settings>`). When set, a Settings entry appears at the bottom of the menu. | `null` |
 | `about` | `Widget?` | Content of the built-in About panel (upstream `<ix-menu-about>`). When set, an About & legal information entry appears at the bottom of the menu. | `null` |
 | `enableToggleTheme` | `bool` | Whether the built-in theme toggle is shown. It only appears when `onThemeModeChanged` is also set. | `true` |
+| `unfocusOnTapOutside` | `bool` | Whether a tap outside a focused text input releases it and takes the soft keyboard down. See [Keyboard dismissal](#keyboard-dismissal). | `true` |
 
 ### IxApplicationStrings
 
@@ -199,6 +201,58 @@ Data model for defining items in the navigation menu.
 *   **Large Screens (> 1024px)**: Displays a permanent side navigation bar on the left. The navigation can be toggled between expanded and collapsed states using the double-arrow button in the header.
 *   **Small Screens (< 1024px)**: Displays a standard `AppBar` with a hamburger menu. Tapping the menu opens a modal `Drawer` containing the navigation. The drawer is always fully expanded.
 *   **Collapsed rail**: A `category` entry has no room for inline children, so tapping it opens a fly-out panel with its children next to the rail instead.
+
+## Keyboard dismissal
+
+Flutter only drops a text field's focus on a tap outside it on **desktop**.
+Its default action (`_EditableTextTapOutsideAction` in
+`packages/flutter/lib/src/widgets/editable_text.dart`) keeps the focus for a
+*touch* pointer on Android, iOS and Fuchsia, so the soft keyboard stays up
+over the form the user is trying to read.
+
+`IxApplicationScaffold` wraps its whole frame -- app bar, menu, fly-out,
+drawer and `body` -- in `IxUnfocusOnTapOutside`, so a tap next to a focused
+input releases it and dismisses the keyboard with no extra code:
+
+```dart
+Widget scaffoldWithoutKeyboardDismissal({
+  required List<IxMenuEntry> entries,
+  required ValueChanged<String> onNavigate,
+  required Widget body,
+}) => IxApplicationScaffold(
+  appTitle: 'My App',
+  entries: entries,
+  onNavigate: onNavigate,
+  body: body,
+  // Back to Flutter's own behaviour: on a touch screen a focused field
+  // survives a tap outside it.
+  unfocusOnTapOutside: false,
+);
+```
+
+What it does *not* do:
+
+*   A tap inside the field, or on one of its `TextFieldTapRegion` satellites
+    (the selection toolbar, the autofill dropdown, a decoration icon), keeps
+    the focus -- the widget reads Flutter's own tap-region grouping rather
+    than hit-testing on its own.
+*   A touch that travels more than `kTouchSlop` before it lifts is a scroll,
+    not a tap, and keeps the keyboard.
+*   A non-text focus (a button, a menu tile) is never cleared, so the
+    keyboard focus model and the desktop focus ring are untouched.
+*   Taps are observed, never consumed: the button you tapped to dismiss the
+    keyboard still fires.
+
+Outside the scaffold, wrap any subtree in the same widget:
+
+```dart
+Widget formPage() => IxUnfocusOnTapOutside(
+  child: const Padding(
+    padding: EdgeInsets.all(16),
+    child: TextField(decoration: InputDecoration(labelText: 'Name')),
+  ),
+);
+```
 
 ## Accessibility
 

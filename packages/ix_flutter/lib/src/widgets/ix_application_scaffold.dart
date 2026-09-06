@@ -9,6 +9,7 @@ import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
 import 'package:ix_flutter/src/ix_core/ix_motion.dart';
 import 'package:ix_flutter/src/ix_core/ix_reveal_focused.dart';
+import 'package:ix_flutter/src/ix_core/ix_unfocus_on_tap_outside.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icon.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icon_key.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icon_size.dart';
@@ -172,6 +173,7 @@ class IxApplicationScaffold extends StatefulWidget {
     this.settings,
     this.about,
     this.enableToggleTheme = true,
+    this.unfocusOnTapOutside = true,
   }) : assert(
          expandedWidth > collapsedWidth && collapsedWidth >= 56,
          'Expanded width must be larger than collapsed width.',
@@ -231,6 +233,26 @@ class IxApplicationScaffold extends StatefulWidget {
   /// The entry only appears when [onThemeModeChanged] is also set, since the
   /// scaffold does not own the app's [ThemeMode].
   final bool enableToggleTheme;
+
+  /// Whether a tap outside a focused text input releases it and takes the
+  /// soft keyboard down with it.
+  ///
+  /// Flutter's own default only drops the focus on desktop: on Android, iOS
+  /// and Fuchsia a *touch* outside a focused field deliberately keeps it
+  /// focused, so the keyboard stays up over the form the user is trying to
+  /// read. Every app then re-implements the dismissal by hand. The scaffold
+  /// wraps its whole frame -- app bar, menu, fly-out, drawer and [body] --
+  /// in an [IxUnfocusOnTapOutside] so it works out of the box, on every
+  /// platform.
+  ///
+  /// A tap inside the field (or on one of its `TextFieldTapRegion`
+  /// satellites, such as the selection toolbar) still keeps focus, a touch
+  /// that travels far enough to be a scroll keeps the keyboard, and a
+  /// non-text focus is never cleared.
+  ///
+  /// Set it to `false` to get Flutter's stock behaviour back, or wrap a
+  /// smaller subtree in [IxUnfocusOnTapOutside] yourself.
+  final bool unfocusOnTapOutside;
 
   /// Forgets which reserved menu entry ids have already been reported, so a
   /// test that asserts on the one-time debug notice starts from a clean
@@ -541,6 +563,18 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    // Wrapped around the whole frame rather than around `widget.body`
+    // alone: the drawer, the permanent side layout and the menu fly-out are
+    // all built below this point, so one wrapper covers every text input
+    // the scaffold can host, and a tap on the app bar or on a menu tile
+    // dismisses the keyboard just as a tap on the page does.
+    return IxUnfocusOnTapOutside(
+      enabled: widget.unfocusOnTapOutside,
+      child: _buildFrame(context),
+    );
+  }
+
+  Widget _buildFrame(BuildContext context) {
     // Placed above the Navigator (a persistent shell in
     // `MaterialApp.builder`) there is no Overlay to host the fly-out, so the
     // scaffold brings its own. The lookup is only reached on a rebuild of

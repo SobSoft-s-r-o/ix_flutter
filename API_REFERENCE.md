@@ -21,6 +21,7 @@ hand-written signature here to fall out of date.
 | Component | Guide |
 |---|---|
 | `IxApplicationScaffold`, `IxMenuEntry`, `IxApplicationStrings` | [doc/ix_application_scaffold.md](doc/ix_application_scaffold.md) |
+| `IxUnfocusOnTapOutside` (tap outside a text input to dismiss the keyboard) | [doc/ix_application_scaffold.md](doc/ix_application_scaffold.md#keyboard-dismissal) |
 | `IxBlind`, `IxBlindAccordion` | [doc/ix_blind.md](doc/ix_blind.md) |
 | `IxBreadcrumb`, `IxBreadcrumbItemData`, `IxBreadcrumbStrings` | [doc/ix_breadcrumb.md](doc/ix_breadcrumb.md) |
 | `IxDropdownButton`, `IxDropdownMenuItem` | [doc/ix_dropdown_button.md](doc/ix_dropdown_button.md) |
