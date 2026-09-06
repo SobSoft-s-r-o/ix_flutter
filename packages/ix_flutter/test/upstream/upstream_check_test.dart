@@ -18,12 +18,23 @@ const _upstreamOk =
     '`56dfa7514832e2c21c406a2aa3b40ab7d9f8bced` (2026-08-27) | x |\n'
     '| `@siemens/ix-icons` | 3.5.0 | `v3.5.0` (annotated) | '
     '`c46e1b13f7ccdaf66e4fcf2261f3765c55d45557` (2026-08-04) | y |\n';
+const _upstreamLine =
+    'Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 '
+    '(c46e1b13)';
+
+/// The shape during development: `[Unreleased]` holds the release notes and
+/// carries the `Upstream:` line, and the section below it already shipped.
 const _changelogOk =
     '## [Unreleased]\n'
+    '$_upstreamLine\n'
     '\n'
-    '## [1.1.0] - 2026-10-01\n'
-    'Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 '
-    '(c46e1b13)\n';
+    '### Added\n'
+    '- something\n'
+    '\n'
+    '## [1.0.2] - 2026-01-28\n'
+    '\n'
+    '### Changed\n'
+    '- something older\n';
 
 /// The shape `cider release` actually writes once CHANGELOG.md carries the
 /// keep-a-changelog link reference definitions its parser needs (see
@@ -32,8 +43,10 @@ const _changelogOk =
 /// history (`## [1.0.2] - ...`).
 const _changelogPostCiderRelease =
     '## 1.1.0 - 2026-10-01\n'
-    'Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 '
-    '(c46e1b13)\n';
+    '$_upstreamLine\n'
+    '\n'
+    '### Added\n'
+    '- something\n';
 
 /// Covers `tool/upstream_check.dart`'s consistency checks between
 /// `UPSTREAM.md`, the `CHANGELOG.md` release header, and `IxUpstream` (no
@@ -83,6 +96,58 @@ void main() {
         facts: _facts,
       ),
       isEmpty,
+    );
+  });
+
+  test(
+    'an older release is not required to carry the current Upstream line',
+    () {
+      // The regression this file exists for: the check used to read the first
+      // *numbered* section, so a baseline pinned long after 1.0.2 shipped had to
+      // be written under 1.0.2's own header to keep CI green -- claiming a
+      // release from January was verified against an August upstream commit.
+      expect(
+        checkUpstream(
+          upstreamMd: _upstreamOk,
+          changelog: _changelogOk,
+          facts: _facts,
+        ),
+        isEmpty,
+      );
+      // ... and it is the `[Unreleased]` line that is load-bearing, not 1.0.2's
+      // absence of one.
+      expect(
+        checkUpstream(
+          upstreamMd: _upstreamOk,
+          changelog: _changelogOk.replaceFirst('$_upstreamLine\n', ''),
+          facts: _facts,
+        ),
+        contains(contains('Unreleased')),
+      );
+    },
+  );
+
+  test('an [Unreleased] heading with no content yet is skipped', () {
+    // Straight after a release: `cider release` has renamed the old section
+    // and a maintainer has opened a fresh, still-empty one on top of it.
+    expect(
+      checkUpstream(
+        upstreamMd: _upstreamOk,
+        changelog: '## [Unreleased]\n\n$_changelogPostCiderRelease',
+        facts: _facts,
+      ),
+      isEmpty,
+    );
+  });
+
+  test('a stale Upstream line under [Unreleased] is reported', () {
+    expect(
+      checkUpstream(
+        upstreamMd: _upstreamOk,
+        changelog: _changelogOk.replaceFirst('56dfa751', '00000000'),
+        facts: _facts,
+      ),
+      contains(contains('Upstream:')),
     );
   });
 

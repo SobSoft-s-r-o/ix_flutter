@@ -9,19 +9,37 @@ Constants in code: `IxUpstream` (`packages/ix_flutter/lib/src/ix_core/ix_upstrea
 
 ## Release header format
 
-Every `CHANGELOG.md` entry for a released version (the first section that is
-not `[Unreleased]`) is immediately followed by one `Upstream:` line naming
-the exact `@siemens/ix` and `@siemens/ix-icons` revisions the release was
-verified against, as the tag plus the first 8 characters of the commit SHA:
+The `CHANGELOG.md` section for the release **being prepared** is immediately
+followed by one `Upstream:` line naming the exact `@siemens/ix` and
+`@siemens/ix-icons` revisions that release is verified against, as the tag
+plus the first 8 characters of the commit SHA. While the release is open that
+section is `[Unreleased]`:
 
 ```markdown
-## [1.1.0] - 2026-10-01
+## [Unreleased]
+Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
+```
+
+`cider release` renames that header in place, so the line travels with its own
+content and becomes the released section's line without anybody moving it:
+
+```markdown
+## 1.1.0 - 2026-10-01
 Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 ```
 
 `tool/upstream_check.dart` enforces that this line is present and matches
-`IxUpstream`; it accepts the header with or without `[...]` brackets around
+`IxUpstream`. It reads the topmost section that carries content -- so
+`[Unreleased]` during development, the newest release once `cider release` has
+run, and an `[Unreleased]` heading opened but not yet filled is skipped rather
+than reported. It accepts the header with or without `[...]` brackets around
 the version (see below).
+
+**Older sections are never checked, and must not be edited to match.** The
+baseline moves while a release is open; stamping today's `IxUpstream` onto a
+version that shipped months ago states something nobody verified. A release
+that has no record of what it was checked against carries no `Upstream:` line
+at all -- as 1.0.2 does.
 
 `cider release` (run by the **Version Bump (Manual)** workflow) needs a
 keep-a-changelog [link reference definition](https://spec.commonmark.org/0.31.2/#link-reference-definition)
@@ -33,18 +51,36 @@ an empty, bracket-less section at the end of the file instead of turning
 these already:
 
 ```markdown
-[Unreleased]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/v1.0.2...HEAD
-[1.0.2]: https://github.com/SobSoft-s-r-o/ix_flutter/releases/tag/v1.0.2
+[Unreleased]: https://github.com/SobSoft-s-r-o/ix_flutter/commits/main
+[1.0.2]: https://pub.dev/packages/ix_flutter/versions/1.0.2
 ```
 
-**After every release**, update these: point `[Unreleased]` at
-`compare/v<new>...HEAD` and add a `[<new>]` definition for the version just
-released (`compare/v<previous>...v<new>`, or `releases/tag/v<new>` for the
-first one) -- otherwise the *next* cycle's `[Unreleased]` has no definition
-and the mangling above returns. The header `cider release` writes for the new
-section itself has no brackets (`## 1.1.0 - 2026-09-06`, not `## [1.1.0]`);
-that is what `tool/upstream_check.dart`'s regex tolerating both forms is for
--- it is not worth fighting cider's own output shape.
+### What these definitions may point at
+
+This repository has **no git tags and no GitHub releases** -- the packages are
+published to pub.dev only. `compare/v<a>...v<b>` and `releases/tag/v<x>` URLs
+therefore all resolve to 404, which the `docs` job's link check (see
+[.github/workflows/ci.yml](.github/workflows/ci.yml)) fails on. So each
+definition points at something that actually exists:
+
+- a **published** version links to its pub.dev version page,
+  `https://pub.dev/packages/<package>/versions/<version>`;
+- `[Unreleased]` links to `commits/main`;
+- a version that was **never published** carries no definition at all, and its
+  header drops the `[...]` brackets so `cider` does not need one -- see
+  `## 0.0.1` in `packages/ix_flutter/CHANGELOG.md`.
+
+Do not restore a tag or release URL unless the tag or release has actually
+been created, and do not exclude these links from the checker instead.
+
+**After every release**, update these: point `[Unreleased]` back at
+`commits/main` (`cider release` deletes that definition outright) and add a
+`[<new>]` definition once the version is live on pub.dev -- otherwise the
+*next* cycle's `[Unreleased]` has no definition and the mangling above
+returns. The header `cider release` writes for the new section itself has no
+brackets (`## 1.1.0 - 2026-09-06`, not `## [1.1.0]`); that is what
+`tool/upstream_check.dart` tolerating both forms is for -- it is not worth
+fighting cider's own output shape.
 
 `cider release`'s markdown round-trip is not fully lossless beyond that: it
 can drop or reflow content outside the keep-a-changelog release structure it

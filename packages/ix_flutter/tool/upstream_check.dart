@@ -1,6 +1,6 @@
-// Machine-checks that `UPSTREAM.md` and the latest CHANGELOG.md release
-// header agree with the pinned `IxUpstream` constants (the single source of
-// truth for the upstream Siemens iX core/icons baseline).
+// Machine-checks that `UPSTREAM.md` and the CHANGELOG.md section for the
+// release being prepared agree with the pinned `IxUpstream` constants (the
+// single source of truth for the upstream Siemens iX core/icons baseline).
 //
 // Usage (from packages/ix_flutter):
 //   dart run tool/upstream_check.dart
@@ -12,9 +12,9 @@ import 'dart:io';
 
 import 'package:ix_flutter/src/ix_core/ix_upstream.dart';
 
-/// The upstream facts to check `UPSTREAM.md` and the CHANGELOG.md release
-/// header against. In production this always mirrors [IxUpstream]; tests
-/// pass synthetic values instead.
+/// The upstream facts to check `UPSTREAM.md` and the CHANGELOG.md section for
+/// the release being prepared against. In production this always mirrors
+/// [IxUpstream]; tests pass synthetic values instead.
 class UpstreamFacts {
   const UpstreamFacts({
     required this.version,
@@ -33,9 +33,9 @@ class UpstreamFacts {
   final String iconsCommit;
 }
 
-/// Compares `UPSTREAM.md` and the CHANGELOG.md release header against
-/// [facts]. Returns the list of mismatches found (empty when everything is
-/// consistent).
+/// Compares `UPSTREAM.md` and the CHANGELOG.md section for the release being
+/// prepared against [facts]. Returns the list of mismatches found (empty when
+/// everything is consistent).
 List<String> checkUpstream({
   required String upstreamMd,
   required String changelog,
@@ -82,14 +82,49 @@ List<String> checkUpstream({
     );
   }
 
-  // The brackets are optional: a hand-written header reads `## [1.0.2] -
-  // date`, but `cider release` (see UPSTREAM.md#release-header-format)
-  // writes the new section as `## 1.1.0 - date`, with no `[...]` at all.
-  final release = RegExp(
-    r'^## \[?(\d+\.\d+\.\d+[^\]\s]*)\]?[^\n]*\n([^\n]*)',
+  // The `Upstream:` line belongs to the release being *prepared*, not to one
+  // already published: it records what that release was verified against, and
+  // the baseline moves while the release is still open. During development
+  // the section being prepared is `[Unreleased]`; `cider release` then renames
+  // that header in place (see UPSTREAM.md#release-header-format), so the line
+  // travels with its own content and becomes the released section's line
+  // without anybody editing it.
+  //
+  // So the section checked here is the topmost one that carries content --
+  // `[Unreleased]` while it holds the release notes, otherwise the newest
+  // numbered release. An `[Unreleased]` heading left empty right after a
+  // release is skipped rather than reported. Older sections are never
+  // checked: stamping today's baseline onto a version that shipped months
+  // ago would be a false claim, not a consistency guarantee.
+  //
+  // Version brackets are optional throughout: a hand-written header reads
+  // `## [1.0.2] - date`, while `cider release` writes `## 1.1.0 - date` with
+  // no `[...]` at all.
+  //
+  // Heading positions are matched first and the bodies sliced between them: a
+  // single section-matching regex would need an end-of-input lookahead, which
+  // Dart's ECMAScript-flavoured RegExp does not offer (`\Z` is an identity
+  // escape there, i.e. a literal `Z`), so the last section in the file would
+  // silently never match.
+  final headings = RegExp(
+    r'^## +(?:\[([^\]]+)\]|(\d[^\s]*))[^\n]*$',
     multiLine: true,
-  ).firstMatch(changelog);
-  if (release == null) {
+  ).allMatches(changelog).toList();
+
+  String? preparedName;
+  String preparedBody = '';
+  for (var i = 0; i < headings.length; i++) {
+    final start = headings[i].end;
+    final end = i + 1 < headings.length
+        ? headings[i + 1].start
+        : changelog.length;
+    final body = changelog.substring(start, end);
+    if (body.trim().isEmpty) continue; // an [Unreleased] opened but not filled
+    preparedName = headings[i].group(1) ?? headings[i].group(2)!;
+    preparedBody = body;
+    break;
+  }
+  if (preparedName == null) {
     errors.add('CHANGELOG.md has no release section');
     return errors;
   }
@@ -97,9 +132,13 @@ List<String> checkUpstream({
       'Upstream: ${facts.tag} (${facts.commit.substring(0, 8)}), '
       '@siemens/ix-icons ${facts.iconsTag} '
       '(${facts.iconsCommit.substring(0, 8)})';
-  if (release.group(2)!.trim() != expected) {
+  final firstLine = preparedBody
+      .split('\n')
+      .map((l) => l.trim())
+      .firstWhere((l) => l.isNotEmpty, orElse: () => '');
+  if (firstLine != expected) {
     errors.add(
-      'CHANGELOG.md release ${release.group(1)} must be followed by '
+      'CHANGELOG.md section $preparedName must be followed by '
       '"$expected" (Upstream: line)',
     );
   }
