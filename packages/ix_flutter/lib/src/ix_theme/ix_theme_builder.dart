@@ -467,25 +467,15 @@ class IxThemeBuilder {
     // Material derives `materialTapTargetSize` itself -- `comfortable`
     // (48x48 hit areas) on touch platforms, `compact` (hit area equals the
     // visual size) on desktop and desktop browsers. `IxDensityScope`
-    // re-adapts this live once a BuildContext exists.
-    final adapted = IxDensityAdapter.apply(
+    // re-adapts this live once a BuildContext exists. `stampTheme: false`
+    // for `adaptive` leaves `IxTheme.density` as `adaptive` rather than the
+    // platform default just baked into the Material component themes, so
+    // `IxDensity.effectiveOf` still resolves it live when no
+    // `IxDensityScope` is present; an explicit density stamps verbatim.
+    return IxDensityAdapter.apply(
       themeData,
       density == IxDensity.adaptive ? IxDensity.resolvePlatform() : density,
-    );
-    if (density != IxDensity.adaptive) {
-      return adapted;
-    }
-    // IxDensityAdapter.apply() stamps the density it was given onto
-    // IxTheme.density, which would otherwise leave the resolved platform
-    // default (the static bake above) inside the theme. Restore the
-    // original, still-adaptive extension so IxDensity.effectiveOf can
-    // resolve it live from a BuildContext when no IxDensityScope is
-    // present.
-    return adapted.copyWith(
-      extensions: [
-        ...adapted.extensions.values.where((e) => e is! IxTheme),
-        ixThemeExtension,
-      ],
+      stampTheme: density != IxDensity.adaptive,
     );
   }
 

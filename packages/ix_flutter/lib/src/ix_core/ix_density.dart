@@ -207,7 +207,8 @@ abstract final class IxDensityAdapter {
   /// Returns a copy of [base] with every button/checkbox/radio/switch/slider
   /// theme adapted to [density]'s [IxDensity.tapTargetSize], and, when
   /// [base] carries an `IxTheme` extension (i.e. it was built by
-  /// [IxThemeBuilder]), that extension's `density` field set to [density].
+  /// [IxThemeBuilder]) and [stampTheme] is true (the default), that
+  /// extension's `density` field set to [density].
   ///
   /// [IxDensityScope] calls this on whatever ambient [ThemeData] is
   /// current, which is not guaranteed to be an [IxThemeBuilder] theme (an
@@ -216,7 +217,20 @@ abstract final class IxDensityAdapter {
   /// tap-target adaptation below applies regardless, but the `IxTheme`
   /// re-stamp is skipped rather than throwing when there is no `IxTheme`
   /// to re-stamp.
-  static ThemeData apply(ThemeData base, IxDensity density) {
+  ///
+  /// [IxThemeBuilder.build] passes `stampTheme: false` for its
+  /// [IxDensity.adaptive] baked default: the Material tap-target sizing
+  /// still bakes in the resolved platform default (there is no
+  /// [BuildContext] yet to resolve it live from), but `IxTheme.density`
+  /// itself must stay [IxDensity.adaptive] so [IxDensity.effectiveOf] keeps
+  /// resolving it live -- without this flag, `build` re-spliced the
+  /// extension list afterwards to undo the stamp this method would
+  /// otherwise have made.
+  static ThemeData apply(
+    ThemeData base,
+    IxDensity density, {
+    bool stampTheme = true,
+  }) {
     final tts = density.tapTargetSize;
     ButtonStyle? withTts(ButtonStyle? style) =>
         (style ?? const ButtonStyle()).copyWith(tapTargetSize: tts);
@@ -249,7 +263,8 @@ abstract final class IxDensityAdapter {
       ),
       extensions: [
         ...base.extensions.values.where((e) => e is! IxTheme),
-        if (ixTheme != null) ixTheme.copyWith(density: density),
+        if (ixTheme != null)
+          stampTheme ? ixTheme.copyWith(density: density) : ixTheme,
       ],
     );
   }

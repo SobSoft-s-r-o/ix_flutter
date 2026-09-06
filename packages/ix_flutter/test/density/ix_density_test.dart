@@ -219,6 +219,31 @@ void main() {
     });
   });
 
+  group('IxDensityAdapter.apply(stampTheme:) (B7)', () {
+    test('stampTheme: false adapts tap targets without touching '
+        'IxTheme.density', () {
+      // adaptive, so IxThemeBuilder.build() itself calls apply with
+      // stampTheme: false and IxTheme.density comes out still adaptive --
+      // exactly the state this is meant to leave alone.
+      final theme = const IxThemeBuilder(density: IxDensity.adaptive).build();
+      expect(theme.extension<IxTheme>()!.density, IxDensity.adaptive);
+
+      final adapted = IxDensityAdapter.apply(
+        theme,
+        IxDensity.compact,
+        stampTheme: false,
+      );
+      expect(adapted.materialTapTargetSize, MaterialTapTargetSize.shrinkWrap);
+      expect(adapted.extension<IxTheme>()!.density, IxDensity.adaptive);
+    });
+
+    test('stampTheme defaults to true', () {
+      final theme = const IxThemeBuilder(density: IxDensity.adaptive).build();
+      final adapted = IxDensityAdapter.apply(theme, IxDensity.compact);
+      expect(adapted.extension<IxTheme>()!.density, IxDensity.compact);
+    });
+  });
+
   test('deprecated invented button variants are still present in 1.x', () {
     // ignore: deprecated_member_use_from_same_package
     expect(IxButtonVariant.warningPrimary, isNotNull);
