@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../ix_colors/ix_theme_color_tokens.dart';
 import '../ix_core/ix_common_geometry.dart';
+import '../ix_core/ix_tap_region_group.dart';
 import '../ix_core/ix_typography.dart';
 import '../ix_icons/ix_icon.dart';
 import '../ix_icons/ix_icon_key.dart';
@@ -25,24 +26,20 @@ const Key kIxMenuFlyoutKey = Key('ix-menu-flyout');
 /// outside, returning focus to [returnFocusTo] (the menu tile that opened
 /// it) so keyboard users never lose their place.
 class IxMenuFlyout extends StatefulWidget {
-  /// Creates a fly-out panel following [link].
+  /// Creates a fly-out panel.
+  ///
+  /// The owner positions it; this widget only sizes and decorates itself.
   const IxMenuFlyout({
     super.key,
-    required this.link,
     required this.title,
     required this.onClose,
     required this.child,
     this.width = 320,
     this.maxHeight,
-    this.offset = Offset.zero,
     this.returnFocusTo,
     this.strings = const IxApplicationStrings(),
     this.groupId,
   });
-
-  /// The link to the menu rail this panel is anchored to; the panel is
-  /// placed at the rail's trailing (top-start-of-the-content) corner.
-  final LayerLink link;
 
   /// Heading rendered above [child].
   final String title;
@@ -63,10 +60,6 @@ class IxMenuFlyout extends StatefulWidget {
   /// Upper bound for the panel's height; the content scrolls beyond it.
   final double? maxHeight;
 
-  /// Shifts the panel away from the anchor's top corner -- used to keep it
-  /// below the app bar when the menu itself starts at the top of the screen.
-  final Offset offset;
-
   /// Focus node that regains focus once the panel closes.
   final FocusNode? returnFocusTo;
 
@@ -83,6 +76,10 @@ class IxMenuFlyout extends StatefulWidget {
 
 class _IxMenuFlyoutState extends State<IxMenuFlyout> {
   final _scope = FocusScopeNode(debugLabel: 'IxMenuFlyout');
+
+  /// Stands in for [IxMenuFlyout.groupId] when the owner declared none, so
+  /// the subtree always has one group to attach an overlay to.
+  final Object _fallbackGroupId = Object();
 
   @override
   void initState() {
@@ -111,19 +108,23 @@ class _IxMenuFlyoutState extends State<IxMenuFlyout> {
     final bg =
         ix?.color(IxThemeColorToken.color1) ??
         Theme.of(context).colorScheme.surface;
-    // `CompositedTransformFollower` takes physical `Alignment`s, so the
-    // start/end anchors are resolved against the ambient text direction by
-    // hand: the panel always opens away from the menu rail.
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
 
-    return CompositedTransformFollower(
-      link: widget.link,
-      offset: widget.offset,
-      targetAnchor: isRtl ? Alignment.topLeft : Alignment.topRight,
-      followerAnchor: isRtl ? Alignment.topRight : Alignment.topLeft,
-      child: TapRegion(
-        groupId: widget.groupId,
-        onTapOutside: (_) => _close(),
+    // Positioned by the owner, not by a `CompositedTransformFollower`: a
+    // follower layer makes the paint transform of everything under it
+    // incomputable, and `OverlayPortal.overlayChildLayoutBuilder` needs
+    // exactly that -- so an `IxDropdownButton` placed in a panel used to
+    // throw "The paint transform cannot be reliably computed because of
+    // RenderFollowerLayer(s)" the moment it was opened.
+    return TapRegion(
+      groupId: widget.groupId,
+      onTapOutside: (_) => _close(),
+      // Announced to the subtree so a control that opens an overlay of
+      // its own -- an `IxDropdownButton` in a `settings:` panel -- can
+      // register that overlay in this group too. Without it the overlay
+      // is mounted outside this `TapRegion`, and tapping one of its rows
+      // reads as a tap outside the panel and dismisses it mid-selection.
+      child: IxTapRegionGroupScope(
+        groupId: widget.groupId ?? _fallbackGroupId,
         child: Shortcuts(
           shortcuts: const {
             SingleActivator(LogicalKeyboardKey.escape): DismissIntent(),

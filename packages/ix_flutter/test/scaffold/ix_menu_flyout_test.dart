@@ -605,4 +605,84 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Settings panel'), findsNothing);
   });
+
+  testWidgets('a dropdown inside a panel does not dismiss it', (tester) async {
+    var selected = 0;
+    await pumpIx(
+      tester,
+      IxApplicationScaffold(
+        appTitle: 'App',
+        initiallyExpanded: true,
+        entries: const [
+          IxMenuEntry(id: 'one', type: IxMenuEntryType.item, label: 'One'),
+        ],
+        settings: Builder(
+          builder: (context) => IxDropdownButton<int>(
+            label: 'Language',
+            items: const [
+              IxDropdownMenuItem(value: 1, label: 'English'),
+              IxDropdownMenuItem(value: 2, label: 'Deutsch'),
+            ],
+            onItemSelected: (value) => selected = value,
+          ),
+        ),
+        onNavigate: (_) {},
+        body: const SizedBox(),
+      ),
+    );
+
+    await tester.tap(find.text('Settings'));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('Language'), findsOneWidget);
+
+    await tester.tap(find.text('Language'));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Language'),
+      findsOneWidget,
+      reason: 'opening the dropdown closed the panel',
+    );
+    expect(find.text('Deutsch'), findsOneWidget);
+
+    await tester.tap(find.text('Deutsch'));
+    await tester.pumpAndSettle();
+    expect(selected, 2);
+    expect(
+      find.text('Language'),
+      findsOneWidget,
+      reason: 'picking a dropdown item closed the panel',
+    );
+  });
+
+  for (final width in const [360.0, 320.0]) {
+    testWidgets('the drawer fly-out stays inside a ${width.toInt()}px '
+        'viewport', (tester) async {
+      final size = Size(width, 640);
+      await pumpIx(
+        tester,
+        IxApplicationScaffold(
+          appTitle: 'App',
+          initiallyExpanded: true,
+          entries: const [
+            IxMenuEntry(id: 'one', type: IxMenuEntryType.item, label: 'One'),
+          ],
+          settings: const Text('Settings panel'),
+          onNavigate: (_) {},
+          body: const SizedBox(),
+        ),
+        size: size,
+      );
+
+      await tester.tap(find.byTooltip('Open menu'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Settings'));
+      await tester.pumpAndSettle();
+
+      final panel = tester.getRect(find.byKey(const Key('ix-menu-flyout')));
+      expect(panel.left, greaterThanOrEqualTo(0));
+      expect(panel.right, lessThanOrEqualTo(width));
+      expect(panel.width, greaterThanOrEqualTo(200));
+      expect(tester.takeException(), isNull);
+    });
+  }
 }

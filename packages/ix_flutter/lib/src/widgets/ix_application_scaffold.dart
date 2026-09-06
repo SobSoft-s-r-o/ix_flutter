@@ -50,6 +50,10 @@ const double _kFlyoutWidth = 320;
 /// Gap kept between the fly-out panel and the viewport edges.
 const double _kFlyoutMargin = IxCommonGeometry.space1;
 
+/// Below this much room beside the menu, the fly-out is placed over the menu
+/// instead of next to it (see `_buildFlyout`).
+const double _kFlyoutMinSideRoom = 200;
+
 /// Resolves the focus node and traversal order assigned to the menu tile of
 /// a given entry id.
 typedef _TileFocusOf = ({FocusNode node, double order}) Function(String id);
@@ -247,9 +251,6 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final Map<String, bool> _categoryExpansion = <String, bool>{};
-
-  /// Anchors the fly-out panel to the menu rail.
-  final LayerLink _rootLink = LayerLink();
 
   /// Measures the menu rail, so the fly-out can be clamped to the room left
   /// beside it.
@@ -544,9 +545,8 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       drawer: Drawer(
         child: SafeArea(
           child: _menuTapRegion(
-            CompositedTransformTarget(
+            KeyedSubtree(
               key: _menuKey,
-              link: _rootLink,
               child: _buildNavigationPanel(
                 isExpanded: true,
                 showCollapseAction: false,
@@ -567,9 +567,8 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       body: Row(
         children: [
           _menuTapRegion(
-            CompositedTransformTarget(
+            KeyedSubtree(
               key: _menuKey,
-              link: _rootLink,
               child: AnimatedContainer(
                 duration: _effectiveAnimationDuration,
                 width: _isExpanded
@@ -656,40 +655,75 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     // clamped to what is left of the viewport: a Drawer in particular
     // starts at the very top and leaves less room than the side rail.
     // (Flipping to the other side is B-5's redesign, not this clamp.)
-    final viewport = MediaQuery.sizeOf(context);
-    final anchor = _menuRect;
+    //
+    // Everything below is in the target `Overlay`'s coordinate space, which
+    // the panel is laid out in. Positioned by hand rather than by a
+    // `CompositedTransformFollower`: a follower layer makes the paint
+    // transform of everything under it incomputable, and
+    // `OverlayPortal.overlayChildLayoutBuilder` needs exactly that -- so an
+    // `IxDropdownButton` inside a `settings:` panel threw the moment it was
+    // opened.
+    final overlayBox =
+        Overlay.maybeOf(context)?.context.findRenderObject() as RenderBox?;
+    final viewport = overlayBox != null && overlayBox.hasSize
+        ? overlayBox.size
+        : MediaQuery.sizeOf(context);
+    final anchor = _menuRectIn(overlayBox);
     final appBarBottom =
         (widget.appBar?.preferredSize.height ?? kToolbarHeight) +
         MediaQuery.paddingOf(context).top;
     final anchorTop = anchor?.top ?? appBarBottom;
     final top = math.max(anchorTop, appBarBottom);
-    // `IxMenuFlyout` opens away from the menu rail, which in RTL means
-    // leftwards from the anchor's leading (left) edge, so the room left for
-    // the panel is measured from the opposite side there.
+    // The panel opens away from the menu rail, which in RTL means leftwards
+    // from the anchor's leading (left) edge, so the room left for the panel
+    // is measured from the opposite side there.
     final isRtl = Directionality.of(context) == TextDirection.rtl;
     final available = anchor == null
         ? _kFlyoutWidth
         : (isRtl ? anchor.left : viewport.width - anchor.right) -
               _kFlyoutMargin;
 
-    // The overlay lays its children out at the full overlay size; aligning
-    // first hands the panel loose constraints so it can size to its content
-    // before the follower layer moves it next to the menu.
-    return Align(
-      alignment: Alignment.topLeft,
-      child: IxMenuFlyout(
-        link: _rootLink,
-        title: title,
-        strings: _strings,
-        groupId: _tapRegionGroupId,
-        width: available <= 0
-            ? _kFlyoutWidth
-            : math.min(_kFlyoutWidth, available),
-        maxHeight: math.max(0.0, viewport.height - top - _kFlyoutMargin),
-        offset: Offset(0, top - anchorTop),
-        returnFocusTo: _tileNodes[anchorId],
-        onClose: _closeFlyout,
-        child: content,
+    // On a phone the drawer leaves next to nothing beside it (304px of a
+    // 360px viewport), and a 48px-wide panel is unreadable -- its own header
+    // row overflows. Below `_kFlyoutMinSideRoom` the panel is placed over
+    // the menu instead of beside it, flush to the far edge of the viewport.
+    final double width;
+    final double left;
+    if (anchor != null && available < _kFlyoutMinSideRoom) {
+      width = math.min(
+        _kFlyoutWidth,
+        math.max(0.0, viewport.width - 2 * _kFlyoutMargin),
+      );
+      left = isRtl
+          ? math.max(_kFlyoutMargin, 0.0)
+          : math.max(_kFlyoutMargin, viewport.width - _kFlyoutMargin - width);
+    } else {
+      width = available <= 0
+          ? _kFlyoutWidth
+          : math.min(_kFlyoutWidth, available);
+      final anchorEdge = anchor == null
+          ? (isRtl ? viewport.width : 0.0)
+          : (isRtl ? anchor.left : anchor.right);
+      left = isRtl ? math.max(0.0, anchorEdge - width) : anchorEdge;
+    }
+
+    // The overlay lays its children out at its own full size, so the panel
+    // is pushed to its place with padding and pinned to the top-left corner
+    // of what is left.
+    return Padding(
+      padding: EdgeInsets.only(left: math.max(0.0, left), top: top),
+      child: Align(
+        alignment: Alignment.topLeft,
+        child: IxMenuFlyout(
+          title: title,
+          strings: _strings,
+          groupId: _tapRegionGroupId,
+          width: width,
+          maxHeight: math.max(0.0, viewport.height - top - _kFlyoutMargin),
+          returnFocusTo: _tileNodes[anchorId],
+          onClose: _closeFlyout,
+          child: content,
+        ),
       ),
     );
   }
@@ -731,14 +765,18 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     );
   }
 
-  /// The menu rail's rect in global coordinates, as of the frame already on
-  /// screen; `null` before the menu has been laid out once.
-  Rect? get _menuRect {
+  /// The menu rail's rect in [ancestor]'s coordinate space (global when it is
+  /// `null`), as of the frame already on screen; `null` before the menu has
+  /// been laid out once.
+  Rect? _menuRectIn(RenderBox? ancestor) {
     final box = _menuKey.currentContext?.findRenderObject() as RenderBox?;
     if (box == null || !box.hasSize) {
       return null;
     }
-    return box.localToGlobal(Offset.zero) & box.size;
+    if (ancestor != null && !ancestor.attached) {
+      return null;
+    }
+    return box.localToGlobal(Offset.zero, ancestor: ancestor) & box.size;
   }
 
   /// Depth-first lookup of the entry carrying [id].

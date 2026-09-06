@@ -86,6 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - a nested menu category no longer traps the arrow keys. A category inside a category renders its own children only in the fly-out, never inline, but the traversal order was built as if they were there, so it contained focus nodes with no widget behind them
 - tapping a menu entry in the drawer layout closes the drawer through the scaffold's own `ScaffoldState` instead of `Navigator.maybePop()`, which threw `Navigator operation requested with a context that does not include a Navigator` for a scaffold placed above the `Navigator` (`MaterialApp.builder`)
 - a settings/about fly-out is closed when its anchor goes away (`settings:` set back to null, the category removed) and when a menu entry navigates, instead of leaving the portal showing an empty panel that re-opened by itself later
+- a control that opens an overlay of its own inside an `IxApplicationScaffold` fly-out panel -- an `IxDropdownButton` in `settings:` -- works there. It threw `The paint transform cannot be reliably computed because of RenderFollowerLayer(s)` when opened, because the panel positioned itself with a `CompositedTransformFollower`; the panel is positioned directly now. Its overlay also registers in the panel's tap-region group, so choosing an item no longer dismisses the panel mid-selection
+- the scaffold fly-out stays inside the viewport on a phone. Anchored beside a 304px drawer it was clamped to the 48px left over at 360px (8px at 320px), where its own header row overflowed; with less than 200px beside the menu the panel is placed over it, flush to the far edge
 
 ---
 

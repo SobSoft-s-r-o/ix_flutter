@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:ix_flutter/ix_flutter.dart';
+import 'package:ix_flutter/src/ix_core/ix_tap_region_group.dart';
 
 part 'ix_dropdown_menu.dart';
 
@@ -611,31 +612,54 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
         placement: widget.placement,
         maxHeight: maxHeight,
       ),
-      child: TapRegion(
-        groupId: _tapRegionGroupId,
-        child: FocusScope(
-          node: _menuFocusScope,
-          onKeyEvent: _onMenuKey,
-          child: _IxDropdownMenu(
-            theme: dropdownTheme,
-            label: widget.semanticLabel ?? widget.label,
-            children: [
-              for (var i = 0; i < widget.items.length; i++)
-                _IxDropdownMenuItemTile<T>(
-                  item: widget.items[i],
-                  theme: dropdownTheme,
-                  focusNode: widget.items[i].disabled ? null : _focusNodeFor(i),
-                  reserveCheckColumn: reserveCheckColumn,
-                  onFocused: () => _focusedIndex = i,
-                  onTap: widget.items[i].disabled
-                      ? null
-                      : () => _selectItem(widget.items[i]),
-                ),
-            ],
+      child: _inEnclosingTapRegion(
+        context,
+        TapRegion(
+          groupId: _tapRegionGroupId,
+          child: FocusScope(
+            node: _menuFocusScope,
+            onKeyEvent: _onMenuKey,
+            child: _IxDropdownMenu(
+              theme: dropdownTheme,
+              label: widget.semanticLabel ?? widget.label,
+              children: [
+                for (var i = 0; i < widget.items.length; i++)
+                  _IxDropdownMenuItemTile<T>(
+                    item: widget.items[i],
+                    theme: dropdownTheme,
+                    focusNode: widget.items[i].disabled
+                        ? null
+                        : _focusNodeFor(i),
+                    reserveCheckColumn: reserveCheckColumn,
+                    onFocused: () => _focusedIndex = i,
+                    onTap: widget.items[i].disabled
+                        ? null
+                        : () => _selectItem(widget.items[i]),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  /// Wraps [child] in the enclosing panel's [TapRegion] group, if there is
+  /// one.
+  ///
+  /// A dismissible panel (the application scaffold's menu fly-out) closes on
+  /// a tap outside its own group. This menu is mounted in the `Overlay`, not
+  /// under the panel, so without this a tap on one of its rows counted as a
+  /// tap outside the panel and shut it mid-selection. Nesting the regions --
+  /// the panel's group outside, this menu's own group inside -- makes a tap
+  /// on a row inside both, while a tap elsewhere in the panel is still
+  /// outside this menu and closes it.
+  Widget _inEnclosingTapRegion(BuildContext context, Widget child) {
+    final enclosing = IxTapRegionGroupScope.maybeOf(context);
+    if (enclosing == null || identical(enclosing, _tapRegionGroupId)) {
+      return child;
+    }
+    return TapRegion(groupId: enclosing, child: child);
   }
 
   @override
@@ -654,16 +678,19 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     // opening it reports the notice in [_warnMissingOverlay] instead.
     _hasOverlay = Overlay.maybeOf(context) != null;
     final trigger = _buildTrigger(buttonStyle);
-    return TapRegion(
-      groupId: _tapRegionGroupId,
-      onTapOutside: _onTapOutside,
-      child: _hasOverlay
-          ? OverlayPortal.overlayChildLayoutBuilder(
-              controller: _portal,
-              overlayChildBuilder: _buildMenu,
-              child: trigger,
-            )
-          : trigger,
+    return _inEnclosingTapRegion(
+      context,
+      TapRegion(
+        groupId: _tapRegionGroupId,
+        onTapOutside: _onTapOutside,
+        child: _hasOverlay
+            ? OverlayPortal.overlayChildLayoutBuilder(
+                controller: _portal,
+                overlayChildBuilder: _buildMenu,
+                child: trigger,
+              )
+            : trigger,
+      ),
     );
   }
 
