@@ -344,9 +344,6 @@ class IxThemeBuilder {
     final scrollbarTheme = IxScrollbarTheme.fromPalette(palette: palette);
     final ixThemeExtension = IxTheme(
       themeName: resolvedTheme,
-      colorSchema: resolvedBrightness == Brightness.dark
-          ? IxColorSchema.dark
-          : IxColorSchema.light,
       // ignore: deprecated_member_use_from_same_package
       family: stampedFamily,
       // ignore: deprecated_member_use_from_same_package
@@ -623,23 +620,18 @@ TextTheme _buildTextTheme(
 class IxTheme extends ThemeExtension<IxTheme> {
   /// Creates the Siemens iX theme extension.
   ///
-  /// [colorSchema] defaults to the schema matching [brightness]; the
-  /// deprecated [family]/[mode] pair stays required so that 1.x call sites
-  /// keep compiling.
+  /// [colorSchema] is derived from [brightness] rather than taken as a
+  /// parameter -- the two can never disagree; the deprecated [family]/[mode]
+  /// pair stays required so that 1.x call sites keep compiling.
   const IxTheme({
     this.themeName = IxThemeName.classic,
-    IxColorSchema? colorSchema,
     required this.family,
     required this.mode,
     required this.brightness,
     required this.palette,
     required this.typography,
     this.density = IxDensity.adaptive,
-  }) : colorSchema =
-           colorSchema ??
-           (brightness == Brightness.dark
-               ? IxColorSchema.dark
-               : IxColorSchema.light);
+  });
 
   /// Resolves the [IxTheme] registered on the closest [Theme], or `null` if
   /// the [ThemeData] wasn't built by [IxThemeBuilder].
@@ -673,12 +665,14 @@ class IxTheme extends ThemeExtension<IxTheme> {
   /// `data-ix-theme`).
   final IxThemeName themeName;
 
-  /// The color schema this [ThemeData] was built for.
+  /// The color schema this [ThemeData] was built for, derived from
+  /// [brightness] -- the two can never disagree.
   ///
   /// Always [IxColorSchema.light] or [IxColorSchema.dark] -- a built theme
   /// has a resolved appearance. [IxColorSchema.system] only exists as the
   /// *configured* schema on `IxThemeController`.
-  final IxColorSchema colorSchema;
+  IxColorSchema get colorSchema =>
+      brightness == Brightness.dark ? IxColorSchema.dark : IxColorSchema.light;
 
   /// The visual family this theme was built for.
   @Deprecated('Use themeName. Removed in 2.0.')
@@ -723,7 +717,6 @@ class IxTheme extends ThemeExtension<IxTheme> {
   @override
   IxTheme copyWith({
     IxThemeName? themeName,
-    IxColorSchema? colorSchema,
     @Deprecated('Use themeName. Removed in 2.0.') IxThemeFamily? family,
     @Deprecated('Use colorSchema / brightness. Removed in 2.0.')
     ThemeMode? mode,
@@ -734,10 +727,6 @@ class IxTheme extends ThemeExtension<IxTheme> {
   }) {
     return IxTheme(
       themeName: themeName ?? this.themeName,
-      // A new brightness without an explicit schema re-derives the schema in
-      // the constructor (passing null); otherwise the current one is kept.
-      colorSchema:
-          colorSchema ?? (brightness == null ? this.colorSchema : null),
       // ignore: deprecated_member_use_from_same_package
       family: family ?? this.family,
       // ignore: deprecated_member_use_from_same_package
@@ -764,7 +753,6 @@ class IxTheme extends ThemeExtension<IxTheme> {
 
     return IxTheme(
       themeName: t < 0.5 ? themeName : other.themeName,
-      colorSchema: t < 0.5 ? colorSchema : other.colorSchema,
       // ignore: deprecated_member_use_from_same_package
       family: t < 0.5 ? family : other.family,
       // ignore: deprecated_member_use_from_same_package

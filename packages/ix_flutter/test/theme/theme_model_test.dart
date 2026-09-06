@@ -110,7 +110,9 @@ void main() {
     );
   });
 
-  test('IxTheme.copyWith and lerp carry themeName and colorSchema', () {
+  test('IxTheme.copyWith carries themeName; colorSchema always follows '
+      'brightness (B6: colorSchema is a derived getter, not stored state, so '
+      'the two can never disagree)', () {
     final light = const IxThemeBuilder.light().build().extension<IxTheme>()!;
     final dark = const IxThemeBuilder.dark().build().extension<IxTheme>()!;
 
@@ -119,22 +121,13 @@ void main() {
     expect(renamed.colorSchema, IxColorSchema.light);
     expect(renamed.brightness, Brightness.light);
 
-    // A new brightness re-derives the schema, unless one is passed too.
+    // A new brightness always re-derives the schema.
     expect(
       light.copyWith(brightness: Brightness.dark).colorSchema,
       IxColorSchema.dark,
     );
     expect(
       dark.copyWith(brightness: Brightness.light).colorSchema,
-      IxColorSchema.light,
-    );
-    expect(
-      light
-          .copyWith(
-            brightness: Brightness.dark,
-            colorSchema: IxColorSchema.light,
-          )
-          .colorSchema,
       IxColorSchema.light,
     );
 
