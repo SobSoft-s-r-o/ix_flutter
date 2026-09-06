@@ -90,9 +90,12 @@ class IxIconResolver extends ThemeExtension<IxIconResolver> {
   /// Resolves the [IxIconResolver] registered on the closest [Theme], or
   /// [IxIconResolver.material] if the [ThemeData] carries no such extension
   /// (e.g. a plain `MaterialApp` not built via `IxThemeBuilder`).
+  ///
+  /// The fallback is the cached [_material] instance, not a fresh
+  /// [IxIconResolver.material] built (and its 26-entry map re-allocated) on
+  /// every call.
   static IxIconResolver of(BuildContext context) =>
-      Theme.of(context).extension<IxIconResolver>() ??
-      IxIconResolver.material();
+      Theme.of(context).extension<IxIconResolver>() ?? _material;
 
   /// Returns a copy with [icons] merged over the current [icons] map, so
   /// individual keys can be overridden without losing the rest.

@@ -198,14 +198,30 @@ class IxIcon extends StatelessWidget {
 /// [ChangeNotifier] is exactly what leak-tracking test suites flag.
 abstract final class _IxSvgFailures {
   static final Set<Object> _keys = <Object>{};
-  static final Set<VoidCallback> _listeners = <VoidCallback>{};
+
+  /// Listeners keyed by the failure key they care about, so [record] wakes
+  /// only the [_IxSvgIcon]s watching the one key that just failed instead of
+  /// every SVG-backed icon on screen.
+  static final Map<Object, Set<VoidCallback>> _listeners =
+      <Object, Set<VoidCallback>>{};
 
   static bool contains(Object key) => _keys.contains(key);
 
-  static void addListener(VoidCallback listener) => _listeners.add(listener);
+  /// Registers [listener] for [key]'s failure state -- [record]ed or
+  /// cleared by [reset] -- not for any other key's.
+  static void addListener(Object key, VoidCallback listener) =>
+      _listeners.putIfAbsent(key, () => <VoidCallback>{}).add(listener);
 
-  static void removeListener(VoidCallback listener) =>
-      _listeners.remove(listener);
+  static void removeListener(Object key, VoidCallback listener) {
+    final forKey = _listeners[key];
+    if (forKey == null) {
+      return;
+    }
+    forKey.remove(listener);
+    if (forKey.isEmpty) {
+      _listeners.remove(key);
+    }
+  }
 
   /// Records [key] as failed.
   ///
@@ -217,7 +233,7 @@ abstract final class _IxSvgFailures {
     if (!_keys.add(key)) {
       return false;
     }
-    _notify();
+    _notify(_listeners[key]);
     return true;
   }
 
@@ -227,11 +243,22 @@ abstract final class _IxSvgFailures {
       return;
     }
     _keys.clear();
-    _notify();
+    // Any key could be affected, so every listener -- across every key --
+    // is woken; a Set (rather than concatenating each key's list) covers a
+    // listener registered under more than one key without notifying it
+    // twice, even though no current caller does that.
+    final all = <VoidCallback>{};
+    for (final forKey in _listeners.values) {
+      all.addAll(forKey);
+    }
+    _notify(all);
   }
 
-  static void _notify() {
-    for (final listener in _listeners.toList(growable: false)) {
+  static void _notify(Iterable<VoidCallback>? listeners) {
+    if (listeners == null) {
+      return;
+    }
+    for (final listener in listeners.toList(growable: false)) {
       listener();
     }
   }
@@ -462,15 +489,46 @@ class _IxSvgIcon extends StatefulWidget {
 }
 
 class _IxSvgIconState extends State<_IxSvgIcon> {
+  /// The key this state is currently registered under with
+  /// [_IxSvgFailures.addListener], or `null` before the first registration.
+  Object? _failureKey;
+
   @override
-  void initState() {
-    super.initState();
-    _IxSvgFailures.addListener(_onFailureRecorded);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _rebindFailureListener();
+  }
+
+  @override
+  void didUpdateWidget(_IxSvgIcon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _rebindFailureListener();
+  }
+
+  /// Re-registers [_onFailureRecorded] under the loader's current
+  /// [_IxGuardedSvgLoader.failureKey], which can change across
+  /// [didChangeDependencies] (a new [BuildContext]-resolved `AssetBundle`)
+  /// or [didUpdateWidget] (a new [_IxSvgIcon.loader]) -- a no-op when the key
+  /// is unchanged.
+  void _rebindFailureListener() {
+    final key = widget.loader.failureKey(context);
+    if (key == _failureKey) {
+      return;
+    }
+    final oldKey = _failureKey;
+    _failureKey = key;
+    if (oldKey != null) {
+      _IxSvgFailures.removeListener(oldKey, _onFailureRecorded);
+    }
+    _IxSvgFailures.addListener(key, _onFailureRecorded);
   }
 
   @override
   void dispose() {
-    _IxSvgFailures.removeListener(_onFailureRecorded);
+    final key = _failureKey;
+    if (key != null) {
+      _IxSvgFailures.removeListener(key, _onFailureRecorded);
+    }
     super.dispose();
   }
 

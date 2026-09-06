@@ -140,6 +140,27 @@ void main() {
     },
   );
 
+  testWidgets(
+    'IxIconResolver.of reuses one cached fallback instead of building a new '
+    'material resolver (with its 26-entry map) on every call',
+    (tester) async {
+      late IxIconResolver first;
+      late IxIconResolver second;
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              first = IxIconResolver.of(context);
+              second = IxIconResolver.of(context);
+              return const SizedBox();
+            },
+          ),
+        ),
+      );
+      expect(identical(first, second), isTrue);
+    },
+  );
+
   // `IxIconKey`'s own doc-comment promises that library widgets always
   // request icons through `IxIcon.key`, and `doc/ix_icons.md` repeats it:
   // an `IxThemeBuilder(icons:)` override has to reach every built-in

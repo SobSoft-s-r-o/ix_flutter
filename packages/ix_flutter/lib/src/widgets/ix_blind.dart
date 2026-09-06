@@ -363,6 +363,10 @@ class _IxBlindHeader extends StatelessWidget {
     this.onFocusChanged,
   });
 
+  /// The type scale used when no [IxThemeBuilder] theme is present, built
+  /// once rather than on every [build] of every theme-less header.
+  static final IxTypography _defaults = IxTypography();
+
   final String title;
   final String? subtitle;
   final Widget? icon;
@@ -383,7 +387,7 @@ class _IxBlindHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ixTypography = IxTheme.maybeOf(context)?.typography ?? IxTypography();
+    final ixTypography = IxTheme.maybeOf(context)?.typography ?? _defaults;
 
     // Determine foreground color
     final foregroundColor = style.foreground;

@@ -50,6 +50,10 @@ class IxToast extends StatefulWidget {
 }
 
 class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
+  /// The type scale used when no [IxThemeBuilder] theme is present, built
+  /// once rather than on every [build] of every theme-less toast.
+  static final IxTypography _defaults = IxTypography();
+
   late AnimationController _progressController;
 
   // The countdown is paused while the toast is hovered OR pressed, and only
@@ -215,8 +219,8 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
         theme?.color(IxThemeColorToken.softText) ?? cs.onSurface;
     final progressColor =
         theme?.color(IxThemeColorToken.softText) ?? cs.onSurface;
-    final titleStyle = theme?.typography.h5 ?? IxTypography().h5;
-    final bodyStyle = theme?.typography.body ?? IxTypography().body;
+    final titleStyle = theme?.typography.h5 ?? _defaults.h5;
+    final bodyStyle = theme?.typography.body ?? _defaults.body;
 
     final effectiveAction =
         widget.data.action ??
