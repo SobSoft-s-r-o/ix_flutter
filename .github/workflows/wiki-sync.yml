@@ -2,7 +2,14 @@ name: Wiki sync
 on:
   push:
     branches: [main]
-    paths: ['doc/**', '*.md', 'packages/ix_flutter/*.md', 'tool/wiki_sync*']
+    # Every sync source in tool/wiki_sync_map.txt must be covered here, or a
+    # change to it never reaches the wiki. `doc/**` covers doc/wiki/ too.
+    paths:
+      - 'doc/**'
+      - '*.md'
+      - 'packages/ix_flutter/*.md'
+      - 'packages/ix_icons_generator/*.md'
+      - 'tool/wiki_sync*'
   workflow_dispatch:
     inputs:
       dry_run: { description: 'Print actions only', type: boolean, default: true }

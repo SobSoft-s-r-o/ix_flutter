@@ -17,6 +17,10 @@ dry=0; [ "${1:-}" = "--dry-run" ] && { dry=1; shift; }
 wiki="${1:?wiki checkout dir required}"
 
 repo_base="https://github.com/SobSoft-s-r-o/ix_flutter"
+# Images need the raw host: `blob/main/<path>.png` serves the file viewer's
+# HTML page (Content-Type: text/html), not the image, so an `![...]()` target
+# rewritten to a blob URL renders as a broken image on the wiki.
+raw_base="https://raw.githubusercontent.com/SobSoft-s-r-o/ix_flutter/main"
 
 # Prints the wiki page name (no .md) mapped from repo-root-relative path $1;
 # fails if $1 is not a sync source.
@@ -74,8 +78,29 @@ glob_escape() {
 # and prints the resulting content.
 rewrite_links() {
   local file="$1" srcdir target path anchor resolved dst new content old_pat
+  local img alt
   srcdir="$(dirname "$file")"
   content="$(cat "$file"; printf x)"; content="${content%x}"
+  # Images first, so the link pass below sees an absolute URL and skips them.
+  # A local image target becomes a raw.githubusercontent URL rather than the
+  # blob/ URL a plain link gets (see raw_base above). The whole `![alt](t)`
+  # construct is replaced, not just `(t)`, so the same path used as both an
+  # image and a link still gets the right host in each place.
+  while IFS= read -r img; do
+    [ -z "$img" ] && continue
+    target="${img##*](}"; target="${target%)}"
+    case "$target" in
+      http://*|https://*|mailto:*|'#'*) continue ;;
+    esac
+    path="${target%%#*}"
+    [ -z "$path" ] && continue
+    resolved="$(resolve_path "$srcdir" "$path")"
+    new="${raw_base}/${resolved}"
+    [ "$target" = "$new" ] && continue
+    alt="${img%%](*}"
+    old_pat="$(glob_escape "${alt}](${target})")"
+    content="${content//$old_pat/${alt}](${new})}"
+  done < <(grep -oE '!\[[^]]*\]\([^)]+\)' "$file" | sort -u)
   while IFS= read -r target; do
     [ -z "$target" ] && continue
     case "$target" in

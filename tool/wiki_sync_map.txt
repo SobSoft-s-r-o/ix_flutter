@@ -7,6 +7,10 @@ SECURITY.md -> Security.md
 packages/ix_flutter/ICON_LICENSING.md -> Icon-Licensing.md
 ICON_MIGRATION.md -> Icon-Migration.md
 packages/ix_flutter/CHANGELOG.md -> Changelog.md
+packages/ix_icons_generator/CHANGELOG.md -> Icons-Generator-Changelog.md
+doc/wiki/_Sidebar.md -> _Sidebar.md
+doc/wiki/_Footer.md -> _Footer.md
+doc/wiki/Installation.md -> Installation.md
 doc/tokens.md -> tokens.md
 doc/density.md -> density.md
 doc/typography.md -> typography.md
