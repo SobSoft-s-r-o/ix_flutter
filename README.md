@@ -22,9 +22,13 @@ This repository contains two packages:
 
 ## Screenshots
 
-![IX Flutter Demo - Dark Theme](screenshots/main_page_example_dark.jpeg)
+![Theme configuration and token overview, classic dark](packages/ix_flutter/screenshots/overview_dark.png)
 
-*IX Flutter demo application showcasing components in dark theme*
+*Theme configuration and token overview (classic dark, bundled Work Sans typography)*
+
+![Buttons: variants and states, classic light](packages/ix_flutter/screenshots/components_light.png)
+
+*Buttons, variants and states (classic light)*
 
 ## Overview
 

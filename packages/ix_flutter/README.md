@@ -13,9 +13,13 @@ A Flutter component library that implements the Siemens iX Design System.
 
 ## Screenshots
 
-![IX Flutter Demo - Dark Theme](screenshots/main_page_example_dark.jpg)
+![Theme configuration and token overview, classic dark](screenshots/overview_dark.png)
 
-*IX Flutter demo application showcasing components in dark theme*
+*Theme configuration and token overview (classic dark, bundled Work Sans typography)*
+
+![Buttons: variants and states, classic light](screenshots/components_light.png)
+
+*Buttons, variants and states (classic light)*
 
 ## Overview
 
