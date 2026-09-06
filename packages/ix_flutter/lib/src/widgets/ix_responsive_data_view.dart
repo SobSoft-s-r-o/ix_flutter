@@ -186,6 +186,21 @@ class IxResponsiveDataView<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // The tracker wraps the *whole* result of [_buildContent] -- including
+    // the branch below that swaps between the empty-state subtree and the
+    // table/card content -- so a `searchQuery` change is detected exactly
+    // once, here, no matter which side of that branch is mounted before and
+    // after the change. See `_SearchQueryTracker`.
+    return _SearchQueryTracker(
+      searchQuery: searchQuery,
+      searchAffectsPagination: searchAffectsPagination,
+      onSearchChangedRequestResetPagination:
+          onSearchChangedRequestResetPagination,
+      child: _buildContent(context),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
     final effectiveStrings =
         strings ??
         stringsResolver?.call(context) ??
@@ -259,9 +274,6 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             onClearSearch: onClearSearch,
             showSearchStatusBar: showSearchStatusBar,
             showSearchClearAction: showSearchClearAction,
-            searchAffectsPagination: searchAffectsPagination,
-            onSearchChangedRequestResetPagination:
-                onSearchChangedRequestResetPagination,
             resultsCountOverride: resultsCountOverride,
             resultsLabelBuilder: resultsLabelBuilder,
             itemBuilder: mobileItemBuilder,
@@ -287,9 +299,6 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             onClearSearch: onClearSearch,
             showSearchStatusBar: showSearchStatusBar,
             showSearchClearAction: showSearchClearAction,
-            searchAffectsPagination: searchAffectsPagination,
-            onSearchChangedRequestResetPagination:
-                onSearchChangedRequestResetPagination,
             resultsCountOverride: resultsCountOverride,
             resultsLabelBuilder: resultsLabelBuilder,
             strings: effectiveStrings,
@@ -317,6 +326,76 @@ class IxResponsiveDataView<T> extends StatelessWidget {
   }
 }
 
+/// Detects a [searchQuery] change and requests a pagination reset via
+/// [onSearchChangedRequestResetPagination], independent of what [child]
+/// renders.
+///
+/// [IxResponsiveDataView._buildContent] swaps between an empty-state
+/// subtree and its table/card content depending on whether [searchQuery]
+/// currently matches any items. A query change that crosses that boundary
+/// therefore unmounts whichever subtree was there and mounts the other one
+/// fresh -- a tracker that lived *inside* that swapped subtree (as this one
+/// used to, duplicated across `_DesktopViewState`/`_MobileViewState`) never
+/// saw the change: its `initState` starts over on the new subtree, and
+/// `didUpdateWidget` never runs on the one that got swapped out. Wrapping
+/// the whole branch in this tracker instead -- the one constant across
+/// every rebuild -- means `didUpdateWidget` reliably fires for every query
+/// change, whichever way it crosses the boundary.
+class _SearchQueryTracker extends StatefulWidget {
+  const _SearchQueryTracker({
+    required this.searchQuery,
+    required this.searchAffectsPagination,
+    required this.onSearchChangedRequestResetPagination,
+    required this.child,
+  });
+
+  final String? searchQuery;
+  final bool searchAffectsPagination;
+  final VoidCallback? onSearchChangedRequestResetPagination;
+  final Widget child;
+
+  @override
+  State<_SearchQueryTracker> createState() => _SearchQueryTrackerState();
+}
+
+class _SearchQueryTrackerState extends State<_SearchQueryTracker> {
+  // Deliberately not `late ... = widget.searchQuery`: a `late` initializer
+  // runs lazily, on first *read* -- which would be inside the first
+  // `didUpdateWidget` below, by which point the framework has already
+  // pointed `widget` at the *new* widget (`StatefulElement.update` assigns
+  // `state._widget` before calling `didUpdateWidget`). That would capture
+  // the new query as "previous" on the very first change and compare it
+  // against itself. Capturing it eagerly in `initState`, while `widget`
+  // still means the mount-time widget, avoids that.
+  String? _previousSearchQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    _previousSearchQuery = widget.searchQuery;
+  }
+
+  @override
+  void didUpdateWidget(_SearchQueryTracker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchAffectsPagination &&
+        widget.searchQuery != _previousSearchQuery) {
+      _previousSearchQuery = widget.searchQuery;
+      // Deferred like every other callback this widget schedules off a
+      // lifecycle method: consumers typically call `setState` from this
+      // callback (see `doc/ix_responsive_data_view.md`), and calling it
+      // synchronously from `didUpdateWidget` -- itself invoked mid-build --
+      // risks "setState() or markNeedsBuild() called during build".
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onSearchChangedRequestResetPagination?.call();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
 class _DesktopView<T> extends StatefulWidget {
   const _DesktopView({
     required this.items,
@@ -336,8 +415,6 @@ class _DesktopView<T> extends StatefulWidget {
     this.onClearSearch,
     required this.showSearchStatusBar,
     required this.showSearchClearAction,
-    required this.searchAffectsPagination,
-    this.onSearchChangedRequestResetPagination,
     this.resultsCountOverride,
     this.resultsLabelBuilder,
     required this.strings,
@@ -363,8 +440,6 @@ class _DesktopView<T> extends StatefulWidget {
   final VoidCallback? onClearSearch;
   final bool showSearchStatusBar;
   final bool showSearchClearAction;
-  final bool searchAffectsPagination;
-  final VoidCallback? onSearchChangedRequestResetPagination;
   final int? resultsCountOverride;
   final String Function(int count)? resultsLabelBuilder;
   final IxResponsiveDataViewStrings strings;
@@ -379,7 +454,6 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   bool _sortAscending = true;
   final ScrollController _scrollController = ScrollController();
   bool _loadTriggeredForCurrentExtent = false;
-  String? _previousSearchQuery;
 
   @override
   void initState() {
@@ -387,7 +461,6 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
     _sortKey = widget.initialSortKey;
     _sortAscending = widget.initialSortAscending;
     _scrollController.addListener(_onScroll);
-    _previousSearchQuery = widget.searchQuery;
   }
 
   @override
@@ -408,14 +481,6 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
     // If the parent reloads data (e.g. due to sort change), we want to keep our sort state.
     // However, if the parent *resets* the view completely (e.g. new instance), state is lost.
     // Since we are in State object, state persists across rebuilds.
-
-    if (widget.searchAffectsPagination &&
-        widget.searchQuery != _previousSearchQuery) {
-      _previousSearchQuery = widget.searchQuery;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onSearchChangedRequestResetPagination?.call();
-      });
-    }
   }
 
   @override
@@ -864,8 +929,6 @@ class _MobileView<T> extends StatefulWidget {
     this.onClearSearch,
     required this.showSearchStatusBar,
     required this.showSearchClearAction,
-    required this.searchAffectsPagination,
-    this.onSearchChangedRequestResetPagination,
     this.resultsCountOverride,
     this.resultsLabelBuilder,
     this.itemBuilder,
@@ -886,8 +949,6 @@ class _MobileView<T> extends StatefulWidget {
   final VoidCallback? onClearSearch;
   final bool showSearchStatusBar;
   final bool showSearchClearAction;
-  final bool searchAffectsPagination;
-  final VoidCallback? onSearchChangedRequestResetPagination;
   final int? resultsCountOverride;
   final String Function(int count)? resultsLabelBuilder;
   final Widget Function(BuildContext context, T item)? itemBuilder;
@@ -901,13 +962,11 @@ class _MobileView<T> extends StatefulWidget {
 class _MobileViewState<T> extends State<_MobileView<T>> {
   final ScrollController _scrollController = ScrollController();
   bool _loadTriggeredForCurrentExtent = false;
-  String? _previousSearchQuery;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _previousSearchQuery = widget.searchQuery;
   }
 
   @override
@@ -916,14 +975,6 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
     if (widget.items.length != oldWidget.items.length ||
         !widget.isPageLoading) {
       _loadTriggeredForCurrentExtent = false;
-    }
-
-    if (widget.searchAffectsPagination &&
-        widget.searchQuery != _previousSearchQuery) {
-      _previousSearchQuery = widget.searchQuery;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onSearchChangedRequestResetPagination?.call();
-      });
     }
   }
 

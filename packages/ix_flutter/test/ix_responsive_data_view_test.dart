@@ -58,6 +58,7 @@ void main() {
     void Function(int)? onPageChanged,
     String? searchQuery,
     VoidCallback? onClearSearch,
+    VoidCallback? onSearchChangedRequestResetPagination,
     bool enableSorting = false,
     void Function(IxSortSpec)? onSortChanged,
   }) {
@@ -80,6 +81,8 @@ void main() {
           onPageChanged: onPageChanged,
           searchQuery: searchQuery,
           onClearSearch: onClearSearch,
+          onSearchChangedRequestResetPagination:
+              onSearchChangedRequestResetPagination,
           enableSorting: enableSorting,
           onSortChanged: onSortChanged,
         ),
@@ -237,6 +240,61 @@ void main() {
 
       expect(find.text('No data available'), findsOneWidget);
     });
+
+    testWidgets(
+      'onSearchChangedRequestResetPagination fires on every search query '
+      'change, including across the empty/non-empty items boundary',
+      (WidgetTester tester) async {
+        // Set screen size to desktop
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+
+        int resetCount = 0;
+
+        // The widget itself never filters `items` -- the caller does, the
+        // same way the example app's `_handleSearch` does -- so a query
+        // change that crosses the empty/non-empty boundary is simulated by
+        // pumping a new `items` list alongside the new `searchQuery`.
+        Future<void> pumpWith({
+          required List<TestItem> items,
+          required String searchQuery,
+        }) => tester.pumpWidget(
+          buildTestWidget(
+            items: items,
+            searchQuery: searchQuery,
+            onClearSearch: () {},
+            onSearchChangedRequestResetPagination: () => resetCount++,
+          ),
+        );
+
+        // Initial mount with a matching query (non-empty results): mounting
+        // is not a "change", so no reset yet.
+        await pumpWith(items: testItems, searchQuery: 'Item');
+        await tester.pump();
+        expect(find.text('Item 0'), findsOneWidget);
+        expect(resetCount, 0);
+
+        // The query changes to one that matches nothing: the widget swaps
+        // to its empty-state subtree. The callback must still fire for
+        // this transition.
+        await pumpWith(items: const [], searchQuery: 'NonExistent');
+        await tester.pump();
+        expect(find.text('No results for "NonExistent"'), findsOneWidget);
+        expect(resetCount, 1);
+
+        // The query changes back to one that matches again: the widget
+        // swaps back to its table content. The callback must fire again.
+        await pumpWith(items: testItems, searchQuery: 'Item');
+        await tester.pump();
+        expect(find.text('Item 0'), findsOneWidget);
+        expect(resetCount, 2);
+
+        // Rebuilding with the *same* query is not a change: no extra call.
+        await pumpWith(items: testItems, searchQuery: 'Item');
+        await tester.pump();
+        expect(resetCount, 2);
+      },
+    );
 
     testWidgets('sorting works without pagination', (
       WidgetTester tester,
