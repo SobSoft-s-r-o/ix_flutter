@@ -10,6 +10,9 @@
 .svn/
 migrate_working_dir/
 
+# Local Superpowers specs and plans. Review in English before publishing.
+/docs/superpowers/
+
 # IntelliJ related
 *.iml
 *.ipr
