@@ -63,7 +63,36 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
     super.dispose();
   }
 
-  Future<void> _loadData() async {
+  /// Whether [item] survives the current search query.
+  ///
+  /// The one place the query is applied: the rows and the pagination
+  /// counters below both go through it, so they can never disagree about
+  /// how many results a query has.
+  bool _matchesQuery(_ExampleItem item) {
+    if (_searchQuery.isEmpty) return true;
+    final query = _searchQuery.toLowerCase();
+    return item.name.toLowerCase().contains(query) ||
+        item.category.toLowerCase().contains(query);
+  }
+
+  /// The demo data set narrowed to the current search query. Always a fresh
+  /// list: the pagination branches below hand it straight to
+  /// `_displayedItems` and then mutate that.
+  List<_ExampleItem> get _filteredItems =>
+      _allItems.where(_matchesQuery).toList();
+
+  /// How many items the current query matches.
+  int get _filteredCount => _searchQuery.isEmpty
+      ? _allItems.length
+      : _allItems.where(_matchesQuery).length;
+
+  /// Starts, or restarts, the simulated network round trip.
+  ///
+  /// A call while one is still pending cancels it outright, so typing in
+  /// the search box debounces into a single load instead of queueing one
+  /// per keystroke -- and no superseded load is left behind to publish
+  /// stale rows over the newer query's.
+  void _loadData() {
     if (_displayedItems.isEmpty && _page == 1) {
       setState(() => _isLoading = true);
     } else {
@@ -71,20 +100,16 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
     }
 
     _loadTimer?.cancel();
-    final completer = Completer<void>();
     _loadTimer = Timer(
       const Duration(milliseconds: 1500), // Simulate network
-      completer.complete,
+      _publishLoadedItems,
     );
-    await completer.future;
-    if (!mounted) return;
+  }
 
-    // Filter by search query
-    final filteredItems = _allItems.where((item) {
-      if (_searchQuery.isEmpty) return true;
-      return item.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          item.category.toLowerCase().contains(_searchQuery.toLowerCase());
-    }).toList();
+  /// Applies the current query, sort and pagination to the demo data.
+  void _publishLoadedItems() {
+    if (!mounted) return;
+    final filteredItems = _filteredItems;
 
     if (_paginationMode == IxPaginationMode.none) {
       setState(() {
@@ -225,11 +250,17 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                     border: OutlineInputBorder(),
                     contentPadding: EdgeInsets.symmetric(horizontal: 12),
                   ),
+                  // The field filters as it is typed in -- `_loadData`
+                  // restarts its delay on every keystroke, so the simulated
+                  // round trip debounces itself. `onSubmitted` alone left
+                  // the query doing nothing until Enter was pressed.
+                  onChanged: _handleSearch,
                   onSubmitted: _handleSearch,
                 ),
               ),
               IconButton(
                 icon: const Icon(Icons.search),
+                tooltip: 'Search',
                 onPressed: () => _handleSearch(_searchController.text),
               ),
               IconButton(
@@ -290,37 +321,8 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                 mode: _paginationMode,
                 page: _page,
                 pageSize: _pageSize,
-                totalItems: _searchQuery.isEmpty
-                    ? _allItems.length
-                    : _allItems
-                          .where(
-                            (item) =>
-                                item.name.toLowerCase().contains(
-                                  _searchQuery.toLowerCase(),
-                                ) ||
-                                item.category.toLowerCase().contains(
-                                  _searchQuery.toLowerCase(),
-                                ),
-                          )
-                          .length,
-                totalPages:
-                    ((_searchQuery.isEmpty
-                                ? _allItems.length
-                                : _allItems
-                                      .where(
-                                        (item) =>
-                                            item.name.toLowerCase().contains(
-                                              _searchQuery.toLowerCase(),
-                                            ) ||
-                                            item.category
-                                                .toLowerCase()
-                                                .contains(
-                                                  _searchQuery.toLowerCase(),
-                                                ),
-                                      )
-                                      .length) /
-                            _pageSize)
-                        .ceil(),
+                totalItems: _filteredCount,
+                totalPages: (_filteredCount / _pageSize).ceil(),
                 pageSizeOptions: [10, 20, 50],
                 hasMore: _hasMore,
                 showPaginationOnMobile: true,
@@ -336,9 +338,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                 });
                 _loadData();
               },
-              onLoadNextPage: () async {
-                await _loadData();
-              },
+              onLoadNextPage: () async => _loadData(),
               desktopColumns: [
                 IxColumnDef(
                   label: 'Name',

@@ -50,4 +50,57 @@ void main() {
     // Exactly one row carries the checkmark the reserved column renders.
     expect(find.byIcon(Icons.check), findsOneWidget);
   });
+
+  /// Types [query] into the toolbar's search field and waits out the page's
+  /// simulated network load, without ever submitting the field.
+  Future<void> search(WidgetTester tester, String query) async {
+    await tester.enterText(find.byType(TextField), query);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pump();
+  }
+
+  /// [text] inside the data view, so the search field's own contents (which
+  /// `find.text` also matches, through its `EditableText`) are not counted.
+  Finder rowText(String text) => find.descendant(
+    of: find.byWidgetPredicate(
+      (widget) =>
+          widget.runtimeType.toString().startsWith('IxResponsiveDataView'),
+    ),
+    matching: find.text(text),
+  );
+
+  testWidgets('typing in the search box filters the rows', (tester) async {
+    await pumpDataViewPage(tester);
+    // Sorted by name as text, so page 1 starts at "Item 0".
+    expect(rowText('Item 0'), findsOneWidget);
+
+    await search(tester, 'Item 199');
+
+    expect(rowText('Item 199'), findsOneWidget);
+    expect(rowText('Item 0'), findsNothing);
+  });
+
+  testWidgets('a query that matches nothing shows the empty state', (
+    tester,
+  ) async {
+    await pumpDataViewPage(tester);
+
+    await search(tester, 'no such item');
+
+    expect(rowText('No results for "no such item"'), findsOneWidget);
+    expect(rowText('Item 0'), findsNothing);
+  });
+
+  testWidgets('clearing the query brings every row back', (tester) async {
+    await pumpDataViewPage(tester);
+
+    await search(tester, 'Item 199');
+    expect(rowText('Item 0'), findsNothing);
+
+    await search(tester, '');
+
+    expect(rowText('Item 0'), findsOneWidget);
+    expect(rowText('Item 199'), findsNothing);
+  });
 }
