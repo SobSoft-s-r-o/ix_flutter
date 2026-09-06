@@ -70,3 +70,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Automatic pubspec.yaml asset path updates
 - Command line options for customization
 - Support for library package asset loading
+
+[Unreleased]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/ix_icons_generator-v1.1.0...HEAD
+[1.1.0]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/ix_icons_generator-v1.0.0...ix_icons_generator-v1.1.0
+[1.0.0]: https://github.com/SobSoft-s-r-o/ix_flutter/releases/tag/ix_icons_generator-v1.0.0

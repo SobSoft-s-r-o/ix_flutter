@@ -25,6 +25,16 @@ const _changelogOk =
     'Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 '
     '(c46e1b13)\n';
 
+/// The shape `cider release` actually writes once CHANGELOG.md carries the
+/// keep-a-changelog link reference definitions its parser needs (see
+/// UPSTREAM.md#release-header-format and A33): the new release header has no
+/// surrounding `[...]`, unlike every hand-written header in this repository's
+/// history (`## [1.0.2] - ...`).
+const _changelogPostCiderRelease =
+    '## 1.1.0 - 2026-10-01\n'
+    'Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 '
+    '(c46e1b13)\n';
+
 /// Covers `tool/upstream_check.dart`'s consistency checks between
 /// `UPSTREAM.md`, the `CHANGELOG.md` release header, and `IxUpstream` (no
 /// upstream `.ct.ts`/scss/tsx counterpart — this guards our own tooling, not
@@ -61,6 +71,18 @@ void main() {
         facts: _facts,
       ),
       contains(contains('Upstream:')),
+    );
+  });
+
+  test('a released header without brackets -- the shape cider release writes '
+      '-- is still found', () {
+    expect(
+      checkUpstream(
+        upstreamMd: _upstreamOk,
+        changelog: _changelogPostCiderRelease,
+        facts: _facts,
+      ),
+      isEmpty,
     );
   });
 

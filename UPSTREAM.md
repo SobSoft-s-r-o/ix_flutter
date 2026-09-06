@@ -20,7 +20,40 @@ Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 ```
 
 `tool/upstream_check.dart` enforces that this line is present and matches
-`IxUpstream`.
+`IxUpstream`; it accepts the header with or without `[...]` brackets around
+the version (see below).
+
+`cider release` (run by the **Version Bump (Manual)** workflow) needs a
+keep-a-changelog [link reference definition](https://spec.commonmark.org/0.31.2/#link-reference-definition)
+for `[Unreleased]` and for every bracketed released version at the bottom of
+each `CHANGELOG.md` -- without one, its markdown parser cannot tell a version
+header (`## [1.0.2]`) from a literal, unresolved link, and `release` appends
+an empty, bracket-less section at the end of the file instead of turning
+`[Unreleased]` into the new release in place. Both `CHANGELOG.md`s carry
+these already:
+
+```markdown
+[Unreleased]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/SobSoft-s-r-o/ix_flutter/releases/tag/v1.0.2
+```
+
+**After every release**, update these: point `[Unreleased]` at
+`compare/v<new>...HEAD` and add a `[<new>]` definition for the version just
+released (`compare/v<previous>...v<new>`, or `releases/tag/v<new>` for the
+first one) -- otherwise the *next* cycle's `[Unreleased]` has no definition
+and the mangling above returns. The header `cider release` writes for the new
+section itself has no brackets (`## 1.1.0 - 2026-09-06`, not `## [1.1.0]`);
+that is what `tool/upstream_check.dart`'s regex tolerating both forms is for
+-- it is not worth fighting cider's own output shape.
+
+`cider release`'s markdown round-trip is not fully lossless beyond that: it
+can drop or reflow content outside the keep-a-changelog release structure it
+recognizes (this project's trailing `## Versioning`/`## Breaking
+Changes`/`## Migration Guides`/`## Contributors`/`## License` sections and
+the closing links), and it backslash-escapes stray `_`/`~` characters in
+plain prose it re-serializes. **Diff `CHANGELOG.md` carefully** in the
+Version Bump pull request (not just the new release section) and restore
+anything it dropped from git history before merging.
 
 ## Sync procedure
 

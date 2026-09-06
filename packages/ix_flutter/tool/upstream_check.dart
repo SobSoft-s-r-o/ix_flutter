@@ -82,8 +82,11 @@ List<String> checkUpstream({
     );
   }
 
+  // The brackets are optional: a hand-written header reads `## [1.0.2] -
+  // date`, but `cider release` (see UPSTREAM.md#release-header-format)
+  // writes the new section as `## 1.1.0 - date`, with no `[...]` at all.
   final release = RegExp(
-    r'^## \[(\d+\.\d+\.\d+[^\]]*)\][^\n]*\n([^\n]*)',
+    r'^## \[?(\d+\.\d+\.\d+[^\]\s]*)\]?[^\n]*\n([^\n]*)',
     multiLine: true,
   ).firstMatch(changelog);
   if (release == null) {

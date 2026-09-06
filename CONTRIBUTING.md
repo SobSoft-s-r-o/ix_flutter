@@ -348,8 +348,11 @@ which only runs on demand (`workflow_dispatch`):
    `cider bump` / `cider release`, and opens a `chore/release-…` pull request
    labelled `release`
 4. Review that pull request: add the `Upstream:` line under the new release
-   header (see [UPSTREAM.md](UPSTREAM.md#release-header-format)), wait for CI,
-   then merge it
+   header (see [UPSTREAM.md](UPSTREAM.md#release-header-format)), update the
+   CHANGELOG's link reference definitions for the new version (same section --
+   `cider release` does not maintain these itself), diff the rest of
+   `CHANGELOG.md` for anything `cider` dropped or reflowed, wait for CI, then
+   merge it
 5. Tag the merge commit on `main` as `v<version>` and push the tag
 6. Publish from the package directory: `dart pub publish`
 
@@ -370,6 +373,16 @@ pub.dev:
       and the CHANGELOG release header agree with `IxUpstream`
 - [ ] CHANGELOG.md: the new release section is followed by its `Upstream:` line
       (see [UPSTREAM.md](UPSTREAM.md#release-header-format))
+- [ ] CHANGELOG.md ends with a keep-a-changelog link reference definition for
+      `[Unreleased]` and for every bracketed released version -- required for
+      `cider release` to parse the file without mangling it; update
+      `[Unreleased]` and add one for the version just released (see
+      [UPSTREAM.md](UPSTREAM.md#release-header-format))
+- [ ] CHANGELOG.md's non-release sections (`Versioning`, `Breaking Changes`,
+      `Migration Guides`, `Contributors`, `License`, the closing links) are
+      still present and unescaped after the Version Bump run -- `cider
+      release`'s markdown round-trip can drop or reflow content outside the
+      release history it recognizes
 - [ ] The version the release will carry is referenced consistently in the
       documentation (`ix_flutter: ^<version>`); the bump in
       `packages/<package>/pubspec.yaml` itself is made by the Version Bump

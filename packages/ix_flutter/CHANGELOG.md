@@ -262,3 +262,9 @@ Icons are subject to Siemens iX Design System licensing - See [ICON_LICENSING.md
 **How to Report Issues**: [GitHub Issues](https://github.com/SobSoft-s-r-o/ix_flutter/issues)
 **How to Contribute**: [CONTRIBUTING.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/CONTRIBUTING.md)
 **Security Issues**: [SECURITY.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/SECURITY.md)
+
+[Unreleased]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/SobSoft-s-r-o/ix_flutter/releases/tag/v1.0.2
+[1.0.1]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/v1.0.0...v1.0.1
+[1.0.0]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/v0.0.1...v1.0.0
+[0.0.1]: https://github.com/SobSoft-s-r-o/ix_flutter/releases/tag/v0.0.1
