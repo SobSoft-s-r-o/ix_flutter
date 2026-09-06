@@ -147,8 +147,13 @@ class MyIconWidget extends StatelessWidget {
 }
 ```
 
-`IxIcon` never reads an ambient `IconTheme.size`, so always pass `size:`
-explicitly.
+`size:` is optional. An `IxIcon` sizes its box from the explicit `size:` if
+one is given, otherwise the ambient `IconTheme.size` (used exactly as given),
+otherwise 24px -- the same order Material's own `Icon` uses, so an `IxIcon`
+handed to a slot that styles its icon (`IxIconButton`, `TextButton.icon`,
+`InputDecoration.prefixIcon`) matches that slot. Pass `size:` when the icon
+should override the slot around it. See
+[doc/ix_icons.md](doc/ix_icons.md#sizing) for the full rule.
 
 ### Troubleshooting Icon Generation
 

@@ -358,6 +358,17 @@ Each release's own `packages/ix_flutter/CHANGELOG.md` entry calls out its
 breaking changes inline, in that release's `Changed`/`Removed`/`Deprecated`
 bullets. Historically:
 
+- **1.1.0** (upcoming, still under `[Unreleased]`): raises the minimum Flutter
+  SDK to 3.38.0; adds enum values that break an exhaustive `switch` in
+  consumer code (`IxSpinnerVariant.secondary`, `IxToastType.error`,
+  `IxTypographyVariant.buttonLabel`/`.caption`/`.textDefault`); changes
+  `IxBlind` from a `StatelessWidget` to a `StatefulWidget`; makes
+  `ThemeData.focusColor` transparent; bakes a platform-derived tap-target
+  density, so controls grow about 7px on touch platforms; makes `IxIcon.size`
+  nullable so an unsized icon follows the slot around it; and moves
+  `IxToastOverlay`'s default top offset from 16px to 32px. Several APIs are
+  deprecated but still work. The changelog's `Changed` and `Deprecated`
+  sections carry the per-API detail and the opt-outs
 - **1.0.2**: the icon generator's command moved from the `ix_flutter`
   package prefix to its own `ix_icons_generator` package, which must be
   added as a dev dependency -- see [ICON_MIGRATION.md](ICON_MIGRATION.md)
@@ -366,14 +377,22 @@ bullets. Historically:
 
 ### Flutter & Dart compatibility
 
-Every published version has required the same minimum SDKs:
+Every published version so far has required the same minimum SDKs. The
+upcoming 1.1.0 raises the Flutter floor for the first time; the Dart floor is
+unchanged:
 
-| Version | Flutter  | Dart     |
-| ------- | -------- | -------- |
-| 1.0.2   | >=3.10.0 | >=3.10.0 |
-| 1.0.1   | >=3.10.0 | >=3.10.0 |
-| 1.0.0   | >=3.10.0 | >=3.10.0 |
-| 0.0.1   | >=3.10.0 | >=3.10.0 |
+| Version           | Flutter  | Dart     |
+| ----------------- | -------- | -------- |
+| 1.1.0 (upcoming)  | >=3.38.0 | >=3.10.0 |
+| 1.0.2             | >=3.10.0 | >=3.10.0 |
+| 1.0.1             | >=3.10.0 | >=3.10.0 |
+| 1.0.0             | >=3.10.0 | >=3.10.0 |
+| 0.0.1             | >=3.10.0 | >=3.10.0 |
+
+`SemanticsRole.*` and `SemanticsService.sendAnnouncement`, which 1.1.0's menu,
+toast, dropdown and data-view semantics are built on, are only available from
+Flutter 3.38 -- hence the floor. `pub` will not resolve 1.1.0 for an app on an
+older Flutter, which stays on 1.0.2.
 
 See [README.md#requirements](README.md#requirements) for the current
 requirement and [README.md#platform-support](README.md#platform-support) for
@@ -403,14 +422,43 @@ which only runs on demand (`workflow_dispatch`):
    `pubspec.yaml` and turns `[Unreleased]` into the new release section with
    `cider bump` / `cider release`, and opens a `chore/release-…` pull request
    labelled `release`
-4. Review that pull request: add the `Upstream:` line under the new release
-   header (see [UPSTREAM.md](UPSTREAM.md#release-header-format)), update the
-   CHANGELOG's link reference definitions for the new version (same section --
-   `cider release` does not maintain these itself), diff the rest of
-   `CHANGELOG.md` for anything `cider` dropped or reflowed, wait for CI, then
-   merge it
-5. Tag the merge commit on `main` as `v<version>` and push the tag
+4. Review that pull request: confirm the `Upstream:` line that sat under
+   `[Unreleased]` is still the first line under the *new* release header (see
+   [UPSTREAM.md](UPSTREAM.md#release-header-format) -- `cider release` renames
+   the header in place and carries the line with it, but the round trip is not
+   guaranteed lossless, so check rather than assume), update the CHANGELOG's
+   link reference definitions (`cider release` deletes the `[Unreleased]` one
+   and adds nothing for the new version), diff the rest of `CHANGELOG.md` for
+   anything `cider` dropped or reflowed, wait for CI, then merge it
+5. Tag the merge commit on `main` as `v<version>` (`ix_icons_generator-v<version>`
+   for the generator) and push the tag
 6. Publish from the package directory: `dart pub publish`
+7. Add the new version's link reference definition
+   (`https://pub.dev/packages/<package>/versions/<version>`) once the version
+   is live on pub.dev, and point `[Unreleased]` back at `commits/main`
+
+#### Which packages need which step
+
+The two packages are versioned independently, and they are not currently at
+the same point in that cycle:
+
+- **`ix_flutter`** is at 1.0.2 in `pubspec.yaml` and its 1.1.0 notes are still
+  under `[Unreleased]`. It needs the full run above: `bump minor` **and**
+  `release`.
+- **`ix_icons_generator`** is already at 1.1.0 in `pubspec.yaml` (bumped for
+  its own changes -- the tarball checksum and zip-slip guards, `--icons-version`,
+  `--no-legacy-getters`, `--no-format`, and `IxIconsData` output). Its notes
+  are under `[Unreleased]` too, so it needs `cider release` **only**; a
+  further `bump` would skip 1.1.0 and publish 1.2.0. Run the workflow for
+  `ix_flutter` alone, and cut the generator's release separately, rather than
+  choosing `both`.
+
+Neither version exists on pub.dev yet. Step 5 has also not been carried out
+for any past release: this repository currently has **no git tags and no
+GitHub releases**, despite 1.0.0, 1.0.1 and 1.0.2 being live on pub.dev. Until
+a tag is actually pushed, no changelog link may point at `releases/tag/…` or
+`compare/…` -- every such URL 404s and fails the `docs` job's link check (see
+[UPSTREAM.md](UPSTREAM.md#what-these-definitions-may-point-at)).
 
 ### Release checklist
 
@@ -427,13 +475,18 @@ pub.dev:
       `doc/tokens.md` unchanged
 - [ ] `packages/ix_flutter`: `dart run tool/upstream_check.dart` -- `UPSTREAM.md`
       and the CHANGELOG release header agree with `IxUpstream`
-- [ ] CHANGELOG.md: the new release section is followed by its `Upstream:` line
-      (see [UPSTREAM.md](UPSTREAM.md#release-header-format))
-- [ ] CHANGELOG.md ends with a keep-a-changelog link reference definition for
-      `[Unreleased]` and for every bracketed released version -- required for
-      `cider release` to parse the file without mangling it; update
-      `[Unreleased]` and add one for the version just released (see
+- [ ] CHANGELOG.md: the section being prepared -- `[Unreleased]` before the
+      bump, the new release section after it -- is followed by its `Upstream:`
+      line, and no *older* section was edited to carry one (see
       [UPSTREAM.md](UPSTREAM.md#release-header-format))
+- [ ] CHANGELOG.md ends with a keep-a-changelog link reference definition for
+      `[Unreleased]` and for every **bracketed** version header -- required for
+      `cider release` to parse the file without mangling it. A version with
+      nothing truthful to link to (never published) carries no definition and
+      drops its brackets instead. Every definition must resolve: pub.dev
+      version pages for published versions, `commits/main` for `[Unreleased]`,
+      and no tag or release URLs while the repository has neither (see
+      [UPSTREAM.md](UPSTREAM.md#what-these-definitions-may-point-at))
 - [ ] CHANGELOG.md stays strictly keep-a-changelog after the Version Bump
       run: the `# Changelog` intro, `## [Unreleased]` (or the release
       section a bump just produced), the per-release sections and the

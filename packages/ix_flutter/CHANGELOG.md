@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
+
+Prepared as **1.1.0**, and not published. `pubspec.yaml` still carries 1.0.2:
+the version bump and this section's release date are made later by the
+**Version Bump (Manual)** workflow, which turns `[Unreleased]` into the new
+release section in place -- see [CONTRIBUTING.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/CONTRIBUTING.md#release-process).
+Until that runs, the newest published version is
+[1.0.2](https://pub.dev/packages/ix_flutter/versions/1.0.2).
 
 ### Added
 - Public exports for `IxPaginationBar` and `IxBottomSheetTheme` from the package barrel
@@ -29,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxThemeName` and `IxColorSchema` (the upstream `data-ix-theme`/`data-ix-color-schema` model), `IxThemeController` (resolves the `system` schema at runtime, `themeChanged` stream, `updatePlatformBrightness`, and forwards `icons:`/`density:` to both built themes), `IxThemeBuilder.light()`/`IxThemeBuilder.dark()` plus `IxThemeBuilder(theme:/brightness:)`, `IxTheme.themeName`/`IxTheme.colorSchema`, `IxCustomPalette.partial()`/`IxCustomPalette.copyWith()` -- see `doc/theming.md`
 
 ### Changed
+- **The minimum Flutter SDK is now 3.38.0** (`environment: flutter: ">=3.38.0"`, was `>=3.10.0`). The Dart SDK floor is unchanged at `>=3.10.0`. `SemanticsRole.*` and `SemanticsService.sendAnnouncement` -- which the menu, toast, dropdown and data-view semantics in this release are built on -- are only available from Flutter 3.38. `pub` will not resolve this version for an app on an older Flutter; such an app stays on 1.0.2. CI builds and tests on Flutter 3.44.6 stable
 - `IxThemeBuilder.build()` now bakes the static tap-target density from the platform the way Material derives `materialTapTargetSize` itself: touch platforms (Android/iOS/Fuchsia) get 48x48 hit areas (`IxDensity.comfortable`), desktop and desktop browsers keep the 1.0.2 layout (`IxDensity.compact`). Buttons, checkboxes, radios and switches therefore grow ~7px taller on touch platforms only. Pass `density: IxDensity.comfortable` (or wrap the app in `IxDensityScope`, which resolves the density live from the input modality) to opt every platform in; `density: IxDensity.compact` pins the 1.0.2 layout everywhere
 - New enum values break exhaustive `switch` statements in consumer code (Dart 3 makes a non-exhaustive `switch` over an enum a compile error): `IxSpinnerVariant.secondary`, `IxToastType.error`, and `IxTypographyVariant.buttonLabel`/`.caption`/`.textDefault`. Add a `default:` arm to any `switch` over these enums
 - `IxBlind` changed supertype from `StatelessWidget` to `StatefulWidget` (required by the new uncontrolled mode); subclasses and `find.byType`-style structural assumptions may need updating
@@ -101,7 +110,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxResponsiveDataView` can localize the pagination bar's page-size trigger: `IxResponsiveDataViewStrings.pageSelectionLabel` (bridged into `IxPaginationStrings.pageSelection`), or a whole `IxPaginationStrings` through the new `paginationStrings` parameter
 - an enabled `IxBlind` header and `IxApplicationScaffold` menu tile publish a `focus` action, so assistive technology can move the focus to a control they already report as focusable. `excludeSemantics: true` had dropped the `InkWell`'s own action along with the rest of its node (WCAG 2.4.7)
 - an SVG-backed `IxIcon` no longer adds an `image: true` semantics annotation of its own. `IxIcon` owns the icon's semantics, and `SvgPicture`'s annotation merged into the enclosing node -- so an `IxIconButton` with an asset icon announced itself as an image, which the Material branch never did
-- both `IxIcon` branches honour `IconThemeData.opacity`, the way Material's own `Icon` does, so an icon in a slot that dims its contents is dimmed too
+- an SVG-backed `IxIcon` honours `IconThemeData.opacity`, so an icon in a slot that dims its contents -- a disabled `ListTile`'s leading icon, say -- is dimmed too, as Material's own `Icon` already was. The Material-glyph branch of `IxIcon` still renders about the *square* of the requested opacity (alpha 0.251 rather than 0.502 at `opacity: 0.5`): `IxIcon` dims the colour itself and hands the result to Flutter's `Icon`, which re-applies the same ambient `IconTheme.opacity` to any colour it is given. Only a slot that sets a non-default `opacity` is affected, and only for Material glyphs; it is not fixed in this release
 - `IxDensity.resolve()`'s adaptive density no longer starts `comfortable` on a desktop platform and jumps to `compact` the first time the cursor enters the window (and back on the way out). `mouseIsConnected` is only true once a pointer has actually been seen, so "no mouse tracked yet" is not the same thing as "this is a touch device": the platform's own static default (the same one `IxThemeBuilder.build()` bakes in) is now consulted before the mouse, and only a touch platform still needs one connected to go `compact`
 - `IxTypography.copyWith(fontFamily: ...)` drops a `package` that named the package shipping the *old* family instead of carrying it over onto the new one, where it would point at the wrong asset bundle -- the same sentinel `monospacePackage` already used to tell "not passed" from an explicit `package: null`
 - `IxThemeBuilder(family: IxThemeFamily.custom)` without a `customPalette` falls back to the classic palette, as 1.0.2 did, instead of asserting in debug builds; it logs a one-time debug notice naming the remedy (`customPalette:` is not deprecated, only the `family:` spelling of it)
@@ -120,9 +129,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ---
 
 ## [1.0.2] - 2026-01-28
-Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 
-Note: the wiki listed 1.0.3 and 1.0.4 (2026-01-28); these were internal bumps never published to pub.dev. The next published version after 1.0.2 is 1.1.0.
+Note: the wiki listed 1.0.3 and 1.0.4 (2026-01-28); these were internal bumps never published to pub.dev. The next published version after 1.0.2 will be 1.1.0.
+
+No `Upstream:` line is recorded for this release. The pinned `@siemens/ix` 5.2.1 / `@siemens/ix-icons` 3.5.0 baseline in [UPSTREAM.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/UPSTREAM.md) was first established for the upcoming release above, months after 1.0.2 shipped, and there is no record of what 1.0.2 was verified against.
 
 ### Changed
 - Icon generator moved to separate package `ix_icons_generator` for cleaner dependencies
@@ -162,7 +172,10 @@ Note: the wiki listed 1.0.3 and 1.0.4 (2026-01-28); these were internal bumps ne
 
 ---
 
-## [0.0.1] - 2026-01-18
+## 0.0.1 - 2026-01-18
+
+The preview that 1.0.0 graduated from. It was never published to pub.dev, so
+it has no link reference definition below and its header carries no `[...]`.
 
 ### Added
 
@@ -196,8 +209,7 @@ Note: the wiki listed 1.0.3 and 1.0.4 (2026-01-28); these were internal bumps ne
 - Community-maintained, not official Siemens product
 - Flutter/Dart versions must be 3.10.0 or higher
 
-[Unreleased]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/v1.0.2...HEAD
-[1.0.2]: https://github.com/SobSoft-s-r-o/ix_flutter/releases/tag/v1.0.2
-[1.0.1]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/v1.0.0...v1.0.1
-[1.0.0]: https://github.com/SobSoft-s-r-o/ix_flutter/compare/v0.0.1...v1.0.0
-[0.0.1]: https://github.com/SobSoft-s-r-o/ix_flutter/releases/tag/v0.0.1
+[Unreleased]: https://github.com/SobSoft-s-r-o/ix_flutter/commits/main
+[1.0.2]: https://pub.dev/packages/ix_flutter/versions/1.0.2
+[1.0.1]: https://pub.dev/packages/ix_flutter/versions/1.0.1
+[1.0.0]: https://pub.dev/packages/ix_flutter/versions/1.0.0

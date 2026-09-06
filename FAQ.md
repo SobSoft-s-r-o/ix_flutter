@@ -22,10 +22,16 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed setup instructions.
 ### Q: What are the minimum Flutter and Dart versions?
 
 **A:** 
-- Flutter: >=3.10.0
+- Flutter: >=3.38.0
 - Dart: >=3.10.0
 
 Run `flutter --version` and `dart --version` to check your versions.
+
+The Flutter floor rose from 3.10.0 in 1.0.2 to 3.38.0 for the upcoming 1.1.0,
+because the semantics APIs the menu, toast, dropdown and data-view roles are
+built on (`SemanticsRole.*`, `SemanticsService.sendAnnouncement`) only exist
+from 3.38. The Dart floor is unchanged. An app that cannot move off an older
+Flutter stays on 1.0.2 -- `pub` will not resolve 1.1.0 for it.
 
 ---
 
