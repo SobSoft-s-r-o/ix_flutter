@@ -58,4 +58,64 @@ void main() {
       expect(scss, contains('--theme-color-primary'));
     });
   });
+
+  group('parseArgs', () {
+    test('defaults tag and repo when no arguments are given', () {
+      final parsed = parseArgs(const []);
+      expect(parsed.tag, '@siemens/ix@5.2.1');
+      expect(parsed.repo, 'https://github.com/siemens/ix');
+    });
+
+    test('accepts the positional <tag> form UPSTREAM.md documents', () {
+      final parsed = parseArgs(const ['@siemens/ix@6.0.0']);
+      expect(parsed.tag, '@siemens/ix@6.0.0');
+      expect(parsed.repo, 'https://github.com/siemens/ix');
+    });
+
+    test('accepts --tag and --repo', () {
+      final parsed = parseArgs(const [
+        '--tag',
+        '@siemens/ix@6.0.0',
+        '--repo',
+        '/local/checkout',
+      ]);
+      expect(parsed.tag, '@siemens/ix@6.0.0');
+      expect(parsed.repo, '/local/checkout');
+    });
+
+    test('--tag wins over a positional argument when both are given', () {
+      final parsed = parseArgs(const [
+        'ignored-positional',
+        '--tag',
+        '@siemens/ix@6.0.0',
+      ]);
+      expect(parsed.tag, '@siemens/ix@6.0.0');
+    });
+
+    test('a trailing --tag with no value throws a one-line usage error', () {
+      expect(
+        () => parseArgs(const ['--tag']),
+        throwsA(
+          isA<UsageException>().having(
+            (e) => e.message,
+            'message',
+            allOf(contains('--tag'), isNot(contains('\n'))),
+          ),
+        ),
+      );
+    });
+
+    test('a trailing --repo with no value throws a one-line usage error', () {
+      expect(
+        () => parseArgs(const ['--repo']),
+        throwsA(
+          isA<UsageException>().having(
+            (e) => e.message,
+            'message',
+            allOf(contains('--repo'), isNot(contains('\n'))),
+          ),
+        ),
+      );
+    });
+  });
 }

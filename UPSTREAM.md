@@ -24,7 +24,7 @@ Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 
 ## Sync procedure
 
-1. `dart run tool/sync_upstream_tokens.dart <tag>` (from `packages/ix_flutter`) → fixtures and the palette diff.
+1. `dart run tool/sync_upstream_tokens.dart <tag>` (from `packages/ix_flutter`) → fixtures and the palette diff. `--tag <tag>` is equivalent; `--repo <url-or-local-path>` overrides the cloned source (default `https://github.com/siemens/ix`).
 2. Update `IxUpstream` (`lib/src/ix_core/ix_upstream.dart`), the table above, and the `Upstream:` line under the release header in `CHANGELOG.md`.
 3. `dart run tool/upstream_check.dart` must pass (it also runs in CI).
 
