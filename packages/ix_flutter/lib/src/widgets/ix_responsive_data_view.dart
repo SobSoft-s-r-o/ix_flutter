@@ -468,7 +468,6 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
           child: Container(
             height: 48,
             decoration: BoxDecoration(
-              color: color1,
               border: Border(
                 bottom: BorderSide(
                   color:
@@ -477,99 +476,54 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                 ),
               ),
             ),
-            child: Row(
-              children: [
-                ...widget.columns.map((col) {
-                  final sortable = widget.enableSorting && col.sortKey != null;
-                  final sorted = sortable && _sortKey == col.sortKey;
-                  final hint = !sortable
-                      ? null
-                      : !sorted
-                      ? widget.strings.sortHint
-                      : (_sortAscending
-                            ? widget.strings.sortedAscending
-                            : widget.strings.sortedDescending);
-                  return Expanded(
-                    flex: col.flex,
-                    // `excludeSemantics` sits on the *inner* visual content
-                    // only (not on this whole `Semantics`/`InkWell` pair):
-                    // it suppresses the label `Text`'s own contribution (it
-                    // would otherwise duplicate `label: col.label` below),
-                    // while letting `InkWell`'s own focus semantics --
-                    // `isFocusable`/`isFocused`, the `focus` and `tap`
-                    // actions -- merge up into this node normally (same
-                    // pattern as `_DesktopRow`, which also leaves
-                    // `focusable`/`onTap` for `InkWell` alone to supply).
-                    // Redeclaring them here too, on the *ancestor*
-                    // `Semantics`, made the merge fail silently instead:
-                    // this node ended up with only `InkWell`'s own
-                    // `isFocusable`/`focus`/`tap` contribution and none of
-                    // `button`/`enabled`/`label`/`hint` below, dropping
-                    // exactly the properties a screen reader needs to
-                    // announce the header as a labelled, sortable button.
-                    // Excluding the whole subtree instead of just the
-                    // inner content would have the opposite problem: it
-                    // drops `isFocused`/`focus` too, so a screen reader
-                    // could tell a header is focusable but never that it
-                    // *is* focused (WCAG 2.4.7).
-                    child: Semantics(
-                      button: sortable,
-                      enabled: sortable,
-                      label: col.label,
-                      hint: hint,
-                      child: InkWell(
-                        key: sortable
-                            ? Key('ix-rdv-header-${col.sortKey}')
-                            : null,
-                        canRequestFocus: sortable,
-                        focusColor: Colors.transparent,
+            // The header background lives on a `Material` rather than on the
+            // `Container` above so the per-column `InkWell`s have an ink
+            // canvas *inside* the header: painted on the enclosing page
+            // Material instead, their hover and press feedback disappeared
+            // under this opaque background.
+            child: Material(
+              color: color1,
+              child: Row(
+                children: [
+                  ...widget.columns.map((col) {
+                    final sortable =
+                        widget.enableSorting && col.sortKey != null;
+                    final sorted = sortable && _sortKey == col.sortKey;
+                    final hint = !sortable
+                        ? null
+                        : !sorted
+                        ? widget.strings.sortHint
+                        : (_sortAscending
+                              ? widget.strings.sortedAscending
+                              : widget.strings.sortedDescending);
+                    return Expanded(
+                      flex: col.flex,
+                      child: _HeaderCell(
+                        column: col,
+                        sortable: sortable,
+                        sorted: sorted,
+                        ascending: _sortAscending,
+                        hint: hint,
+                        labelStyle: labelStyle,
                         hoverColor: ghostHover,
                         onTap: sortable
                             ? () => _onHeaderTap(col.sortKey!)
                             : null,
-                        child: ExcludeSemantics(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            alignment: col.alignment,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    col.label,
-                                    style: labelStyle,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                if (sorted) ...[
-                                  const SizedBox(width: 4),
-                                  IxIcon.key(
-                                    _sortAscending
-                                        ? IxIconKey.chevronUp
-                                        : IxIconKey.chevronDown,
-                                    size: IxIconSize.s16,
-                                    excludeFromSemantics: true,
-                                  ),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
+                      ),
+                    );
+                  }),
+                  // Tools column header
+                  SizedBox(
+                    width: 48,
+                    child: Center(
+                      child: Text(
+                        widget.strings.toolsColumnHeader,
+                        style: labelStyle,
                       ),
                     ),
-                  );
-                }),
-                // Tools column header
-                SizedBox(
-                  width: 48,
-                  child: Center(
-                    child: Text(
-                      widget.strings.toolsColumnHeader,
-                      style: labelStyle,
-                    ),
-                  ),
-                ), // Fixed width for tools
-              ],
+                  ), // Fixed width for tools
+                ],
+              ),
             ),
           ),
         ),
@@ -623,7 +577,115 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   }
 }
 
-class _DesktopRow<T> extends StatelessWidget {
+/// One column heading of the desktop table.
+///
+/// A sortable heading is a keyboard-reachable button, so it carries the
+/// Siemens IX [IxFocusRing]; a plain label carries neither the ring nor the
+/// button/enabled semantics that would otherwise announce it as a *disabled*
+/// control to a screen reader.
+class _HeaderCell<T> extends StatefulWidget {
+  const _HeaderCell({
+    required this.column,
+    required this.sortable,
+    required this.sorted,
+    required this.ascending,
+    required this.hint,
+    required this.labelStyle,
+    required this.hoverColor,
+    required this.onTap,
+  });
+
+  final IxColumnDef<T> column;
+  final bool sortable;
+  final bool sorted;
+  final bool ascending;
+  final String? hint;
+  final TextStyle? labelStyle;
+  final Color hoverColor;
+  final VoidCallback? onTap;
+
+  @override
+  State<_HeaderCell<T>> createState() => _HeaderCellState<T>();
+}
+
+class _HeaderCellState<T> extends State<_HeaderCell<T>> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final col = widget.column;
+    // `excludeSemantics` sits on the *inner* visual content only (not on
+    // this whole `Semantics`/`InkWell` pair): it suppresses the label
+    // `Text`'s own contribution (it would otherwise duplicate `label:
+    // col.label` below), while letting `InkWell`'s own focus semantics --
+    // `isFocusable`/`isFocused`, the `focus` and `tap` actions -- merge up
+    // into this node normally (same pattern as `_DesktopRow`, which also
+    // leaves `focusable`/`onTap` for `InkWell` alone to supply).
+    // Redeclaring them here too, on the *ancestor* `Semantics`, made the
+    // merge fail silently instead: this node ended up with only `InkWell`'s
+    // own `isFocusable`/`focus`/`tap` contribution and none of
+    // `button`/`enabled`/`label`/`hint` below, dropping exactly the
+    // properties a screen reader needs to announce the header as a
+    // labelled, sortable button. Excluding the whole subtree instead of
+    // just the inner content would have the opposite problem: it drops
+    // `isFocused`/`focus` too, so a screen reader could tell a header is
+    // focusable but never that it *is* focused (WCAG 2.4.7).
+    return Semantics(
+      // `null`, not `false`, for a plain heading: `button: false` +
+      // `enabled: false` publish a *disabled control*, so a screen reader
+      // announced every non-sortable column label as unavailable.
+      button: widget.sortable ? true : null,
+      enabled: widget.sortable ? true : null,
+      label: col.label,
+      hint: widget.hint,
+      child: IxFocusRing(
+        focused: _focused,
+        // Negative, like the dropdown rows: the ring stays inside the cell
+        // instead of overlapping the neighbouring column and the header's
+        // bottom border.
+        offset: -IxCommonGeometry.focusBorderThickness,
+        child: InkWell(
+          key: widget.sortable ? Key('ix-rdv-header-${col.sortKey}') : null,
+          canRequestFocus: widget.sortable,
+          focusColor: Colors.transparent,
+          hoverColor: widget.hoverColor,
+          onFocusChange: (focused) => setState(() => _focused = focused),
+          onTap: widget.onTap,
+          child: ExcludeSemantics(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              alignment: col.alignment,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      col.label,
+                      style: widget.labelStyle,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (widget.sorted) ...[
+                    const SizedBox(width: 4),
+                    IxIcon.key(
+                      widget.ascending
+                          ? IxIconKey.chevronUp
+                          : IxIconKey.chevronDown,
+                      size: IxIconSize.s16,
+                      excludeFromSemantics: true,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DesktopRow<T> extends StatefulWidget {
   const _DesktopRow({
     required this.index,
     required this.item,
@@ -645,7 +707,21 @@ class _DesktopRow<T> extends StatelessWidget {
   final IxResponsiveDataViewStrings strings;
 
   @override
+  State<_DesktopRow<T>> createState() => _DesktopRowState<T>();
+}
+
+class _DesktopRowState<T> extends State<_DesktopRow<T>> {
+  bool _focused = false;
+
+  @override
   Widget build(BuildContext context) {
+    final index = widget.index;
+    final item = widget.item;
+    final columns = widget.columns;
+    final actions = widget.actions;
+    final onTap = widget.onTap;
+    final theme = widget.theme;
+    final strings = widget.strings;
     final cs = Theme.of(context).colorScheme;
     final color0 = theme?.color(IxThemeColorToken.color0) ?? cs.surface;
     final ghostHover =
@@ -657,84 +733,99 @@ class _DesktopRow<T> extends StatelessWidget {
     return Semantics(
       button: onTap != null,
       label: null,
-      child: InkWell(
-        key: Key('ix-rdv-row-$index'),
-        canRequestFocus: onTap != null,
-        focusColor: Colors.transparent,
-        hoverColor: ghostHover,
-        onTap: onTap != null ? () => onTap!(item) : null,
-        child: Container(
-          height: 56, // Standard row height
-          decoration: BoxDecoration(
-            color: color0,
-            border: Border(bottom: BorderSide(color: borderColor)),
-          ),
-          child: Row(
-            children: [
-              ...columns.map((col) {
-                return Expanded(
-                  flex: col.flex,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    alignment: col.alignment,
-                    child: col.cellBuilder(context, item),
-                  ),
-                );
-              }),
-              // Tools column
-              SizedBox(
-                width: 48,
-                child: Center(
-                  child: PopupMenuButton<IxRowAction<T>>(
-                    key: Key('ix-rdv-row-actions-$index'),
-                    icon: const IxIcon.key(IxIconKey.moreMenu),
-                    tooltip: strings.rowActionsTooltip,
-                    onSelected: (action) => action.onSelected(item),
-                    itemBuilder: (context) {
-                      return actions
-                          .where((a) => a.isVisible?.call(item) ?? true)
-                          .map((action) {
-                            final enabled =
-                                action.isEnabled?.call(item) ?? true;
-                            return PopupMenuItem<IxRowAction<T>>(
-                              value: action,
-                              enabled: enabled,
-                              child: Row(
-                                children: [
-                                  IconTheme(
-                                    data: IconThemeData(
-                                      color: action.destructive
-                                          ? theme?.color(
-                                              IxThemeColorToken.alarm,
-                                            )
-                                          : theme?.color(
-                                              IxThemeColorToken.stdText,
-                                            ),
-                                      size: 20,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: borderColor)),
+        ),
+        // The row background lives on a `Material` rather than on the box
+        // above, so the `InkWell`'s hover and press feedback has an ink
+        // canvas *inside* the row: painted on the enclosing page Material
+        // instead, it was hidden under this opaque background.
+        child: Material(
+          color: color0,
+          child: IxFocusRing(
+            focused: _focused,
+            // Negative, like the dropdown rows: the ring stays inside the
+            // row instead of overlapping its neighbours.
+            offset: -IxCommonGeometry.focusBorderThickness,
+            child: InkWell(
+              key: Key('ix-rdv-row-$index'),
+              canRequestFocus: onTap != null,
+              focusColor: Colors.transparent,
+              hoverColor: ghostHover,
+              onFocusChange: (focused) => setState(() => _focused = focused),
+              onTap: onTap != null ? () => onTap(item) : null,
+              child: SizedBox(
+                height: 56, // Standard row height
+                child: Row(
+                  children: [
+                    ...columns.map((col) {
+                      return Expanded(
+                        flex: col.flex,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          alignment: col.alignment,
+                          child: col.cellBuilder(context, item),
+                        ),
+                      );
+                    }),
+                    // Tools column
+                    SizedBox(
+                      width: 48,
+                      child: Center(
+                        child: PopupMenuButton<IxRowAction<T>>(
+                          key: Key('ix-rdv-row-actions-$index'),
+                          icon: const IxIcon.key(IxIconKey.moreMenu),
+                          tooltip: strings.rowActionsTooltip,
+                          onSelected: (action) => action.onSelected(item),
+                          itemBuilder: (context) {
+                            return actions
+                                .where((a) => a.isVisible?.call(item) ?? true)
+                                .map((action) {
+                                  final enabled =
+                                      action.isEnabled?.call(item) ?? true;
+                                  return PopupMenuItem<IxRowAction<T>>(
+                                    value: action,
+                                    enabled: enabled,
+                                    child: Row(
+                                      children: [
+                                        IconTheme(
+                                          data: IconThemeData(
+                                            color: action.destructive
+                                                ? theme?.color(
+                                                    IxThemeColorToken.alarm,
+                                                  )
+                                                : theme?.color(
+                                                    IxThemeColorToken.stdText,
+                                                  ),
+                                            size: 20,
+                                          ),
+                                          child: action.icon,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          action.label,
+                                          style: TextStyle(
+                                            color: action.destructive
+                                                ? theme?.color(
+                                                    IxThemeColorToken.alarm,
+                                                  )
+                                                : null,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    child: action.icon,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    action.label,
-                                    style: TextStyle(
-                                      color: action.destructive
-                                          ? theme?.color(
-                                              IxThemeColorToken.alarm,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          })
-                          .toList();
-                    },
-                  ),
+                                  );
+                                })
+                                .toList();
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -911,7 +1002,7 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
   }
 }
 
-class _MobileCard<T> extends StatelessWidget {
+class _MobileCard<T> extends StatefulWidget {
   const _MobileCard({
     required this.item,
     required this.fields,
@@ -925,7 +1016,18 @@ class _MobileCard<T> extends StatelessWidget {
   final IxResponsiveDataViewStrings strings;
 
   @override
+  State<_MobileCard<T>> createState() => _MobileCardState<T>();
+}
+
+class _MobileCardState<T> extends State<_MobileCard<T>> {
+  bool _focused = false;
+
+  @override
   Widget build(BuildContext context) {
+    final item = widget.item;
+    final fields = widget.fields;
+    final onTap = widget.onTap;
+    final strings = widget.strings;
     final theme = Theme.of(context).extension<IxTheme>();
     final cs = Theme.of(context).colorScheme;
     final cardTheme = Theme.of(context).extension<IxCardTheme>();
@@ -946,46 +1048,57 @@ class _MobileCard<T> extends StatelessWidget {
     // `label: null` (like `_DesktopRow`) so the field label/value texts
     // below merge into this button's accessible name automatically instead
     // of it announcing just a single hand-picked field.
+    final radius = BorderRadius.circular(4); // IX Card radius
     return Semantics(
       button: true,
       label: null,
       hint: strings.rowHint,
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
+      child: IxFocusRing(
+        focused: _focused,
+        borderRadius: radius,
+        // The card background lives on a `Material` rather than on the box
+        // around it, so the `InkWell`'s hover and press feedback has an ink
+        // canvas *inside* the card: painted on the enclosing page Material
+        // instead, it was hidden under this opaque background.
+        child: Material(
+          type: MaterialType.card,
           color: cardColor,
-          border: Border.all(color: borderColor),
-          borderRadius: BorderRadius.circular(4), // IX Card radius
-        ),
-        child: InkWell(
-          onTap: onTap,
-          focusColor: Colors.transparent,
-          hoverColor: ghostHover,
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: fields.map((field) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: 100,
-                        child: Text(
-                          field.label,
-                          style: theme?.textStyle(
-                            IxTypographyVariant.label,
-                            tone: IxThemeTextTone.soft,
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: radius,
+            side: BorderSide(color: borderColor),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            focusColor: Colors.transparent,
+            hoverColor: ghostHover,
+            onFocusChange: (focused) => setState(() => _focused = focused),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: fields.map((field) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            field.label,
+                            style: theme?.textStyle(
+                              IxTypographyVariant.label,
+                              tone: IxThemeTextTone.soft,
+                            ),
                           ),
                         ),
-                      ),
-                      Expanded(child: field.valueBuilder(context, item)),
-                    ],
-                  ),
-                );
-              }).toList(),
+                        Expanded(child: field.valueBuilder(context, item)),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
             ),
           ),
         ),

@@ -79,6 +79,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - an `IxDropdownButton` menu exposes its rows to assistive technology from the first frame of its fade-in. The transparent opening frame dropped their semantics, which also left the `menu` role node child-less and tripped the framework's "a menu cannot be empty" assertion on every open in a debug build with semantics enabled
 - the dropdown menu is laid out inside the safe area: the status bar, a notch and the home indicator no longer count as room, so a menu near the bottom of the screen flips above the trigger instead of hiding under the home indicator
 - `bottomStart`/`bottomEnd`/`topStart`/`topEnd` align the dropdown menu to the *reading* start/end, so in RTL the menu's right edge lines up with the trigger's right edge instead of its physical left
+- `IxResponsiveDataView`'s sortable headers, desktop rows and mobile cards paint the Siemens IX focus ring while they hold the keyboard focus. They have been focusable since this release, but `ThemeData.focusColor` is transparent app-wide (`IxFocusRing` owns the affordance), so they showed nothing at all (WCAG 2.4.7)
+- hover and press feedback is visible again on those headers, rows and cards. Their `InkWell` had no `Material` of its own, so the ink painted on the enclosing page's Material -- underneath the opaque background each of them draws. The background now lives on a `Material` inside each one
+- a non-sortable `IxResponsiveDataView` column heading is no longer published as a *disabled* control (`button: false` + `enabled: false`); it is a plain label, and screen readers stop announcing it as unavailable
 
 ---
 

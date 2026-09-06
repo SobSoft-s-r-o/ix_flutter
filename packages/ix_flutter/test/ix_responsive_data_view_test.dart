@@ -477,6 +477,23 @@ void main() {
       },
     );
 
+    testWidgets('a non-sortable header is a plain label, not a disabled '
+        'control', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpIx(
+        tester,
+        // `enableSorting` is off, so every heading is a plain label even
+        // though the columns declare a sortKey.
+        buildTestWidget(items: testItems, columns: sortableDesktopColumns),
+        size: const Size(1024, 768),
+      );
+      expect(
+        tester.getSemantics(find.text('Name').first),
+        isSemantics(hasEnabledState: false, isButton: false, label: 'Name'),
+      );
+      handle.dispose();
+    });
+
     testWidgets('rows are focusable buttons only when onRowTapDesktop is set', (
       tester,
     ) async {
