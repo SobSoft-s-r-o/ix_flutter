@@ -32,6 +32,14 @@ void expectFocusOn(WidgetTester tester, String label) {
   );
 }
 
+/// The strings `IxApplicationStrings` now defers to: the drawer button
+/// and the fly-out's close button take Flutter's own localized names
+/// unless the app overrides them.
+final String _openDrawer =
+    const DefaultMaterialLocalizations().openAppDrawerTooltip;
+final String _closePanel =
+    const DefaultMaterialLocalizations().closeButtonTooltip;
+
 void main() {
   const withDisabled = [
     IxMenuEntry(id: 'first', type: IxMenuEntryType.item, label: 'First'),
@@ -213,7 +221,7 @@ void main() {
     );
     expect(tester.takeException(), isNull);
 
-    await tester.tap(find.byTooltip('Open menu'));
+    await tester.tap(find.byTooltip(_openDrawer));
     await tester.pumpAndSettle();
     expect(find.text('One'), findsOneWidget);
 

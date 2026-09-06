@@ -14,6 +14,7 @@ class IxResponsiveDataViewStrings {
     this.pageOfBuilder,
     this.pageBuilder,
     this.rowsPerPageLabel = 'Items per page:',
+    this.pageSelectionLabel = 'Page selection',
     this.totalItemsBuilder,
     this.resultsCountBuilder,
     this.detailsTitle = 'Details',
@@ -38,6 +39,10 @@ class IxResponsiveDataViewStrings {
   final String Function(int page, int totalPages)? pageOfBuilder;
   final String Function(int page)? pageBuilder;
   final String rowsPerPageLabel;
+
+  /// Accessible name of the pagination bar's page-size trigger, mapped onto
+  /// [IxPaginationStrings.pageSelection].
+  final String pageSelectionLabel;
   final String Function(int count)? totalItemsBuilder;
   final String Function(int count)? resultsCountBuilder;
   final String detailsTitle;

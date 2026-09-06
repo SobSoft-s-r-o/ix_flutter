@@ -300,6 +300,12 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         return widget.settings != null;
       case _kAboutEntryId:
         return widget.about != null;
+      case 'settings':
+        return widget.settings != null &&
+            _findEntry(widget.entries, anchorId) != null;
+      case 'about-legal':
+        return widget.about != null &&
+            _findEntry(widget.entries, anchorId) != null;
       default:
         return _findEntry(widget.entries, anchorId) != null;
     }
@@ -426,8 +432,11 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
   /// the app still supplies the reserved entry that fills the same role, so
   /// a menu never shows two settings, theme or about rows.
   List<IxMenuEntry> get _builtInBottomEntries {
+    // Every entry, not only the bottom ones: a reserved id used in the top
+    // list fills the same role, and suppressing the built-in only for a
+    // bottom one produced two settings rows.
     bool hasReserved(String id) =>
-        widget.entries.any((entry) => entry.isBottom && entry.id == id);
+        widget.entries.any((entry) => entry.id == id);
 
     return [
       if (widget.settings != null &&
@@ -534,7 +543,11 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
               builder: (context) {
                 return IxIconButton(
                   icon: const IxIcon.key(IxIconKey.apps),
-                  tooltip: _strings.openMenu,
+                  // Flutter already localizes this button's name for every
+                  // locale the app declares; an explicit string overrides it.
+                  tooltip:
+                      _strings.openMenu ??
+                      MaterialLocalizations.of(context).openAppDrawerTooltip,
                   onPressed: () {
                     Scaffold.of(context).openDrawer();
                   },
@@ -636,10 +649,13 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
 
     final Widget? content;
     final String title;
-    if (anchorId == _kSettingsEntryId) {
+    // The reserved 1.x ids are aliases of the built-in entries: an app that
+    // keeps `IxMenuEntry(id: 'settings')` while adopting `settings:` gets
+    // the panel from its own row.
+    if (anchorId == _kSettingsEntryId || anchorId == 'settings') {
       content = widget.settings;
       title = _strings.settings;
-    } else if (anchorId == _kAboutEntryId) {
+    } else if (anchorId == _kAboutEntryId || anchorId == 'about-legal') {
       content = widget.about;
       title = _strings.about;
     } else {
@@ -931,6 +947,16 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         if (widget.showSettings) {
           // ignore: deprecated_member_use_from_same_package
           widget.onOpenSettings?.call();
+          if (widget.settings != null) {
+            // The reserved entry replaces the built-in row (see
+            // `_builtInBottomEntries`), so it has to do the built-in row's
+            // job as well -- otherwise migrating to `settings:` while
+            // keeping the 1.x entry leaves a row that does nothing.
+            // Anchored to this entry's own tile, so closing the panel
+            // hands the focus back to the row the user actually pressed.
+            _toggleFlyout(entry.id);
+            return;
+          }
         }
         break;
       case 'theme-toggle':
@@ -947,6 +973,10 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         if (widget.showAboutLegal) {
           // ignore: deprecated_member_use_from_same_package
           widget.onOpenAboutLegal?.call();
+          if (widget.about != null) {
+            _toggleFlyout(entry.id);
+            return;
+          }
         }
         break;
       default:

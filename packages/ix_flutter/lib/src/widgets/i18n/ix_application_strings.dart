@@ -5,9 +5,11 @@
 /// `:149 i18nToggleTheme`). [menuLabel], [expandSidebar] and
 /// [collapseSidebar] fill the roles of `menu.tsx:125 i18nAriaLabelMenu`
 /// ('Application Navigation'), `:154 i18nExpand` ('Expand') and `:159
-/// i18nCollapse` ('Collapse') with wording of our own; the rest
-/// ([openMenu], the theme names and [closePanel]) label parts that only
-/// exist in this Flutter port and have no upstream counterpart.
+/// i18nCollapse` ('Collapse') with wording of our own; the rest (the theme
+/// names) label parts that only exist in this Flutter port and have no
+/// upstream counterpart. [openMenu] and [closePanel] default to `null`,
+/// which takes the string Flutter already localizes for the same control
+/// (`MaterialLocalizations.openAppDrawerTooltip` / `.closeButtonTooltip`).
 ///
 /// Pass an instance to `IxApplicationScaffold.strings` to localize the
 /// navigation menu without forking the widget:
@@ -26,7 +28,7 @@ class IxApplicationStrings {
   /// English copy.
   const IxApplicationStrings({
     this.menuLabel = 'Main navigation',
-    this.openMenu = 'Open menu',
+    this.openMenu,
     this.expandSidebar = 'Expand sidebar',
     this.collapseSidebar = 'Collapse sidebar',
     this.settings = 'Settings',
@@ -35,7 +37,7 @@ class IxApplicationStrings {
     this.themeSystem = 'System',
     this.themeLight = 'Light',
     this.themeDark = 'Dark',
-    this.closePanel = 'Close',
+    this.closePanel,
   });
 
   /// Accessible name of the navigation menu's `menuBar` landmark
@@ -45,10 +47,11 @@ class IxApplicationStrings {
   /// Tooltip and accessible name of the app bar button that opens the
   /// navigation drawer on small screens.
   ///
-  /// This replaces `MaterialLocalizations.openAppDrawerTooltip`, which
-  /// Flutter localizes automatically -- a localized app should therefore set
-  /// this string along with the rest.
-  final String openMenu;
+  /// `null` (the default) uses
+  /// `MaterialLocalizations.openAppDrawerTooltip`, which Flutter localizes
+  /// for every locale the app declares -- the same string a plain
+  /// `Scaffold` gives its drawer button. Set it only to override that.
+  final String? openMenu;
 
   /// Tooltip of the sidebar toggle while the menu is collapsed
   /// (upstream `menu.tsx:154 i18nExpand`, 'Expand').
@@ -85,5 +88,7 @@ class IxApplicationStrings {
   final String themeDark;
 
   /// Tooltip and accessible name of the fly-out panel's close button.
-  final String closePanel;
+  ///
+  /// `null` (the default) uses `MaterialLocalizations.closeButtonTooltip`.
+  final String? closePanel;
 }

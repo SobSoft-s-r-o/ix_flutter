@@ -49,6 +49,14 @@ import '../helpers/upstream.dart';
 /// The viewport the fly-out must stay inside, in global coordinates.
 Rect _viewportRect(Size size) => Offset.zero & size;
 
+/// The strings `IxApplicationStrings` now defers to: the drawer button
+/// and the fly-out's close button take Flutter's own localized names
+/// unless the app overrides them.
+final String _openDrawer =
+    const DefaultMaterialLocalizations().openAppDrawerTooltip;
+final String _closePanel =
+    const DefaultMaterialLocalizations().closeButtonTooltip;
+
 void main() {
   testWidgets(
     'collapsed rail: category opens a fly-out with children; Escape closes '
@@ -151,7 +159,7 @@ void main() {
       await tester.pump(const Duration(milliseconds: 200));
       expect(find.text('settings-panel'), findsOneWidget);
 
-      await tester.tap(find.byTooltip('Close'));
+      await tester.tap(find.byTooltip(_closePanel));
       await tester.pump(const Duration(milliseconds: 200));
       expect(find.text('settings-panel'), findsNothing);
 
@@ -326,7 +334,7 @@ void main() {
         size: const Size(600, 800),
       );
 
-      await tester.tap(find.byTooltip('Open menu'));
+      await tester.tap(find.byTooltip(_openDrawer));
       // The drawer's own slide-in is not driven by MediaQuery, so it needs
       // to settle rather than a single fixed pump.
       await tester.pumpAndSettle();
@@ -399,7 +407,7 @@ void main() {
         textDirection: TextDirection.rtl,
       );
 
-      await tester.tap(find.byTooltip('Open menu'));
+      await tester.tap(find.byTooltip(_openDrawer));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();
@@ -673,7 +681,7 @@ void main() {
         size: size,
       );
 
-      await tester.tap(find.byTooltip('Open menu'));
+      await tester.tap(find.byTooltip(_openDrawer));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Settings'));
       await tester.pumpAndSettle();

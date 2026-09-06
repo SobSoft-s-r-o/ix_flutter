@@ -130,6 +130,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
     this.noResultsTextBuilder,
     this.mobileItemBuilder,
     this.strings,
+    this.paginationStrings,
     this.stringsResolver,
   });
 
@@ -169,6 +170,15 @@ class IxResponsiveDataView<T> extends StatelessWidget {
 
   /// Optional strings override for this widget instance.
   final IxResponsiveDataViewStrings? strings;
+
+  /// Optional pagination strings, forwarded to the [IxPaginationBar] this
+  /// view builds.
+  ///
+  /// Without it the bar's strings are bridged from [strings], which covers
+  /// every label except the page-size trigger's accessible name -- set
+  /// [IxResponsiveDataViewStrings.pageSelectionLabel] for that, or pass a
+  /// whole [IxPaginationStrings] here.
+  final IxPaginationStrings? paginationStrings;
 
   /// Optional resolver to fetch strings from context (e.g. AppLocalizations).
   final IxResponsiveDataViewStrings Function(BuildContext context)?
@@ -253,6 +263,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             resultsLabelBuilder: resultsLabelBuilder,
             itemBuilder: mobileItemBuilder,
             strings: effectiveStrings,
+            paginationStrings: paginationStrings,
           );
         } else {
           return _DesktopView<T>(
@@ -279,6 +290,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             resultsCountOverride: resultsCountOverride,
             resultsLabelBuilder: resultsLabelBuilder,
             strings: effectiveStrings,
+            paginationStrings: paginationStrings,
           );
         }
       },
@@ -326,6 +338,7 @@ class _DesktopView<T> extends StatefulWidget {
     this.resultsCountOverride,
     this.resultsLabelBuilder,
     required this.strings,
+    this.paginationStrings,
   });
 
   final List<T> items;
@@ -352,6 +365,7 @@ class _DesktopView<T> extends StatefulWidget {
   final int? resultsCountOverride;
   final String Function(int count)? resultsLabelBuilder;
   final IxResponsiveDataViewStrings strings;
+  final IxPaginationStrings? paginationStrings;
 
   @override
   State<_DesktopView<T>> createState() => _DesktopViewState<T>();
@@ -571,6 +585,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
             onPageChanged: widget.onPageChanged!,
             onPageSizeChanged: widget.onPageSizeChanged,
             strings: widget.strings,
+            paginationStrings: widget.paginationStrings,
           ),
       ],
     );
@@ -852,6 +867,7 @@ class _MobileView<T> extends StatefulWidget {
     this.resultsLabelBuilder,
     this.itemBuilder,
     required this.strings,
+    this.paginationStrings,
   });
 
   final List<T> items;
@@ -873,6 +889,7 @@ class _MobileView<T> extends StatefulWidget {
   final String Function(int count)? resultsLabelBuilder;
   final Widget Function(BuildContext context, T item)? itemBuilder;
   final IxResponsiveDataViewStrings strings;
+  final IxPaginationStrings? paginationStrings;
 
   @override
   State<_MobileView<T>> createState() => _MobileViewState<T>();
@@ -996,6 +1013,7 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
             // Minimal mobile pagination usually doesn't show page size options
             onPageChanged: widget.onPageChanged!,
             strings: widget.strings,
+            paginationStrings: widget.paginationStrings,
           ),
       ],
     );

@@ -66,6 +66,7 @@ class IxPaginationStrings {
       previousPage: s.paginationPrevTooltip,
       nextPage: s.paginationNextTooltip,
       rowsPerPage: s.rowsPerPageLabel,
+      pageSelection: s.pageSelectionLabel,
       pageOf: s.pageOf,
       page: s.page,
       totalItems: s.totalItems,

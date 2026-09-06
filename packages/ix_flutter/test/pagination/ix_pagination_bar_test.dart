@@ -117,4 +117,84 @@ void main() {
     );
     expect(find.byTooltip('Ďalšia strana'), findsOneWidget);
   });
+
+  testWidgets('IxResponsiveDataView localizes the page-size trigger', (
+    tester,
+  ) async {
+    await pumpIx(
+      tester,
+      IxResponsiveDataView<int>(
+        items: const [1, 2, 3],
+        desktopColumns: [
+          IxColumnDef<int>(
+            label: 'N',
+            cellBuilder: (context, item) => Text('$item'),
+          ),
+        ],
+        mobileFields: [
+          IxMobileFieldDef<int>(
+            label: 'N',
+            valueBuilder: (context, item) => Text('$item'),
+          ),
+        ],
+        rowActions: const [],
+        pagination: const IxPaginationConfig(
+          mode: IxPaginationMode.standard,
+          page: 0,
+          pageSize: 10,
+          totalPages: 3,
+          pageSizeOptions: [10, 25],
+        ),
+        onPageChanged: (_) {},
+        onPageSizeChanged: (_) {},
+        strings: const IxResponsiveDataViewStrings(
+          pageSelectionLabel: 'Seitenauswahl',
+        ),
+      ),
+      size: const Size(1024, 768),
+    );
+
+    expect(find.bySemanticsLabel('Seitenauswahl'), findsOneWidget);
+  });
+
+  testWidgets('IxResponsiveDataView forwards an explicit paginationStrings', (
+    tester,
+  ) async {
+    await pumpIx(
+      tester,
+      IxResponsiveDataView<int>(
+        items: const [1, 2, 3],
+        desktopColumns: [
+          IxColumnDef<int>(
+            label: 'N',
+            cellBuilder: (context, item) => Text('$item'),
+          ),
+        ],
+        mobileFields: [
+          IxMobileFieldDef<int>(
+            label: 'N',
+            valueBuilder: (context, item) => Text('$item'),
+          ),
+        ],
+        rowActions: const [],
+        pagination: const IxPaginationConfig(
+          mode: IxPaginationMode.standard,
+          page: 0,
+          pageSize: 10,
+          totalPages: 3,
+          pageSizeOptions: [10, 25],
+        ),
+        onPageChanged: (_) {},
+        onPageSizeChanged: (_) {},
+        paginationStrings: const IxPaginationStrings(
+          pageSelection: 'Pages',
+          previousPage: 'Zuruck',
+        ),
+      ),
+      size: const Size(1024, 768),
+    );
+
+    expect(find.bySemanticsLabel('Pages'), findsOneWidget);
+    expect(find.byTooltip('Zuruck'), findsOneWidget);
+  });
 }

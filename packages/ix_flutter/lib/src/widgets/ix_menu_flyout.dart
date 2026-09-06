@@ -179,7 +179,11 @@ class _IxMenuFlyoutState extends State<IxMenuFlyout> {
                               ),
                               IxIconButton(
                                 icon: const IxIcon.key(IxIconKey.close),
-                                tooltip: widget.strings.closePanel,
+                                tooltip:
+                                    widget.strings.closePanel ??
+                                    MaterialLocalizations.of(
+                                      context,
+                                    ).closeButtonTooltip,
                                 onPressed: _close,
                               ),
                             ],
