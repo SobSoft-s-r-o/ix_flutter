@@ -105,7 +105,8 @@ class IxDropdownMenuItem<T> {
 ///
 /// | Key | On the trigger | In the menu |
 /// | --- | --- | --- |
-/// | `ArrowDown`, `Home`, `Enter`, `Space` | opens on the first item | — |
+/// | `ArrowDown`, `Enter`, `Space` | opens on the checked item, else the first | — |
+/// | `Home` | opens on the first item | — |
 /// | `ArrowUp`, `End` | opens on the last item | — |
 /// | `ArrowDown` / `ArrowUp` | — | cycles, skipping disabled rows |
 /// | `Home` / `End` | — | first / last enabled row |
@@ -338,6 +339,24 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     return null;
   }
 
+  /// The row a menu opens on when nothing more specific was asked for: the
+  /// checked one, so the menu opens showing where the user already is
+  /// (upstream `dropdown.tsx`), falling back to the first enabled row when
+  /// nothing is checked. A checked row that is also disabled cannot take
+  /// the focus, so it falls back as well.
+  ///
+  /// The explicit positional keys keep their own meaning: `Home` opens on
+  /// the first row and `ArrowUp`/`End` on the last, checked or not.
+  int? _checkedOrFirstEnabled() {
+    for (var i = 0; i < widget.items.length; i++) {
+      final item = widget.items[i];
+      if (item.checked && !item.disabled) {
+        return i;
+      }
+    }
+    return _firstEnabled();
+  }
+
   /// Requests focus for row [index] and scrolls it into view; the request is
   /// honoured as soon as the overlay attaches the node, so it is safe to call
   /// while opening.
@@ -423,7 +442,7 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     if (widget.disabled) {
       return;
     }
-    _setOpen(!_isOpen, focusIndex: _isOpen ? null : _firstEnabled());
+    _setOpen(!_isOpen, focusIndex: _isOpen ? null : _checkedOrFirstEnabled());
   }
 
   void _selectItem(IxDropdownMenuItem<T> item) {
@@ -455,9 +474,12 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
       return KeyEventResult.ignored;
     }
     if (key == LogicalKeyboardKey.arrowDown ||
-        key == LogicalKeyboardKey.home ||
         key == LogicalKeyboardKey.enter ||
         key == LogicalKeyboardKey.space) {
+      _setOpen(true, focusIndex: _checkedOrFirstEnabled());
+      return KeyEventResult.handled;
+    }
+    if (key == LogicalKeyboardKey.home) {
       _setOpen(true, focusIndex: _firstEnabled());
       return KeyEventResult.handled;
     }

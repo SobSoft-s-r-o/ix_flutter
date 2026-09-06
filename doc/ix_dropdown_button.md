@@ -69,6 +69,8 @@ Widget dropdownWithIconAndVariant(ValueChanged<String> onItemSelected) =>
 
 A menu that contains at least one `checked` item reserves a leading checkmark column for every row, so all labels stay aligned. The checked state is exposed to screen readers.
 
+Opening the menu -- by click, `ArrowDown`, `Enter` or `Space` -- puts the focus on the checked item and scrolls it into view, so a menu that picks a value opens showing where the user already is. A menu with nothing checked (an action menu) still opens on its first enabled row. Set `checked` on the row matching the current value whenever the menu selects something rather than running an action.
+
 ```dart
 Widget dropdownWithCheckedItem() => const IxDropdownButton<String>(
   label: 'Sort by',
@@ -166,7 +168,8 @@ Mirrors upstream `dropdown.tsx` / `dropdown-focus.ts`.
 
 | Key | On the trigger | In the menu |
 | :--- | :--- | :--- |
-| `ArrowDown`, `Home`, `Enter`, `Space` | opens the menu on the first enabled item | — |
+| `ArrowDown`, `Enter`, `Space` | opens the menu on the checked item, or the first enabled one when nothing is checked | — |
+| `Home` | opens the menu on the first enabled item | — |
 | `ArrowUp`, `End` | opens the menu on the last enabled item | — |
 | `ArrowDown` / `ArrowUp` | — | moves to the next/previous enabled item, cycling |
 | `Home` / `End` | — | first / last enabled item |

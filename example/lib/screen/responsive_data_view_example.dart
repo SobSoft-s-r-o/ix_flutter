@@ -197,6 +197,10 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
                           (mode) => IxDropdownMenuItem<IxPaginationMode>(
                             label: mode.name.toUpperCase(),
                             value: mode,
+                            // This menu picks a mode rather than running an
+                            // action, so the current one carries the check
+                            // and the menu opens on it.
+                            checked: mode == _paginationMode,
                           ),
                         )
                         .toList(),
