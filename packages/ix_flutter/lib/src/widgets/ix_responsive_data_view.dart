@@ -199,7 +199,10 @@ class IxResponsiveDataView<T> extends StatelessWidget {
       if (searchQuery != null && searchQuery!.isNotEmpty) {
         return Center(
           child: IxEmptyState(
-            icon: const IxIcon.key(IxIconKey.search, size: IxIconSize.s32),
+            // No `size:`: `IxEmptyState` styles its icon slot (56px in the
+            // large layout, 32px compact) and an explicit size would
+            // override it.
+            icon: const IxIcon.key(IxIconKey.search),
             title:
                 noResultsTextBuilder?.call(searchQuery!) ??
                 effectiveStrings.noResultsTitle(searchQuery!),
@@ -223,7 +226,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
       }
       return Center(
         child: IxEmptyState(
-          icon: const IxIcon.key(IxIconKey.info, size: IxIconSize.s32),
+          icon: const IxIcon.key(IxIconKey.info),
           title: effectiveStrings.emptyTitle,
           subtitle: effectiveStrings.emptyBody,
         ),

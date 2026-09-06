@@ -192,7 +192,9 @@ class IxBreadcrumb extends StatelessWidget {
               homeIcon:
                   homeIcon ??
                   rootItem.icon ??
-                  const IxIcon.key(IxIconKey.home, size: IxIconSize.s16),
+                  // No `size:`: the home slot styles its icon at 18px (the
+                  // width `_homeButtonWidth` reserves for it).
+                  const IxIcon.key(IxIconKey.home),
               menuItems: items,
               menuLabel: menuSemanticLabel,
               showNavigationMenu: showNavigationMenu && items.length > 1,

@@ -21,7 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 Widget largeEmptyState(VoidCallback onCreate) => IxEmptyState(
-  icon: const IxIcon.key(IxIconKey.document, size: IxIconSize.s32),
+  icon: const IxIcon.key(IxIconKey.document),
   title: 'No elements available',
   subtitle: 'Create an element first',
   primaryAction: FilledButton(
@@ -55,7 +55,7 @@ You can specify the semantic type using `IxEmptyStateType`. While visually simil
 ```dart
 Widget errorEmptyState(VoidCallback onRetry) => IxEmptyState(
   type: IxEmptyStateType.error,
-  icon: const IxIcon.key(IxIconKey.error, size: IxIconSize.s32),
+  icon: const IxIcon.key(IxIconKey.error),
   title: 'Something went wrong',
   subtitle: 'Please try again later',
   primaryAction: FilledButton(onPressed: onRetry, child: const Text('Retry')),

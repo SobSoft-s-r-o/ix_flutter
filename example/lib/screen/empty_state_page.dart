@@ -25,7 +25,7 @@ class EmptyStatePage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             IxEmptyState(
-              icon: IxIcon(IxIconsData.add, size: IxIconSize.s32),
+              icon: IxIcon(IxIconsData.add),
               title: 'No elements available',
               subtitle: 'Create an element first',
               primaryAction: FilledButton(
@@ -44,7 +44,7 @@ class EmptyStatePage extends StatelessWidget {
             const SizedBox(height: 16),
             IxEmptyState(
               layout: IxEmptyStateLayout.compact,
-              icon: IxIcon(IxIconsData.search, size: IxIconSize.s32),
+              icon: IxIcon(IxIconsData.search),
               title: 'No results found',
               subtitle: 'Try adjusting your search terms',
               primaryAction: FilledButton(
@@ -63,7 +63,7 @@ class EmptyStatePage extends StatelessWidget {
             const SizedBox(height: 16),
             IxEmptyState(
               type: IxEmptyStateType.error,
-              icon: IxIcon(IxIconsData.error, size: IxIconSize.s32),
+              icon: IxIcon(IxIconsData.error),
               title: 'Something went wrong',
               subtitle: 'Please try again later',
               primaryAction: FilledButton(
