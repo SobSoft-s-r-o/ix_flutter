@@ -37,6 +37,7 @@ void main() {
             isEnabled: true,
             isFocusable: true,
             hasTapAction: true,
+            hasFocusAction: true,
             label: 'Section',
           ),
         );

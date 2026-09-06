@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
+import '../helpers/fixture_asset_bundle.dart';
 import '../helpers/pump_ix.dart';
 import '../helpers/upstream.dart';
 
@@ -172,5 +174,72 @@ void main() {
       mode: ThemeMode.light,
     ).build().extension<IxTheme>()!;
     expect(icon.color, ix.color(IxThemeColorToken.alarm));
+  });
+
+  testWidgets('an SVG icon adds no image node of its own', (tester) async {
+    final handle = tester.ensureSemantics();
+    await pumpIx(
+      tester,
+      DefaultAssetBundle(
+        bundle: FixtureAssetBundle(const {
+          'valid.svg': 'test/fixtures/icons/valid.svg',
+        }),
+        child: IxIconButton(
+          icon: const IxIcon(IxIconData.asset('valid.svg')),
+          tooltip: 'Refresh',
+          onPressed: () {},
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+
+    // `IxIcon` owns the icon's semantics; `SvgPicture`'s own `image: true`
+    // node would announce a labelled button as an image on top of it.
+    expect(
+      tester.getSemantics(find.byType(IxIconButton)).flagsCollection.isImage,
+      isFalse,
+    );
+    handle.dispose();
+  });
+
+  testWidgets('an SVG icon honours IconThemeData.opacity', (tester) async {
+    await pumpIx(
+      tester,
+      DefaultAssetBundle(
+        bundle: FixtureAssetBundle(const {
+          'valid.svg': 'test/fixtures/icons/valid.svg',
+        }),
+        child: const IconTheme(
+          data: IconThemeData(size: 24, color: Color(0xFF102030), opacity: 0.5),
+          child: IxIcon(IxIconData.asset('valid.svg')),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final picture = tester.widget<SvgPicture>(find.byType(SvgPicture));
+    expect(
+      picture.colorFilter,
+      ColorFilter.mode(
+        const Color(0xFF102030).withValues(alpha: 0.5),
+        BlendMode.srcIn,
+      ),
+    );
+  });
+
+  testWidgets('a Material icon honours IconThemeData.opacity too', (
+    tester,
+  ) async {
+    await pumpIx(
+      tester,
+      const IconTheme(
+        data: IconThemeData(size: 24, color: Color(0xFF102030), opacity: 0.5),
+        child: IxIcon(IxMaterialIconData(Icons.close)),
+      ),
+    );
+    expect(
+      tester.widget<Icon>(find.byType(Icon)).color,
+      const Color(0xFF102030).withValues(alpha: 0.5),
+    );
   });
 }

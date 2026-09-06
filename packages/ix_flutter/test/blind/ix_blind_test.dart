@@ -56,6 +56,7 @@ void main() {
             isEnabled: true,
             isFocusable: true,
             hasTapAction: true,
+            hasFocusAction: true,
             label: 'Section',
             hint: 'Sub',
           ),
@@ -245,6 +246,7 @@ void main() {
         isFocusable: true,
         isFocused: true,
         hasTapAction: true,
+        hasFocusAction: true,
         label: 'First',
       ),
     );
@@ -257,6 +259,7 @@ void main() {
         isEnabled: true,
         isFocusable: true,
         hasTapAction: true,
+        hasFocusAction: true,
         label: 'Second',
       ),
     );

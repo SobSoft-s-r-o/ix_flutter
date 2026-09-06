@@ -99,6 +99,7 @@ void main() {
             isEnabled: true,
             isFocusable: true,
             hasTapAction: true,
+            hasFocusAction: true,
             label: 'Home',
           ),
         );
@@ -112,6 +113,7 @@ void main() {
             isEnabled: true,
             isFocusable: true,
             hasTapAction: true,
+            hasFocusAction: true,
             label: 'Reports',
           ),
         );
@@ -125,6 +127,7 @@ void main() {
             isEnabled: true,
             isFocusable: true,
             hasTapAction: true,
+            hasFocusAction: true,
             label: 'Toggle theme',
             value: 'Dark',
           ),
@@ -184,6 +187,7 @@ void main() {
           isFocusable: true,
           isFocused: true,
           hasTapAction: true,
+          hasFocusAction: true,
           label: 'Home',
         ),
       );
@@ -196,6 +200,7 @@ void main() {
           isEnabled: true,
           isFocusable: true,
           hasTapAction: true,
+          hasFocusAction: true,
           label: 'Profile',
         ),
         reason: 'an unfocused tile keeps reporting isFocused: false',

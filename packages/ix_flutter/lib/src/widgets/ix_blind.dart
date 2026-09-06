@@ -425,6 +425,10 @@ class _IxBlindHeader extends StatelessWidget {
       label: title,
       hint: subtitle,
       onTap: onTap,
+      // `excludeSemantics` drops the `InkWell`'s own `focus` action along
+      // with the rest of its node, so a screen reader could see that this
+      // header is focusable but had no way to focus it. Republished here.
+      onFocus: disabled ? null : focusNode.requestFocus,
       excludeSemantics: true,
       child: Material(
         color: Colors.transparent, // Container handles background

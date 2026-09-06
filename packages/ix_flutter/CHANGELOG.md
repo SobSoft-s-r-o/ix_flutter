@@ -98,6 +98,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - the scaffold's drawer button and the fly-out panel's close button are localized again: `IxApplicationStrings.openMenu` and `.closePanel` are now `String?` and default to `null`, which takes `MaterialLocalizations.openAppDrawerTooltip` / `.closeButtonTooltip` -- the strings Flutter already translates for every locale the app declares. A string passed explicitly still wins
 - a reserved `settings`/`about-legal` menu entry opens the matching `settings:`/`about:` panel (and still calls the deprecated `onOpenSettings`/`onOpenAboutLegal`). Keeping the 1.x entry while adopting the new parameters used to leave a row that did nothing, because the entry suppressed the built-in row and the callback it invoked was already null. A reserved id in the *top* entry list now suppresses the built-in row as well, instead of producing two identical rows
 - `IxResponsiveDataView` can localize the pagination bar's page-size trigger: `IxResponsiveDataViewStrings.pageSelectionLabel` (bridged into `IxPaginationStrings.pageSelection`), or a whole `IxPaginationStrings` through the new `paginationStrings` parameter
+- an enabled `IxBlind` header and `IxApplicationScaffold` menu tile publish a `focus` action, so assistive technology can move the focus to a control they already report as focusable. `excludeSemantics: true` had dropped the `InkWell`'s own action along with the rest of its node (WCAG 2.4.7)
+- an SVG-backed `IxIcon` no longer adds an `image: true` semantics annotation of its own. `IxIcon` owns the icon's semantics, and `SvgPicture`'s annotation merged into the enclosing node -- so an `IxIconButton` with an asset icon announced itself as an image, which the Material branch never did
+- both `IxIcon` branches honour `IconThemeData.opacity`, the way Material's own `Icon` does, so an icon in a slot that dims its contents is dimmed too
 
 ---
 

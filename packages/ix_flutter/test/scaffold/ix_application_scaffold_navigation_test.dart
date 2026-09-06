@@ -32,13 +32,10 @@ void expectFocusOn(WidgetTester tester, String label) {
   );
 }
 
-/// The strings `IxApplicationStrings` now defers to: the drawer button
-/// and the fly-out's close button take Flutter's own localized names
-/// unless the app overrides them.
+/// The drawer button now takes Flutter's own localized name unless the app
+/// overrides it (`IxApplicationStrings.openMenu`).
 final String _openDrawer =
     const DefaultMaterialLocalizations().openAppDrawerTooltip;
-final String _closePanel =
-    const DefaultMaterialLocalizations().closeButtonTooltip;
 
 void main() {
   const withDisabled = [

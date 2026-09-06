@@ -1946,6 +1946,10 @@ class _NavigationTileState extends State<_NavigationTile> {
       value: widget.value,
       hint: widget.entry.tooltip,
       onTap: widget.enabled ? widget.onTap : null,
+      // Same reason as `focused` above: `excludeSemantics` drops the
+      // `InkWell`'s own `focus` action, leaving a tile that says it is
+      // focusable but cannot be focused from assistive technology.
+      onFocus: widget.enabled ? widget.focusNode?.requestFocus : null,
       excludeSemantics: true,
       child: Padding(
         padding: EdgeInsetsDirectional.only(start: widget.depth * 16.0),

@@ -157,4 +157,28 @@ void main() {
     expect(IxMotion.xSlow, const Duration(milliseconds: 1000));
     expect(IxMotion.short, Duration.zero);
   });
+
+  testWidgets('IxSpinner and IxMotion tolerate a tree without a MediaQuery', (
+    tester,
+  ) async {
+    // 1.0.2 rendered an `IxSpinner` under a bare `Directionality` + `Theme`
+    // (a custom host, a widget test that skips `MaterialApp`); reading the
+    // reduce-motion preference must not make that a crash.
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: Theme(
+          data: const IxThemeBuilder(mode: ThemeMode.light).build(),
+          child: const Center(child: IxSpinner()),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(find.byType(IxSpinner), findsOneWidget);
+
+    expect(
+      IxMotion.of(tester.element(find.byType(IxSpinner)), IxMotion.defaultTime),
+      IxMotion.defaultTime,
+    );
+  });
 }

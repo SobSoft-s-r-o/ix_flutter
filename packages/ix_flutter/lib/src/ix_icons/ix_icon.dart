@@ -116,12 +116,20 @@ class IxIcon extends StatelessWidget {
     final ix = Theme.of(context).extension<IxTheme>();
     final iconTheme = IconTheme.of(context);
     final resolvedSize = size?.px ?? iconTheme.size ?? _defaultSizePx;
-    final resolvedColor =
+    final baseColor =
         color ??
         (colorToken != null && ix != null ? ix.color(colorToken!) : null) ??
         iconTheme.color ??
         ix?.color(IxThemeColorToken.stdText) ??
         Theme.of(context).colorScheme.onSurface;
+    // `IconThemeData.opacity` is how a slot dims the icon it hosts (a
+    // disabled `ListTile`'s leading icon, say). Material's own `Icon`
+    // applies it; both branches here have to as well, or an `IxIcon` would
+    // be the one icon in such a slot rendering at full strength.
+    final opacity = iconTheme.opacity;
+    final resolvedColor = opacity == null
+        ? baseColor
+        : baseColor.withValues(alpha: baseColor.a * opacity);
     final label = semanticLabel ?? resolved.semanticLabel;
 
     Widget child = switch (resolved) {
@@ -484,6 +492,12 @@ class _IxSvgIconState extends State<_IxSvgIcon> {
       widget.loader,
       width: widget.sizePx,
       height: widget.sizePx,
+      // `IxIcon` owns this icon's semantics (see its `build`). Left on,
+      // `SvgPicture` annotates its subtree `image: true` with an empty
+      // label, which merges into whatever node encloses it -- so an
+      // `IxIconButton` would announce itself as an image, something the
+      // Material branch of `IxIcon` never does.
+      excludeFromSemantics: true,
       colorFilter: ColorFilter.mode(widget.color, BlendMode.srcIn),
       placeholderBuilder: (_) => SizedBox.square(dimension: widget.sizePx),
       // Belt and braces: the guarded loader never fails, so this only runs
