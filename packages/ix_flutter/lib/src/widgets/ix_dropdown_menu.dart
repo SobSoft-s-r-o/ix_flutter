@@ -289,7 +289,6 @@ class _IxDropdownMenuItemTile<T> extends StatefulWidget {
     required this.theme,
     required this.focusNode,
     required this.reserveCheckColumn,
-    required this.onFocused,
     required this.onTap,
   });
 
@@ -297,7 +296,6 @@ class _IxDropdownMenuItemTile<T> extends StatefulWidget {
   final IxDropdownTheme theme;
   final FocusNode? focusNode;
   final bool reserveCheckColumn;
-  final VoidCallback onFocused;
   final VoidCallback? onTap;
 
   @override
@@ -335,12 +333,7 @@ class _IxDropdownMenuItemTileState<T>
           hoverColor: theme.itemHover,
           highlightColor: theme.itemActive,
           splashColor: theme.itemActive,
-          onFocusChange: (focused) {
-            if (focused) {
-              widget.onFocused();
-            }
-            setState(() => _focused = focused);
-          },
+          onFocusChange: (focused) => setState(() => _focused = focused),
           child: ExcludeSemantics(
             child: ConstrainedBox(
               constraints: BoxConstraints(minHeight: theme.itemHeight),

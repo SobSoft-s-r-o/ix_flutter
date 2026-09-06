@@ -230,7 +230,16 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
   final Object _tapRegionGroupId = Object();
 
   bool _internalOpen = false;
-  int? _focusedIndex;
+
+  /// Row a *controlled* open asked to focus, held until the owner actually
+  /// opens the menu.
+  ///
+  /// Requesting focus on a row that is not in the tree arms the node
+  /// (`_requestFocusWhenReparented`) until it next attaches -- so an owner
+  /// that declines the request would leave a live claim behind, and the
+  /// *following* accepted open would land on that stale row instead of the
+  /// one the key asked for.
+  int? _pendingFocusIndex;
 
   /// Whether the last build found an [Overlay] able to host the menu.
   ///
@@ -258,8 +267,21 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
   @override
   void didUpdateWidget(covariant IxDropdownButton<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_focusedIndex != null && _focusedIndex! >= widget.items.length) {
-      _focusedIndex = null;
+    final wasControlled = oldWidget.isOpen != null;
+    final isControlled = widget.isOpen != null;
+    if (isControlled && oldWidget.isOpen != widget.isOpen) {
+      if (widget.isOpen!) {
+        // The owner accepted: only now is there a menu to put the focus in.
+        _focusIndex(_pendingFocusIndex);
+      }
+      _pendingFocusIndex = null;
+    }
+    if (wasControlled && !isControlled) {
+      // Handing the menu back to the widget keeps whatever the owner last
+      // said, the way `IxBlind` seeds its uncontrolled state -- snapping it
+      // shut would be a state change the owner never asked for and never
+      // hears about (`onOpenChanged` is for requests, not for this).
+      _internalOpen = oldWidget.isOpen!;
     }
   }
 
@@ -309,10 +331,21 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     if (index == null) {
       return;
     }
-    _focusedIndex = index;
     final node = _focusNodeFor(index);
     node.requestFocus();
     _revealFocusedRow(node);
+  }
+
+  /// The row that currently holds the focus, read from the row nodes
+  /// themselves rather than mirrored in a field that goes stale whenever the
+  /// menu is opened or closed from outside.
+  int? get _focusedIndex {
+    for (final entry in _itemFocus.entries) {
+      if (entry.key < widget.items.length && entry.value.hasFocus) {
+        return entry.key;
+      }
+    }
+    return null;
   }
 
   /// Scrolls the menu by the smallest amount that brings the row owning
@@ -389,7 +422,12 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
   /// In controlled mode ([IxDropdownButton.isOpen] set) this only reports the
   /// request through [IxDropdownButton.onOpenChanged]; the overlay follows
   /// once the owner rebuilds with the new value.
-  void _setOpen(bool open, {int? focusIndex}) {
+  /// [returnFocus] is the keyboard contract: a close driven from the
+  /// keyboard hands the focus back to the trigger, but only if the focus was
+  /// still inside the menu. A pointer never put it there, so a pointer close
+  /// leaves the focus wherever the pointer sent it -- and a selection
+  /// handler that moves the focus itself is not overruled.
+  void _setOpen(bool open, {int? focusIndex, bool returnFocus = false}) {
     if (open == _isOpen) {
       return;
     }
@@ -400,16 +438,19 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
       _warnMissingOverlay();
       return;
     }
-    if (open) {
-      _focusIndex(focusIndex);
-    } else {
-      _focusedIndex = null;
-    }
+    final focusWasInMenu = _menuFocusScope.hasFocus;
     if (widget.isOpen == null) {
       setState(() => _internalOpen = open);
+      if (open) {
+        _focusIndex(focusIndex);
+      }
+    } else {
+      // Controlled: nothing has opened yet, so the row focus is only
+      // remembered (see [_pendingFocusIndex]).
+      _pendingFocusIndex = open ? focusIndex : null;
     }
     widget.onOpenChanged?.call(open);
-    if (!open) {
+    if (!open && returnFocus && focusWasInMenu) {
       _triggerFocus.requestFocus();
     }
   }
@@ -422,11 +463,13 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
   }
 
   void _selectItem(IxDropdownMenuItem<T> item) {
-    widget.onItemSelected?.call(item.value);
+    // Closed first, so a handler that moves the focus somewhere of its own
+    // runs after this widget has finished moving it.
     if (widget.closeBehavior == IxDropdownCloseBehavior.inside ||
         widget.closeBehavior == IxDropdownCloseBehavior.both) {
-      _setOpen(false);
+      _setOpen(false, returnFocus: true);
     }
+    widget.onItemSelected?.call(item.value);
   }
 
   KeyEventResult _onTriggerKey(FocusNode node, KeyEvent event) {
@@ -441,7 +484,7 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
       // close the menu -- a keyboard user has to be able to leave it
       // (WCAG 2.1.2 No Keyboard Trap). Focus is already here, so it stays.
       if (key == LogicalKeyboardKey.escape) {
-        _setOpen(false);
+        _setOpen(false, returnFocus: true);
         return KeyEventResult.handled;
       }
       // Anything else while open belongs to the menu scope.
@@ -467,12 +510,12 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     }
     final key = event.logicalKey;
     if (key == LogicalKeyboardKey.escape) {
-      _setOpen(false);
+      _setOpen(false, returnFocus: true);
       return KeyEventResult.handled;
     }
     if (key == LogicalKeyboardKey.tab) {
       final forward = !HardwareKeyboard.instance.isShiftPressed;
-      _setOpen(false);
+      _setOpen(false, returnFocus: true);
       // The focused row is about to leave the tree, so traversal is resumed
       // from the trigger once the close has been applied.
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -631,7 +674,6 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
                         ? null
                         : _focusNodeFor(i),
                     reserveCheckColumn: reserveCheckColumn,
-                    onFocused: () => _focusedIndex = i,
                     onTap: widget.items[i].disabled
                         ? null
                         : () => _selectItem(widget.items[i]),
