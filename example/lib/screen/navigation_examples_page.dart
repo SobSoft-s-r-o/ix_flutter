@@ -79,20 +79,34 @@ class _BottomAppBarNavigation extends StatelessWidget {
       top: false,
       child: BottomAppBar(
         height: 88,
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            for (var i = 0; i < _navigationSpecs.length; i++)
-              _BottomAppBarItem(
-                label: _navigationSpecs[i].label,
-                icon: _navigationSpecs[i].icon,
-                selectedIcon: _navigationSpecs[i].selectedIcon,
-                selected: selectedIndex == i,
-                colorScheme: colorScheme,
-                onSelect: () => onSelect(i),
-              ),
-          ],
+        padding: EdgeInsets.zero,
+        // Three pills at their natural (icon + label) width don't fit a
+        // narrow phone viewport -- `spaceEvenly` inside a fixed-width `Row`
+        // only redistributes space that is already there, it does not
+        // shrink the pills or make room, so the last one overflowed off
+        // the right edge. A horizontally scrollable strip is the standard
+        // fix for a row of chip/pill switches that may outgrow their
+        // viewport; it still shows every pill at its full, tappable size
+        // at any width, wide screens included.
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < _navigationSpecs.length; i++) ...[
+                if (i > 0) const SizedBox(width: 12),
+                _BottomAppBarItem(
+                  label: _navigationSpecs[i].label,
+                  icon: _navigationSpecs[i].icon,
+                  selectedIcon: _navigationSpecs[i].selectedIcon,
+                  selected: selectedIndex == i,
+                  colorScheme: colorScheme,
+                  onSelect: () => onSelect(i),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
