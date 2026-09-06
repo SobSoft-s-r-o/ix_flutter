@@ -295,4 +295,46 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
     expect(withMouse, IxDensity.compact);
   });
+
+  testWidgets(
+    'a resize that does not change the resolved density reuses the same '
+    'adapted ThemeData object (B5)',
+    (tester) async {
+      // Desktop: resolve() is compact from the platform alone (no mouse
+      // needed) at any width from 600px up, so 1200px and 1100px below
+      // resolve to the same density and the ambient IxThemeBuilder ThemeData
+      // handed to pumpIx is the same object both times -- the two
+      // preconditions IxDensityScope's cache keys on.
+      //
+      // ThemeData's own value equality already stops a fresh-but-equal
+      // instance from rebuilding a Theme.of dependent (Theme's
+      // updateShouldNotify compares by ==), so counting dependents' builds
+      // cannot tell the memoized ThemeData apart from an unmemoized one
+      // that happens to compare equal -- reading Theme.of(element) directly
+      // (which does not depend on any rebuild happening at all) and
+      // comparing object identity is what actually distinguishes them.
+      debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+      const probe = ValueKey('probe');
+      Widget scope() => IxDensityScope(child: const SizedBox(key: probe));
+      await pumpIx(tester, scope(), size: const Size(1200, 800));
+      final element = tester.element(find.byKey(probe));
+      final before = Theme.of(element);
+
+      // pumpIx's own MediaQuery is built fresh from `size:` each call
+      // (`tester.view` resizing alone would not reach it), so calling it
+      // again with the same widget shape and a different size is what
+      // resizing the viewport looks like here: an update, not a remount.
+      await pumpIx(tester, scope(), size: const Size(1100, 800));
+
+      final after = Theme.of(element);
+      debugDefaultTargetPlatformOverride = null;
+      expect(
+        identical(after, before),
+        isTrue,
+        reason:
+            'IxDensityAdapter.apply ran again and built a new (if '
+            'value-equal) ThemeData instead of reusing the cached one',
+      );
+    },
+  );
 }

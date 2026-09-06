@@ -116,7 +116,7 @@ enum IxDensity {
 /// explicit [IxDensity.compact]/[IxDensity.comfortable] to pin the density
 /// for a subtree regardless of input modality; an explicit [IxDensityScope]
 /// always takes precedence over `IxThemeBuilder(density:)`.
-class IxDensityScope extends StatelessWidget {
+class IxDensityScope extends StatefulWidget {
   const IxDensityScope({
     super.key,
     this.density = IxDensity.adaptive,
@@ -138,21 +138,51 @@ class IxDensityScope extends StatelessWidget {
       ?.density;
 
   @override
+  State<IxDensityScope> createState() => _IxDensityScopeState();
+}
+
+class _IxDensityScopeState extends State<IxDensityScope> {
+  // The inputs [IxDensityAdapter.apply] was last called with, and the
+  // `ThemeData` it returned -- reused verbatim while both are unchanged, so
+  // `Theme`'s `updateShouldNotify` (identical/`==` data) sees nothing new
+  // and skips every `Theme.of` dependent in `child`. `MediaQuery.sizeOf`
+  // inside `IxDensity.resolve` makes a viewport resize rebuild this widget
+  // on every frame of the drag; on any platform where that does not also
+  // change the resolved density (most of them, most of the time), the
+  // ambient `ThemeData` handed down from above is the same object it always
+  // is, so this reduces such a resize to redoing this one, cheap
+  // comparison instead of reapplying every button/checkbox/radio/switch/
+  // slider theme's `copyWith`.
+  ThemeData? _baseTheme;
+  IxDensity? _resolvedDensity;
+  ThemeData? _adaptedTheme;
+
+  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
       // Rebuilds this scope when a mouse connects/disconnects, so `adaptive`
       // re-resolves live rather than only on unrelated rebuilds.
       listenable: RendererBinding.instance.mouseTracker,
       builder: (context, _) {
-        final resolved = density == IxDensity.adaptive
+        final resolved = widget.density == IxDensity.adaptive
             ? IxDensity.resolve(context)
-            : density;
+            : widget.density;
+        final base = Theme.of(context);
+        final cached = _adaptedTheme;
+        final ThemeData adapted;
+        if (cached != null &&
+            identical(base, _baseTheme) &&
+            resolved == _resolvedDensity) {
+          adapted = cached;
+        } else {
+          adapted = IxDensityAdapter.apply(base, resolved);
+          _baseTheme = base;
+          _resolvedDensity = resolved;
+          _adaptedTheme = adapted;
+        }
         return _IxDensityInherited(
           density: resolved,
-          child: Theme(
-            data: IxDensityAdapter.apply(Theme.of(context), resolved),
-            child: child,
-          ),
+          child: Theme(data: adapted, child: widget.child),
         );
       },
     );
