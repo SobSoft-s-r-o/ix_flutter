@@ -41,6 +41,11 @@ Future<void> main(List<String> arguments) async {
       help: 'Emit deprecated IxIcons widget getters',
     )
     ..addFlag(
+      'format',
+      defaultsTo: true,
+      help: 'Run "dart format" on the generated file',
+    )
+    ..addFlag(
       'help',
       abbr: 'h',
       help: 'Show this help message',
@@ -66,6 +71,7 @@ Future<void> main(List<String> arguments) async {
     final packageName = results['package'] as String?;
     final iconsVersion = results['icons-version'] as String;
     final legacyGetters = results['legacy-getters'] as bool;
+    final format = results['format'] as bool;
 
     print('Project root: $projectRoot');
     print('Output directory: $outputDir');
@@ -99,6 +105,7 @@ Future<void> main(List<String> arguments) async {
       flutterPackageName: packageName?.isNotEmpty == true ? packageName : null,
       iconsVersion: iconsVersion,
       legacyGetters: legacyGetters,
+      format: format,
     );
 
     // Update pubspec.yaml to include assets
@@ -116,9 +123,6 @@ Future<void> main(List<String> arguments) async {
     print('       - ${path.relative(assetsDir, from: projectRoot)}/');
     print('2. Run: flutter pub get');
     print('3. Use: IxIcon(IxIconsData.about)');
-    print(
-      '4. Optionally run: dart format ${path.relative(outputDir, from: projectRoot)}/ix_icons.dart',
-    );
     exit(0);
   } catch (e, stackTrace) {
     print('\n✗ Error during icon generation:');

@@ -28,6 +28,7 @@ class IconGenerator {
   /// [client] - Optional HTTP client for testing
   /// [iconsVersion] - Version of `@siemens/ix-icons` to download
   /// [legacyGetters] - Also emit the deprecated `IxIcons` widget getters
+  /// [format] - Run `dart format` on the generated file (best effort)
   static Future<void> generateIcons({
     required String outputDir,
     required String assetsDir,
@@ -35,6 +36,7 @@ class IconGenerator {
     http.Client? client,
     String iconsVersion = defaultIconsVersion,
     bool legacyGetters = true,
+    bool format = true,
   }) async {
     final httpClient = client ?? http.Client();
 
@@ -113,6 +115,9 @@ class IconGenerator {
 
         var generatedCount = 0;
         final svgFiles = await _getSvgFiles(svgDir);
+        // Identifier -> the file it was derived from, so a collision names
+        // both sides instead of writing a class that does not compile.
+        final claimedNames = <String, String>{};
 
         print('Found ${svgFiles.length} SVG files');
 
@@ -133,9 +138,18 @@ class IconGenerator {
           await assetFile.writeAsString(svgContent);
 
           // Generate icon data constant
-          final iconName = ReCase(
+          final iconName = dartIdentifierFor(
             path.basenameWithoutExtension(fileName),
-          ).camelCase;
+          );
+          final claimedBy = claimedNames[iconName];
+          if (claimedBy != null) {
+            throw Exception(
+              'Duplicate icon identifier "$iconName": both "$claimedBy" and '
+              '"$fileName" map to it. Rename one of the source icons or '
+              'exclude it before generating.',
+            );
+          }
+          claimedNames[iconName] = fileName;
           final packageArgument = flutterPackageName != null
               ? ", package: '$flutterPackageName'"
               : '';
@@ -170,6 +184,9 @@ class IconGenerator {
 
         final outputFile = File(path.join(outputDir, 'ix_icons.dart'));
         await outputFile.writeAsString(outputBuffer.toString());
+        if (format) {
+          await _formatGeneratedFile(outputFile);
+        }
 
         print('Generated $generatedCount icons');
         print('Output file: ${outputFile.path}');
@@ -263,54 +280,162 @@ class IconGenerator {
     // Create temporary directory
     final tempDir = await Directory.systemTemp.createTemp('ix_icons_');
 
-    // Extract the tarball
+    // Extract the tarball. A rejected entry aborts the whole extraction, so
+    // the half-written directory has to go with it - otherwise every refused
+    // archive leaves a stray `ix_icons_*` tree in the system temp directory.
     print('Extracting package to ${tempDir.path}');
-    final archive = TarDecoder().decodeBytes(
-      GZipDecoder().decodeBytes(tarballResponse.bodyBytes),
-    );
+    try {
+      final archive = TarDecoder().decodeBytes(
+        GZipDecoder().decodeBytes(tarballResponse.bodyBytes),
+      );
 
-    for (final file in archive) {
-      // A tar entry names its own output path, so a hostile or corrupt
-      // archive can point it outside the extraction directory
-      // ("zip slip", e.g. `../../.ssh/authorized_keys`). Resolve the entry
-      // against tempDir and refuse anything that does not stay inside it.
-      final filename = path.normalize(path.join(tempDir.path, file.name));
-      if (!path.isWithin(tempDir.path, filename)) {
-        throw Exception(
-          'Refusing to extract "${file.name}": it escapes the extraction '
-          'directory ${tempDir.path}.',
-        );
+      for (final file in archive) {
+        // A tar entry names its own output path, so a hostile or corrupt
+        // archive can point it outside the extraction directory
+        // ("zip slip", e.g. `../../.ssh/authorized_keys`). Resolve the entry
+        // against tempDir and refuse anything that does not stay inside it.
+        final filename = path.normalize(path.join(tempDir.path, file.name));
+        if (!path.isWithin(tempDir.path, filename)) {
+          throw Exception(
+            'Refusing to extract "${file.name}": it escapes the extraction '
+            'directory ${tempDir.path}.',
+          );
+        }
+        // Symlinks are never needed for an icon package and are the second
+        // half of the same attack (a link is followed by later entries
+        // written "through" it), so drop them instead of materialising them.
+        if (file.isSymbolicLink) {
+          print('Skipping symbolic link ${file.name}');
+          continue;
+        }
+        if (file.isFile) {
+          final outputFile = File(filename);
+          await outputFile.create(recursive: true);
+          await outputFile.writeAsBytes(file.content as List<int>);
+        } else {
+          await Directory(filename).create(recursive: true);
+        }
       }
-      // Symlinks are never needed for an icon package and are the second
-      // half of the same attack (a link is followed by later entries
-      // written "through" it), so drop them instead of materialising them.
-      if (file.isSymbolicLink) {
-        print('Skipping symbolic link ${file.name}');
-        continue;
+    } catch (_) {
+      if (await tempDir.exists()) {
+        await tempDir.delete(recursive: true);
       }
-      if (file.isFile) {
-        final outputFile = File(filename);
-        await outputFile.create(recursive: true);
-        await outputFile.writeAsBytes(file.content as List<int>);
-      } else {
-        await Directory(filename).create(recursive: true);
-      }
+      rethrow;
     }
 
     print('Extraction complete');
     return (tempDir, shasum);
   }
 
-  /// Strips `fill="none"` from `<g>` elements so the icon can be tinted.
+  /// Dart's reserved words, which may never be used as an identifier.
   ///
-  /// This mirrors upstream's `icon.css` rule (`svg [fill] { fill: currentColor
-  /// !important }`) for the group elements that would otherwise swallow the
-  /// tint. No other part of the SVG is modified.
+  /// Built-in identifiers (`export`, `import`, `library`, `extension`, …) are
+  /// deliberately absent: they are only restricted as type names and are
+  /// perfectly legal member names, so icons called `export.svg` or
+  /// `library.svg` keep the name they have always had.
+  static const _dartReservedWords = {
+    'assert', 'break', 'case', 'catch', 'class', 'const', 'continue',
+    'default', 'do', 'else', 'enum', 'extends', 'false', 'final', 'finally',
+    'for', 'if', 'in', 'is', 'new', 'null', 'rethrow', 'return', 'super',
+    'switch', 'this', 'throw', 'true', 'try', 'var', 'void', 'while', 'with',
+    // A static member may not repeat a name every class inherits from Object.
+    'hashCode', 'noSuchMethod', 'runtimeType', 'toString',
+  };
+
+  /// Turns an icon file's base name into a Dart identifier that compiles.
+  ///
+  /// The name is camel-cased as before; on top of that a leading digit is
+  /// prefixed (`3d-view` -> `icon3dView`, since Dart identifiers may not start
+  /// with one), a reserved word gets a trailing underscore (`class` ->
+  /// `class_`), and anything that is left empty falls back to `icon`.
+  static String dartIdentifierFor(String fileBaseName) {
+    var name = ReCase(
+      fileBaseName,
+    ).camelCase.replaceAll(RegExp(r'[^A-Za-z0-9_$]'), '');
+    if (name.isEmpty) {
+      return 'icon';
+    }
+    if (RegExp(r'^[0-9]').hasMatch(name)) {
+      name = 'icon${name[0].toUpperCase()}${name.substring(1)}';
+    }
+    if (_dartReservedWords.contains(name)) {
+      name = '${name}_';
+    }
+    return name;
+  }
+
+  /// Runs `dart format` over [file], best effort.
+  ///
+  /// The generated catalogue lands in the host project's `lib/`, which CI
+  /// formatting checks usually cover, so the generator formats it rather than
+  /// leaving that to the caller. A missing or failing `dart` executable is
+  /// only reported - it never fails the generation.
+  static Future<void> _formatGeneratedFile(File file) async {
+    try {
+      final result = await Process.run('dart', ['format', file.path]);
+      if (result.exitCode != 0) {
+        print('Could not format ${file.path}: ${result.stderr}');
+      } else {
+        print('Formatted ${file.path}');
+      }
+    } on ProcessException catch (e) {
+      print('Could not run "dart format" (${e.message}); output left as is');
+    }
+  }
+
+  /// Element start tag: name plus its attribute list, quote-aware so that an
+  /// attribute value may legally contain `>`.
+  static final RegExp _startTag = RegExp(
+    r'<([a-zA-Z][\w:.-]*)((?:[^>\x22\x27]|\x22[^\x22]*\x22|\x27[^\x27]*\x27)*)>',
+  );
+
+  /// A `fill="none"` (or `fill='none'`) attribute, tolerating whitespace and
+  /// never matching `fill-rule` / `fill-opacity`.
+  static final RegExp _fillNone = RegExp(
+    r'(?<![\w-])fill\s*=\s*[\x22\x27]none[\x22\x27]',
+  );
+
+  /// A `stroke` paint attribute whose value is not `none`.
+  static final RegExp _paintingStroke = RegExp(
+    r'(?<![\w-])stroke\s*=\s*[\x22\x27](?!none[\x22\x27])[^\x22\x27]+[\x22\x27]',
+  );
+
+  /// SVG elements that only group other elements; a `fill` on one of them is
+  /// inherited by its children and never paints anything itself.
+  static const _containerElements = {'svg', 'g', 'a', 'switch', 'symbol'};
+
+  /// Strips the `fill="none"` attributes that would otherwise make an icon
+  /// invisible.
+  ///
+  /// Upstream ships its icons for the web, where `icon.css`
+  /// (`svg [fill] { fill: currentColor !important }`) overrides every `fill`
+  /// at paint time. Flutter has no such stylesheet, so a `fill="none"` that
+  /// upstream never honours is taken literally and the icon compiles to zero
+  /// draw commands. `@siemens/ix-icons` 3.5.0 declares `fill="none"` on the
+  /// root `<svg>` of 891 of its 1479 icons whose `<path>`s carry no fill of
+  /// their own, and all of those would render blank.
+  ///
+  /// The attribute is removed from container elements (`<svg>`, `<g>`, …),
+  /// which cannot paint themselves, and from shapes that carry no stroke.
+  /// A shape that pairs `fill="none"` with a real `stroke` is a deliberate
+  /// outline and keeps its attribute. No other part of the SVG is modified.
   static String cleanSvgContent(String svgContent) {
-    return svgContent.replaceAllMapped(
-      RegExp(r'(<g\b[^>]*?)\s+fill\s*=\s*"none"'),
-      (match) => match.group(1)!,
-    );
+    return svgContent.replaceAllMapped(_startTag, (match) {
+      final attributes = match.group(2)!;
+      if (!_fillNone.hasMatch(attributes)) {
+        return match.group(0)!;
+      }
+      final name = match.group(1)!;
+      if (!_containerElements.contains(name.toLowerCase()) &&
+          _paintingStroke.hasMatch(attributes)) {
+        return match.group(0)!;
+      }
+      final cleaned = attributes
+          .replaceAll(_fillNone, '')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trimRight();
+      return '<$name$cleaned>';
+    });
   }
 
   /// Recursively get all SVG files from a directory

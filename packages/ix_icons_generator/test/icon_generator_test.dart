@@ -77,12 +77,57 @@ void main() {
       ArchiveFile.string('package/svg/b-c.svg', '<svg><path d="M1 1"/></svg>'),
     );
 
-  test('cleanSvgContent removes fill="none" only on <g> elements', () {
+  test('cleanSvgContent removes fill="none" from <g> elements', () {
     const svg =
-        '<svg><g id="p" fill="none"><path fill="none" d="M0 0"/><g fill="none"><polygon points="0,0"/></g></g></svg>';
+        '<svg><g id="p" fill="none"><path d="M0 0"/><g fill="none"><polygon points="0,0"/></g></g></svg>';
     final out = IconGenerator.cleanSvgContent(svg);
-    expect(out, contains('<path fill="none"'));
     expect(RegExp(r'<g[^>]*fill="none"').hasMatch(out), isFalse);
+  });
+
+  test('cleanSvgContent removes fill="none" from the root <svg>', () {
+    const svg =
+        '<svg width="512" height="512" viewBox="0 0 512 512" fill="none" '
+        'xmlns="http://www.w3.org/2000/svg"><desc>dashboard</desc>'
+        '<path fill-rule="evenodd" d="M0 0"/></svg>';
+    final out = IconGenerator.cleanSvgContent(svg);
+    expect(RegExp(r'<svg[^>]*fill="none"').hasMatch(out), isFalse);
+    expect(out, contains('fill-rule="evenodd"'));
+    expect(out, contains('viewBox="0 0 512 512"'));
+    expect(out, contains('<desc>dashboard</desc>'));
+  });
+
+  test('cleanSvgContent removes fill="none" from an unstroked shape', () {
+    const svg = '<svg><path fill="none" d="M0 0"/></svg>';
+    final out = IconGenerator.cleanSvgContent(svg);
+    expect(out, isNot(contains('fill="none"')));
+    expect(out, contains('d="M0 0"'));
+  });
+
+  test('cleanSvgContent keeps fill="none" on a stroked shape', () {
+    const svg =
+        '<svg><path fill="none" stroke="#000" stroke-width="2" d="M0 0"/></svg>';
+    final out = IconGenerator.cleanSvgContent(svg);
+    expect(out, contains('fill="none"'));
+    expect(out, contains('stroke="#000"'));
+  });
+
+  test('generated assets carry no root-level fill="none"', () async {
+    final archive = Archive()
+      ..add(
+        ArchiveFile.string(
+          'package/svg/blank.svg',
+          '<svg viewBox="0 0 24 24" fill="none"><path d="M0 0"/></svg>',
+        ),
+      );
+    await IconGenerator.generateIcons(
+      outputDir: '${tmp.path}/lib',
+      assetsDir: '${tmp.path}/assets/ix_icons',
+      client: clientForArchive(archive),
+    );
+    final asset = File(
+      '${tmp.path}/assets/ix_icons/blank.svg',
+    ).readAsStringSync();
+    expect(asset, isNot(contains('fill="none"')));
   });
 
   test(
@@ -164,6 +209,58 @@ void main() {
     final code = File('${tmp.path}/lib/ix_icons.dart').readAsStringSync();
     expect(code, isNot(contains('link.svg')));
     expect(File('${tmp.path}/assets/ix_icons/a.svg').existsSync(), isTrue);
+  });
+
+  test('a rejected entry leaves no extraction directory behind', () async {
+    Set<String> extractionDirs() => Directory.systemTemp
+        .listSync()
+        .whereType<Directory>()
+        .map((d) => d.path)
+        .where((p) => p.contains('ix_icons_'))
+        .toSet();
+
+    final before = extractionDirs();
+    final archive = validArchive()
+      ..add(ArchiveFile.string('package/../../escape.svg', '<svg/>'));
+    await expectLater(
+      IconGenerator.generateIcons(
+        outputDir: '${tmp.path}/lib',
+        assetsDir: '${tmp.path}/assets/ix_icons',
+        client: clientForArchive(archive),
+      ),
+      throwsA(anything),
+    );
+    expect(extractionDirs().difference(before), isEmpty);
+  });
+
+  test('sanitises identifiers that Dart cannot spell', () async {
+    final archive = Archive()
+      ..add(ArchiveFile.string('package/svg/3d-view.svg', '<svg/>'))
+      ..add(ArchiveFile.string('package/svg/class.svg', '<svg/>'))
+      ..add(ArchiveFile.string('package/svg/ok.svg', '<svg/>'));
+    await IconGenerator.generateIcons(
+      outputDir: '${tmp.path}/lib',
+      assetsDir: '${tmp.path}/assets/ix_icons',
+      client: clientForArchive(archive),
+    );
+    final code = File('${tmp.path}/lib/ix_icons.dart').readAsStringSync();
+    expect(code, contains('IxIconData icon3dView ='));
+    expect(code, contains('IxIconData class_ ='));
+    expect(code, contains('IxIconData ok ='));
+  });
+
+  test('fails on two icons that collapse to one identifier', () async {
+    final archive = Archive()
+      ..add(ArchiveFile.string('package/svg/a-b.svg', '<svg/>'))
+      ..add(ArchiveFile.string('package/svg/a_b.svg', '<svg/>'));
+    await expectLater(
+      IconGenerator.generateIcons(
+        outputDir: '${tmp.path}/lib',
+        assetsDir: '${tmp.path}/assets/ix_icons',
+        client: clientForArchive(archive),
+      ),
+      throwsA(predicate((e) => e.toString().contains('Duplicate icon'))),
+    );
   });
 
   test('rejects a tarball whose sha1 does not match dist.shasum', () async {

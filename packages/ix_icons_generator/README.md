@@ -37,6 +37,7 @@ This will:
     --icons-version   Version of @siemens/ix-icons to download (default: 3.5.0)
     --[no-]legacy-getters
                       Emit deprecated IxIcons widget getters (default: on)
+    --[no-]format     Run `dart format` on the generated file (default: on)
 -h, --help            Show help message
 ```
 
@@ -54,6 +55,9 @@ dart run ix_icons_generator:generate_icons -n my_package
 
 # Pin a specific icon set version and skip the deprecated widget getters
 dart run ix_icons_generator:generate_icons --icons-version 3.5.0 --no-legacy-getters
+
+# Leave the generated file unformatted (e.g. no `dart` on PATH)
+dart run ix_icons_generator:generate_icons --no-format
 ```
 
 ## Using Generated Icons
