@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 # One-way sync of canonical documents into a wiki checkout. Usage: tool/wiki_sync.sh [--dry-run] <wiki-dir>
 set -euo pipefail
+# bash >= 5.2 turns the `patsub_replacement` option on by default (it is on
+# ubuntu-latest, where wiki-sync.yml runs): once on, an unescaped `&` in the
+# replacement side of a `${var//pattern/repl}` substitution expands to the
+# text the pattern matched, sed-style, and `\` starts an escape -- rather
+# than both being literal, as every bash before 5.2 (and this script) always
+# treated them. rewrite_links below relies on the old, literal behaviour: a
+# rewritten link target is a plausible place for a `&` (a query string) or a
+# `\` to appear. Turning the option back off restores it; this is a no-op
+# that fails harmlessly on bash 3.2/4.x, which do not know the option (and
+# so never turned it on to begin with).
+shopt -u patsub_replacement 2>/dev/null || true
 cd "$(dirname "$0")/.."
 dry=0; [ "${1:-}" = "--dry-run" ] && { dry=1; shift; }
 wiki="${1:?wiki checkout dir required}"
