@@ -464,4 +464,145 @@ void main() {
       expect(capture.logs.where((l) => l.contains('reserved')).length, 1);
     },
   );
+
+  testWidgets('re-tapping the anchor closes the panel and keeps the focus on '
+      'the tile', (tester) async {
+    await pumpIx(
+      tester,
+      IxApplicationScaffold(
+        appTitle: 'App',
+        initiallyExpanded: false,
+        entries: const [
+          IxMenuEntry(
+            id: 'cat',
+            type: IxMenuEntryType.category,
+            label: 'Reports',
+            icon: Icons.folder,
+            children: [
+              IxMenuEntry(id: 'r1', type: IxMenuEntryType.item, label: 'Daily'),
+            ],
+          ),
+        ],
+        onNavigate: (_) {},
+        body: const SizedBox(),
+      ),
+      size: const Size(1440, 900),
+    );
+
+    // Opened from the keyboard, so the focus really is inside the panel.
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab); // collapse button
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab); // category tile
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('Daily'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Reports'));
+    await tester.pumpAndSettle();
+    expect(find.text('Daily'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byWidget(FocusManager.instance.primaryFocus!.context!.widget),
+        matching: find.byTooltip('Reports'),
+      ),
+      findsOneWidget,
+      reason: 'closing by re-tapping the anchor drops the focus',
+    );
+  });
+
+  testWidgets('expanding the rail closes the panel and keeps the focus on the '
+      'tile', (tester) async {
+    await pumpIx(
+      tester,
+      IxApplicationScaffold(
+        appTitle: 'App',
+        initiallyExpanded: false,
+        entries: const [
+          IxMenuEntry(
+            id: 'cat',
+            type: IxMenuEntryType.category,
+            label: 'Reports',
+            icon: Icons.folder,
+            children: [
+              IxMenuEntry(id: 'r1', type: IxMenuEntryType.item, label: 'Daily'),
+            ],
+          ),
+        ],
+        onNavigate: (_) {},
+        body: const SizedBox(),
+      ),
+      size: const Size(1440, 900),
+    );
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab); // collapse button
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab); // category tile
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('Daily'), findsOneWidget);
+
+    await tester.tap(find.byType(IxIconButton).first);
+    await tester.pumpAndSettle();
+    expect(find.text('Daily'), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byWidget(FocusManager.instance.primaryFocus!.context!.widget),
+        matching: find.text('Reports'),
+      ),
+      findsOneWidget,
+      reason: 'expanding the rail dropped the focus out of the menu',
+    );
+  });
+
+  testWidgets('a panel whose anchor disappears is closed', (tester) async {
+    Widget scaffold({required bool withSettings}) => IxApplicationScaffold(
+      appTitle: 'App',
+      initiallyExpanded: true,
+      entries: const [
+        IxMenuEntry(id: 'one', type: IxMenuEntryType.item, label: 'One'),
+      ],
+      settings: withSettings ? const Text('Settings panel') : null,
+      onNavigate: (_) {},
+      body: const SizedBox(),
+    );
+
+    await pumpIx(tester, scaffold(withSettings: true));
+    await tester.tap(find.text('Settings'));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('Settings panel'), findsOneWidget);
+
+    await pumpIx(tester, scaffold(withSettings: false));
+    await tester.pumpAndSettle();
+    expect(find.text('Settings panel'), findsNothing);
+    expect(tester.takeException(), isNull);
+
+    // The panel must not re-open by itself when the anchor comes back: the
+    // open state was forgotten with the anchor, not merely un-rendered.
+    await pumpIx(tester, scaffold(withSettings: true));
+    await tester.pumpAndSettle();
+    expect(find.text('Settings panel'), findsNothing);
+  });
+
+  testWidgets('navigating from a menu entry closes an open panel', (
+    tester,
+  ) async {
+    await pumpIx(
+      tester,
+      IxApplicationScaffold(
+        appTitle: 'App',
+        initiallyExpanded: true,
+        entries: const [
+          IxMenuEntry(id: 'one', type: IxMenuEntryType.item, label: 'One'),
+        ],
+        settings: const Text('Settings panel'),
+        onNavigate: (_) {},
+        body: const SizedBox(),
+      ),
+    );
+    await tester.tap(find.text('Settings'));
+    await tester.pump(const Duration(milliseconds: 200));
+    expect(find.text('Settings panel'), findsOneWidget);
+
+    await tester.tap(find.text('One'));
+    await tester.pumpAndSettle();
+    expect(find.text('Settings panel'), findsNothing);
+  });
 }

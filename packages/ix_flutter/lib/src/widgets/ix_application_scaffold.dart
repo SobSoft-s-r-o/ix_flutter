@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
@@ -291,6 +292,18 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
     _syncCategoryExpansion(widget.entries);
   }
 
+  /// Whether the tile a fly-out with [anchorId] hangs off is still there.
+  bool _hasFlyoutAnchor(String anchorId) {
+    switch (anchorId) {
+      case _kSettingsEntryId:
+        return widget.settings != null;
+      case _kAboutEntryId:
+        return widget.about != null;
+      default:
+        return _findEntry(widget.entries, anchorId) != null;
+    }
+  }
+
   @override
   void dispose() {
     for (final node in _tileNodes.values) {
@@ -341,6 +354,14 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       _isExpanded = widget.initiallyExpanded;
     }
     _syncCategoryExpansion(widget.entries);
+    final anchor = _openFlyoutId;
+    if (anchor != null && !_hasFlyoutAnchor(anchor)) {
+      // The panel's anchor is gone -- `settings:` was set back to null, or
+      // the category was removed -- so the portal would keep showing an
+      // empty child and re-open by itself later. Focus cannot go back to a
+      // tile that no longer exists.
+      _closeFlyout(returnFocus: false);
+    }
   }
 
   void _syncCategoryExpansion(List<IxMenuEntry> entries) {
@@ -742,43 +763,102 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
   /// fly-out works anywhere -- including above the `Navigator`, in
   /// `MaterialApp.builder`.
   void _toggleFlyout(String anchorId) {
-    setState(() => _openFlyoutId = _openFlyoutId == anchorId ? null : anchorId);
-    if (_openFlyoutId == null) {
-      _hideFlyoutPortal();
-    } else {
-      _flyoutPortal.show();
+    if (_openFlyoutId == anchorId) {
+      // Re-tapping the anchor is a close like any other, so it goes through
+      // the same path -- which hands the focus back to the anchor tile
+      // instead of dropping it into the root scope.
+      _closeFlyout();
+      return;
     }
+    setState(() => _openFlyoutId = anchorId);
+    _flyoutPortal.show();
   }
 
   /// Hides the portal, if it is showing at all.
+  ///
+  /// `hide()` asserts when it is called during a build, which
+  /// [didUpdateWidget] is. The panel is already gone from that frame's tree
+  /// (the portal builds nothing once `_openFlyoutId` is null), so the hide
+  /// itself waits for the frame to end.
   void _hideFlyoutPortal() {
-    if (_flyoutPortal.isShowing) {
-      _flyoutPortal.hide();
-    }
-  }
-
-  void _closeFlyout() {
-    if (_openFlyoutId == null) {
+    if (!_flyoutPortal.isShowing) {
       return;
     }
-    setState(() => _openFlyoutId = null);
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _openFlyoutId == null) {
+          _hideFlyoutPortal();
+        }
+      });
+      return;
+    }
+    _flyoutPortal.hide();
+  }
+
+  /// Closes the open fly-out.
+  ///
+  /// [returnFocus] hands the keyboard focus back to the tile that opened the
+  /// panel, post-frame (the panel's own focus scope is still unwinding).
+  /// It is switched off when the caller is about to move the focus itself,
+  /// or when the tile is going away with the panel.
+  void _closeFlyout({bool returnFocus = true}) {
+    final anchor = _openFlyoutId;
+    if (anchor == null) {
+      return;
+    }
+    // Assigned rather than `setState`-ed when this runs from
+    // `didUpdateWidget`: the build that reads it is the very next thing the
+    // framework does.
+    if (SchedulerBinding.instance.schedulerPhase ==
+        SchedulerPhase.persistentCallbacks) {
+      _openFlyoutId = null;
+    } else {
+      setState(() => _openFlyoutId = null);
+    }
     _hideFlyoutPortal();
+    if (!returnFocus) {
+      return;
+    }
+    final node = _tileNodes[anchor];
+    if (node == null) {
+      return;
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && node.context != null && node.canRequestFocus) {
+        node.requestFocus();
+      }
+    });
   }
 
   void _toggleExpandedState() {
-    setState(() {
-      _isExpanded = !_isExpanded;
-      // The panel is anchored to the rail whose width is about to change,
-      // and a collapsed category expands inline once the menu is open.
-      _openFlyoutId = null;
-    });
-    _hideFlyoutPortal();
+    // The panel is anchored to the rail whose width is about to change, and
+    // a collapsed category expands inline once the menu is open -- so the
+    // fly-out closes, through the path that returns the focus to its anchor.
+    _closeFlyout();
+    setState(() => _isExpanded = !_isExpanded);
+  }
+
+  /// Closes the drawer this scaffold owns.
+  ///
+  /// Through its own [ScaffoldState], not `Navigator.maybePop()`: the drawer
+  /// route belongs to the `Scaffold` below, and a scaffold placed *above* the
+  /// `Navigator` (a persistent shell in `MaterialApp.builder`) has no
+  /// navigator in its context at all, so popping threw instead of closing.
+  void _closeDrawer() {
+    final scaffold = _scaffoldKey.currentState;
+    if (scaffold != null && scaffold.isDrawerOpen) {
+      scaffold.closeDrawer();
+    }
   }
 
   void _handleEntryTap(IxMenuEntry entry, {bool closeDrawer = false}) {
+    // A fly-out anchored in the menu belongs to the menu; navigating away
+    // leaves nothing to anchor it to.
+    _closeFlyout();
     widget.onNavigate(entry.id);
     if (closeDrawer) {
-      Navigator.of(context).maybePop();
+      _closeDrawer();
     }
   }
 
@@ -786,7 +866,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
   /// category tile that opened it.
   void _handleFlyoutEntryTap(IxMenuEntry entry) {
     final anchor = _openFlyoutId;
-    _closeFlyout();
+    _closeFlyout(returnFocus: false);
     widget.onNavigate(entry.id);
     final node = anchor == null ? null : _tileNodes[anchor];
     if (node != null) {
@@ -836,8 +916,9 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
         break;
     }
 
+    _closeFlyout();
     if (closeDrawer) {
-      Navigator.of(context).maybePop();
+      _closeDrawer();
     }
   }
 
@@ -963,7 +1044,10 @@ class _NavigationPanelState extends State<_NavigationPanel> {
   void _focusTile(FocusNode node, {required bool forward}) {
     node.requestFocus();
     final context = node.context;
-    if (context == null) {
+    // `mounted` as well as non-null: a node whose tile has been unmounted
+    // (a category collapsed under it, say) keeps its defunct element until
+    // it is reattached, and `ensureVisible` asserts on one.
+    if (context == null || !context.mounted) {
       return;
     }
     Scrollable.ensureVisible(
@@ -980,22 +1064,58 @@ class _NavigationPanelState extends State<_NavigationPanel> {
   ///
   /// Upstream's `menu.tsx:887-899` wraps around; the programme constraints
   /// prescribe clamping for the 1.x menu instead.
+  ///
+  /// A disabled tile is in [_order] -- it is rendered, and the eye walks past
+  /// it -- but its `InkWell` refuses focus, so landing on one used to stop
+  /// the arrow keys dead. Disabled tiles are stepped over instead, and the
+  /// clamp applies to the tiles that can actually take the focus.
   void _move(int delta) {
     final index = _order.indexWhere((node) => node.hasFocus);
     if (index < 0) {
       return;
     }
-    final target = (index + delta).clamp(0, _order.length - 1);
+    final step = delta.sign;
+    final target = _focusableFrom(index + delta, step);
+    if (target == null) {
+      return;
+    }
     _focusTile(_order[target], forward: target >= index);
   }
 
-  /// Moves focus to the first or last tile (`Home`/`End`,
+  /// The first index at or after [from] (walking in direction [step]) whose
+  /// tile can take the focus, or `null` when there is none in that
+  /// direction.
+  int? _focusableFrom(int from, int step) {
+    final clamped = from.clamp(0, _order.length - 1);
+    for (var i = clamped; i >= 0 && i < _order.length; i += step) {
+      if (_order[i].canRequestFocus) {
+        return i;
+      }
+    }
+    // Nothing beyond the requested end: fall back to the nearest focusable
+    // tile on the way back, so a run of disabled entries at one edge does
+    // not swallow the key press.
+    for (var i = clamped; i >= 0 && i < _order.length; i -= step) {
+      if (_order[i].canRequestFocus) {
+        return i;
+      }
+    }
+    return null;
+  }
+
+  /// Moves focus to the first or last tile that can take it (`Home`/`End`,
   /// `menu.tsx:901-910`).
   void _jump({required bool first}) {
     if (_order.isEmpty) {
       return;
     }
-    _focusTile(first ? _order.first : _order.last, forward: !first);
+    final target = first
+        ? _focusableFrom(0, 1)
+        : _focusableFrom(_order.length - 1, -1);
+    if (target == null) {
+      return;
+    }
+    _focusTile(_order[target], forward: !first);
   }
 
   @override
@@ -1015,18 +1135,25 @@ class _NavigationPanelState extends State<_NavigationPanel> {
         // The tiles that are actually on screen, in the order the eye (and
         // therefore the arrow keys and Tab) walks them.
         final visible = <IxMenuEntry>[];
-        void collect(List<IxMenuEntry> nodes) {
+        // `depth`, because only a top-level category renders its children
+        // inline: `_NavigationEntry` builds a nested one with
+        // `isCategoryExpanded: false`, so its grandchildren are never
+        // mounted. Collecting them anyway put focus nodes with no element
+        // into the traversal order -- a dead stop for the arrow keys, and a
+        // defunct context for `Scrollable.ensureVisible`.
+        void collect(List<IxMenuEntry> nodes, int depth) {
           for (final entry in nodes) {
             visible.add(entry);
             if (entry.type == IxMenuEntryType.category &&
                 isPanelExpanded &&
+                depth == 0 &&
                 widget.isCategoryExpanded(entry.id)) {
-              collect(entry.children);
+              collect(entry.children, depth + 1);
             }
           }
         }
 
-        collect(widget.entries);
+        collect(widget.entries, 0);
         visible.addAll(widget.bottomEntries);
 
         // Traversal order 0 belongs to the sidebar toggle in the header, so

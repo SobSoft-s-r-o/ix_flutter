@@ -82,6 +82,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxResponsiveDataView`'s sortable headers, desktop rows and mobile cards paint the Siemens IX focus ring while they hold the keyboard focus. They have been focusable since this release, but `ThemeData.focusColor` is transparent app-wide (`IxFocusRing` owns the affordance), so they showed nothing at all (WCAG 2.4.7)
 - hover and press feedback is visible again on those headers, rows and cards. Their `InkWell` had no `Material` of its own, so the ink painted on the enclosing page's Material -- underneath the opaque background each of them draws. The background now lives on a `Material` inside each one
 - a non-sortable `IxResponsiveDataView` column heading is no longer published as a *disabled* control (`button: false` + `enabled: false`); it is a plain label, and screen readers stop announcing it as unavailable
+- the `IxApplicationScaffold` menu's arrow keys, `Home` and `End` step over a disabled entry instead of stopping at it. A disabled tile is rendered, so it was in the traversal order, but its `InkWell` refuses the focus -- so the arrow keys could not move past one (WCAG 2.1.1)
+- a nested menu category no longer traps the arrow keys. A category inside a category renders its own children only in the fly-out, never inline, but the traversal order was built as if they were there, so it contained focus nodes with no widget behind them
+- tapping a menu entry in the drawer layout closes the drawer through the scaffold's own `ScaffoldState` instead of `Navigator.maybePop()`, which threw `Navigator operation requested with a context that does not include a Navigator` for a scaffold placed above the `Navigator` (`MaterialApp.builder`)
+- a settings/about fly-out is closed when its anchor goes away (`settings:` set back to null, the category removed) and when a menu entry navigates, instead of leaving the portal showing an empty panel that re-opened by itself later
 
 ---
 
