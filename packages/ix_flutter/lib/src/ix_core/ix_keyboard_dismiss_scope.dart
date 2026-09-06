@@ -4,13 +4,16 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-/// Releases a focused text input when the user taps outside of it, taking
-/// the on-screen keyboard down with it.
+/// Releases a focused text input -- taking the on-screen keyboard down with
+/// it -- when the user taps outside the field or scrolls the page.
 ///
 /// ## Why this exists
 ///
-/// Flutter deliberately does *not* do this on a touch screen. Its default
-/// tap-outside action (`_EditableTextTapOutsideAction` in
+/// Flutter does neither of those things by default on a touch screen, and
+/// both defaults live too far down to fix once for a whole app.
+///
+/// **Tapping outside.** The default tap-outside action
+/// (`_EditableTextTapOutsideAction` in
 /// `packages/flutter/lib/src/widgets/editable_text.dart`) reads:
 ///
 /// ```dart
@@ -24,17 +27,28 @@ import 'package:flutter/widgets.dart';
 ///     // of events.
 /// ```
 ///
-/// So on an Android or iOS device a tap next to a focused `TextField` leaves
-/// it focused and the soft keyboard covering the form. Users read that as a
-/// bug; every app ends up re-implementing the dismissal by hand.
+/// so on Android or iOS a tap next to a focused `TextField` leaves it
+/// focused and the keyboard covering the form.
+///
+/// **Scrolling.** Flutter dismisses on scroll per scroll view, through
+/// `ScrollView.keyboardDismissBehavior`, and the app-wide default opts out
+/// (`packages/flutter/lib/src/widgets/scroll_configuration.dart`):
+///
+/// ```dart
+/// ScrollViewKeyboardDismissBehavior getKeyboardDismissBehavior(BuildContext context) =>
+///     ScrollViewKeyboardDismissBehavior.manual;
+/// ```
+///
+/// so every list, grid and `SingleChildScrollView` in the app has to opt in
+/// one by one.
 ///
 /// Wrapping a subtree in this widget gives every text input inside it the
-/// behaviour users expect, on every platform, without touching the fields
-/// themselves. [IxApplicationScaffold] does it for its whole frame by
+/// behaviour users expect, on every platform, without touching the fields or
+/// the scroll views. [IxApplicationScaffold] does it for its whole frame by
 /// default, so an app built on the scaffold needs no extra code.
 ///
 /// ```dart
-/// IxUnfocusOnTapOutside(
+/// IxKeyboardDismissScope(
 ///   child: Padding(
 ///     padding: const EdgeInsets.all(16),
 ///     child: TextField(decoration: InputDecoration(labelText: 'Name')),
@@ -61,11 +75,24 @@ import 'package:flutter/widgets.dart';
 /// never cleared by an unrelated tap. Taps are observed, never consumed:
 /// the button you tapped to dismiss the keyboard still fires.
 ///
+/// ## Which scrolls count
+///
+/// A `NotificationListener<ScrollNotification>` watches the subtree, so one
+/// scope covers every scroll view under it -- lists, grids,
+/// `SingleChildScrollView`s and nested scrollables alike -- and it never
+/// absorbs the notification. Only a `ScrollUpdateNotification` carrying
+/// `dragDetails` releases the field, mirroring Flutter's own
+/// `ScrollViewKeyboardDismissBehavior.onDrag`: a programmatic `jumpTo` or
+/// `animateTo`, the ballistic settle after a fling and a mouse wheel carry
+/// no drag details, and a field scrolling its own text never dismisses its
+/// own keyboard. As with the tap trigger, only a focused *text input* is
+/// released; a focused button survives a scroll.
+///
 /// ## Taps, not scrolls
 ///
-/// A touch that travels more than `kTouchSlop` before it lifts is a scroll,
-/// not a tap, and keeps the keyboard: losing the keyboard the moment a form
-/// is scrolled would be a worse bug than the one this fixes. Flutter
+/// For the tap trigger a touch that travels more than `kTouchSlop` before it
+/// lifts is a drag, not a tap, and is left to the scroll trigger to judge --
+/// so dragging a page that cannot scroll keeps the keyboard. Flutter
 /// documents this refinement itself on `EditableTextTapUpOutsideIntent`
 /// ("it's often desirable to only unfocus when the user taps outside of the
 /// text field, but not when they scroll"). Mouse, stylus and unknown
@@ -74,27 +101,42 @@ import 'package:flutter/widgets.dart';
 ///
 /// See also:
 ///
-///  * [IxApplicationScaffold.unfocusOnTapOutside], the opt-out for apps
-///    that want Flutter's stock behaviour back.
-class IxUnfocusOnTapOutside extends StatefulWidget {
-  /// Gives every text input in [child] the tap-to-dismiss behaviour.
-  const IxUnfocusOnTapOutside({
+///  * [IxApplicationScaffold.dismissKeyboardOnInteraction], the opt-out for
+///    apps that want Flutter's stock behaviour back.
+class IxKeyboardDismissScope extends StatefulWidget {
+  /// Gives every text input in [child] the dismiss-on-interaction behaviour.
+  const IxKeyboardDismissScope({
     super.key,
     required this.child,
     this.enabled = true,
+    this.onTapOutside = true,
+    this.onDrag = true,
     this.dismissKeyboard = true,
   });
 
-  /// The subtree whose text inputs are released on a tap outside them.
+  /// The subtree whose text inputs are released on a tap or a scroll.
   final Widget child;
 
   /// Whether the behaviour is installed at all.
   ///
-  /// `false` puts Flutter's platform default back for [child] -- a focused
-  /// field survives a touch outside it on Android, iOS and Fuchsia -- while
-  /// keeping this widget in the tree, so toggling it never remounts the
-  /// subtree.
+  /// `false` puts Flutter's platform defaults back for [child] -- a focused
+  /// field survives both a touch outside it on Android, iOS and Fuchsia and
+  /// a scroll of any scroll view -- while keeping this widget in the tree,
+  /// so toggling it never remounts the subtree.
   final bool enabled;
+
+  /// Whether a tap outside a focused text input releases it.
+  ///
+  /// The two triggers are independent: turning this off leaves [onDrag]
+  /// working, and vice versa.
+  final bool onTapOutside;
+
+  /// Whether dragging a scroll view releases a focused text input.
+  ///
+  /// Only a *user* drag counts. A programmatic `jumpTo`/`animateTo`, the
+  /// ballistic settling after a fling and the field's own internal text
+  /// scrolling all leave the keyboard alone.
+  final bool onDrag;
 
   /// Whether the platform is asked to take the keyboard down explicitly.
   ///
@@ -109,10 +151,10 @@ class IxUnfocusOnTapOutside extends StatefulWidget {
   final bool dismissKeyboard;
 
   @override
-  State<IxUnfocusOnTapOutside> createState() => _IxUnfocusOnTapOutsideState();
+  State<IxKeyboardDismissScope> createState() => _IxKeyboardDismissScopeState();
 }
 
-class _IxUnfocusOnTapOutsideState extends State<IxUnfocusOnTapOutside> {
+class _IxKeyboardDismissScopeState extends State<IxKeyboardDismissScope> {
   /// The touch that went down outside a focused field, and where it landed.
   ///
   /// Held from the pointer down to the pointer up so the distance between
@@ -171,6 +213,51 @@ class _IxUnfocusOnTapOutsideState extends State<IxUnfocusOnTapOutside> {
     return null;
   }
 
+  /// Releases a focused text input when the user drags a scroll view.
+  ///
+  /// Always returns `false`, so the notification keeps bubbling and every
+  /// other listener still sees the scroll.
+  bool _onScroll(ScrollNotification notification) {
+    if (!widget.enabled || !widget.onDrag || !_isUserDrag(notification)) {
+      return false;
+    }
+    final node = FocusManager.instance.primaryFocus;
+    if (node == null || !_isTextInput(node.context)) {
+      return false;
+    }
+    // The field scrolling its own content (a selection drag in a long
+    // single-line input) must not take its own keyboard away.
+    if (_isTextInput(notification.context)) {
+      return false;
+    }
+    _release(node);
+    return false;
+  }
+
+  /// Whether [notification] reports a scroll the user is driving with a
+  /// pointer, as opposed to a `jumpTo`/`animateTo`, a ballistic settle after
+  /// a fling, or a mouse wheel -- none of which carry drag details.
+  ///
+  /// Only [ScrollUpdateNotification] counts, exactly as in Flutter's own
+  /// `ScrollViewKeyboardDismissBehavior.onDrag` (`scroll_view.dart`). A
+  /// [ScrollStartNotification] would be wrong: when a scroll view is the
+  /// sole member of the gesture arena, a plain *tap* on it is accepted as a
+  /// drag and starts one with real drag details, without ever moving the
+  /// offset. Keying off the update means the content actually has to move.
+  static bool _isUserDrag(ScrollNotification notification) =>
+      notification is ScrollUpdateNotification &&
+      notification.dragDetails != null;
+
+  /// Whether [context] sits inside a text input.
+  ///
+  /// Used both to decide that the current focus is a field -- a focused
+  /// button or menu tile must keep its focus through a scroll -- and to
+  /// recognise a field's own internal scroll view.
+  static bool _isTextInput(BuildContext? context) =>
+      context != null &&
+      (context.widget is EditableText ||
+          context.findAncestorWidgetOfExactType<EditableText>() != null);
+
   void _release(FocusNode node) {
     node.unfocus();
     if (widget.dismissKeyboard) {
@@ -196,9 +283,16 @@ class _IxUnfocusOnTapOutsideState extends State<IxUnfocusOnTapOutside> {
 
   @override
   Widget build(BuildContext context) {
-    return Actions(
-      actions: widget.enabled ? _actions : _passThrough,
-      child: widget.child,
+    // Both wrappers stay in the tree whatever the flags say -- they gate
+    // themselves -- so flipping a flag never remounts the subtree.
+    return NotificationListener<ScrollNotification>(
+      onNotification: _onScroll,
+      child: Actions(
+        actions: widget.enabled && widget.onTapOutside
+            ? _actions
+            : _passThrough,
+        child: widget.child,
+      ),
     );
   }
 }

@@ -6,7 +6,7 @@ export 'src/ix_core/ix_common_geometry.dart';
 export 'src/ix_core/ix_density.dart';
 export 'src/ix_core/ix_focus_ring.dart';
 export 'src/ix_core/ix_motion.dart';
-export 'src/ix_core/ix_unfocus_on_tap_outside.dart';
+export 'src/ix_core/ix_keyboard_dismiss_scope.dart';
 export 'src/ix_core/ix_upstream.dart';
 export 'src/ix_theme/components/ix_app_header_theme.dart';
 export 'src/ix_theme/components/ix_app_menu_theme.dart';

@@ -117,11 +117,11 @@ Widget scaffoldWithoutKeyboardDismissal({
   onNavigate: onNavigate,
   body: body,
   // Back to Flutter's own behaviour: on a touch screen a focused field
-  // survives a tap outside it.
-  unfocusOnTapOutside: false,
+  // survives both a tap outside it and a scroll.
+  dismissKeyboardOnInteraction: false,
 );
 
-Widget formPage() => IxUnfocusOnTapOutside(
+Widget formPage() => IxKeyboardDismissScope(
   child: const Padding(
     padding: EdgeInsets.all(16),
     child: TextField(decoration: InputDecoration(labelText: 'Name')),

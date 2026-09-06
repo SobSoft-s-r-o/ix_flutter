@@ -11,7 +11,7 @@ The `IxApplicationScaffold` is a responsive application shell widget designed to
 *   **Built-in Bottom Entries**: `settings:`, `about:` and `enableToggleTheme` add the upstream Settings, About & legal information and Toggle theme entries at the bottom of the menu.
 *   **Fly-out Panels**: A category in a collapsed menu -- and the built-in settings/about entries -- reveal their content in an overlay panel anchored to the menu.
 *   **Accessible**: The menu is a `menuBar` landmark with one semantics node per entry, full arrow-key navigation and a visible focus ring.
-*   **Keyboard dismissal**: A tap outside a focused text input releases it and takes the soft keyboard down, on every platform.
+*   **Keyboard dismissal**: A tap outside a focused text input, or a drag of any scroll view in the frame, releases it and takes the soft keyboard down -- on every platform.
 *   **Localizable**: Every user-facing string comes from `IxApplicationStrings`.
 *   **Theming**: Integrates with `IxAppMenuTheme` and `IxSidebarTheme` for consistent styling.
 
@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
 | `settings` | `Widget?` | Content of the built-in Settings panel (upstream `<ix-menu-settings>`). When set, a Settings entry appears at the bottom of the menu. | `null` |
 | `about` | `Widget?` | Content of the built-in About panel (upstream `<ix-menu-about>`). When set, an About & legal information entry appears at the bottom of the menu. | `null` |
 | `enableToggleTheme` | `bool` | Whether the built-in theme toggle is shown. It only appears when `onThemeModeChanged` is also set. | `true` |
-| `unfocusOnTapOutside` | `bool` | Whether a tap outside a focused text input releases it and takes the soft keyboard down. See [Keyboard dismissal](#keyboard-dismissal). | `true` |
+| `dismissKeyboardOnInteraction` | `bool` | Whether a tap outside a focused text input, or a drag of a scroll view, releases it and takes the soft keyboard down. See [Keyboard dismissal](#keyboard-dismissal). | `true` |
 
 ### IxApplicationStrings
 
@@ -204,15 +204,23 @@ Data model for defining items in the navigation menu.
 
 ## Keyboard dismissal
 
-Flutter only drops a text field's focus on a tap outside it on **desktop**.
-Its default action (`_EditableTextTapOutsideAction` in
-`packages/flutter/lib/src/widgets/editable_text.dart`) keeps the focus for a
-*touch* pointer on Android, iOS and Fuchsia, so the soft keyboard stays up
-over the form the user is trying to read.
+Flutter dismisses the soft keyboard neither on a tap outside a field nor on a
+scroll, and both defaults live too far down to fix once for a whole app:
 
+*   **Tapping outside.** The default action (`_EditableTextTapOutsideAction`
+    in `packages/flutter/lib/src/widgets/editable_text.dart`) only drops the
+    focus on **desktop**; it keeps it for a *touch* pointer on Android, iOS
+    and Fuchsia.
+*   **Scrolling.** Dismissal on scroll is per scroll view, through
+    `ScrollView.keyboardDismissBehavior`, and the app-wide default in
+    `packages/flutter/lib/src/widgets/scroll_configuration.dart` is
+    `ScrollViewKeyboardDismissBehavior.manual` -- so every list, grid and
+    `SingleChildScrollView` has to opt in one by one.
+
+Either way the keyboard sits over the form the user is trying to read.
 `IxApplicationScaffold` wraps its whole frame -- app bar, menu, fly-out,
-drawer and `body` -- in `IxUnfocusOnTapOutside`, so a tap next to a focused
-input releases it and dismisses the keyboard with no extra code:
+drawer and `body` -- in `IxKeyboardDismissScope`, so both gestures dismiss
+the keyboard with no extra code:
 
 ```dart
 Widget scaffoldWithoutKeyboardDismissal({
@@ -225,8 +233,8 @@ Widget scaffoldWithoutKeyboardDismissal({
   onNavigate: onNavigate,
   body: body,
   // Back to Flutter's own behaviour: on a touch screen a focused field
-  // survives a tap outside it.
-  unfocusOnTapOutside: false,
+  // survives both a tap outside it and a scroll.
+  dismissKeyboardOnInteraction: false,
 );
 ```
 
@@ -234,19 +242,28 @@ What it does *not* do:
 
 *   A tap inside the field, or on one of its `TextFieldTapRegion` satellites
     (the selection toolbar, the autofill dropdown, a decoration icon), keeps
-    the focus -- the widget reads Flutter's own tap-region grouping rather
+    the focus -- the scope reads Flutter's own tap-region grouping rather
     than hit-testing on its own.
-*   A touch that travels more than `kTouchSlop` before it lifts is a scroll,
-    not a tap, and keeps the keyboard.
+*   A touch that travels more than `kTouchSlop` before it lifts is a drag,
+    not a tap; whether it dismisses is then up to the scroll trigger, so
+    dragging a page that cannot scroll keeps the keyboard.
+*   A programmatic `jumpTo`/`animateTo`, the ballistic settle after a fling
+    and a mouse wheel carry no drag details and never dismiss. Neither does a
+    field scrolling its own text under a selection drag.
 *   A non-text focus (a button, a menu tile) is never cleared, so the
-    keyboard focus model and the desktop focus ring are untouched.
-*   Taps are observed, never consumed: the button you tapped to dismiss the
-    keyboard still fires.
+    keyboard focus model and the desktop focus ring are untouched. This is
+    stricter than Flutter's own `onDrag`, which unfocuses whatever holds the
+    primary focus.
+*   Taps and scroll notifications are observed, never consumed: the button
+    you tapped still fires and every other scroll listener still sees the
+    scroll.
 
-Outside the scaffold, wrap any subtree in the same widget:
+Outside the scaffold, wrap any subtree in the same widget. `onTapOutside` and
+`onDrag` turn the two triggers on and off independently, and `enabled: false`
+restores Flutter's defaults for both:
 
 ```dart
-Widget formPage() => IxUnfocusOnTapOutside(
+Widget formPage() => IxKeyboardDismissScope(
   child: const Padding(
     padding: EdgeInsets.all(16),
     child: TextField(decoration: InputDecoration(labelText: 'Name')),
@@ -254,6 +271,13 @@ Widget formPage() => IxUnfocusOnTapOutside(
 );
 ```
 
+| Property | Type | Description | Default |
+|---|---|---|---|
+| `child` | `Widget` | The subtree whose text inputs are released. | Required |
+| `enabled` | `bool` | Whether the scope does anything at all. | `true` |
+| `onTapOutside` | `bool` | Release a focused field on a tap outside it. | `true` |
+| `onDrag` | `bool` | Release a focused field when the user drags a scroll view. | `true` |
+| `dismissKeyboard` | `bool` | Also ask the platform to hide the IME, ahead of Flutter's own teardown of the input connection. | `true` |
 ## Accessibility
 
 The menu publishes exactly one semantics node per entry: its label, its

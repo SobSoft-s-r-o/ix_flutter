@@ -407,11 +407,13 @@ See [doc/ix_application_scaffold.md](doc/ix_application_scaffold.md) for
 categories, built-in settings/about panels and the theme toggle.
 
 The scaffold also dismisses the soft keyboard for you: a tap outside a focused
-text input releases it, on every platform. Flutter's own default only does that
-on desktop -- on Android and iOS a touch outside a field deliberately keeps it
-focused -- so a form under the scaffold behaves the way users expect without
-any per-field wiring. Pass `unfocusOnTapOutside: false` to opt out, or wrap a
-screen that does not use the scaffold in `IxUnfocusOnTapOutside` to get the
+text input releases it, and so does dragging any scroll view in the frame.
+Flutter does neither on a touch screen by default -- its tap-outside action
+only drops the focus on desktop, and dismissal on scroll is opt-in per scroll
+view (`ScrollView.keyboardDismissBehavior`, which defaults to `manual`) -- so a
+form under the scaffold behaves the way users expect without any per-field or
+per-list wiring. Pass `dismissKeyboardOnInteraction: false` to opt out, or wrap
+a screen that does not use the scaffold in `IxKeyboardDismissScope` to get the
 same behaviour there. See
 [Keyboard dismissal](doc/ix_application_scaffold.md#keyboard-dismissal).
 
