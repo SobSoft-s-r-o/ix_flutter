@@ -27,6 +27,29 @@ Future<void> focusFirstTile(WidgetTester tester) async {
 final String _openDrawer =
     const DefaultMaterialLocalizations().openAppDrawerTooltip;
 
+/// Captures `debugPrint` so the reserved-id one-time notice never leaks into
+/// the suite log (same pattern as `test/scaffold/ix_menu_flyout_test.dart`).
+///
+/// Flutter asserts that no foundation debug variable is still overridden
+/// *before* `addTearDown` callbacks run, so the caller must call the
+/// returned function itself before the test body ends; `addTearDown` here
+/// is only the guard for a body that throws first.
+VoidCallback _captureDebugPrint() {
+  final previous = debugPrint;
+  var restored = false;
+  void restore() {
+    if (restored) {
+      return;
+    }
+    restored = true;
+    debugPrint = previous;
+  }
+
+  addTearDown(restore);
+  debugPrint = (String? message, {int? wrapWidth}) {};
+  return restore;
+}
+
 void main() {
   const withDisabled = [
     IxMenuEntry(id: 'first', type: IxMenuEntryType.item, label: 'First'),
@@ -103,6 +126,8 @@ void main() {
   });
 
   testWidgets('a disabled theme-toggle entry is skipped too', (tester) async {
+    final restoreDebugPrint = _captureDebugPrint();
+    addTearDown(IxApplicationScaffold.debugResetReservedIdWarnings);
     // A reserved `theme-toggle` custom entry is disabled while
     // `onThemeModeChanged` is null.
     await pumpIx(
@@ -129,6 +154,7 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
     await tester.pumpAndSettle();
     expectFocusOn(tester, 'Help');
+    restoreDebugPrint();
   });
 
   testWidgets('ArrowDown leaves a nested category without throwing', (

@@ -7,6 +7,28 @@ import '../helpers/pump_ix.dart';
 /// Strings the scaffold does not have to invent, and the reserved 1.x entry
 /// ids that now cooperate with the `settings:`/`about:` panels.
 
+/// Captures `debugPrint` so the reserved-id one-time notice never leaks into
+/// the suite log (same pattern as `test/scaffold/ix_menu_flyout_test.dart`).
+///
+/// The tear-down is only the guard for a body that throws first; the caller
+/// restores it itself when it needs to read `logs` before the test ends.
+({List<String> logs, VoidCallback restore}) _captureDebugPrint() {
+  final logs = <String>[];
+  final previous = debugPrint;
+  var restored = false;
+  void restore() {
+    if (restored) {
+      return;
+    }
+    restored = true;
+    debugPrint = previous;
+  }
+
+  addTearDown(restore);
+  debugPrint = (String? message, {int? wrapWidth}) => logs.add(message ?? '');
+  return (logs: logs, restore: restore);
+}
+
 void main() {
   const material = DefaultMaterialLocalizations();
 
@@ -56,6 +78,8 @@ void main() {
   testWidgets('a reserved settings entry opens the settings: panel once', (
     tester,
   ) async {
+    final capture = _captureDebugPrint();
+    addTearDown(IxApplicationScaffold.debugResetReservedIdWarnings);
     var deprecatedCalls = 0;
     await pumpIx(
       tester,
@@ -85,11 +109,14 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Settings panel'), findsOneWidget);
     expect(deprecatedCalls, 1, reason: 'the 1.x callback must still fire');
+    capture.restore();
   });
 
   testWidgets('a reserved settings entry in the top list is not duplicated', (
     tester,
   ) async {
+    final capture = _captureDebugPrint();
+    addTearDown(IxApplicationScaffold.debugResetReservedIdWarnings);
     await pumpIx(
       tester,
       IxApplicationScaffold(
@@ -107,5 +134,6 @@ void main() {
       ),
     );
     expect(find.text('Settings'), findsOneWidget);
+    capture.restore();
   });
 }
