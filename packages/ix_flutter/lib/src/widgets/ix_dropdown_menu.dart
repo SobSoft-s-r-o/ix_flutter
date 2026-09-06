@@ -15,23 +15,31 @@ const Key _kMenuKey = Key('ix-dropdown-menu');
 
 /// Positions the dropdown menu relative to its trigger.
 ///
-/// Works in the target `Overlay`'s coordinate space: [triggerOrigin] and the
-/// returned offset are both measured from the overlay's top-left corner. The
-/// delegate flips the menu to the opposite side when the preferred one has no
-/// room, and always shifts it back inside the viewport, leaving a
-/// [_kViewportMargin] gap.
+/// Works in the target `Overlay`'s coordinate space: [triggerOrigin],
+/// [viewport] and the returned offset are all measured from the overlay's
+/// top-left corner. The delegate flips the menu to the opposite side when the
+/// preferred one has no room, and always shifts it back inside [viewport],
+/// leaving a [_kViewportMargin] gap.
 class _IxDropdownMenuLayout extends SingleChildLayoutDelegate {
   const _IxDropdownMenuLayout({
     required this.triggerSize,
     required this.triggerOrigin,
     required this.viewport,
+    required this.textDirection,
     required this.placement,
     required this.maxHeight,
   });
 
   final Size triggerSize;
   final Offset triggerOrigin;
-  final Size viewport;
+
+  /// The area the menu may occupy, safe area already removed.
+  final Rect viewport;
+
+  /// Resolves the `start`/`end` half of a vertical [placement]: `start` is
+  /// the reading start, so it is the trigger's right edge in RTL.
+  final TextDirection textDirection;
+
   final IxDropdownPlacement placement;
   final double maxHeight;
 
@@ -78,32 +86,40 @@ class _IxDropdownMenuLayout extends SingleChildLayoutDelegate {
         extent: childSize.height,
         triggerStart: triggerOrigin.dy,
         triggerExtent: triggerSize.height,
-        viewportExtent: viewport.height,
+        viewportStart: viewport.top,
+        viewportEnd: viewport.bottom,
       );
       cross = _resolveCross(
         extent: childSize.width,
         triggerStart: triggerOrigin.dx,
         triggerExtent: triggerSize.width,
+        // `start` is the reading start on the horizontal cross axis, so RTL
+        // pins the menu's right edge to the trigger's right edge.
+        alignsToStart: _alignsToStart == (textDirection == TextDirection.ltr),
       );
       return Offset(
-        _clamp(cross, childSize.width, viewport.width),
-        _clamp(main, childSize.height, viewport.height),
+        _clamp(cross, childSize.width, viewport.left, viewport.right),
+        _clamp(main, childSize.height, viewport.top, viewport.bottom),
       );
     }
     main = _resolveMain(
       extent: childSize.width,
       triggerStart: triggerOrigin.dx,
       triggerExtent: triggerSize.width,
-      viewportExtent: viewport.width,
+      viewportStart: viewport.left,
+      viewportEnd: viewport.right,
     );
     cross = _resolveCross(
       extent: childSize.height,
       triggerStart: triggerOrigin.dy,
       triggerExtent: triggerSize.height,
+      // The cross axis of a left/right placement is vertical, which the
+      // reading direction does not mirror.
+      alignsToStart: _alignsToStart,
     );
     return Offset(
-      _clamp(main, childSize.width, viewport.width),
-      _clamp(cross, childSize.height, viewport.height),
+      _clamp(main, childSize.width, viewport.left, viewport.right),
+      _clamp(cross, childSize.height, viewport.top, viewport.bottom),
     );
   }
 
@@ -119,12 +135,13 @@ class _IxDropdownMenuLayout extends SingleChildLayoutDelegate {
     required double extent,
     required double triggerStart,
     required double triggerExtent,
-    required double viewportExtent,
+    required double viewportStart,
+    required double viewportEnd,
   }) {
     final after = triggerStart + triggerExtent + _kMenuGap;
     final before = triggerStart - _kMenuGap - extent;
-    final slackAfter = viewportExtent - _kViewportMargin - after - extent;
-    final slackBefore = before - _kViewportMargin;
+    final slackAfter = viewportEnd - _kViewportMargin - after - extent;
+    final slackBefore = before - viewportStart - _kViewportMargin;
     if (_prefersAfter) {
       return slackAfter >= 0 || slackBefore <= slackAfter ? after : before;
     }
@@ -136,19 +153,24 @@ class _IxDropdownMenuLayout extends SingleChildLayoutDelegate {
     required double extent,
     required double triggerStart,
     required double triggerExtent,
+    required bool alignsToStart,
   }) {
-    return _alignsToStart
-        ? triggerStart
-        : triggerStart + triggerExtent - extent;
+    return alignsToStart ? triggerStart : triggerStart + triggerExtent - extent;
   }
 
   /// Keeps [position] inside the viewport with a [_kViewportMargin] gap.
-  double _clamp(double position, double extent, double viewportExtent) {
+  double _clamp(
+    double position,
+    double extent,
+    double viewportStart,
+    double viewportEnd,
+  ) {
+    final minPosition = viewportStart + _kViewportMargin;
     final maxPosition = math.max(
-      _kViewportMargin,
-      viewportExtent - _kViewportMargin - extent,
+      minPosition,
+      viewportEnd - _kViewportMargin - extent,
     );
-    return position.clamp(_kViewportMargin, maxPosition);
+    return position.clamp(minPosition, maxPosition);
   }
 
   @override
@@ -156,6 +178,7 @@ class _IxDropdownMenuLayout extends SingleChildLayoutDelegate {
     return triggerSize != oldDelegate.triggerSize ||
         triggerOrigin != oldDelegate.triggerOrigin ||
         viewport != oldDelegate.viewport ||
+        textDirection != oldDelegate.textDirection ||
         placement != oldDelegate.placement ||
         maxHeight != oldDelegate.maxHeight;
   }
@@ -216,6 +239,13 @@ class _IxDropdownMenuState extends State<_IxDropdownMenu>
       label: widget.label,
       child: FadeTransition(
         opacity: _opacity,
+        // The menu is open from the first frame of the fade; a screen reader
+        // must see its rows then, not once the animation has finished. It
+        // also keeps the `menu` role above legal: a fully transparent
+        // `FadeTransition` drops its child's semantics, which would leave
+        // this node child-less and trip the framework's "a menu cannot be
+        // empty" assertion on the opening frame.
+        alwaysIncludeSemantics: true,
         child: DecoratedBox(
           key: _kMenuKey,
           decoration: BoxDecoration(

@@ -231,6 +231,15 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
   bool _internalOpen = false;
   int? _focusedIndex;
 
+  /// Whether the last build found an [Overlay] able to host the menu.
+  ///
+  /// Recorded during `build` (see there) so `_setOpen` can report a placement
+  /// that cannot show a menu without repeating the ancestor lookup.
+  bool _hasOverlay = true;
+
+  /// Reported at most once per widget, and only in debug builds.
+  bool _warnedMissingOverlay = false;
+
   /// Whether the menu is currently open, honouring the controlled
   /// [IxDropdownButton.isOpen] property when it is set.
   bool get _isOpen => widget.isOpen ?? _internalOpen;
@@ -386,6 +395,10 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     if (open && widget.onWillOpen?.call() == false) {
       return;
     }
+    if (open && !_hasOverlay) {
+      _warnMissingOverlay();
+      return;
+    }
     if (open) {
       _focusIndex(focusIndex);
     } else {
@@ -524,6 +537,47 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     }
   }
 
+  /// The area the menu may occupy, in the target [Overlay]'s coordinate
+  /// space.
+  ///
+  /// The overlay is not the screen: the status bar, a notch and the home
+  /// indicator all sit inside it, and a menu placed under them is unreadable
+  /// (and on iOS partly untappable). The safe area reported by [MediaQuery]
+  /// is therefore removed from the overlay's own box.
+  ///
+  Rect _viewportRect(BuildContext context, OverlayChildLayoutInfo info) {
+    final padding = MediaQuery.paddingOf(context);
+    final overlay = info.overlaySize;
+    return Rect.fromLTRB(
+      padding.left,
+      padding.top,
+      math.max(padding.left, overlay.width - padding.right),
+      math.max(padding.top, overlay.height - padding.bottom),
+    );
+  }
+
+  /// Reports, once and only in debug builds, that this trigger sits where no
+  /// [Overlay] can host its menu.
+  ///
+  /// A floating menu has to be laid out by an ancestor that spans the area it
+  /// may cover — an inline host would paint it but never hit-test it — so
+  /// there is nothing the trigger can do about this on its own.
+  void _warnMissingOverlay() {
+    assert(() {
+      if (!_warnedMissingOverlay) {
+        _warnedMissingOverlay = true;
+        debugPrint(
+          'IxDropdownButton("${widget.label}"): no Overlay ancestor, so the '
+          'menu cannot be shown. A shell built above the Navigator '
+          '(MaterialApp.builder) has none -- wrap it in Overlay.wrap(child: '
+          '...) so this trigger, tooltips and other floating widgets have '
+          'somewhere to go.',
+        );
+      }
+      return true;
+    }());
+  }
+
   /// Builds the overlay contents.
   ///
   /// Runs in the host's element tree, so the ambient `Theme`,
@@ -537,22 +591,23 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     final theme = Theme.of(context);
     final dropdownTheme =
         theme.extension<IxDropdownTheme>() ?? IxDropdownTheme.fallback(theme);
-    final viewport = info.overlaySize;
     final triggerSize = info.childSize;
     final triggerOrigin = MatrixUtils.transformPoint(
       info.childPaintTransform,
       Offset.zero,
     );
+    final viewportRect = _viewportRect(context, info);
     final maxHeight =
         widget.maxHeight ??
-        math.max(0.0, viewport.height / 2 - _kMaxHeightInset);
+        math.max(0.0, viewportRect.height / 2 - _kMaxHeightInset);
     final reserveCheckColumn = widget.items.any((item) => item.checked);
 
     return CustomSingleChildLayout(
       delegate: _IxDropdownMenuLayout(
         triggerSize: triggerSize,
         triggerOrigin: triggerOrigin,
-        viewport: viewport,
+        viewport: viewportRect,
+        textDirection: Directionality.of(context),
         placement: widget.placement,
         maxHeight: maxHeight,
       ),
@@ -591,63 +646,77 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
         widget.buttonVariant ?? _mapVariant(widget.variant);
     final buttonStyle = buttonTheme?.style(variant);
 
+    // A trigger placed above the `Navigator` -- a persistent shell built
+    // through `MaterialApp.builder`, the placement 1.x supports for
+    // `IxApplicationScaffold` -- has no `Overlay` to host its menu. The
+    // portal is only mounted where one exists, so the trigger still *builds*
+    // there (it did in 1.0.2, which only touched the overlay on open);
+    // opening it reports the notice in [_warnMissingOverlay] instead.
+    _hasOverlay = Overlay.maybeOf(context) != null;
+    final trigger = _buildTrigger(buttonStyle);
     return TapRegion(
       groupId: _tapRegionGroupId,
       onTapOutside: _onTapOutside,
-      child: OverlayPortal.overlayChildLayoutBuilder(
-        controller: _portal,
-        overlayChildBuilder: _buildMenu,
-        child: Focus(
-          canRequestFocus: false,
-          skipTraversal: true,
-          onKeyEvent: _onTriggerKey,
-          child: ElevatedButton(
-            onPressed: widget.disabled ? null : _toggle,
-            style: buttonStyle,
-            focusNode: _triggerFocus,
-            child: Semantics(
-              expanded: _isOpen,
-              label: widget.semanticLabel,
-              child: ExcludeSemantics(
-                excluding: widget.semanticLabel != null,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final label = Text(
-                      widget.label,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    );
-                    return Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (widget.icon != null) ...[
-                          widget.icon!,
-                          const SizedBox(width: IxCommonGeometry.space1),
-                        ],
-                        // A `Flexible` label would assert inside a row with
-                        // unbounded width (a trigger placed directly in
-                        // another `Row`), so it only flexes when there is a
-                        // width to shrink into.
-                        if (constraints.maxWidth.isFinite)
-                          Flexible(child: label)
-                        else
-                          label,
-                        const SizedBox(width: IxCommonGeometry.space1),
-                        // 16px, the size 1.x rendered this glyph at: a
-                        // larger icon box would grow the trigger on every
-                        // existing call site.
-                        IxIcon.key(
-                          _isOpen
-                              ? IxIconKey.chevronUpSmall
-                              : IxIconKey.chevronDownSmall,
-                          size: IxIconSize.s16,
-                          excludeFromSemantics: true,
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              ),
+      child: _hasOverlay
+          ? OverlayPortal.overlayChildLayoutBuilder(
+              controller: _portal,
+              overlayChildBuilder: _buildMenu,
+              child: trigger,
+            )
+          : trigger,
+    );
+  }
+
+  Widget _buildTrigger(ButtonStyle? buttonStyle) {
+    return Focus(
+      canRequestFocus: false,
+      skipTraversal: true,
+      onKeyEvent: _onTriggerKey,
+      child: ElevatedButton(
+        onPressed: widget.disabled ? null : _toggle,
+        style: buttonStyle,
+        focusNode: _triggerFocus,
+        child: Semantics(
+          expanded: _isOpen,
+          label: widget.semanticLabel,
+          child: ExcludeSemantics(
+            excluding: widget.semanticLabel != null,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final label = Text(
+                  widget.label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                );
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.icon != null) ...[
+                      widget.icon!,
+                      const SizedBox(width: IxCommonGeometry.space1),
+                    ],
+                    // A `Flexible` label would assert inside a row with
+                    // unbounded width (a trigger placed directly in
+                    // another `Row`), so it only flexes when there is a
+                    // width to shrink into.
+                    if (constraints.maxWidth.isFinite)
+                      Flexible(child: label)
+                    else
+                      label,
+                    const SizedBox(width: IxCommonGeometry.space1),
+                    // 16px, the size 1.x rendered this glyph at: a
+                    // larger icon box would grow the trigger on every
+                    // existing call site.
+                    IxIcon.key(
+                      _isOpen
+                          ? IxIconKey.chevronUpSmall
+                          : IxIconKey.chevronDownSmall,
+                      size: IxIconSize.s16,
+                      excludeFromSemantics: true,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         ),
