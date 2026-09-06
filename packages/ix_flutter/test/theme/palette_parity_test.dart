@@ -9,8 +9,8 @@ import 'package:ix_flutter/src/ix_colors/theme/ix_classic_light_colors.dart';
 
 import '../helpers/upstream.dart';
 
-/// Mapa enum → CSS názov je odvodená z doc-komentárov v generovaných
-/// paletách (`/// CSS Variable: --theme-color-…`).
+/// The enum → CSS name map is derived from the doc comments in the
+/// generated palettes (`/// CSS Variable: --theme-color-…`).
 Map<IxThemeColorToken, String> _cssNames(String dartFile) {
   final src = File(dartFile).readAsStringSync();
   final re = RegExp(

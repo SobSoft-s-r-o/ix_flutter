@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Načíta bundled fonty, aby goldeny a merania šírok textu používali
-/// skutočné glyfy namiesto testovacieho Ahem fontu.
+/// Loads the bundled fonts so goldens and text-width measurements use real
+/// glyphs instead of the test Ahem font.
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   TestWidgetsFlutterBinding.ensureInitialized();
   await _loadFont('Roboto Mono', [

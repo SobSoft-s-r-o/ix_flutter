@@ -12,7 +12,8 @@ import 'package:example/app.dart';
 void main() {
   testWidgets('renders iX design system overview', (WidgetTester tester) async {
     await tester.pumpWidget(const IxDemoApp());
-    // IxSpinner drží scheduler (repeat()), preto nie pumpAndSettle.
+    // IxSpinner keeps the scheduler running (repeat()), so pumpAndSettle is
+    // not used.
     await tester.pump(const Duration(milliseconds: 500));
 
     expect(find.text('IX Flutter Theme Overview'), findsOneWidget);

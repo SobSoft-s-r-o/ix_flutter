@@ -1,7 +1,7 @@
-# Goldeny
+# Goldens
 
-Názvy: `<component>-<state>-<theme>.png`, zrkadlia upstream
+Names: `<component>-<state>-<theme>.png`, mirroring the upstream
 `testing/visual-testing/__screenshots__/tests/<component>/<component>.e2e.ts/<state>-1-chromium---classic-<theme>-linux.png`.
-Generovanie: `flutter test --update-goldens test/golden` iba v samostatnom PR
-s review; CI beží na pinnutej verzii Flutteru 3.44.6 (DPR 1, bundled fonty z
+Generation: `flutter test --update-goldens test/golden`, only in a dedicated PR
+with review; CI runs on a pinned Flutter 3.44.6 (DPR 1, bundled fonts from
 `test/flutter_test_config.dart`).

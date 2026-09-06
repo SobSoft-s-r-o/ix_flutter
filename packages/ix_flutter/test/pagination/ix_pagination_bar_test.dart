@@ -130,10 +130,10 @@ void main() {
         page: 1,
         totalPages: 2,
         onPageChanged: (_) {},
-        paginationStrings: const IxPaginationStrings(nextPage: 'Ďalšia strana'),
+        paginationStrings: const IxPaginationStrings(nextPage: 'Forward'),
       ),
     );
-    expect(find.byTooltip('Ďalšia strana'), findsOneWidget);
+    expect(find.byTooltip('Forward'), findsOneWidget);
   });
 
   testWidgets('IxResponsiveDataView localizes the page-size trigger', (

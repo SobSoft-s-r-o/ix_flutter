@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-/// Štandardné obalenie widgetu pre testy ix_flutter.
+/// Standard widget wrapper for ix_flutter tests.
 ///
-/// - `disableAnimations: true` zastaví IxSpinner/Animated* po zavedení
-///   IxMotion (plán accessibility-interaction, Task A-5) a umožní pumpAndSettle.
-/// - `size` nastaví logický viewport (DPR 1) a po teste ho vráti.
+/// - `disableAnimations: true` stops IxSpinner/Animated* once IxMotion lands
+///   (accessibility-interaction plan, Task A-5), allowing pumpAndSettle.
+/// - `size` sets the logical viewport (DPR 1) and resets it after the test.
 Future<void> pumpIx(
   WidgetTester tester,
   Widget child, {

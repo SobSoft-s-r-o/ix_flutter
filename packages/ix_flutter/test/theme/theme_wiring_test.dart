@@ -5,7 +5,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ix_flutter/ix_flutter.dart'; // jediný import – overuje verejný barrel
+import 'package:ix_flutter/ix_flutter.dart'; // the only import -- verifies the public barrel
 
 import '../helpers/pump_ix.dart';
 

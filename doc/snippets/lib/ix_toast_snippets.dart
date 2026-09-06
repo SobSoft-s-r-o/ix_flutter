@@ -130,5 +130,5 @@ Future<Object?> showUploadToast(
 Widget bottomRightToastOverlay(IxToastService service) => IxToastOverlay(
   service: service,
   placement: IxToastPosition.bottomRight,
-  strings: const IxToastStrings(closeToast: 'Zavrieť'),
+  strings: const IxToastStrings(closeToast: 'Dismiss'),
 );

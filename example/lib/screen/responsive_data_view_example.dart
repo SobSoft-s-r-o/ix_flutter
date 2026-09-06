@@ -38,7 +38,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
   IxSortSpec? _currentSort = const IxSortSpec(key: 'name', ascending: true);
-  bool _useSlovak = false;
+  bool _useCustomStrings = false;
 
   // Backs the simulated network delay below with a cancelable `Timer`
   // (instead of a bare `Future.delayed`, whose underlying timer cannot be
@@ -239,16 +239,16 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('Language: '),
+                  const Text('Strings: '),
                   Switch(
-                    value: _useSlovak,
+                    value: _useCustomStrings,
                     onChanged: (value) {
                       setState(() {
-                        _useSlovak = value;
+                        _useCustomStrings = value;
                       });
                     },
                   ),
-                  Text(_useSlovak ? 'SK' : 'EN'),
+                  Text(_useCustomStrings ? 'Custom' : 'Default'),
                 ],
               ),
             ],
@@ -259,7 +259,7 @@ class _ResponsiveDataViewExampleState extends State<ResponsiveDataViewExample> {
             padding: const EdgeInsets.all(16.0),
             child: IxResponsiveDataView<_ExampleItem>(
               items: _displayedItems,
-              strings: _useSlovak ? _slovakStrings : null,
+              strings: _useCustomStrings ? _customStrings : null,
               enableSorting: true,
               onSortChanged: _handleSort,
               initialSortKey: _currentSort?.key,
@@ -471,25 +471,25 @@ class _ExampleItem {
   final String category;
 }
 
-final _slovakStrings = IxResponsiveDataViewStrings(
-  toolsColumnHeader: 'Nástroje',
-  emptyTitle: 'Žiadne dáta',
-  emptyBody: 'Nie sú k dispozícii žiadne položky na zobrazenie.',
-  noResultsTitleBuilder: (query) => 'Žiadne výsledky pre "$query"',
-  noResultsBody: 'Skúste iný hľadaný výraz',
-  searchChipLabel: 'Filtrované podľa',
-  clearSearchLabel: 'Vymazať hľadanie',
-  clearSearchTooltip: 'Vymazať hľadanie',
-  paginationPrevTooltip: 'Predchádzajúca strana',
-  paginationNextTooltip: 'Nasledujúca strana',
-  pageOfBuilder: (page, total) => 'Strana $page z $total',
-  pageBuilder: (page) => 'Strana $page',
-  rowsPerPageLabel: 'Položiek na stranu:',
-  totalItemsBuilder: (count) => '$count položiek',
-  resultsCountBuilder: (count) => 'Výsledky: $count',
-  detailsTitle: 'Detaily',
-  actionsTitle: 'Akcie',
-  rowActionsTooltip: 'Akcie',
+final _customStrings = IxResponsiveDataViewStrings(
+  toolsColumnHeader: 'Options',
+  emptyTitle: 'Nothing here',
+  emptyBody: 'There is nothing to show yet.',
+  noResultsTitleBuilder: (query) => 'Nothing matched "$query"',
+  noResultsBody: 'Try a different keyword',
+  searchChipLabel: 'Filtered on',
+  clearSearchLabel: 'Reset search',
+  clearSearchTooltip: 'Reset search',
+  paginationPrevTooltip: 'Back',
+  paginationNextTooltip: 'Forward',
+  pageOfBuilder: (page, total) => '$page / $total',
+  pageBuilder: (page) => 'p. $page',
+  rowsPerPageLabel: 'Rows shown:',
+  totalItemsBuilder: (count) => '$count entries',
+  resultsCountBuilder: (count) => 'Found: $count',
+  detailsTitle: 'Info',
+  actionsTitle: 'Options',
+  rowActionsTooltip: 'Options',
 );
 
 class _StatusChip extends StatelessWidget {

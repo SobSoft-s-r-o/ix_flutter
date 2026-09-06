@@ -130,10 +130,10 @@ Widget localizedPaginationBar({
   totalPages: totalPages,
   onPageChanged: onPageChanged,
   paginationStrings: const IxPaginationStrings(
-    previousPage: 'Predchádzajúca strana',
-    nextPage: 'Ďalšia strana',
-    rowsPerPage: 'Položiek na stranu',
-    pageSelection: 'Výber strany',
+    previousPage: 'Back',
+    nextPage: 'Forward',
+    rowsPerPage: 'Rows per view',
+    pageSelection: 'Choose rows per page',
   ),
 );
 

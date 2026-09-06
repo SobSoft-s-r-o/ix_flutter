@@ -4,15 +4,15 @@ import 'package:ix_flutter/ix_flutter.dart';
 
 import '../helpers/pump_ix.dart';
 
-/// Matica šírok × text scale. Widgety, ktoré dnes pretekajú, sú označené
-/// skip s ID nálezu; po oprave sa skip odstráni.
+/// Width × text-scale matrix. Widgets that currently overflow are marked
+/// skip with the finding ID; the skip is removed once fixed.
 ///
-/// Traceability: upstream `@siemens/ix` nemá pre túto maticu šírok × text
-/// scale priamy Playwright `.ct.ts` ani scss/tsx náprotivok (CSS breakpointy
-/// vs. Flutter `LayoutBuilder` sa nedajú mapovať 1:1), preto jednotlivé testy
-/// necitujú `@Upstream`. Matica stráži nález IXF-024 (WCAG 1.4.4 Resize
-/// text) pre `IxDropdownButton`; skip bol odstránený v úlohe A-2, ktorá
-/// spravila label triggeru flexibilným s ellipsis.
+/// Traceability: upstream `@siemens/ix` has no direct Playwright `.ct.ts` or
+/// scss/tsx counterpart for this width × text-scale matrix (CSS breakpoints
+/// vs. Flutter `LayoutBuilder` don't map 1:1), so the individual tests don't
+/// cite `@Upstream`. The matrix guards finding IXF-024 (WCAG 1.4.4 Resize
+/// text) for `IxDropdownButton`; the skip was removed in task A-2, which
+/// made the trigger's label flexible with ellipsis.
 ///
 /// `IxResponsiveDataView`/`IxPaginationBar` cases (A-4, IXF-002/IXF-024/
 /// IXF-031) were never skipped -- the header/row/search-chip labels and the
