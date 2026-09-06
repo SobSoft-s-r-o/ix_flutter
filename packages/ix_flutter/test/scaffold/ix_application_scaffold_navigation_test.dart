@@ -186,6 +186,41 @@ void main() {
     expectFocusOn(tester, 'After');
   });
 
+  // B2: the scaffold keeps one FocusNode per tile id in a map of its own
+  // (so a fly-out can hand focus back to the tile that opened it) rather
+  // than disposing it with the tile's widget; an app that adds and removes
+  // menu entries at runtime must not grow that map forever, but pruning it
+  // must never dispose the node a tile removed out from under the keyboard
+  // focus is still holding.
+  testWidgets(
+    'removing the focused entry does not dispose its still-focused node',
+    (tester) async {
+      const both = [
+        IxMenuEntry(id: 'first', type: IxMenuEntryType.item, label: 'First'),
+        IxMenuEntry(id: 'second', type: IxMenuEntryType.item, label: 'Second'),
+      ];
+      await pumpIx(tester, app(both));
+      await focusFirstTile(tester);
+      expectFocusOn(tester, 'First');
+
+      // Rebuilds the same scaffold (didUpdateWidget, not a remount) with
+      // "first" gone while its node is still the primary focus.
+      const secondOnly = [
+        IxMenuEntry(id: 'second', type: IxMenuEntryType.item, label: 'Second'),
+      ];
+      await pumpIx(tester, app(secondOnly));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+
+      // The menu is still keyboard-navigable afterwards -- pruning did not
+      // leave the traversal order or the focus tree in a broken state.
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expectFocusOn(tester, 'Second');
+    },
+  );
+
   testWidgets('tapping an entry closes the drawer above the Navigator', (
     tester,
   ) async {

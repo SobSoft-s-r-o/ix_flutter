@@ -361,6 +361,7 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       _isExpanded = widget.initiallyExpanded;
     }
     _syncCategoryExpansion(widget.entries);
+    _pruneTileNodes();
     final anchor = _openFlyoutId;
     if (anchor != null && !_hasFlyoutAnchor(anchor)) {
       // The panel's anchor is gone -- `settings:` was set back to null, or
@@ -368,6 +369,38 @@ class _IxApplicationScaffoldState extends State<IxApplicationScaffold> {
       // empty child and re-open by itself later. Focus cannot go back to a
       // tile that no longer exists.
       _closeFlyout(returnFocus: false);
+    }
+  }
+
+  /// Disposes the focus node of any tile whose id has left [widget.entries]
+  /// (and the current built-in bottom entries), so an app that adds and
+  /// removes menu entries at runtime does not grow [_tileNodes] forever.
+  ///
+  /// The node currently holding the keyboard focus, and the fly-out's
+  /// anchor, are kept even if their id is momentarily gone: disposing a
+  /// focus node still in use is unsafe, and a genuinely removed anchor is
+  /// already handled by the `_hasFlyoutAnchor` check right after this call.
+  void _pruneTileNodes() {
+    final ids = <String>{};
+    void visit(List<IxMenuEntry> nodes) {
+      for (final entry in nodes) {
+        ids.add(entry.id);
+        visit(entry.children);
+      }
+    }
+
+    visit(widget.entries);
+    for (final entry in _builtInBottomEntries) {
+      ids.add(entry.id);
+    }
+
+    final stale = _tileNodes.keys
+        .where((id) => !ids.contains(id))
+        .where((id) => id != _openFlyoutId)
+        .where((id) => !(_tileNodes[id]?.hasFocus ?? false))
+        .toList(growable: false);
+    for (final id in stale) {
+      _tileNodes.remove(id)?.dispose();
     }
   }
 
