@@ -87,6 +87,15 @@ class _MyAppState extends State<MyApp> {
 }
 ```
 
+That placement puts the overlay above the `Navigator`, so there is no
+`Overlay` in scope for anything inside a toast that floats -- the close
+button's tooltip, a menu or fly-out in a custom `action`. `IxToastOverlay`
+therefore hosts its own `Overlay` whenever it finds none, exactly like
+[IxApplicationScaffold](ix_application_scaffold.md); nothing extra is
+needed, and an `Overlay` that is already in scope is used as-is. The hosted
+overlay fills the surrounding `Stack` but stays click-through, so widgets
+underneath keep receiving pointer events.
+
 ### 2. Showing Toasts
 
 Access the service and call `show()` to display a toast (kept for 1.x compatibility) or `showToast()` to get back a live `IxToastHandle`.

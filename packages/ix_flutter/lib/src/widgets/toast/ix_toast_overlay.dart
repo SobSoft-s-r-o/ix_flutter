@@ -206,6 +206,35 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
 
   @override
   Widget build(BuildContext context) {
+    final layer = _buildLayer(context);
+
+    // Placed above the Navigator -- the documented placement, a `Stack` in
+    // `MaterialApp.builder` -- there is no Overlay in scope, and anything
+    // inside a toast that needs one throws instead of building: the close
+    // button's tooltip (Material's `Tooltip` resolves `Overlay.of` when it
+    // shows, on hover *or* focus, and the raised "No Overlay widget found"
+    // replaces the button with an `ErrorWidget`), a menu or a fly-out in a
+    // custom `IxToastData.action`, and so on. So the overlay brings its
+    // own, exactly like `IxApplicationScaffold` does for its fly-out
+    // (`ix_application_scaffold.dart`, `Overlay.maybeOf(context) == null`).
+    //
+    // It fills the host `Stack` -- `_RenderTheater` has no `hitTestSelf`
+    // and only hit-tests actual children, so the empty area around the
+    // toast column stays click-through -- which also keeps tooltips
+    // positioned against the whole viewport rather than against the 280px
+    // toast column. The lookup is LookupBoundary-aware, matching what
+    // `Tooltip` itself asks for, and its answer is stable for a given
+    // placement.
+    if (Overlay.maybeOf(context) == null) {
+      return Positioned.fill(
+        child: Overlay.wrap(child: Stack(children: [layer])),
+      );
+    }
+    return layer;
+  }
+
+  /// The toast stack itself, as a [Positioned] for the host [Stack].
+  Widget _buildLayer(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
     // A viewport narrower than the two 16px margins leaves a negative
     // width, and `MediaQueryData()` (no size at all) reports `Size.zero` --
