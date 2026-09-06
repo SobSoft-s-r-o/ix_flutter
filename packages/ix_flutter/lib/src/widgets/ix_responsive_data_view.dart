@@ -120,6 +120,10 @@ class IxResponsiveDataView<T> extends StatelessWidget {
     this.isPageLoading = false,
     this.searchQuery,
     this.onClearSearch,
+    @Deprecated(
+      'IxResponsiveDataView renders no search field; pass the hint to '
+      'your own input. Removed in 2.0.',
+    )
     this.searchHintText,
     this.showSearchStatusBar = true,
     this.showSearchClearAction = true,
@@ -155,6 +159,19 @@ class IxResponsiveDataView<T> extends StatelessWidget {
   // Search / Filtering
   final String? searchQuery;
   final VoidCallback? onClearSearch;
+
+  /// Hint text for a search field.
+  ///
+  /// Dead already in 1.0.2 (confirmed against `origin/main`): this widget
+  /// has never rendered a search input to apply the hint to -- it only
+  /// renders a read-only search *status* bar once [searchQuery] is
+  /// non-empty. Build your own field and pass this string to its own
+  /// `InputDecoration.hintText` instead; see "Search / Filtering" in
+  /// `doc/ix_responsive_data_view.md` for the recommended wiring.
+  @Deprecated(
+    'IxResponsiveDataView renders no search field; pass the hint to '
+    'your own input. Removed in 2.0.',
+  )
   final String? searchHintText;
   final bool showSearchStatusBar;
   final bool showSearchClearAction;

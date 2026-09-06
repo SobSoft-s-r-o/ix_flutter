@@ -295,7 +295,25 @@ Widget sortableDataView({
 
 ### Search / Filtering
 
-The widget provides a built-in search status bar and empty state handling for search results.
+The widget provides a built-in search *status* bar (a "Filtered by" chip,
+a results count and an optional clear button) and empty state handling for
+search results -- but it never renders an editable search field itself, and
+never filters `items` itself either. The full contract is:
+
+*   `searchQuery` -- the current query. Passing a non-empty value shows the
+    status bar (when `showSearchStatusBar` is true) and switches the empty
+    state to its "No results" variant once `items` is empty.
+*   `onClearSearch` -- called when the status bar's clear button is
+    pressed. Wire it to reset your own query state (and clear your own
+    field's text).
+*   `onSearchChangedRequestResetPagination` -- called once for every
+    `searchQuery` change, when `searchAffectsPagination` is true (the
+    default). Reset your pagination/paged-fetch state from here if you
+    don't already do so at the same call site that updates the query.
+*   The actual editable field, and the filtering of `items` against the
+    query, are entirely yours -- most apps already own a `TextField` for
+    this (search bars are commonly shared chrome, not specific to one data
+    view) and feed its value into `searchQuery`:
 
 ```dart
 Widget searchableDataView({
@@ -315,6 +333,43 @@ Widget searchableDataView({
   // Optional: Reset pagination when the search changes
   searchAffectsPagination: true,
   onSearchChangedRequestResetPagination: onResetPagination,
+);
+```
+
+#### Wiring your own search field
+
+`searchHintText` is `@Deprecated`: it looks like it should hand a hint to a
+built-in field, but no such field has ever existed to render it (true
+already in 1.0.2). Build the field yourself, feed its `onChanged` into
+whatever updates `currentSearchQuery` above, and hand your hint text to the
+field's own `InputDecoration` instead:
+
+```dart
+Widget searchFieldAndDataView({
+  required List<MyItem> filteredItems,
+  required String currentSearchQuery,
+  required ValueChanged<String> onSearchChanged,
+  required VoidCallback onClearSearch,
+  required VoidCallback onResetPagination,
+}) => Column(
+  children: [
+    TextField(
+      decoration: const InputDecoration(hintText: 'Search items...'),
+      onChanged: onSearchChanged,
+    ),
+    Expanded(
+      child: IxResponsiveDataView<MyItem>(
+        items: filteredItems,
+        desktopColumns: demoColumns(),
+        mobileFields: demoMobileFields(),
+        rowActions: demoRowActions(),
+        searchQuery: currentSearchQuery,
+        onClearSearch: onClearSearch,
+        searchAffectsPagination: true,
+        onSearchChangedRequestResetPagination: onResetPagination,
+      ),
+    ),
+  ],
 );
 ```
 
@@ -412,7 +467,7 @@ Widget dataViewWithStringsResolver(List<MyItem> items) =>
 | `initialSortAscending` | `bool` | The initial sort direction (default true). |
 | `searchQuery` | `String?` | The current search query to display in the status bar. |
 | `onClearSearch` | `VoidCallback?` | Callback when the "Clear search" button is clicked. |
-| `searchHintText` | `String?` | Hint text for the search field (if integrated). |
+| `searchHintText` | `String?` | **Deprecated.** Never rendered -- the widget has no built-in search field to apply a hint to (confirmed dead already in 1.0.2). Pass it to your own search input's `InputDecoration.hintText` instead; see [Search / Filtering](#search--filtering). Removed in 2.0. |
 | `showSearchStatusBar` | `bool` | Whether to show the search status bar (default true). |
 | `showSearchClearAction` | `bool` | Whether to show the clear action in the status bar (default true). |
 | `searchAffectsPagination` | `bool` | Whether search changes should trigger pagination reset callbacks (default true). |

@@ -190,6 +190,38 @@ Widget searchableDataView({
   onSearchChangedRequestResetPagination: onResetPagination,
 );
 
+/// `IxResponsiveDataView` never renders an editable search field --
+/// `searchHintText` is `@Deprecated` for exactly that reason. Build the
+/// field yourself and feed its `onChanged` into whatever updates
+/// `currentSearchQuery`; the hint text goes on the field's own
+/// `InputDecoration`, not on the data view.
+Widget searchFieldAndDataView({
+  required List<MyItem> filteredItems,
+  required String currentSearchQuery,
+  required ValueChanged<String> onSearchChanged,
+  required VoidCallback onClearSearch,
+  required VoidCallback onResetPagination,
+}) => Column(
+  children: [
+    TextField(
+      decoration: const InputDecoration(hintText: 'Search items...'),
+      onChanged: onSearchChanged,
+    ),
+    Expanded(
+      child: IxResponsiveDataView<MyItem>(
+        items: filteredItems,
+        desktopColumns: demoColumns(),
+        mobileFields: demoMobileFields(),
+        rowActions: demoRowActions(),
+        searchQuery: currentSearchQuery,
+        onClearSearch: onClearSearch,
+        searchAffectsPagination: true,
+        onSearchChangedRequestResetPagination: onResetPagination,
+      ),
+    ),
+  ],
+);
+
 Widget customMobileCard(List<MyItem> items) => IxResponsiveDataView<MyItem>(
   items: items,
   desktopColumns: demoColumns(),

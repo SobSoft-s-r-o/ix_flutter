@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxThemeFamily.brand` (never a real palette in the OSS build -- it resolves to classic and now logs a debug notice; removed in 2.0)
 - `IxThemeBuilder.family`/`.mode`/`.systemBrightness` (use `theme:` + `brightness:`, `IxThemeBuilder.light()`/`.dark()`, or `IxThemeController` for the `system` schema)
 - `IxTheme.family`/`.mode` (use `IxTheme.themeName` / `IxTheme.colorSchema`)
+- `IxResponsiveDataView.searchHintText` -- confirmed dead already in 1.0.2 (`origin/main`): the widget has never rendered a search field to apply a hint to, only a read-only search status bar. Pass the hint to your own search input's `InputDecoration.hintText` instead -- see "Search / Filtering" in `doc/ix_responsive_data_view.md`. Removed in 2.0
 
 ### Fixed
 - `IxBlind` now honours `IxThemeBuilder(typography:)` instead of always falling back to the default typography
