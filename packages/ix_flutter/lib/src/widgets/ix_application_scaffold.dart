@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
+import 'package:ix_flutter/src/ix_core/ix_collapsible.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
 import 'package:ix_flutter/src/ix_core/ix_motion.dart';
+import 'package:ix_flutter/src/ix_core/ix_reveal_focused.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icon.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icon_key.dart';
 import 'package:ix_flutter/src/ix_icons/ix_icon_size.dart';
@@ -1143,21 +1145,16 @@ class _NavigationPanelState extends State<_NavigationPanel> {
   /// would take focus while staying off screen, which is exactly what the
   /// focus ring is there to prevent.
   void _focusTile(FocusNode node, {required bool forward}) {
-    node.requestFocus();
-    final context = node.context;
-    // `mounted` as well as non-null: a node whose tile has been unmounted
-    // (a category collapsed under it, say) keeps its defunct element until
-    // it is reattached, and `ensureVisible` asserts on one.
-    if (context == null || !context.mounted) {
-      return;
-    }
-    Scrollable.ensureVisible(
-      context,
+    // `revealFocused` itself guards a defunct context (`mounted`, not just
+    // non-null): a node whose tile has been unmounted (a category collapsed
+    // under it, say) keeps its defunct element until it is reattached, and
+    // `ensureVisible` asserts on one.
+    revealFocused(
+      node,
       alignment: forward ? 1.0 : 0.0,
       alignmentPolicy: forward
           ? ScrollPositionAlignmentPolicy.keepVisibleAtEnd
           : ScrollPositionAlignmentPolicy.keepVisibleAtStart,
-      duration: IxMotion.of(context, IxMotion.defaultTime),
     );
   }
 
@@ -1567,10 +1564,10 @@ class _NavigationEntry extends StatelessWidget {
                 ? () => onOpenFlyout(entry)
                 : () => onCategoryExpansionChanged(entry.id),
           ),
-          _CategoryChildren(
+          IxCollapsible(
             expanded: showChildren,
             duration: animationDuration,
-            tileFocusNode: focus.node,
+            returnFocusTo: focus.node,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -1685,162 +1682,6 @@ class _BottomNavigationEntry extends StatelessWidget {
       focusNode: focus.node,
       traversalOrder: focus.order,
       onTap: entry.enabled ? () => onTap(entry) : null,
-    );
-  }
-}
-
-/// The animated container for an expanded category's child entries.
-///
-/// Drives the reveal with its own [AnimationController] and a
-/// [SizeTransition] rather than an `AnimatedSize`, for the same two reasons
-/// `IxBlind` does (see `ix_blind.dart`): under reduced motion the duration
-/// is [Duration.zero], and a zero-duration `RenderAnimatedSize` asked to
-/// animate an actual size change re-dirties itself from inside its own
-/// `performLayout()`. That is reachable here through public API --
-/// [IxMenuEntry.children] and each child's [IxMenuEntry.iconWidget] are
-/// consumer-supplied, so an open category *can* change height on its own --
-/// and the alternative workaround (re-keying while the duration is zero)
-/// remounts the whole child subtree whenever the platform's reduce-motion
-/// setting flips, destroying any state those widgets hold.
-///
-/// A controller keeps the subtree's shape and elements identical whatever
-/// the duration is, and snaps synchronously *outside* layout when the
-/// duration is zero.
-class _CategoryChildren extends StatefulWidget {
-  const _CategoryChildren({
-    required this.expanded,
-    required this.duration,
-    required this.tileFocusNode,
-    required this.child,
-  });
-
-  /// Whether the category is currently open. The state is owned by the
-  /// scaffold, so this widget is purely controlled.
-  final bool expanded;
-
-  /// The category tile's own focus node: where the focus goes when the
-  /// entry holding it is collapsed away.
-  final FocusNode tileFocusNode;
-
-  /// The scaffold's [IxApplicationScaffold.animationDuration], already
-  /// resolved against the ambient reduced-motion preference by
-  /// `_IxApplicationScaffoldState._effectiveAnimationDuration`.
-  final Duration duration;
-
-  /// The child entries, built unconditionally by the caller: this widget
-  /// decides when they are in the tree.
-  final Widget child;
-
-  @override
-  State<_CategoryChildren> createState() => _CategoryChildrenState();
-}
-
-class _CategoryChildrenState extends State<_CategoryChildren>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _expansion;
-  late final CurvedAnimation _heightFactor;
-
-  /// A non-focusable, non-traversable ancestor of the children: the
-  /// `ExcludeFocus` that keeps traversal out of a collapsed (or still
-  /// collapsing) subtree, held as a node so [didUpdateWidget] can also ask
-  /// whether the focus is inside it.
-  final FocusNode _childrenFocus = FocusNode(
-    debugLabel: 'IxApplicationScaffold.categoryChildren',
-    skipTraversal: true,
-    canRequestFocus: false,
-  );
-
-  @override
-  void initState() {
-    super.initState();
-    _expansion = AnimationController(
-      vsync: this,
-      value: widget.expanded ? 1.0 : 0.0,
-    );
-    _heightFactor = CurvedAnimation(
-      parent: _expansion,
-      curve: Curves.easeInOut,
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // The duration arrives as a widget property rather than being read from
-    // `MediaQuery` here, so that a consumer's own
-    // `IxApplicationScaffold.animationDuration` keeps working; the scaffold
-    // has already run it through `IxMotion.of`, and it rebuilds (passing a
-    // new one down to `didUpdateWidget` below) when reduced motion flips.
-    _expansion.duration = widget.duration;
-  }
-
-  @override
-  void didUpdateWidget(covariant _CategoryChildren oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.duration != oldWidget.duration) {
-      _expansion.duration = widget.duration;
-    }
-    if (widget.expanded == oldWidget.expanded) {
-      return;
-    }
-    if (widget.expanded) {
-      _expansion.forward();
-      return;
-    }
-    // The children are about to stop being focusable (and, once the
-    // transition ends, to leave the tree). Hand the focus to the category
-    // tile they belong to rather than letting the framework drop it into
-    // the enclosing scope, so the next Tab continues from the category
-    // instead of restarting at the top of the page (WCAG 2.4.3). Same
-    // rescue `IxBlind` does for its header.
-    if (_childrenFocus.hasFocus) {
-      widget.tileFocusNode.requestFocus();
-    }
-    _expansion.reverse().whenComplete(() {
-      if (!mounted) {
-        return;
-      }
-      // Rebuild so the now fully collapsed children leave the tree; the
-      // controller alone only repaints the transition.
-      setState(() {});
-    });
-  }
-
-  @override
-  void dispose() {
-    _heightFactor.dispose();
-    _expansion.dispose();
-    _childrenFocus.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // Collapsed children stay out of the tree, but only once the collapse
-    // has actually finished -- otherwise there would be nothing to shrink.
-    final hasChildren = widget.expanded || !_expansion.isDismissed;
-    return SizeTransition(
-      sizeFactor: _heightFactor,
-      alignment: Alignment.topCenter,
-      // A *collapsing* subtree is still mounted (it is what the transition
-      // shrinks) and still painted, clipped, until the last frame. Until it
-      // is fully open again it must not be announced or reachable by Tab,
-      // or the focus would land on an entry that is about to be unmounted.
-      //
-      // `ExcludeFocus`, spelled out as the `Focus` it is so the state holds
-      // the node too -- see [_childrenFocus].
-      child: Focus(
-        focusNode: _childrenFocus,
-        canRequestFocus: false,
-        skipTraversal: true,
-        descendantsAreFocusable: widget.expanded,
-        child: ExcludeSemantics(
-          excluding: !widget.expanded,
-          child: hasChildren
-              ? widget.child
-              : const SizedBox(width: double.infinity, height: 0),
-        ),
-      ),
     );
   }
 }

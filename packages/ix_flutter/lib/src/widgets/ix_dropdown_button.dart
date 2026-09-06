@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:ix_flutter/ix_flutter.dart';
+import 'package:ix_flutter/src/ix_core/ix_reveal_focused.dart';
 import 'package:ix_flutter/src/ix_core/ix_tap_region_group.dart';
 
 part 'ix_dropdown_menu.dart';
@@ -331,9 +332,10 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
     if (index == null) {
       return;
     }
-    final node = _focusNodeFor(index);
-    node.requestFocus();
-    _revealFocusedRow(node);
+    revealFocused(
+      _focusNodeFor(index),
+      retryUntilBuilt: () => mounted && _isOpen,
+    );
   }
 
   /// The row that currently holds the focus, read from the row nodes
@@ -346,57 +348,6 @@ class _IxDropdownButtonState<T> extends State<IxDropdownButton<T>> {
       }
     }
     return null;
-  }
-
-  /// Scrolls the menu by the smallest amount that brings the row owning
-  /// [node] fully into view, mirroring upstream's
-  /// `element.scrollIntoView({block: 'nearest'})`
-  /// (`dropdown-focus.ts:75-92`).
-  ///
-  /// The rows are all built eagerly, so focusing one that is scrolled out of
-  /// sight would otherwise leave it focused but invisible (WCAG 2.4.7).
-  ///
-  /// The two `ensureVisible` calls are the "nearest" part: each of these
-  /// policies only ever scrolls one way (`keepVisibleAtEnd` never scrolls
-  /// backwards, `keepVisibleAtStart` never forwards) and a call whose
-  /// computed target equals the current offset returns without touching the
-  /// position, so exactly one of the pair moves the menu -- whichever
-  /// direction the row happens to be off screen in. A single
-  /// direction-of-travel policy would miss the cases where focus wraps
-  /// (ArrowDown from the last row to the first) or opens on a row far down
-  /// the list.
-  void _revealFocusedRow(FocusNode node) {
-    void reveal() {
-      final nodeContext = node.context;
-      if (nodeContext == null || !nodeContext.mounted) {
-        return;
-      }
-      final duration = IxMotion.of(nodeContext, IxMotion.defaultTime);
-      for (final policy in const [
-        ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
-        ScrollPositionAlignmentPolicy.keepVisibleAtStart,
-      ]) {
-        Scrollable.ensureVisible(
-          nodeContext,
-          alignmentPolicy: policy,
-          duration: duration,
-          curve: Curves.easeOut,
-        );
-      }
-    }
-
-    if (node.context == null) {
-      // The menu is still opening: this row has no element yet, so there is
-      // nothing to scroll to until the overlay has been built and laid out.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || !_isOpen) {
-          return;
-        }
-        reveal();
-      });
-      return;
-    }
-    reveal();
   }
 
   /// Moves focus [delta] rows, cycling and skipping disabled rows.

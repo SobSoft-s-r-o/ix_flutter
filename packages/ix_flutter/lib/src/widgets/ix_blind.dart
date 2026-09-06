@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ix_flutter/src/ix_core/ix_collapsible.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_focus_ring.dart';
 import 'package:ix_flutter/src/ix_core/ix_motion.dart';
@@ -122,7 +123,7 @@ class IxBlind extends StatefulWidget {
   State<IxBlind> createState() => _IxBlindState();
 }
 
-class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
+class _IxBlindState extends State<IxBlind> {
   /// Backing store for the uncontrolled contract; only consulted when
   /// [IxBlind.expanded] is `null`. `late` because it reads [widget], which
   /// is not yet assigned during this object's own field initialization.
@@ -133,71 +134,22 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
   // rather than clipped away by the outer Container's `Clip.antiAlias`.
   bool _headerFocused = false;
 
-  /// Drives the content's height factor: 0 collapsed, 1 expanded.
-  ///
-  /// An explicit controller rather than an `AnimatedSize`: under reduced
-  /// motion the duration is [Duration.zero], and a zero-duration
-  /// `RenderAnimatedSize` re-dirties itself from inside its own
-  /// `performLayout()` whenever the size it is asked to animate changes
-  /// (`A RenderObject must not re-dirty itself while still being laid
-  /// out`). This controller instead snaps synchronously *outside* layout,
-  /// and the widget tree below stays the same shape whatever the duration
-  /// is -- so flipping `MediaQuery.disableAnimations` while the blind is
-  /// open no longer remounts the content subtree either.
-  late final AnimationController _expansion;
-  late final CurvedAnimation _heightFactor;
-
   /// The header's own focus node, so the blind can put the focus back on it
   /// when the content that held it is collapsed away.
   final FocusNode _headerFocusNode = FocusNode(debugLabel: 'IxBlind.header');
-
-  /// A non-focusable, non-traversable ancestor of the content. It is the
-  /// `ExcludeFocus` that keeps traversal out of a collapsed (or still
-  /// collapsing) subtree, and its `hasFocus` is what tells [_animateTo]
-  /// whether the focus has to be rescued first.
-  final FocusNode _contentFocus = FocusNode(
-    debugLabel: 'IxBlind.content',
-    skipTraversal: true,
-    canRequestFocus: false,
-  );
 
   /// The effective expanded state: the controlled [IxBlind.expanded] value
   /// when set, otherwise the internally-tracked uncontrolled state.
   bool get _expanded => widget.expanded ?? _internal;
 
   @override
-  void initState() {
-    super.initState();
-    _expansion = AnimationController(vsync: this, value: _expanded ? 1.0 : 0.0);
-    _heightFactor = CurvedAnimation(
-      parent: _expansion,
-      curve: Curves.easeInOut,
-    );
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // The reduced-motion-aware duration depends on MediaQuery, which is
-    // only safe to read from didChangeDependencies (not initState).
-    // Re-reading it here keeps a live "reduce motion" toggle honoured
-    // without touching the controller's value, so the content neither
-    // jumps nor remounts.
-    _expansion.duration = IxMotion.of(context, IxMotion.defaultTime);
-  }
-
-  @override
   void dispose() {
-    _heightFactor.dispose();
-    _expansion.dispose();
-    _contentFocus.dispose();
     _headerFocusNode.dispose();
     super.dispose();
   }
 
   @override
   void didUpdateWidget(covariant IxBlind oldWidget) {
-    final wasExpanded = oldWidget.expanded ?? _internal;
     super.didUpdateWidget(oldWidget);
     // Transitioning from controlled to uncontrolled: seed the internal
     // state from the last controlled value so the next toggle continues
@@ -206,42 +158,15 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
     if (oldWidget.expanded != null && widget.expanded == null) {
       _internal = oldWidget.expanded!;
     }
-    // Controlled mode drives the transition from here: the owner's new
-    // `expanded` value is the only signal the blind gets.
-    if (_expanded != wasExpanded) {
-      _animateTo(_expanded);
-    }
-  }
-
-  void _animateTo(bool expanded) {
-    if (expanded) {
-      _expansion.forward();
-      return;
-    }
-    // The content is about to stop being focusable (and, once the
-    // transition ends, to leave the tree). Move the focus to the header
-    // *before* that rather than letting the framework drop it: it is the
-    // nearest still-meaningful stop, so the next Tab continues from the
-    // blind instead of restarting at the top of the page (WCAG 2.4.3).
-    if (_contentFocus.hasFocus) {
-      _headerFocusNode.requestFocus();
-    }
-    _expansion.reverse().whenComplete(() {
-      if (!mounted) {
-        return;
-      }
-      // Rebuild so the now fully collapsed content leaves the tree; the
-      // controller alone only repaints the transition, it does not rebuild
-      // this widget.
-      setState(() {});
-    });
+    // No explicit animate-on-change call needed: build() below always
+    // passes the current `_expanded` to IxCollapsible, whose own
+    // didUpdateWidget drives the transition when that value changes.
   }
 
   void _toggle() {
     final next = !_expanded;
     if (widget.expanded == null) {
       setState(() => _internal = next);
-      _animateTo(next);
     }
     widget.onExpandedChanged?.call(next);
   }
@@ -253,10 +178,6 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
         themeData.extension<IxBlindTheme>() ?? IxBlindTheme.fallback(themeData);
     final style = blindTheme.style(widget.variant);
     final isExpanded = _expanded;
-    // The collapsed content stays out of the tree (the 1.x contract), but
-    // only once the collapse transition has actually finished -- otherwise
-    // there would be nothing left to shrink.
-    final hasContent = isExpanded || !_expansion.isDismissed;
 
     // Resolve colors based on state (hover, active handled by InkWell/Material)
     // But we need to set the base style.
@@ -304,41 +225,28 @@ class _IxBlindState extends State<IxBlind> with SingleTickerProviderStateMixin {
               onFocusChanged: (focused) =>
                   setState(() => _headerFocused = focused),
             ),
-            // `SizeTransition` reveals the content from its top edge (the
-            // `AnimatedSize(alignment: Alignment.topCenter)` this replaces),
-            // and only ever clips: the content subtree keeps the same shape
-            // and the same elements from the first frame of the transition
-            // to the last, whatever the duration is.
-            SizeTransition(
-              sizeFactor: _heightFactor,
-              alignment: Alignment.topCenter,
-              // `ExcludeFocus`, spelled out so the state also holds the node
-              // (see [_contentFocus]): a *collapsing* content subtree is
-              // still mounted -- it is what the transition is shrinking --
-              // so without this Tab could move the focus into a control
-              // that is about to be unmounted, dropping the focus
-              // altogether when it goes.
-              child: Focus(
-                focusNode: _contentFocus,
-                canRequestFocus: false,
-                skipTraversal: true,
-                descendantsAreFocusable: isExpanded,
-                child: ExcludeSemantics(
-                  excluding: !isExpanded,
-                  child: hasContent
-                      ? Container(
-                          decoration: BoxDecoration(
-                            border: Border(
-                              top: BorderSide(
-                                color: style.borderColor,
-                                width: blindTheme.borderWidth,
-                              ),
-                            ),
-                          ),
-                          child: widget.child,
-                        )
-                      : const SizedBox.shrink(),
+            // IxCollapsible reveals the content from its top edge and only
+            // ever clips: the content subtree keeps the same shape and the
+            // same elements from the first frame of the transition to the
+            // last, whatever the duration is (see its own doc comment).
+            IxCollapsible(
+              expanded: isExpanded,
+              // The reduced-motion-aware duration depends on MediaQuery,
+              // re-read on every build so a live "reduce motion" toggle is
+              // honoured without touching IxCollapsible's own controller
+              // value directly.
+              duration: IxMotion.of(context, IxMotion.defaultTime),
+              returnFocusTo: _headerFocusNode,
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: style.borderColor,
+                      width: blindTheme.borderWidth,
+                    ),
+                  ),
                 ),
+                child: widget.child,
               ),
             ),
           ],
