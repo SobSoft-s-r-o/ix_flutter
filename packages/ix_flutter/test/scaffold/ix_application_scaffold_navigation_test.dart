@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
+import '../helpers/focus.dart';
 import '../helpers/pump_ix.dart';
 
 /// Arrow-key navigation and drawer dismissal in [IxApplicationScaffold].
@@ -19,17 +20,6 @@ Future<void> focusFirstTile(WidgetTester tester) async {
   await tester.sendKeyEvent(LogicalKeyboardKey.tab); // collapse button
   await tester.sendKeyEvent(LogicalKeyboardKey.tab); // first tile
   await tester.pumpAndSettle();
-}
-
-/// Asserts that the widget owning the primary focus renders [label].
-void expectFocusOn(WidgetTester tester, String label) {
-  final ctx = FocusManager.instance.primaryFocus?.context;
-  expect(ctx, isNotNull, reason: 'nothing focused');
-  expect(
-    find.descendant(of: find.byWidget(ctx!.widget), matching: find.text(label)),
-    findsOneWidget,
-    reason: 'expected focus on "$label"',
-  );
 }
 
 /// The drawer button now takes Flutter's own localized name unless the app

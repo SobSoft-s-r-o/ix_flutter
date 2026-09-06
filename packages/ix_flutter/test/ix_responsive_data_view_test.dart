@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
+import 'helpers/focus.dart';
 import 'helpers/pump_ix.dart';
 
 class TestItem {
@@ -10,20 +11,6 @@ class TestItem {
   final String name;
 
   TestItem(this.id, this.name);
-}
-
-/// Asserts that the currently focused widget lives inside the widget
-/// identified by [key] -- used to walk the Tab order without depending on
-/// exactly which internal widget (e.g. the `InkWell`) ends up owning the
-/// platform focus node.
-void expectFocusWithin(WidgetTester tester, Key key) {
-  final ctx = FocusManager.instance.primaryFocus?.context;
-  expect(ctx, isNotNull, reason: 'nothing focused');
-  expect(
-    find.ancestor(of: find.byWidget(ctx!.widget), matching: find.byKey(key)),
-    findsOneWidget,
-    reason: 'focus is not inside $key',
-  );
 }
 
 void main() {

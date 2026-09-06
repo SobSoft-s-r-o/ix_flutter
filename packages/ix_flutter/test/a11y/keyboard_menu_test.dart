@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
+import '../helpers/focus.dart';
 import '../helpers/pump_ix.dart';
 import '../helpers/upstream.dart';
 
@@ -49,30 +50,12 @@ Widget _app({List<String>? navigated}) => IxApplicationScaffold(
 /// Asserts that the focused tile is inside the menu's scroll viewport, so
 /// the focus ring the arrow keys move is actually on screen.
 void expectFocusedTileVisible(WidgetTester tester) {
-  final ctx = FocusManager.instance.primaryFocus?.context;
-  expect(ctx, isNotNull);
-  final tile = tester.getRect(find.byWidget(ctx!.widget));
+  final tile = tester.getRect(find.byWidget(focusedContext(tester).widget));
   final viewport = tester.getRect(find.byType(Scrollable));
-  expect(
-    tile.top,
-    greaterThanOrEqualTo(viewport.top - 0.5),
-    reason: 'focused tile $tile is above the menu viewport $viewport',
-  );
-  expect(
-    tile.bottom,
-    lessThanOrEqualTo(viewport.bottom + 0.5),
-    reason: 'focused tile $tile is below the menu viewport $viewport',
-  );
-}
-
-/// Asserts that the widget owning the primary focus renders [label].
-void expectFocusOn(WidgetTester tester, String label) {
-  final ctx = FocusManager.instance.primaryFocus?.context;
-  expect(ctx, isNotNull);
-  expect(
-    find.descendant(of: find.byWidget(ctx!.widget), matching: find.text(label)),
-    findsOneWidget,
-    reason: 'expected focus on "$label"',
+  expectRectWithin(
+    tile,
+    viewport,
+    reason: 'focused tile $tile is outside the menu viewport $viewport',
   );
 }
 
