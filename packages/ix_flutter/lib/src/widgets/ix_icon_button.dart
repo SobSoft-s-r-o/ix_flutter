@@ -109,6 +109,15 @@ class IxIconButton extends StatelessWidget {
     final label = semanticLabel ?? tooltip;
     return IconButton(
       style: style,
+      // `style` alone sizes the button under Material 3: under
+      // `ThemeData(useMaterial3: false)`, IconButton's legacy render path
+      // reads `constraints`/`padding`/`iconSize` directly and ignores the
+      // matching ButtonStyle properties, so the fixed/min/maximumSize above
+      // has no effect there. Forwarding the same sizing through the plain
+      // constructor parameters keeps M2 apps at the fixed visual size too;
+      // harmless under M3, which already gets it from `style`.
+      constraints: BoxConstraints.tight(Size.square(size.px)),
+      padding: EdgeInsets.zero,
       onPressed: onPressed,
       focusNode: focusNode,
       autofocus: autofocus,

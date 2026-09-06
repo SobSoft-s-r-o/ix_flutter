@@ -184,19 +184,56 @@ class IxThemeBuilder {
     }());
   }
 
+  /// Forgets that the "custom family without customPalette" notice was
+  /// already printed, so a test that asserts on the one-time notice starts
+  /// from a clean slate. Call it from `addTearDown`.
+  @visibleForTesting
+  static void debugResetCustomPaletteNotice() {
+    _customPaletteNoticeShown = false;
+  }
+
+  /// Whether the "custom family without customPalette" notice has already
+  /// been printed. Static so an app that builds many themes is told exactly
+  /// once.
+  static bool _customPaletteNoticeShown = false;
+
+  /// Reports, once per process and in debug builds only, that the
+  /// deprecated `family: IxThemeFamily.custom` was given without a
+  /// [customPalette]. 1.0.2 fell back to the classic palette silently in
+  /// that case; this keeps the fallback (`custom` itself is not deprecated,
+  /// only the `family` parameter that spells it) but names the remedy
+  /// instead of asserting.
+  static void _warnCustomPaletteOnce(
+    IxThemeFamily family,
+    IxCustomPalette? customPalette,
+  ) {
+    assert(() {
+      // ignore: deprecated_member_use_from_same_package
+      if (family == IxThemeFamily.custom &&
+          customPalette == null &&
+          !_customPaletteNoticeShown) {
+        _customPaletteNoticeShown = true;
+        debugPrint(
+          'IxThemeBuilder: family: IxThemeFamily.custom was given without a '
+          'customPalette -- falling back to the classic palette, as 1.0.2 '
+          'did. Pass the palette the family promises, or drop family and '
+          'pass customPalette: alone.',
+        );
+      }
+      return true;
+    }());
+  }
+
   /// Returns [ThemeData] configured with Siemens IX global colors and fonts.
   ///
   /// The resulting theme exports both Material defaults (color scheme,
   /// typographic scale, component theme data) and custom Siemens IX extensions
   /// such as [IxTheme], [IxButtonTheme], and component-specific tokens.
   ThemeData build() {
-    assert(
-      // ignore: deprecated_member_use_from_same_package
-      family != IxThemeFamily.custom || customPalette != null,
-      'IxThemeFamily.custom requires customPalette',
-    );
     // ignore: deprecated_member_use_from_same_package
     _warnBrandOnce(family);
+    // ignore: deprecated_member_use_from_same_package
+    _warnCustomPaletteOnce(family, customPalette);
     final resolvedBrightness =
         brightness ??
         // ignore: deprecated_member_use_from_same_package
@@ -209,6 +246,25 @@ class IxThemeBuilder {
         (family == IxThemeFamily.custom
             ? const IxThemeName('custom')
             : IxThemeName.classic);
+    // `theme:`/`brightness:` are the new API; when either is given, stamp
+    // `IxTheme.family`/`.mode` from what was actually resolved instead of
+    // parroting back the deprecated fields' defaults (`classic`/`system`),
+    // which made every `IxThemeBuilder.dark()` report `mode ==
+    // ThemeMode.system`. A caller who only ever touches the deprecated
+    // `family:`/`mode:` pair keeps seeing exactly what it passed.
+    final usesNewApi = theme != null || brightness != null;
+    final stampedFamily = usesNewApi
+        ? (resolvedTheme == IxThemeName.classic
+              ? IxThemeFamily.classic
+              : IxThemeFamily.custom)
+        // ignore: deprecated_member_use_from_same_package
+        : family;
+    final stampedMode = usesNewApi
+        ? (resolvedBrightness == Brightness.dark
+              ? ThemeMode.dark
+              : ThemeMode.light)
+        // ignore: deprecated_member_use_from_same_package
+        : mode;
     // Every bundled family resolves to the classic palette (`brand` is a
     // deprecated alias, `custom` is served by `customPalette`), so the
     // palette only depends on the resolved brightness.
@@ -292,9 +348,9 @@ class IxThemeBuilder {
           ? IxColorSchema.dark
           : IxColorSchema.light,
       // ignore: deprecated_member_use_from_same_package
-      family: family,
+      family: stampedFamily,
       // ignore: deprecated_member_use_from_same_package
-      mode: mode,
+      mode: stampedMode,
       brightness: resolvedBrightness,
       palette: palette,
       typography: typeScale,

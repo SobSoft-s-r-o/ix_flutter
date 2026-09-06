@@ -223,4 +223,76 @@ void main() {
     // ignore: deprecated_member_use_from_same_package
     expect(IxButtonVariant.warningPrimary, isNotNull);
   });
+
+  testWidgets('a desktop platform stays compact with no mouse tracked yet', (
+    tester,
+  ) async {
+    // "No mouse has moved yet" is not "this is a touch device": on desktop
+    // the adaptive density used to start comfortable and flip to compact the
+    // first time the cursor entered the window (and back on the way out),
+    // resizing every button under it -- and disagreeing with the static
+    // density `IxThemeBuilder.build()` bakes from the same platform.
+    // Restored inside the body: Flutter checks for a leaked foundation
+    // debug variable *before* `addTearDown` callbacks run.
+    debugDefaultTargetPlatformOverride = TargetPlatform.macOS;
+
+    late IxDensity resolved;
+    await pumpIx(
+      tester,
+      Builder(
+        builder: (context) {
+          resolved = IxDensity.resolve(context);
+          return const SizedBox();
+        },
+      ),
+      size: const Size(1440, 900),
+    );
+    debugDefaultTargetPlatformOverride = null;
+    expect(resolved, IxDensity.compact);
+  });
+
+  testWidgets('a touch platform without a mouse resolves comfortable', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+
+    late IxDensity resolved;
+    await pumpIx(
+      tester,
+      Builder(
+        builder: (context) {
+          resolved = IxDensity.resolve(context);
+          return const SizedBox();
+        },
+      ),
+      size: const Size(1440, 900),
+    );
+    debugDefaultTargetPlatformOverride = null;
+    expect(resolved, IxDensity.comfortable);
+  });
+
+  testWidgets('a touch platform with a mouse attached resolves compact', (
+    tester,
+  ) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.android;
+
+    await pumpIx(
+      tester,
+      const SizedBox(width: 100, height: 100),
+      size: const Size(1440, 900),
+    );
+    // Read through the element rather than a captured build result: a
+    // connected mouse is not something a bare `Builder` rebuilds for
+    // (`IxDensityScope` is what turns it into a rebuild).
+    final element = tester.element(find.byType(SizedBox).first);
+    expect(IxDensity.resolve(element), IxDensity.comfortable);
+
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    await mouse.addPointer(location: const Offset(10, 10));
+    await tester.pumpAndSettle();
+    final withMouse = IxDensity.resolve(element);
+    await mouse.removePointer();
+    debugDefaultTargetPlatformOverride = null;
+    expect(withMouse, IxDensity.compact);
+  });
 }

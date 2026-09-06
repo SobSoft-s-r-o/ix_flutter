@@ -142,11 +142,11 @@ for patching a specific base family.
 
 ## Migration from the 1.x `family`/`mode` API
 
-The old API keeps working until 2.0 and only produces deprecation warnings,
-with one exception: `IxThemeBuilder(family: IxThemeFamily.custom)` *without* a
-`customPalette` now trips an assertion in debug builds (it used to fall back
-to the classic palette silently). Either pass the palette the family promises,
-or drop the family -- `customPalette:` alone is enough. Building with
+The old API keeps working until 2.0 and only produces deprecation warnings.
+`IxThemeBuilder(family: IxThemeFamily.custom)` *without* a `customPalette`
+falls back to the classic palette, exactly as 1.0.2 did, and logs a one-time
+debug notice naming the remedy: pass the palette the family promises, or drop
+the family -- `customPalette:` alone is enough. Building with
 `IxThemeFamily.brand` also logs a one-time debug notice, since it has always
 resolved to the classic palette.
 

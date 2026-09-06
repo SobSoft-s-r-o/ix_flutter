@@ -38,6 +38,12 @@ enum IxTypographyVariant {
 /// explicit `monospacePackage: null` (force-disable the package prefix).
 const Object _defaultMonospacePackage = Object();
 
+/// Sentinel default for [IxTypography.copyWith]'s `package` parameter,
+/// distinguishing "caller didn't pass this argument" (keep the current one,
+/// unless the family it belonged to is changing) from an explicit
+/// `package: null` (force-disable the package prefix).
+const Object _defaultPackage = Object();
+
 /// Precomputed Siemens IX typography scale for Flutter widgets.
 ///
 /// Provide a custom [fontFamily] (and optionally [monospaceFontFamily]) to
@@ -418,7 +424,7 @@ class IxTypography {
     List<String>? fontFamilyFallback,
     String? monospaceFontFamily,
     List<String>? monospaceFontFamilyFallback,
-    String? package,
+    Object? package = _defaultPackage,
     Object? monospacePackage = _defaultMonospacePackage,
   }) {
     return IxTypography(
@@ -427,7 +433,15 @@ class IxTypography {
       monospaceFontFamily: monospaceFontFamily ?? this.monospaceFontFamily,
       monospaceFontFamilyFallback:
           monospaceFontFamilyFallback ?? this.monospaceFontFamilyFallback,
-      package: package ?? this.package,
+      // `package` names the package that ships `this.fontFamily`. When the
+      // family changes and the caller says nothing about the package, the
+      // old one no longer applies, so it is dropped rather than pointing a
+      // new family at the wrong asset bundle. An explicit value (including
+      // `null`, which clears it) always wins -- the same rule
+      // `monospacePackage` follows below.
+      package: identical(package, _defaultPackage)
+          ? (fontFamily != null ? null : this.package)
+          : package as String?,
       // When the caller omits `monospacePackage` (it is still the shared
       // `_defaultMonospacePackage` sentinel), preserve `this.monospacePackage`
       // verbatim — UNLESS `monospaceFontFamily` is also changing in this same

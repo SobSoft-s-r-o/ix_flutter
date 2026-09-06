@@ -27,12 +27,23 @@ enum IxDensity {
   /// Resolves [adaptive] modality from [context]; never returns [adaptive].
   ///
   /// A viewport narrower than 600 logical pixels always resolves to
-  /// [comfortable] (a small screen implies touch). Otherwise, a connected
-  /// mouse or [NavigationMode.directional] (TV/remote-control navigation)
-  /// resolves to [compact]; anything else (touch, with no pointer) resolves
-  /// to [comfortable].
+  /// [comfortable] (a small screen implies touch). Otherwise the platform
+  /// decides first — a desktop platform (and a desktop browser) is
+  /// [compact] whether or not a mouse has moved yet — and a touch platform
+  /// upgrades to [compact] once a mouse is connected or the app is being
+  /// driven with [NavigationMode.directional] (TV/remote control).
+  ///
+  /// The platform is consulted *before* the mouse because
+  /// `mouseIsConnected` only becomes true once a pointer event has actually
+  /// been seen: treating "no mouse tracked yet" as touch made every desktop
+  /// app start [comfortable] and then resize its controls the first time
+  /// the cursor entered the window — and disagree with the static density
+  /// `IxThemeBuilder.build()` bakes from the same platform.
   static IxDensity resolve(BuildContext context) {
     if (MediaQuery.sizeOf(context).width < 600) return IxDensity.comfortable;
+    if (resolvePlatform(Theme.of(context).platform) == IxDensity.compact) {
+      return IxDensity.compact;
+    }
     final pointer = RendererBinding.instance.mouseTracker.mouseIsConnected;
     final directional =
         MediaQuery.navigationModeOf(context) == NavigationMode.directional;
