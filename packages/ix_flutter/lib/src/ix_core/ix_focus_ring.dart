@@ -46,9 +46,7 @@ class IxFocusRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color =
-        Theme.of(
-          context,
-        ).extension<IxTheme>()?.color(IxThemeColorToken.focusBdr) ??
+        IxTheme.maybeOf(context)?.color(IxThemeColorToken.focusBdr) ??
         Theme.of(context).colorScheme.primary;
     // `Border.all` draws its stroke on the *inside* of the box it decorates
     // (the default `strokeAlign: BorderSide.strokeAlignInside`), so a box

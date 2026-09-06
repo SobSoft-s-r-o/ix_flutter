@@ -113,7 +113,7 @@ class IxIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resolved = data ?? IxIconResolver.of(context).resolve(iconKey!);
-    final ix = Theme.of(context).extension<IxTheme>();
+    final ix = IxTheme.maybeOf(context);
     final iconTheme = IconTheme.of(context);
     final resolvedSize = size?.px ?? iconTheme.size ?? _defaultSizePx;
     final baseColor =

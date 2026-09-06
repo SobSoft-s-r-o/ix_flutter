@@ -82,7 +82,7 @@ enum IxDensity {
   /// [resolve] so this method never returns [adaptive] either.
   static IxDensity effectiveOf(BuildContext context) {
     final scoped = IxDensityScope.maybeOf(context);
-    final themed = Theme.of(context).extension<IxTheme>()?.density;
+    final themed = IxTheme.maybeOf(context)?.density;
     final chosen = scoped ?? themed ?? IxDensity.adaptive;
     return chosen == IxDensity.adaptive ? resolve(context) : chosen;
   }

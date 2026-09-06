@@ -1,3 +1,5 @@
+import 'ix_pagination_strings.dart';
+
 /// Holds all localizable strings for [IxResponsiveDataView] and its sub-components.
 class IxResponsiveDataViewStrings {
   const IxResponsiveDataViewStrings({
@@ -13,7 +15,7 @@ class IxResponsiveDataViewStrings {
     this.paginationNextTooltip = 'Next page',
     this.pageOfBuilder,
     this.pageBuilder,
-    this.rowsPerPageLabel = 'Items per page:',
+    this.rowsPerPageLabel = IxPaginationStrings.defaultRowsPerPage,
     this.pageSelectionLabel = 'Page selection',
     this.totalItemsBuilder,
     this.resultsCountBuilder,
@@ -38,6 +40,12 @@ class IxResponsiveDataViewStrings {
   final String paginationNextTooltip;
   final String Function(int page, int totalPages)? pageOfBuilder;
   final String Function(int page)? pageBuilder;
+
+  /// Label preceding the pagination bar's page-size selector, mapped onto
+  /// [IxPaginationStrings.rowsPerPage]. Defaults to
+  /// [IxPaginationStrings.defaultRowsPerPage] -- the single owner of that
+  /// default -- so this and a directly-constructed [IxPaginationStrings]
+  /// never drift apart.
   final String rowsPerPageLabel;
 
   /// Accessible name of the pagination bar's page-size trigger, mapped onto

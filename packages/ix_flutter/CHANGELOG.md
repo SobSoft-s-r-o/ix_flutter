@@ -105,6 +105,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `IxThemeBuilder(family: IxThemeFamily.custom)` without a `customPalette` falls back to the classic palette, as 1.0.2 did, instead of asserting in debug builds; it logs a one-time debug notice naming the remedy (`customPalette:` is not deprecated, only the `family:` spelling of it)
 - `IxTheme.family`/`.mode` report the resolved family/mode when the theme was built with the new API (`theme:`/`brightness:`, including `IxThemeBuilder.light()`/`.dark()`), instead of parroting back the deprecated fields' unrelated defaults -- `IxThemeBuilder.dark()` used to report `mode == ThemeMode.system`. A theme built with only the deprecated `family:`/`mode:` pair still reports exactly what was passed
 - `IxIconButton` keeps its fixed visual size under `ThemeData(useMaterial3: false)`. Its size/shape/tap-target were only forwarded through `IconButton.style`, which Material's legacy (M2) render path does not read; `constraints`/`padding` are now also forwarded through the plain constructor parameters that path does use (harmless under M3, which already had it from `style`)
+- `IxPaginationStrings.rowsPerPage`'s own default ("Items per page", no colon) no longer disagrees with `IxResponsiveDataViewStrings.rowsPerPageLabel`'s ("Items per page:", with one) -- constructing `IxPaginationStrings` directly and bridging from `IxResponsiveDataViewStrings.defaultsEn()` now produce the identical label, both from the one constant (`IxPaginationStrings.defaultRowsPerPage`) that owns it
 
 ---
 

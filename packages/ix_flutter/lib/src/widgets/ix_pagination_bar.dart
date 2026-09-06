@@ -54,12 +54,11 @@ class IxPaginationBar extends StatelessWidget {
   ///
   /// When neither this nor [strings] is set, the bar's strings are derived
   /// from `IxResponsiveDataViewStrings.defaultsEn()` via
-  /// [IxPaginationStrings.fromDataView] -- so, for example, the page-size
-  /// label reads "Items per page:" (with the trailing colon
-  /// `IxResponsiveDataViewStrings.rowsPerPageLabel` has always used), not
-  /// the "Items per page" (no colon) shown in [IxPaginationStrings
-  /// .rowsPerPage]'s own default. Pass this parameter explicitly to opt
-  /// into [IxPaginationStrings]'s own defaults instead.
+  /// [IxPaginationStrings.fromDataView]. Every default matches what a bare
+  /// `IxPaginationStrings()` would give this parameter directly --
+  /// including the page-size label, `IxPaginationStrings.defaultRowsPerPage`
+  /// -- so there is no behavioural difference between passing this or
+  /// leaving both unset with the defaults each field carries today.
   final IxPaginationStrings? paginationStrings;
 
   @override

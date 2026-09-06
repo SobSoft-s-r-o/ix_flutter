@@ -367,31 +367,22 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
                                     ),
                                   ),
                                   const SizedBox(width: 4),
-                                  IconButton(
-                                    iconSize: 16,
-                                    constraints: const BoxConstraints.tightFor(
-                                      width: 24,
-                                      height: 24,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                    tooltip: widget.strings.closeToast,
-                                    onPressed: widget.onDismiss,
-                                    color: closeButtonColor,
-                                    // IconButton's own `tooltip:` only sets
-                                    // SemanticsData.tooltip, not `.label` (see
-                                    // IxIconButton's doc comment) -- merge an
-                                    // explicit label into the icon (a
-                                    // non-boundary descendant of the button's
-                                    // own Semantics(container: true, button:
-                                    // true) node) so the button still has a
-                                    // spoken accessible name.
-                                    icon: Semantics(
-                                      label: widget.strings.closeToast,
-                                      excludeSemantics: true,
-                                      child: IxIcon.key(
+                                  // Pinned to compact regardless of the
+                                  // ambient density: IxIconButton's 24px
+                                  // visual size stays put, but its hit area
+                                  // grows to 48x48 in IxDensity.comfortable
+                                  // (touch), which would not fit this card's
+                                  // fixed 280px width next to the message.
+                                  IxDensityScope(
+                                    density: IxDensity.compact,
+                                    child: IxIconButton(
+                                      icon: IxIcon.key(
                                         IxIconKey.close,
-                                        size: IxIconSize.s16,
+                                        color: closeButtonColor,
                                       ),
+                                      onPressed: widget.onDismiss,
+                                      size: IxIconButtonSize.s24,
+                                      tooltip: widget.strings.closeToast,
                                     ),
                                   ),
                                 ],

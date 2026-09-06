@@ -9,7 +9,7 @@ class IxPaginationStrings {
   const IxPaginationStrings({
     this.previousPage = 'Previous page',
     this.nextPage = 'Next page',
-    this.rowsPerPage = 'Items per page',
+    this.rowsPerPage = defaultRowsPerPage,
     this.pageSelection = 'Page selection',
     this.pageOf = defaultPageOf,
     this.page = defaultPage,
@@ -24,14 +24,19 @@ class IxPaginationStrings {
 
   /// Label preceding the page-size selector.
   ///
-  /// This constructor's own default ("Items per page", no colon) only
-  /// applies when an [IxPaginationStrings] is constructed directly. An
-  /// [IxPaginationBar] with neither `paginationStrings:` nor `strings:`
-  /// set instead bridges from `IxResponsiveDataViewStrings.defaultsEn()`
-  /// (see [IxPaginationBar.paginationStrings]), whose matching
-  /// `rowsPerPageLabel` has always read "Items per page:" (with a
-  /// trailing colon) -- that visual default is unchanged by this class.
+  /// Defaults to [defaultRowsPerPage], the single owner of this string:
+  /// `IxResponsiveDataViewStrings.rowsPerPageLabel`'s own default is this
+  /// same constant (not an independently maintained literal), so
+  /// constructing this class directly and bridging from
+  /// `IxResponsiveDataViewStrings.defaultsEn()` (see
+  /// [IxPaginationBar.paginationStrings]) produce the identical label.
   final String rowsPerPage;
+
+  /// The default value of [rowsPerPage], and of
+  /// `IxResponsiveDataViewStrings.rowsPerPageLabel` -- the trailing colon
+  /// matches the label's upstream 1.0.2 rendering, which predates this
+  /// class.
+  static const String defaultRowsPerPage = 'Items per page:';
 
   /// Accessible name of the page-size selector trigger.
   final String pageSelection;

@@ -105,6 +105,24 @@ void main() {
     },
   );
 
+  test('rowsPerPage/rowsPerPageLabel share one default (B10: no more '
+      '"Items per page" vs "Items per page:" drift)', () {
+    expect(
+      const IxPaginationStrings().rowsPerPage,
+      IxPaginationStrings.defaultRowsPerPage,
+    );
+    expect(
+      IxResponsiveDataViewStrings.defaultsEn().rowsPerPageLabel,
+      IxPaginationStrings.defaultRowsPerPage,
+    );
+    expect(
+      IxPaginationStrings.fromDataView(
+        IxResponsiveDataViewStrings.defaultsEn(),
+      ).rowsPerPage,
+      const IxPaginationStrings().rowsPerPage,
+    );
+  });
+
   testWidgets('paginationStrings override wins over strings', (tester) async {
     await pumpIx(
       tester,
