@@ -266,6 +266,75 @@ void main() {
     handle.dispose();
   });
 
+  group('expanded content divider spans the full blind width', () {
+    // Manual-testing regression (Android, dark theme, Blind example page):
+    // the content's top-border `Container` sits inside `IxCollapsible`'s
+    // `SizeTransition`, whose `Align` always *loosens* the width constraint
+    // it hands to its child -- unlike 1.0.2's `AnimatedSize`, which forwards
+    // the ambient (tight, full-width) constraint through unchanged. A
+    // `Container` with no explicit width then shrink-wraps to a short `Text`
+    // child instead of stretching, so the divider ends up only as wide as
+    // the content instead of spanning the whole blind like upstream and
+    // 1.0.2 both do.
+    Future<void> expectFullWidthContentDivider(
+      WidgetTester tester,
+      IxBlindVariant variant,
+    ) async {
+      await pumpIx(
+        tester,
+        IxBlind(
+          title: 'T',
+          variant: variant,
+          expanded: true,
+          onExpandedChanged: (_) {},
+          child: const Text('Short'),
+        ),
+        size: const Size(400, 600),
+      );
+
+      final theme = Theme.of(tester.element(find.byType(IxBlind)));
+      final borderWidth =
+          (theme.extension<IxBlindTheme>() ?? IxBlindTheme.fallback(theme))
+              .borderWidth;
+      final blindWidth = tester.getRect(find.byType(IxBlind)).width;
+      final headerWidth = tester.getRect(find.byType(InkWell)).width;
+
+      // The divider is the `Container` whose `BoxDecoration.border` sets
+      // only the top side -- unlike the blind's own outer `Container`,
+      // which uses `Border.all` on every side -- so this predicate finds it
+      // specifically, wherever it sits inside `IxCollapsible`'s subtree.
+      final contentDivider = find.byWidgetPredicate((widget) {
+        if (widget is! Container) {
+          return false;
+        }
+        final decoration = widget.decoration;
+        if (decoration is! BoxDecoration) {
+          return false;
+        }
+        final border = decoration.border;
+        return border is Border &&
+            border.top != BorderSide.none &&
+            border.bottom == BorderSide.none;
+      });
+      expect(contentDivider, findsOneWidget);
+      final contentWidth = tester.getRect(contentDivider).width;
+
+      expect(
+        contentWidth,
+        moreOrLessEquals(blindWidth - 2 * borderWidth, epsilon: 0.5),
+      );
+      expect(contentWidth, moreOrLessEquals(headerWidth, epsilon: 0.5));
+    }
+
+    testWidgets('outline variant', (tester) async {
+      await expectFullWidthContentDivider(tester, IxBlindVariant.outline);
+    });
+
+    testWidgets('filled variant', (tester) async {
+      await expectFullWidthContentDivider(tester, IxBlindVariant.filled);
+    });
+  });
+
   group('expansion transition', () {
     testWidgets('an open blind lays out a content height change under '
         'reduced motion', (tester) async {

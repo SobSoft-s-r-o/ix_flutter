@@ -142,8 +142,21 @@ class _IxCollapsibleState extends State<IxCollapsible>
         descendantsAreFocusable: widget.expanded,
         child: ExcludeSemantics(
           excluding: !widget.expanded,
+          // `SizeTransition` is built from an `Align` (to size itself down
+          // via `heightFactor`), and `Align` always *loosens* the width
+          // constraint it hands to its child, however tight the constraint
+          // it received itself -- unlike the `AnimatedSize` this replaced,
+          // which forwarded the ambient constraint through unchanged. Left
+          // alone, a `child` with intrinsic width (e.g. a bare `Text`)
+          // would shrink-wrap instead of stretching, so both callers get a
+          // `width: double.infinity` box here to force the same full-width
+          // behaviour regardless of what `child` itself does with the
+          // width it is given. A no-op for a `child` that already stretches
+          // on its own (e.g. `IxApplicationScaffold`'s menu category
+          // `Column`), since it would have reported the same full width
+          // either way.
           child: hasContent
-              ? widget.child
+              ? SizedBox(width: double.infinity, child: widget.child)
               : const SizedBox(width: double.infinity, height: 0),
         ),
       ),
