@@ -155,14 +155,14 @@ CI workflow comments, and tool scripts -- is written in English (see
 localization files (for example `*.arb`, `*.po`, or a `l10n/`/`translations/`
 directory), which carry the target language of the translation.
 `tool/check_docs.sh` runs in CI and fails the build if it finds a letter
-unique to the Slovak alphabet (`ľ ť ď ň ô ĺ ŕ` and their uppercase forms) in
-a `*.dart`, `*.md`, `*.sh`, `*.yml`/`*.yaml` or `*.txt` file, guarding against
-a regression of the Slovak comments that had crept into tests and tooling
-before this rule existed. The check is deliberately narrow to that one
-alphabet rather than every non-English language, so a deliberate, narrow use
-of another language elsewhere (for example a localization-override example,
-or a string exercising text rendering) is still subject to the general rule
-above and should be justified in review.
+unique to the Slovak alphabet (see that script's `check_no_slovak` function
+for the exact set) in a `*.dart`, `*.md`, `*.sh`, `*.yml`/`*.yaml` or `*.txt`
+file, guarding against a regression of the Slovak comments that had crept
+into tests and tooling before this rule existed. The check is deliberately
+narrow to that one alphabet rather than every non-English language, so a
+deliberate, narrow use of another language elsewhere (for example a
+localization-override example, or a string exercising text rendering) is
+still subject to the general rule above and should be justified in review.
 
 ### Dart/Flutter Code Style
 
