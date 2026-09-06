@@ -146,6 +146,24 @@ dart run ix_icons_generator:generate_icons --output lib/generated --assets asset
 
 ## Style Guidelines
 
+### Language
+
+Everything committed to this repository -- source code comments and
+dartdoc, tests, documentation, commit messages, pull request descriptions,
+CI workflow comments, and tool scripts -- is written in English (see
+[CLAUDE.md](CLAUDE.md#language)). The only exception is translation/
+localization files (for example `*.arb`, `*.po`, or a `l10n/`/`translations/`
+directory), which carry the target language of the translation.
+`tool/check_docs.sh` runs in CI and fails the build if it finds a letter
+unique to the Slovak alphabet (`ľ ť ď ň ô ĺ ŕ` and their uppercase forms) in
+a `*.dart`, `*.md`, `*.sh`, `*.yml`/`*.yaml` or `*.txt` file, guarding against
+a regression of the Slovak comments that had crept into tests and tooling
+before this rule existed. The check is deliberately narrow to that one
+alphabet rather than every non-English language, so a deliberate, narrow use
+of another language elsewhere (for example a localization-override example,
+or a string exercising text rendering) is still subject to the general rule
+above and should be justified in review.
+
 ### Dart/Flutter Code Style
 
 - Follow the [Dart Style Guide](https://dart.dev/guides/language/effective-dart/style)
