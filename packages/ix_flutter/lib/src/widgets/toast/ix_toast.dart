@@ -20,6 +20,7 @@ class IxToast extends StatefulWidget {
     required this.onDismiss,
     this.onEnter,
     this.onExit,
+    this.paused = false,
     this.strings = const IxToastStrings(),
   });
 
@@ -27,6 +28,18 @@ class IxToast extends StatefulWidget {
   final VoidCallback onDismiss;
   final VoidCallback? onEnter;
   final VoidCallback? onExit;
+
+  /// Whether the owner of the countdown has it paused.
+  ///
+  /// The auto-close timer lives in [IxToastService], which is also where
+  /// [IxToastHandle.pause] reaches it, so the progress bar has to be told:
+  /// on its own it only knows about the pauses this widget itself caused
+  /// (hover, touch) and would keep draining through a programmatic one --
+  /// showing a countdown that is not running. The bar stops while this is
+  /// `true` *or* the toast is hovered/pressed, and resumes only when
+  /// neither holds, so leaving a hover cannot resume a pause the owner
+  /// asked for.
+  final bool paused;
 
   /// Localizable strings for this toast's chrome (currently just the close
   /// button's accessible name/tooltip).
@@ -49,6 +62,10 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
   bool _hovered = false;
   bool _pointerDown = false;
 
+  /// Whether the pause currently in force was started by this widget's own
+  /// hover/press, and is therefore this widget's to lift again.
+  bool _pointerOwnsPause = false;
+
   @override
   void initState() {
     super.initState();
@@ -57,8 +74,18 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
       duration: widget.data.duration ?? Duration.zero,
     );
 
-    if (widget.data.autoClose && widget.data.duration != null) {
+    if (widget.data.autoClose &&
+        widget.data.duration != null &&
+        !widget.paused) {
       _progressController.forward();
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant IxToast oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.paused != oldWidget.paused) {
+      _applyPauseState();
     }
   }
 
@@ -140,13 +167,29 @@ class _IxToastState extends State<IxToast> with SingleTickerProviderStateMixin {
     if (!mounted) return; // A pointer event can arrive after dispose.
     if (!widget.data.autoClose || widget.data.duration == null) return;
     if (_hovered || _pointerDown) {
+      // The countdown is only *this widget's* to resume later if the
+      // pointer is what paused it. Entering an already-paused toast (the
+      // owner called `IxToastHandle.pause()`) leaves the pause where it is.
+      if (!_pointerOwnsPause && !widget.paused) {
+        _pointerOwnsPause = true;
+        widget.onEnter?.call();
+      }
       _progressController.stop();
-      widget.onEnter?.call();
+      return;
+    }
+    var paused = widget.paused;
+    if (_pointerOwnsPause) {
+      _pointerOwnsPause = false;
+      widget.onExit?.call();
+      // `widget` is still the pre-resume one until the rebuild lands.
+      paused = false;
+    }
+    if (paused) {
+      _progressController.stop();
     } else {
       // AnimationController.forward() is a no-op once already at 1.0, so
       // this is safe to call even if the countdown had already completed.
       _progressController.forward();
-      widget.onExit?.call();
     }
   }
 

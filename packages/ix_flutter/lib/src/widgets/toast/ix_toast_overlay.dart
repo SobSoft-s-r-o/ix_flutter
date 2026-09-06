@@ -157,12 +157,20 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
         ),
         child: Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
-          child: IxToast(
-            data: toast,
-            strings: widget.strings,
-            onDismiss: () => widget.service.dismiss(toast.id),
-            onEnter: () => widget.service.pauseTimer(toast.id),
-            onExit: () => widget.service.resumeTimer(toast.id),
+          // Rebuilt from the service so the card follows its paused state:
+          // `IxToastHandle.pause()` reaches the timer, not this widget, and
+          // the progress bar would otherwise keep draining through it.
+          // Only the card rebuilds, not the whole list.
+          child: ListenableBuilder(
+            listenable: widget.service,
+            builder: (context, _) => IxToast(
+              data: toast,
+              strings: widget.strings,
+              paused: widget.service.isPaused(toast.id),
+              onDismiss: () => widget.service.dismiss(toast.id),
+              onEnter: () => widget.service.pauseTimer(toast.id),
+              onExit: () => widget.service.resumeTimer(toast.id),
+            ),
           ),
         ),
       ),
@@ -199,7 +207,15 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.sizeOf(context);
-    final effectiveWidth = math.min(widget.width, screenSize.width - 32);
+    // A viewport narrower than the two 16px margins leaves a negative
+    // width, and `MediaQueryData()` (no size at all) reports `Size.zero` --
+    // both used to reach `SizedBox`/`ConstrainedBox` as an illegal
+    // constraint ("BoxConstraints has a negative minimum width"). A zero
+    // size means "unknown", so the toast keeps its own width there.
+    final hasSize = !screenSize.isEmpty;
+    final effectiveWidth = hasSize
+        ? math.max(0.0, math.min(widget.width, screenSize.width - 32))
+        : widget.width;
     final edges = _edges;
 
     return Positioned(
@@ -209,7 +225,9 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
       right: edges.right,
       child: SafeArea(
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: screenSize.height),
+          constraints: BoxConstraints(
+            maxHeight: hasSize ? screenSize.height : double.infinity,
+          ),
           child: FocusTraversalGroup(
             policy: ReadingOrderTraversalPolicy(),
             child: SizedBox(

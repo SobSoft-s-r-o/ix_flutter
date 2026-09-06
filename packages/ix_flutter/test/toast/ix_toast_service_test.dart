@@ -319,4 +319,191 @@ void main() {
   }
 
   progressBarFreezesWhileHoveredAndResumesAfterExit();
+
+  test('dismiss after dispose, and a second close, are no-ops', () {
+    final service = IxToastService();
+    final handle = service.showToast(message: 'x', autoClose: false);
+    var notifications = 0;
+    void listener() => notifications++;
+    service.addListener(listener);
+
+    handle.close('first');
+    expect(notifications, 1);
+    // A second close of an id that is no longer live must not notify
+    // (a listener would rebuild for nothing) nor complete `onClose` twice.
+    handle.close('second');
+    expect(notifications, 1);
+
+    service.removeListener(listener);
+    service.dispose();
+    // A kept handle firing later -- an animation callback, a pending
+    // future -- must not resurrect a disposed ChangeNotifier.
+    expect(handle.close, returnsNormally);
+    expect(() => service.dismiss('nope'), returnsNormally);
+    expect(() => service.dismissAll(), returnsNormally);
+  });
+
+  test('close reports its result exactly once', () {
+    fakeAsync((async) {
+      final service = IxToastService();
+      final handle = service.showToast(message: 'x', autoClose: false);
+      final results = <Object?>[];
+      handle.onClose.then(results.add);
+      handle.close('first');
+      handle.close('second');
+      async.flushMicrotasks();
+      expect(results, ['first']);
+      service.dispose();
+    });
+  });
+
+  testWidgets('a programmatic pause freezes the progress bar', (tester) async {
+    final service = IxToastService()..now = clock.now;
+    addTearDown(service.dispose);
+    await pumpIx(
+      tester,
+      Stack(children: [IxToastOverlay(service: service)]),
+      disableAnimations: false,
+    );
+    final handle = service.showToast(
+      message: 'Saved',
+      autoCloseDelay: const Duration(seconds: 10),
+    );
+    await tester.pump();
+
+    double progress() => tester
+        .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
+        .value!;
+
+    await tester.pump(const Duration(seconds: 1));
+    handle.pause();
+    await tester.pump();
+    final atPause = progress();
+    expect(atPause, greaterThan(0));
+
+    await tester.pump(const Duration(seconds: 2));
+    expect(
+      progress(),
+      atPause,
+      reason: 'the bar kept draining through a programmatic pause',
+    );
+
+    handle.resume();
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+    // The bar counts down, so a running countdown *lowers* the value.
+    expect(progress(), lessThan(atPause), reason: 'resume did not restart');
+
+    service.dismissAll();
+  });
+
+  testWidgets('leaving a hover does not resume a programmatic pause', (
+    tester,
+  ) async {
+    final service = IxToastService()..now = clock.now;
+    addTearDown(service.dispose);
+    await pumpIx(
+      tester,
+      Stack(children: [IxToastOverlay(service: service)]),
+      disableAnimations: false,
+    );
+    final handle = service.showToast(
+      message: 'Saved',
+      autoCloseDelay: const Duration(seconds: 10),
+    );
+    await tester.pump();
+    handle.pause();
+    await tester.pump(const Duration(milliseconds: 500));
+
+    double progress() => tester
+        .widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator))
+        .value!;
+    final atPause = progress();
+
+    final location =
+        tester.getTopLeft(find.byType(IxToast)) + const Offset(2, 2);
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(() => mouse.removePointer());
+    await mouse.addPointer(location: location);
+    await tester.pump();
+    await mouse.moveTo(const Offset(2000, 2000));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
+
+    expect(
+      progress(),
+      atPause,
+      reason: 'a hover exit resumed a countdown the owner had paused',
+    );
+    expect(handle.isPaused, isTrue);
+
+    service.dismissAll();
+  });
+
+  testWidgets('the toast overlay survives a viewport narrower than its '
+      'margins', (tester) async {
+    final service = IxToastService();
+    addTearDown(service.dispose);
+    await pumpIx(
+      tester,
+      Stack(children: [IxToastOverlay(service: service)]),
+      size: const Size(20, 200),
+    );
+    service.showToast(message: 'x', autoClose: false);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    service.dismissAll();
+  });
+
+  testWidgets('the toast overlay survives a zero-size MediaQuery', (
+    tester,
+  ) async {
+    final service = IxToastService();
+    addTearDown(service.dispose);
+    await tester.pumpWidget(
+      const MediaQuery(
+        data: MediaQueryData(),
+        child: Directionality(
+          textDirection: TextDirection.ltr,
+          child: SizedBox(width: 400, height: 400, child: _OverlayHost()),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+  });
+}
+
+/// Hosts an [IxToastOverlay] with its own service, for the zero-size
+/// `MediaQuery` case above (which cannot use `pumpIx`, since that supplies a
+/// size).
+class _OverlayHost extends StatefulWidget {
+  const _OverlayHost();
+
+  @override
+  State<_OverlayHost> createState() => _OverlayHostState();
+}
+
+class _OverlayHostState extends State<_OverlayHost> {
+  final IxToastService _service = IxToastService();
+
+  @override
+  void initState() {
+    super.initState();
+    _service.showToast(message: 'x', autoClose: false);
+  }
+
+  @override
+  void dispose() {
+    _service.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Overlay.wrap(
+    // The toast's close button is a tooltipped `IxIconButton`, and a
+    // Material tooltip needs an `Overlay` wherever it is rendered.
+    child: Material(
+      child: Stack(children: [IxToastOverlay(service: _service)]),
+    ),
+  );
 }

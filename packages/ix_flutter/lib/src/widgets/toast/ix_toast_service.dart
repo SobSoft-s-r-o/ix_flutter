@@ -15,6 +15,7 @@ class IxToastService extends ChangeNotifier {
   final Map<String, Duration> _remainingTimes = {};
   final Set<String> _pausedIds = {};
   int _counter = 0;
+  bool _disposed = false;
 
   /// The time source used to compute auto-close countdowns.
   ///
@@ -131,12 +132,17 @@ class IxToastService extends ChangeNotifier {
   }
 
   /// Pauses the auto-close timer for a toast.
+  ///
+  /// The paused set is observable state ([isPaused]), so listeners are
+  /// notified: the toast widget stops its own progress bar from it, rather
+  /// than only knowing about the pauses it caused itself.
   void pauseTimer(String id) {
     final timer = _timers[id];
     if (timer != null && timer.isActive) {
       timer.cancel();
       _timers.remove(id);
       _pausedIds.add(id);
+      _notifyListeners();
 
       final startTime = _startTimes[id];
       final initialDuration = _remainingTimes[id];
@@ -170,6 +176,7 @@ class IxToastService extends ChangeNotifier {
       final remaining = _remainingTimes[id]!;
       _startTimer(id, remaining);
     }
+    _notifyListeners();
   }
 
   /// Whether the auto-close countdown for toast [id] is currently paused
@@ -179,14 +186,22 @@ class IxToastService extends ChangeNotifier {
 
   /// Dismisses a toast by its ID, completing its [IxToastHandle.onClose]
   /// with [result].
+  /// A no-op for an id that is not live, and for a service that has already
+  /// been disposed: an [IxToastHandle] outlives the toast it refers to (an
+  /// app may keep one to close later), and a `ChangeNotifier` that has been
+  /// disposed throws when it is notified.
   void dismiss(String id, [Object? result]) {
+    if (_disposed ||
+        !_handles.containsKey(id) && !_toasts.any((t) => t.id == id)) {
+      return;
+    }
     _timers[id]?.cancel();
     _timers.remove(id);
     _startTimes.remove(id);
     _remainingTimes.remove(id);
     _pausedIds.remove(id);
     _toasts.removeWhere((t) => t.id == id);
-    notifyListeners();
+    _notifyListeners();
     _handles.remove(id)?._notifyClosed(result);
   }
 
@@ -199,17 +214,29 @@ class IxToastService extends ChangeNotifier {
     _startTimes.clear();
     _remainingTimes.clear();
     _pausedIds.clear();
-    final closed = List<IxToastData>.from(_toasts);
     _toasts.clear();
-    notifyListeners();
-    for (final toast in closed) {
-      _handles.remove(toast.id)?._notifyClosed(null);
+    _notifyListeners();
+    // Every handle, not only the ones whose toast was still live: a handle
+    // that outlived its toast still owes its owner a completed `onClose`.
+    final handles = List<IxToastHandle>.from(_handles.values);
+    _handles.clear();
+    for (final handle in handles) {
+      handle._notifyClosed(null);
     }
+  }
+
+  /// [notifyListeners], skipped once the service is disposed.
+  void _notifyListeners() {
+    if (_disposed) {
+      return;
+    }
+    notifyListeners();
   }
 
   @override
   void dispose() {
     dismissAll();
+    _disposed = true;
     super.dispose();
   }
 }
