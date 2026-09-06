@@ -144,6 +144,22 @@ Supported placements:
 *   `rightStart`
 *   `rightEnd`
 
+## Overlay requirement
+
+`IxDropdownButton` builds fine with no `Overlay` ancestor -- the trigger
+button always renders -- but *opening* the menu needs one: the menu is laid
+out by an `OverlayPortal` into the nearest `Overlay`, not by the trigger's
+own parent, the same way `Tooltip` and other floating Material widgets work.
+
+Placed directly in `MaterialApp.builder`, above the `Navigator` that
+normally hosts the app's `Overlay`, the trigger still renders, but tapping
+it logs a one-time debug notice instead of opening the menu, and the menu
+stays closed. Fix it one of two ways:
+
+*   Wrap that shell in `Overlay.wrap(child: ...)`.
+*   Nest it inside [IxApplicationScaffold](ix_application_scaffold.md), which
+    self-hosts an `Overlay` for exactly this placement.
+
 ## Keyboard model
 
 Mirrors upstream `dropdown.tsx` / `dropdown-focus.ts`.

@@ -346,6 +346,44 @@ When working with icons or design patterns:
 - Discussion may occur before merging
 - Be patient and respectful during review
 
+## Versioning and compatibility
+
+We follow [Semantic Versioning](https://semver.org/):
+
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backwards compatible)
+- **PATCH**: Bug fixes and minor improvements
+
+Each release's own `packages/ix_flutter/CHANGELOG.md` entry calls out its
+breaking changes inline, in that release's `Changed`/`Removed`/`Deprecated`
+bullets. Historically:
+
+- **1.0.2**: the icon generator's command moved from the `ix_flutter`
+  package prefix to its own `ix_icons_generator` package, which must be
+  added as a dev dependency -- see [ICON_MIGRATION.md](ICON_MIGRATION.md)
+  for the exact old and new commands
+- **1.0.1**, **1.0.0**, **0.0.1**: no breaking changes
+
+### Flutter & Dart compatibility
+
+Every published version has required the same minimum SDKs:
+
+| Version | Flutter  | Dart     |
+| ------- | -------- | -------- |
+| 1.0.2   | >=3.10.0 | >=3.10.0 |
+| 1.0.1   | >=3.10.0 | >=3.10.0 |
+| 1.0.0   | >=3.10.0 | >=3.10.0 |
+| 0.0.1   | >=3.10.0 | >=3.10.0 |
+
+See [README.md#requirements](README.md#requirements) for the current
+requirement and [README.md#platform-support](README.md#platform-support) for
+the current supported-platform list (unchanged since 0.0.1).
+
+### Migration guides
+
+See [ICON_MIGRATION.md](ICON_MIGRATION.md) for migrating between published
+releases -- currently just the 1.0.2 icon-generator package split above.
+
 ## Release Process
 
 Maintainers handle releases. The version bump itself is done by the **Version
@@ -396,11 +434,23 @@ pub.dev:
       `cider release` to parse the file without mangling it; update
       `[Unreleased]` and add one for the version just released (see
       [UPSTREAM.md](UPSTREAM.md#release-header-format))
-- [ ] CHANGELOG.md's non-release sections (`Versioning`, `Breaking Changes`,
-      `Migration Guides`, `Contributors`, `License`, the closing links) are
-      still present and unescaped after the Version Bump run -- `cider
-      release`'s markdown round-trip can drop or reflow content outside the
-      release history it recognizes
+- [ ] CHANGELOG.md stays strictly keep-a-changelog after the Version Bump
+      run: the `# Changelog` intro, `## [Unreleased]` (or the release
+      section a bump just produced), the per-release sections and the
+      closing link reference definitions, and nothing else. `cider release`
+      silently drops or misfiles a heading or paragraph outside that shape
+      (a `## Versioning`-style section, a stray paragraph inside a category,
+      a non-standard `#### `-level heading) instead of erroring, which is
+      why the versioning policy, the per-release compatibility/breaking-change
+      history and the migration guide pointer live in this file's
+      [Versioning and compatibility](#versioning-and-compatibility) section
+      instead of the changelog -- the Version Bump run never touches this
+      file
+- [ ] Diff the whole `CHANGELOG.md` change from the Version Bump run anyway
+      (see [Release Process](#release-process) step 4): `cider release`
+      escapes a stray underscore and drops blank lines/`---` separators even
+      inside a section it keeps. That much is cosmetic (renders the same),
+      but the diff is the only way to confirm nothing else moved
 - [ ] The version the release will carry is referenced consistently in the
       documentation (`ix_flutter: ^<version>`); the bump in
       `packages/<package>/pubspec.yaml` itself is made by the Version Bump
@@ -421,6 +471,7 @@ Contributors are recognized in:
 - Pull request comments
 - Release notes in CHANGELOG.md
 - AUTHORS file (if applicable)
+- Individual commit history, for full contributor attribution
 
 ## Questions?
 

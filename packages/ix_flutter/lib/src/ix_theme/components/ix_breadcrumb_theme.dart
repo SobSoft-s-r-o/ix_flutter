@@ -5,14 +5,13 @@ import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 
-// This class's own `copyWith` and `lerp` still populate and read
-// `dropdownBackground`/`dropdownBorderRadius` below (so an explicit
-// override keeps taking effect at the one remaining read site, in
-// `IxBreadcrumb`'s overflow menu, which falls back to `IxDropdownTheme`
-// when neither is set -- see that read site -- until both fields are
-// removed in 2.0), so the same-package deprecation notice is suppressed
-// file-wide instead of at each site individually (mirrors
-// `ix_button_theme.dart`).
+// This class's own `fromPalette`/`fallback` factories, `copyWith` and
+// `lerp` all still populate and read `dropdownBackground`/
+// `dropdownBorderRadius` below (so an explicit override keeps taking
+// effect at the one remaining read site, in `IxBreadcrumb`'s overflow
+// menu, until both fields are removed in 2.0), so the same-package
+// deprecation notice is suppressed file-wide instead of at each site
+// individually (mirrors `ix_button_theme.dart`).
 // ignore_for_file: deprecated_member_use_from_same_package
 
 /// Theme extension that exposes Siemens IX breadcrumb metrics and tokens.
@@ -27,12 +26,12 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
     required this.separatorColor,
     required this.iconColor,
     required this.ellipsisFontWeight,
-    this.dropdownBackground,
+    required this.dropdownBackground,
     required this.dropdownTextStyle,
     required this.dropdownElevation,
     required this.focusOutlineColor,
     required this.dropdownPadding,
-    this.dropdownBorderRadius,
+    required this.dropdownBorderRadius,
   });
 
   factory IxBreadcrumbTheme.fromPalette({
@@ -61,13 +60,7 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
       separatorColor: pick(IxThemeColorToken.softText),
       iconColor: pick(IxThemeColorToken.primary),
       ellipsisFontWeight: FontWeight.w700,
-      // dropdownBackground/dropdownBorderRadius are left null: the overflow
-      // menu's read site falls back to IxDropdownTheme.background/
-      // borderRadius, which this factory's caller (IxThemeBuilder.build)
-      // always builds from the same palette -- pick(color2) and
-      // IxCommonGeometry.defaultBorderRadius, identically -- so leaving
-      // them unset here is not a visible change from hard-coding the same
-      // values twice.
+      dropdownBackground: pick(IxThemeColorToken.color2),
       dropdownTextStyle: typography.bodySm.copyWith(
         color: pick(IxThemeColorToken.stdText),
       ),
@@ -76,6 +69,9 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
       dropdownPadding: EdgeInsets.symmetric(
         horizontal: IxCommonGeometry.space(2),
         vertical: IxCommonGeometry.space(1),
+      ),
+      dropdownBorderRadius: const BorderRadius.all(
+        Radius.circular(IxCommonGeometry.smallBorderRadius),
       ),
     );
   }
@@ -99,11 +95,7 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
       separatorColor: theme.colorScheme.onSurfaceVariant,
       iconColor: theme.colorScheme.primary,
       ellipsisFontWeight: FontWeight.w700,
-      // dropdownBackground/dropdownBorderRadius left null: same reasoning
-      // as IxBreadcrumbTheme.fromPalette above -- IxBreadcrumb builds this
-      // and IxDropdownTheme.fallback from the same ThemeData, and that
-      // factory's background/borderRadius already resolve to
-      // theme.colorScheme.surface / IxCommonGeometry.defaultBorderRadius.
+      dropdownBackground: theme.colorScheme.surface,
       dropdownTextStyle:
           theme.textTheme.bodyMedium ?? TextStyle(color: currentColor),
       dropdownElevation: 4,
@@ -111,6 +103,9 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
       dropdownPadding: EdgeInsets.symmetric(
         horizontal: IxCommonGeometry.space(2),
         vertical: IxCommonGeometry.space(1),
+      ),
+      dropdownBorderRadius: const BorderRadius.all(
+        Radius.circular(IxCommonGeometry.smallBorderRadius),
       ),
     );
   }
@@ -125,25 +120,33 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
   final Color iconColor;
   final FontWeight ellipsisFontWeight;
 
-  /// Background of the overflow/next-items popup surface, or `null` (the
-  /// default) to use `IxDropdownTheme.background` instead.
+  /// Background of the overflow/next-items popup surface.
+  ///
+  /// The overflow menu still reads this field directly; `IxDropdownTheme`
+  /// already styles the rest of the popup (item height, padding, etc.) and
+  /// takes over this field too once it is removed.
   @Deprecated(
-    'Overflow menus are styled by IxDropdownTheme.background unless this is '
-    'explicitly set. Removed in 2.0.',
+    'The overflow menu still reads this field directly; IxDropdownTheme '
+    'already styles the rest of the popup (item height, etc.). Removed in '
+    '2.0.',
   )
-  final Color? dropdownBackground;
+  final Color dropdownBackground;
   final TextStyle dropdownTextStyle;
   final double dropdownElevation;
   final Color focusOutlineColor;
   final EdgeInsets dropdownPadding;
 
-  /// Corner radius of the overflow/next-items popup surface, or `null` (the
-  /// default) to use `IxDropdownTheme.borderRadius` instead.
+  /// Corner radius of the overflow/next-items popup surface.
+  ///
+  /// The overflow menu still reads this field directly; `IxDropdownTheme`
+  /// already styles the rest of the popup (item height, padding, etc.) and
+  /// takes over this field too once it is removed.
   @Deprecated(
-    'Overflow menus are styled by IxDropdownTheme.borderRadius unless this '
-    'is explicitly set. Removed in 2.0.',
+    'The overflow menu still reads this field directly; IxDropdownTheme '
+    'already styles the rest of the popup (item height, etc.). Removed in '
+    '2.0.',
   )
-  final BorderRadius? dropdownBorderRadius;
+  final BorderRadius dropdownBorderRadius;
 
   @override
   IxBreadcrumbTheme copyWith({
@@ -208,12 +211,9 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
       ellipsisFontWeight: t < 0.5
           ? ellipsisFontWeight
           : other.ellipsisFontWeight,
-      // Discrete switch, not a smooth Color.lerp: null means "deferred to
-      // IxDropdownTheme", which is not a colour Color.lerp could blend
-      // toward/from without treating the deferral as transparent.
-      dropdownBackground: t < 0.5
-          ? dropdownBackground
-          : other.dropdownBackground,
+      dropdownBackground:
+          Color.lerp(dropdownBackground, other.dropdownBackground, t) ??
+          dropdownBackground,
       dropdownTextStyle:
           TextStyle.lerp(dropdownTextStyle, other.dropdownTextStyle, t) ??
           dropdownTextStyle,
@@ -226,10 +226,13 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
       dropdownPadding:
           EdgeInsets.lerp(dropdownPadding, other.dropdownPadding, t) ??
           dropdownPadding,
-      // Same reasoning as dropdownBackground above.
-      dropdownBorderRadius: t < 0.5
-          ? dropdownBorderRadius
-          : other.dropdownBorderRadius,
+      dropdownBorderRadius:
+          BorderRadius.lerp(
+            dropdownBorderRadius,
+            other.dropdownBorderRadius,
+            t,
+          ) ??
+          dropdownBorderRadius,
     );
   }
 }

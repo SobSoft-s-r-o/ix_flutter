@@ -89,6 +89,13 @@ class IxIcon extends StatelessWidget {
   ///
   /// Every currently mounted [IxIcon] rebuilds, so an icon showing the
   /// Material fallback retries its asset on the next frame.
+  ///
+  /// The retry reaches the asset bundle for real, rather than replaying a
+  /// cached rejection: [_IxGuardedSvgLoader.loadBytes] never lets a failed
+  /// load reach `flutter_svg`'s own cache -- it completes with the empty-SVG
+  /// bytes and records the key in [_IxSvgFailures] instead of rethrowing --
+  /// so clearing that record here, not evicting anything from a lower-level
+  /// cache, is what makes the next load an actual one.
   @visibleForTesting
   static void debugResetFailedSvgAssets() {
     _IxSvgFailures.reset();

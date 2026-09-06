@@ -133,6 +133,19 @@ class IxDropdownMenuItem<T> {
 ///   onItemSelected: (value) => debugPrint(value),
 /// )
 /// ```
+///
+/// ## Overlay
+///
+/// The widget builds fine with no [Overlay] ancestor -- the trigger button
+/// always renders -- but *opening* the menu needs one: the menu is laid out
+/// by an [OverlayPortal] into the nearest [Overlay], not by the trigger's
+/// own parent, the same way [Tooltip] and other floating Material widgets
+/// work. Placed directly in `MaterialApp.builder`, above the `Navigator`
+/// that normally hosts the app's [Overlay], the trigger still renders, but
+/// tapping it logs a one-time debug notice instead of opening the menu.
+/// Fix it by wrapping that shell in `Overlay.wrap(child: ...)`, or by
+/// nesting it inside [IxApplicationScaffold], which self-hosts an [Overlay]
+/// for exactly this placement.
 class IxDropdownButton<T> extends StatefulWidget {
   /// Creates a Siemens IX dropdown button.
   const IxDropdownButton({

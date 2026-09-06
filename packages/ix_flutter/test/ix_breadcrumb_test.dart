@@ -267,50 +267,56 @@ void main() {
     },
   );
 
-  testWidgets('without an explicit override, the overflow menu follows '
-      'IxDropdownTheme.background (B12: the deprecation notice made true)', (
-    tester,
-  ) async {
-    final baseTheme = const IxThemeBuilder().build();
-    const dropdownBackground = Color(0xFF556677);
-    final customTheme = baseTheme.copyWith(
-      extensions: [
-        for (final extension in baseTheme.extensions.values)
-          if (extension is IxDropdownTheme)
-            extension.copyWith(background: dropdownBackground)
-          else
-            extension,
-      ],
+  test('IxBreadcrumbTheme.fromPalette leaves dropdownBackground/'
+      'dropdownBorderRadius non-null (1.x source compatibility: '
+      'ix_flutter 1.0.2 declared both required Color/BorderRadius fields, so '
+      'consumer code such as `final Color c = theme.dropdownBackground;` '
+      'must keep compiling)', () {
+    const palette = <IxThemeColorToken, Color>{
+      IxThemeColorToken.primary: Color(0xFF111111),
+      IxThemeColorToken.softText: Color(0xFF222222),
+      IxThemeColorToken.stdText: Color(0xFF333333),
+      IxThemeColorToken.focusBdr: Color(0xFF444444),
+      IxThemeColorToken.color2: Color(0xFF555555),
+    };
+    final theme = IxBreadcrumbTheme.fromPalette(
+      palette: palette,
+      typography: IxTypography(),
     );
-    // IxBreadcrumbTheme itself is untouched -- dropdownBackground stays
-    // null (the default), so the menu has nothing of its own to prefer
-    // over IxDropdownTheme.
+
+    // Both assignments are a compile-time (not just runtime) guard: a
+    // nullable field would make this file fail to analyze.
+    // ignore: deprecated_member_use_from_same_package
+    final Color background = theme.dropdownBackground;
+    // ignore: deprecated_member_use_from_same_package
+    final BorderRadius borderRadius = theme.dropdownBorderRadius;
+
+    expect(background, palette[IxThemeColorToken.color2]);
     expect(
-      // ignore: deprecated_member_use_from_same_package
-      customTheme.extension<IxBreadcrumbTheme>()!.dropdownBackground,
-      isNull,
-    );
-
-    await pumpIx(
-      tester,
-      const IxBreadcrumb(
-        showHomeLabel: true,
-        items: [
-          IxBreadcrumbItemData(label: 'Home', breadcrumbKey: 'home'),
-          IxBreadcrumbItemData(label: 'Plants', breadcrumbKey: 'plants'),
-        ],
+      borderRadius,
+      const BorderRadius.all(
+        Radius.circular(IxCommonGeometry.smallBorderRadius),
       ),
-      theme: customTheme,
     );
+  });
 
-    await tester.tap(find.text('Home'));
-    await tester.pumpAndSettle();
+  test('IxBreadcrumbTheme.fallback leaves dropdownBackground/'
+      'dropdownBorderRadius non-null (same 1.x source compatibility '
+      'guarantee as .fromPalette, for the no-IxThemeBuilder path)', () {
+    final baseTheme = ThemeData.light();
+    final theme = IxBreadcrumbTheme.fallback(baseTheme);
 
+    // ignore: deprecated_member_use_from_same_package
+    final Color background = theme.dropdownBackground;
+    // ignore: deprecated_member_use_from_same_package
+    final BorderRadius borderRadius = theme.dropdownBorderRadius;
+
+    expect(background, baseTheme.colorScheme.surface);
     expect(
-      find.byWidgetPredicate(
-        (widget) => widget is Material && widget.color == dropdownBackground,
+      borderRadius,
+      const BorderRadius.all(
+        Radius.circular(IxCommonGeometry.smallBorderRadius),
       ),
-      findsOneWidget,
     );
   });
 
