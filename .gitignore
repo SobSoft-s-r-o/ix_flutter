@@ -38,3 +38,6 @@ migrate_working_dir/
 # by `flutter test`), which the root-anchored pattern above never matches.
 build/
 /coverage/
+
+# Claude Code session data and git worktrees created by the AI assistant
+.claude/
