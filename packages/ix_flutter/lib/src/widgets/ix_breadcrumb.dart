@@ -914,22 +914,23 @@ Future<T?> _showIxMenu<T>({
   return showMenu<T>(
     context: triggerContext,
     position: RelativeRect.fromRect(triggerRect, Offset.zero & overlayBox.size),
-    // Background and corner radius stay sourced from IxBreadcrumbTheme (its
-    // `dropdownBackground`/`dropdownBorderRadius` are deprecated -- removed
-    // in 2.0 -- but still read here) so a caller's explicit override keeps
-    // taking effect; row height comes from the shared IxDropdownTheme, so
-    // it matches every other Siemens IX dropdown menu in the app. Both
-    // themes' *defaults* resolve to the same values (see
-    // IxBreadcrumbTheme.fromPalette/.fallback), so nothing changes visually
-    // for a caller who customizes neither.
+    // Background and corner radius are styled by the shared IxDropdownTheme
+    // -- the same surface every other Siemens IX dropdown menu in the app
+    // uses -- unless IxBreadcrumbTheme's own (deprecated, removed in 2.0)
+    // `dropdownBackground`/`dropdownBorderRadius` were explicitly set, which
+    // then still wins. IxDropdownTheme.borderRadius is a plain radius
+    // (shared with plain-radius consumers); IxBreadcrumbTheme's own field
+    // is a full BorderRadius, so the fallback wraps it into one.
     // ignore: deprecated_member_use_from_same_package
-    color: theme.dropdownBackground,
+    color: theme.dropdownBackground ?? dropdownTheme.background,
     elevation: theme.dropdownElevation,
     surfaceTintColor: Colors.transparent,
     shadowColor: Colors.transparent,
     shape: RoundedRectangleBorder(
       // ignore: deprecated_member_use_from_same_package
-      borderRadius: theme.dropdownBorderRadius,
+      borderRadius:
+          theme.dropdownBorderRadius ??
+          BorderRadius.all(Radius.circular(dropdownTheme.borderRadius)),
     ),
     items: [
       for (final entry in entries)

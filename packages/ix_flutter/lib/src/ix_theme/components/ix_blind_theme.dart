@@ -288,9 +288,11 @@ class IxBlindTheme extends ThemeExtension<IxBlindTheme> {
       // colors. `alarm` above already does the same for `error`; `critical`
       // shares it (Material has only one danger role), `warning` maps to
       // `tertiary` (M3's warm accent role), `success` to `secondary`, `info`
-      // to `primary`, and `neutral` to the muted `outline` role -- paired
-      // with `onSurface` since `outline` has no `onOutline` counterpart of
-      // its own.
+      // to `primary`, and `neutral` to the muted `surfaceContainerHighest`
+      // role, paired with `onSurface` -- the Material 3 `on*` role that is
+      // actually calibrated for contrast against any `surface*` container,
+      // unlike `outline` (a thin-line/border tone, not meant to carry body
+      // text at a passing contrast ratio).
       IxBlindVariant.critical: buildFallbackStyle(
         background: theme.colorScheme.error,
         foreground: theme.colorScheme.onError,
@@ -308,7 +310,7 @@ class IxBlindTheme extends ThemeExtension<IxBlindTheme> {
         foreground: theme.colorScheme.onPrimary,
       ),
       IxBlindVariant.neutral: buildFallbackStyle(
-        background: theme.colorScheme.outline,
+        background: theme.colorScheme.surfaceContainerHighest,
         foreground: theme.colorScheme.onSurface,
       ),
     };

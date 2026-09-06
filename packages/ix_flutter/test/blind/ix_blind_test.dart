@@ -510,6 +510,18 @@ void main() {
       expect(_focusedDebugLabel(), 'IxBlind.header');
     });
   });
+
+  test('IxBlindTheme.fallback neutral pairs onSurface with a surface role, not '
+      'the border-only outline tone (B12)', () {
+    final theme = ThemeData(colorScheme: const ColorScheme.light());
+    final style = IxBlindTheme.fallback(theme).style(IxBlindVariant.neutral);
+    expect(style.background, theme.colorScheme.surfaceContainerHighest);
+    expect(style.foreground, theme.colorScheme.onSurface);
+    // outline is a thin-line/border tone, not calibrated for onSurface to
+    // read against as a fill -- the two must not coincide, or this test
+    // would pass by accident on a ColorScheme where they happen to match.
+    expect(style.background, isNot(theme.colorScheme.outline));
+  });
 }
 
 /// The `debugLabel` of the [FocusNode] that currently holds the primary

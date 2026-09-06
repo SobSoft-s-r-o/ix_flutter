@@ -267,6 +267,53 @@ void main() {
     },
   );
 
+  testWidgets('without an explicit override, the overflow menu follows '
+      'IxDropdownTheme.background (B12: the deprecation notice made true)', (
+    tester,
+  ) async {
+    final baseTheme = const IxThemeBuilder().build();
+    const dropdownBackground = Color(0xFF556677);
+    final customTheme = baseTheme.copyWith(
+      extensions: [
+        for (final extension in baseTheme.extensions.values)
+          if (extension is IxDropdownTheme)
+            extension.copyWith(background: dropdownBackground)
+          else
+            extension,
+      ],
+    );
+    // IxBreadcrumbTheme itself is untouched -- dropdownBackground stays
+    // null (the default), so the menu has nothing of its own to prefer
+    // over IxDropdownTheme.
+    expect(
+      // ignore: deprecated_member_use_from_same_package
+      customTheme.extension<IxBreadcrumbTheme>()!.dropdownBackground,
+      isNull,
+    );
+
+    await pumpIx(
+      tester,
+      const IxBreadcrumb(
+        showHomeLabel: true,
+        items: [
+          IxBreadcrumbItemData(label: 'Home', breadcrumbKey: 'home'),
+          IxBreadcrumbItemData(label: 'Plants', breadcrumbKey: 'plants'),
+        ],
+      ),
+      theme: customTheme,
+    );
+
+    await tester.tap(find.text('Home'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.byWidgetPredicate(
+        (widget) => widget is Material && widget.color == dropdownBackground,
+      ),
+      findsOneWidget,
+    );
+  });
+
   testWidgets(
     'a non-interactive current-page crumb shrink-wraps like an interactive '
     'one, instead of stretching to maxItemWidth',
