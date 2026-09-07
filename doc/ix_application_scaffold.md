@@ -278,6 +278,18 @@ Widget formPage() => IxKeyboardDismissScope(
 | `onTapOutside` | `bool` | Release a focused field on a tap outside it. | `true` |
 | `onDrag` | `bool` | Release a focused field when the user drags a scroll view. | `true` |
 | `dismissKeyboard` | `bool` | Also ask the platform to hide the IME, ahead of Flutter's own teardown of the input connection. | `true` |
+
+Scopes nest, and the one nearest above a focused field owns it -- the tap
+trigger through the `Actions` lookup, the scroll trigger by matching the
+field's own nearest scope. A drag inside a *sibling* scope therefore never
+releases a field that belongs to another one. Because the override is
+installed whatever the switches say, a nested `enabled: false` hands that
+subtree back to Flutter's platform defaults even inside
+`IxApplicationScaffold`'s frame, where dismissal is on by default, and
+`onTapOutside` and `onDrag` take precedence over an enclosing scope the
+same way, independently of each other -- a nested scope can keep the tap
+trigger while switching the scroll trigger off.
+
 ## Accessibility
 
 The menu publishes exactly one semantics node per entry: its label, its
