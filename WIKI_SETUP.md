@@ -6,7 +6,7 @@ The GitHub wiki at https://github.com/SobSoft-s-r-o/ix_flutter/wiki is **generat
 
 The [`wiki-sync.yml`](.github/workflows/wiki-sync.yml) workflow performs a **one-way** sync — repository to wiki, never the other direction — after every merge to `main`:
 
-1. A `push` to `main` touching `doc/**`, a root `*.md`, `packages/ix_flutter/*.md`, or `tool/wiki_sync*` triggers the workflow.
+1. A `push` to `main` touching `doc/**`, a root `*.md`, `packages/ix_flutter/*.md`, `packages/ix_icons_generator/*.md`, or `tool/wiki_sync*` triggers the workflow.
 2. The workflow checks out this repository and, separately, `SobSoft-s-r-o/ix_flutter.wiki` (into `wiki-checkout`).
 3. `tool/wiki_sync.sh wiki-checkout` copies every file listed in the mapping below into the wiki checkout. Local links are rewritten so they still work on the wiki:
    - a link to another synced document (e.g. `doc/theming.md`, `GETTING_STARTED.md`, `#anchor` included) becomes a bare wiki page name (`theming`, `Getting-Started`);
