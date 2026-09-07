@@ -131,8 +131,11 @@ class IxIcon extends StatelessWidget {
         Theme.of(context).colorScheme.onSurface;
     // `IconThemeData.opacity` is how a slot dims the icon it hosts (a
     // disabled `ListTile`'s leading icon, say). Material's own `Icon`
-    // applies it; both branches here have to as well, or an `IxIcon` would
-    // be the one icon in such a slot rendering at full strength.
+    // applies it; every branch here has to as well, or an `IxIcon` would
+    // be the one icon in such a slot rendering at full strength. Resolving
+    // it into the colour once, here, is what lets the four branches agree:
+    // neither the SVG tint nor the widget builder's `IconTheme` has an
+    // opacity of its own to apply.
     final opacity = iconTheme.opacity;
     final resolvedColor = opacity == null
         ? baseColor
@@ -166,9 +169,22 @@ class IxIcon extends StatelessWidget {
         resolvedSize,
       ),
     };
-    child = SizedBox.square(
-      dimension: resolvedSize,
-      child: Center(child: child),
+    // `resolvedColor` already carries `opacity`, and Material's `Icon`
+    // resolves the ambient `IconThemeData.opacity` against whatever colour
+    // it is handed (`widgets/icon.dart`). Without neutralising it here, the
+    // Material branch above -- and the fallback glyph `_IxSvgIcon` swaps in
+    // for an asset that fails to load -- would dim an already dimmed colour
+    // and paint the icon at opacity squared. Overriding the opacity for the
+    // subtree, rather than giving those two a colour of their own, keeps a
+    // single resolved colour across all four branches, and `Icon` skips its
+    // multiplication entirely at 1.0, so the glyph is painted with exactly
+    // the alpha computed above.
+    child = IconTheme(
+      data: iconTheme.copyWith(opacity: 1),
+      child: SizedBox.square(
+        dimension: resolvedSize,
+        child: Center(child: child),
+      ),
     );
     if (excludeFromSemantics) {
       return ExcludeSemantics(child: child);

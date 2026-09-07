@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -158,6 +159,53 @@ void main() {
     // The failure is still surfaced, just not as an uncaught error.
     expect(_iconErrors(reported), isNotEmpty);
     handle.dispose();
+  });
+
+  testWidgets('the Material fallback is painted at the ambient opacity, not '
+      'its square', (tester) async {
+    // The fallback is a Material `Icon` like any other, so it goes through
+    // the same double-dimming as the `IxIconData.material` branch: `IxIcon`
+    // resolves `IconThemeData.opacity` into the colour it passes down, and
+    // `Icon` applies the ambient opacity to that colour again before
+    // painting. The painted glyph colour is where that shows.
+    const base = Color(0xFF102030);
+    final reported = _captureReportedErrors();
+
+    await tester.runAsync(() async {
+      final uncaught = await _uncaughtDuring(() async {
+        await pumpIx(
+          tester,
+          _bundled(
+            const IconTheme(
+              data: IconThemeData(size: 24, color: base, opacity: 0.5),
+              child: IxIcon(
+                IxIconData.asset('missing.svg', fallback: Icons.close),
+                key: Key('i'),
+              ),
+            ),
+            const {},
+          ),
+        );
+        await tester.pump(const Duration(milliseconds: 200));
+      });
+      expect(uncaught, isEmpty);
+    });
+    await tester.pump();
+
+    expect(_otherErrors(reported), isEmpty);
+    expect(find.byIcon(Icons.close), findsOneWidget);
+    final painted = tester
+        .renderObject<RenderParagraph>(
+          find.descendant(
+            of: find.byKey(const Key('i')),
+            matching: find.byType(RichText),
+          ),
+        )
+        .text
+        .style!
+        .color!;
+    expect(painted.withValues(alpha: 1), base);
+    expect(painted.a, closeTo(0.5, 0.001));
   });
 
   testWidgets('a corrupt SVG falls back, reports in debug and leaks no '

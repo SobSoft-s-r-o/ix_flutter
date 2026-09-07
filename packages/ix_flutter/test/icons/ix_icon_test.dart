@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ix_flutter/ix_flutter.dart';
@@ -241,5 +242,103 @@ void main() {
       tester.widget<Icon>(find.byType(Icon)).color,
       const Color(0xFF102030).withValues(alpha: 0.5),
     );
+  });
+
+  group('IconThemeData.opacity is applied exactly once', () {
+    // `Icon.color` and `SvgPicture.colorFilter` only record what `IxIcon`
+    // *asked* for. Material's own `Icon` then resolves the ambient
+    // `IconThemeData.opacity` against the colour it was handed
+    // (`widgets/icon.dart`: `iconColor.withOpacity(iconColor.opacity *
+    // iconOpacity)`) before the glyph is painted, so a colour `IxIcon` has
+    // already dimmed is dimmed a second time. Only the painted colour tells
+    // the two apart, which is why these assertions read the
+    // `RenderParagraph` that actually paints the glyph.
+    const base = Color(0xFF102030);
+    const translucent = Color(0x80102030);
+
+    Color paintedGlyphColor(WidgetTester tester, Key key) {
+      final paragraph = tester.renderObject<RenderParagraph>(
+        find.descendant(of: find.byKey(key), matching: find.byType(RichText)),
+      );
+      return paragraph.text.style!.color!;
+    }
+
+    void expectPainted(Color painted, Color source, double alpha) {
+      expect(painted.withValues(alpha: 1), source.withValues(alpha: 1));
+      expect(painted.a, closeTo(alpha, 0.001));
+    }
+
+    testWidgets('a Material glyph is painted at the ambient opacity, not '
+        'its square', (tester) async {
+      await pumpIx(
+        tester,
+        const IconTheme(
+          data: IconThemeData(size: 24, color: base, opacity: 0.5),
+          child: IxIcon(IxIconData.material(Icons.close), key: Key('i')),
+        ),
+      );
+      expectPainted(paintedGlyphColor(tester, const Key('i')), base, 0.5);
+    });
+
+    testWidgets("an explicit color's own alpha is dimmed once", (tester) async {
+      await pumpIx(
+        tester,
+        const IconTheme(
+          data: IconThemeData(size: 24, color: base, opacity: 0.5),
+          child: IxIcon(
+            IxIconData.material(Icons.close),
+            color: translucent,
+            key: Key('i'),
+          ),
+        ),
+      );
+      expectPainted(
+        paintedGlyphColor(tester, const Key('i')),
+        translucent,
+        translucent.a * 0.5,
+      );
+    });
+
+    testWidgets('a custom widget icon is painted at the same opacity', (
+      tester,
+    ) async {
+      await pumpIx(
+        tester,
+        IconTheme(
+          data: const IconThemeData(size: 24, color: base, opacity: 0.5),
+          child: IxIcon(
+            IxIconData.widget((_) => const Icon(Icons.check)),
+            key: const Key('i'),
+          ),
+        ),
+      );
+      expectPainted(paintedGlyphColor(tester, const Key('i')), base, 0.5);
+    });
+
+    testWidgets('a successful SVG tint dims an explicit alpha once', (
+      tester,
+    ) async {
+      await pumpIx(
+        tester,
+        DefaultAssetBundle(
+          bundle: FixtureAssetBundle(const {
+            'valid.svg': 'test/fixtures/icons/valid.svg',
+          }),
+          child: const IconTheme(
+            data: IconThemeData(size: 24, color: base, opacity: 0.5),
+            child: IxIcon(IxIconData.asset('valid.svg'), color: translucent),
+          ),
+        ),
+      );
+      await tester.pump(const Duration(milliseconds: 200));
+
+      expect(
+        tester.widget<SvgPicture>(find.byType(SvgPicture)).colorFilter,
+        ColorFilter.mode(
+          translucent.withValues(alpha: translucent.a * 0.5),
+          BlendMode.srcIn,
+        ),
+      );
+    });
   });
 }
