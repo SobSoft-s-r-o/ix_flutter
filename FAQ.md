@@ -10,7 +10,7 @@ Common questions about ix_flutter and how to use it.
 
 ```yaml
 dependencies:
-   ix_flutter: ^1.0.0
+  ix_flutter: ^1.1.0
 ```
 
 Then run `flutter pub get`.
@@ -22,22 +22,31 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed setup instructions.
 ### Q: What are the minimum Flutter and Dart versions?
 
 **A:** 
-- Flutter: >=3.10.0
+- Flutter: >=3.38.0
 - Dart: >=3.10.0
 
 Run `flutter --version` and `dart --version` to check your versions.
+
+The Flutter floor rose from 3.10.0 in 1.0.2 to 3.38.0 for the upcoming 1.1.0,
+because the semantics APIs the menu, toast, dropdown and data-view roles are
+built on (`SemanticsRole.*`, `SemanticsService.sendAnnouncement`) only exist
+from 3.38. The Dart floor is unchanged. An app that cannot move off an older
+Flutter stays on 1.0.2 -- `pub` will not resolve 1.1.0 for it.
 
 ---
 
 ### Q: Do I need any additional setup?
 
-**A:** Yes, you must generate icons before using them:
+**A:** No. `ix_flutter` widgets render their own icons out of the box (falling back to Material glyphs today; see [doc/ix_icons.md](doc/ix_icons.md#fallback-policy)). Only add the optional `ix_icons_generator` dev dependency if your own code needs the full Siemens iX icon catalogue:
 
-```bash
-dart run ix_flutter:generate_icons
+```yaml
+dev_dependencies:
+  ix_icons_generator: ^1.1.0
 ```
 
-This downloads icons from the official Siemens source.
+```bash
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
+```
 
 ---
 
@@ -45,7 +54,15 @@ This downloads icons from the official Siemens source.
 
 ### Q: Why aren't icons included in the package?
 
-**A:** Due to licensing and distribution restrictions on Siemens iX Design System icons, SVG files cannot be bundled. The generator ensures legal compliance by downloading icons from the official source.
+**A:** The library's own widgets need only a small, fixed set — 28 keys,
+enumerated in `IxIconKey`. Once the LEGAL REVIEW gate documented in
+[UPSTREAM.md](UPSTREAM.md) is passed, the library will bundle that minimal
+internal set; until then its widgets fall back to Material glyphs through
+`IxIconResolver.material()` (see
+[doc/ix_icons.md](doc/ix_icons.md#fallback-policy)). The full 1 479-icon
+catalogue is optional either way and generated into your own app by
+`ix_icons_generator`, which downloads it from the official `@siemens/ix-icons`
+npm source.
 
 ---
 
@@ -54,7 +71,7 @@ This downloads icons from the official Siemens source.
 **A:** Run:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
 This creates an `ix_icons.dart` file in your `lib/` directory.
@@ -65,22 +82,11 @@ This creates an `ix_icons.dart` file in your `lib/` directory.
 
 **A:** Check these common issues:
 
-1. **Node.js/npm not installed**
-   ```bash
-   node --version
-   npm --version
-   ```
+1. **Network connectivity**
+   - Check your internet connection and access to `https://registry.npmjs.org`
+   - Check proxy/firewall settings if you're behind one
 
-2. **Network connectivity**
-   - Check your internet connection
-   - The generator downloads from npm
-
-3. **Permissions issue**
-   ```bash
-   sudo dart run ix_flutter:generate_icons  # macOS/Linux
-   ```
-
-4. **Invalid project structure**
+2. **Invalid project structure**
    - Make sure you're in your app directory
    - Check that `lib/` folder exists
 
@@ -111,12 +117,13 @@ The generated files are static assets.
 
 ### Q: How do I use icons in my app?
 
-**A:** Import the generated file and use the icons:
+**A:** Import the generated file and pass its constants to `IxIcon`:
 
 ```dart
+import 'package:ix_flutter/ix_flutter.dart';
 import 'package:your_app/ix_icons.dart';
 
-Icon(IxIcons.home)
+Widget catalogueIcon() => const IxIcon(IxIconsData.home);
 ```
 
 See [doc/ix_icons.md](doc/ix_icons.md) for complete usage.
@@ -134,9 +141,10 @@ See [doc/ix_icons.md](doc/ix_icons.md) for complete usage.
 - IxDropdownButton
 - IxEmptyState
 - IxResponsiveDataView
-- IxToast (notifications)
+- IxToastService / IxToastOverlay (notifications)
 - IxPaginationBar
-- And more...
+- IxSpinner
+- IxIcon / IxIconButton
 
 See [API_REFERENCE.md](API_REFERENCE.md) for complete list.
 
@@ -144,27 +152,28 @@ See [API_REFERENCE.md](API_REFERENCE.md) for complete list.
 
 ### Q: How do I use components?
 
-**A:** Import from the main package:
+**A:** Import the single barrel and use the widgets directly:
 
 ```dart
 import 'package:ix_flutter/ix_flutter.dart';
-
-// Use components
-IxToast.success(context, message: 'Done!')
 ```
 
-See [doc/](doc/) for component-specific documentation.
+See [doc/](doc/) for component-specific documentation, and
+[API_REFERENCE.md](API_REFERENCE.md) for the index.
 
 ---
 
 ### Q: Can I customize component styles?
 
 **A:** Yes, through:
-1. **Theme system** - Use `IxTheme`
-2. **Widget parameters** - Most components accept styling params
-3. **Override theme** - Create custom theme based on `IxTheme`
+1. **Theme extensions** - every component reads its own `ThemeExtension`
+   (`IxButtonTheme`, `IxBreadcrumbTheme`, `IxSpinnerTheme`, ...), which
+   `IxThemeBuilder` registers
+2. **Widget parameters** - most components accept styling parameters directly
+3. **Custom palette** - `IxCustomPalette.partial` overrides individual color
+   tokens
 
-See [doc/copilot_colors.md](doc/copilot_colors.md) for color tokens.
+See [doc/theming.md](doc/theming.md) for the theme model and [doc/tokens.md](doc/tokens.md) for every color token.
 
 ---
 
@@ -172,41 +181,43 @@ See [doc/copilot_colors.md](doc/copilot_colors.md) for color tokens.
 
 ### Q: How do I apply a theme?
 
-**A:**
+**A:** Build one `ThemeData` per brightness with `IxThemeBuilder`:
 
 ```dart
-MaterialApp(
-  theme: IxTheme.lightTheme,
-  darkTheme: IxTheme.darkTheme,
-  themeMode: ThemeMode.system,
-)
+Widget systemThemedApp() => MaterialApp(
+  theme: const IxThemeBuilder.light().build(),
+  darkTheme: const IxThemeBuilder.dark().build(),
+  themeMode: ThemeMode.system, // Uses device setting
+  home: const HomePage(),
+);
 ```
+
+To switch themes at runtime, use `IxThemeController` — see
+[doc/theming.md](doc/theming.md).
 
 ---
 
 ### Q: Can I create a custom theme?
 
-**A:** Yes, extend `IxTheme`:
+**A:** Yes. Override individual color tokens with `IxCustomPalette` and hand
+the result to `IxThemeBuilder` or `IxThemeController`:
 
 ```dart
-final customTheme = ThemeData(
-  useMaterial3: true,
-  colorScheme: ColorScheme.fromSeed(
-    seedColor: Colors.blue,
-  ),
-  // ... customize
-);
+IxThemeController controllerWithBrandPrimary() {
+  final palette = IxCustomPalette.partial(
+    light: {IxThemeColorToken.primary: const Color(0xFF0050F5)},
+    dark: {IxThemeColorToken.primary: const Color(0xFF82A0FF)},
+  );
 
-MaterialApp(
-  theme: customTheme,
-)
+  return IxThemeController(customPalette: palette);
+}
 ```
 
 ---
 
 ### Q: What colors are available?
 
-**A:** See [doc/copilot_colors.md](doc/copilot_colors.md) for the complete color system.
+**A:** [doc/tokens.md](doc/tokens.md) lists every `IxThemeColorToken` with its light and dark value; it is generated from the palettes the package ships.
 
 ---
 
@@ -245,18 +256,19 @@ MaterialApp(
 
 ### Q: What license is this package under?
 
-**A:** MIT License for the code. See [LICENSE](LICENSE).
+**A:** MIT License for the code. See [LICENSE](packages/ix_flutter/LICENSE).
 
-Icons have separate licensing. See [ICON_LICENSING.md](ICON_LICENSING.md).
+Icons have separate licensing. See
+[ICON_LICENSING.md](packages/ix_flutter/ICON_LICENSING.md).
 
 ---
 
 ### Q: Can I use this commercially?
 
 **A:** Yes, under MIT License terms. However:
-- Review the [LICENSE](LICENSE) file
+- Review the [LICENSE](packages/ix_flutter/LICENSE) file
 - Ensure Siemens iX icon compliance
-- See [ICON_LICENSING.md](ICON_LICENSING.md) for icon terms
+- See [ICON_LICENSING.md](packages/ix_flutter/ICON_LICENSING.md) for icon terms
 
 ---
 
@@ -268,11 +280,11 @@ Icons have separate licensing. See [ICON_LICENSING.md](ICON_LICENSING.md).
 
 ### Q: Can I use Siemens iX icons?
 
-**A:** Yes, but you must:
-1. Generate them using our tool
-2. Comply with Siemens iX licensing
-3. Provide proper attribution
-4. See [ICON_LICENSING.md](ICON_LICENSING.md)
+**A:** Yes:
+1. `ix_flutter`'s own widgets already use them — no generator needed. They render as Material glyphs today; once the LEGAL REVIEW gate documented in [UPSTREAM.md](UPSTREAM.md) is passed, the library bundles a minimal internal set (28 icons) with an MIT notice.
+2. For the full 1 479-icon catalogue in your own code, running the optional `ix_icons_generator` (`dart run ix_icons_generator:generate_icons`) is up to you.
+3. `@siemens/ix-icons` is MIT-licensed: redistribution keeps the copyright/permission notice and `READMEOSS.html`. Siemens trademarks and brand guidelines are separate from the MIT license.
+4. See [ICON_LICENSING.md](packages/ix_flutter/ICON_LICENSING.md) for details.
 
 ---
 
@@ -293,7 +305,7 @@ Icons have separate licensing. See [ICON_LICENSING.md](ICON_LICENSING.md).
 ### Q: Icons aren't showing up
 
 **A:**
-1. Generate icons: `dart run ix_flutter:generate_icons`
+1. Generate icons: `dart run ix_icons_generator:generate_icons`
 2. Make sure you import the generated file:
    ```dart
    import 'package:your_app/ix_icons.dart';
@@ -333,8 +345,8 @@ flutter build web  # or android, ios, etc.
 
 **A:**
 ```bash
-flutter pub upgrade ix_flutter
-dart run ix_flutter:generate_icons  # Regenerate icons if needed
+flutter pub upgrade ix_flutter ix_icons_generator
+dart run ix_icons_generator:generate_icons  # Regenerate icons if needed
 ```
 
 ---
@@ -369,7 +381,7 @@ For large data sets, use pagination (IxPaginationBar).
 **A:** Yes, but:
 1. Generate icons with `--package` flag:
    ```bash
-   dart run ix_flutter:generate_icons --package my_library_name
+   dart run ix_icons_generator:generate_icons --package my_library_name
    ```
 2. Include generated files in your library
 3. Document icon usage for library consumers
@@ -395,7 +407,7 @@ For large data sets, use pagination (IxPaginationBar).
 ```bash
 cd example
 flutter pub get
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 flutter run
 ```
 
@@ -405,8 +417,8 @@ flutter run
 
 **A:** Visit official resources:
 - https://ix.siemens.io
-- https://ix.siemens.io/docs/
-- https://ix.siemens.io/docs/guidelines/
+- https://ix.siemens.io/docs/home/overview
+- https://ix.siemens.io/docs/guidelines/overview
 
 ---
 
@@ -445,8 +457,5 @@ flutter run
 - **Report a bug** - If something's broken, create an issue
 
 ---
-
-**Last Updated**: January 2026
-**Package Version**: 1.0.0
 
 Thank you for using ix_flutter! 🎉

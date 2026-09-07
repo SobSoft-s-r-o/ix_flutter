@@ -3,6 +3,13 @@ import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 
+// This file's `style()` switch necessarily still refers to the nine
+// deprecated variants below (every IxButtonVariant value must resolve to a
+// style so they stay usable, unchanged, until they're removed in 2.0), so
+// the same-package deprecation notice is suppressed file-wide instead of
+// at each of the nine `case` labels individually.
+// ignore_for_file: deprecated_member_use_from_same_package
+
 /// Enumerates the Siemens IX button variants.
 enum IxButtonVariant {
   primary,
@@ -14,14 +21,77 @@ enum IxButtonVariant {
   dangerPrimary,
   dangerSecondary,
   dangerTertiary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   warningPrimary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   warningSecondary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   warningTertiary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   infoPrimary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   infoSecondary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   infoTertiary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   successPrimary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   successSecondary,
+
+  /// Not part of Siemens iX; removed in 2.0. Use primary/secondary/tertiary,
+  /// subtle* or danger* variants.
+  @Deprecated(
+    'Not part of Siemens iX. Use primary/secondary/tertiary, subtle* or '
+    'danger* variants. Removed in 2.0.',
+  )
   successTertiary,
 }
 
@@ -174,6 +244,13 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       double width = IxCommonGeometry.borderWidthDefault,
     }) => BorderSide(color: value, width: width);
 
+    // 1px focus-bdr outline applied to every variant's focused state
+    // (button-mixin.scss:171-182), regardless of its unfocused border.
+    final focusSide = border(
+      color(IxThemeColorToken.focusBdr),
+      width: IxCommonGeometry.focusBorderThickness,
+    );
+
     final hoverOverlay = overlayStates(
       hovered: color(IxThemeColorToken.component1Hover),
       focused: color(IxThemeColorToken.component1Active),
@@ -193,7 +270,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.primaryContrast),
       ),
       overlay: hoverOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final secondary = baseStyle(
@@ -215,7 +292,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       side: borderStates(
         base: border(color(IxThemeColorToken.primary)),
         hovered: border(color(IxThemeColorToken.dynamic)),
-        focused: border(color(IxThemeColorToken.dynamicActive)),
+        focused: focusSide,
         pressed: border(color(IxThemeColorToken.dynamic)),
         disabled: border(color(IxThemeColorToken.component4)),
       ),
@@ -237,7 +314,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.weakText),
       ),
       overlay: hoverOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final subtlePrimary = baseStyle(
@@ -255,7 +332,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.weakText),
       ),
       overlay: hoverOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final subtleSecondary = baseStyle(
@@ -276,6 +353,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       side: borderStates(
         base: border(color(IxThemeColorToken.component4)),
         hovered: border(color(IxThemeColorToken.component4)),
+        focused: focusSide,
         pressed: border(color(IxThemeColorToken.stdBdr)),
         disabled: border(color(IxThemeColorToken.component4)),
       ),
@@ -296,7 +374,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.weakText),
       ),
       overlay: hoverOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final dangerOverlay = overlayStates(
@@ -317,7 +395,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.primaryContrast),
       ),
       overlay: dangerOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final dangerSecondary = baseStyle(
@@ -338,7 +416,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       side: borderStates(
         base: border(color(IxThemeColorToken.alarmText)),
         hovered: border(color(IxThemeColorToken.alarmText)),
-        focused: border(color(IxThemeColorToken.alarmText)),
+        focused: focusSide,
         pressed: border(color(IxThemeColorToken.alarmText)),
         disabled: border(color(IxThemeColorToken.component4)),
       ),
@@ -359,7 +437,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.weakText),
       ),
       overlay: dangerOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final warningOverlay = overlayStates(
@@ -380,7 +458,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.primaryContrast),
       ),
       overlay: warningOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final warningSecondary = baseStyle(
@@ -401,7 +479,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       side: borderStates(
         base: border(color(IxThemeColorToken.warningBdr)),
         hovered: border(color(IxThemeColorToken.warningText)),
-        focused: border(color(IxThemeColorToken.warningText)),
+        focused: focusSide,
         pressed: border(color(IxThemeColorToken.warningText)),
         disabled: border(color(IxThemeColorToken.component4)),
       ),
@@ -422,7 +500,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.weakText),
       ),
       overlay: warningOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final infoOverlay = overlayStates(
@@ -443,7 +521,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.primaryContrast),
       ),
       overlay: infoOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final infoSecondary = baseStyle(
@@ -464,7 +542,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       side: borderStates(
         base: border(color(IxThemeColorToken.info)),
         hovered: border(color(IxThemeColorToken.info)),
-        focused: border(color(IxThemeColorToken.info)),
+        focused: focusSide,
         pressed: border(color(IxThemeColorToken.info)),
         disabled: border(color(IxThemeColorToken.component4)),
       ),
@@ -485,7 +563,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.weakText),
       ),
       overlay: infoOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final successOverlay = overlayStates(
@@ -506,7 +584,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.primaryContrast),
       ),
       overlay: successOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     final successSecondary = baseStyle(
@@ -527,7 +605,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
       side: borderStates(
         base: border(color(IxThemeColorToken.success)),
         hovered: border(color(IxThemeColorToken.success)),
-        focused: border(color(IxThemeColorToken.success)),
+        focused: focusSide,
         pressed: border(color(IxThemeColorToken.success)),
         disabled: border(color(IxThemeColorToken.component4)),
       ),
@@ -548,7 +626,7 @@ class IxButtonTheme extends ThemeExtension<IxButtonTheme> {
         disabled: color(IxThemeColorToken.weakText),
       ),
       overlay: successOverlay,
-      side: borderStates(base: transparentSide()),
+      side: borderStates(base: transparentSide(), focused: focusSide),
     );
 
     return IxButtonTheme(

@@ -56,7 +56,7 @@ class _BlindPageState extends State<BlindPage> {
             const SizedBox(height: 16),
             IxBlind(
               title: 'Blind with Actions',
-              icon: IxIcons.about, // Using an available icon
+              icon: IxIcon(IxIconsData.about), // Using an available icon
               headerActions: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
-import 'package:ix_flutter/src/widgets/ix_pagination_bar.dart';
+
+import 'helpers/focus.dart';
+import 'helpers/pump_ix.dart';
 
 class TestItem {
   final int id;
@@ -55,6 +58,7 @@ void main() {
     void Function(int)? onPageChanged,
     String? searchQuery,
     VoidCallback? onClearSearch,
+    VoidCallback? onSearchChangedRequestResetPagination,
     bool enableSorting = false,
     void Function(IxSortSpec)? onSortChanged,
   }) {
@@ -77,6 +81,8 @@ void main() {
           onPageChanged: onPageChanged,
           searchQuery: searchQuery,
           onClearSearch: onClearSearch,
+          onSearchChangedRequestResetPagination:
+              onSearchChangedRequestResetPagination,
           enableSorting: enableSorting,
           onSortChanged: onSortChanged,
         ),
@@ -235,6 +241,61 @@ void main() {
       expect(find.text('No data available'), findsOneWidget);
     });
 
+    testWidgets(
+      'onSearchChangedRequestResetPagination fires on every search query '
+      'change, including across the empty/non-empty items boundary',
+      (WidgetTester tester) async {
+        // Set screen size to desktop
+        tester.view.physicalSize = const Size(1024, 768);
+        tester.view.devicePixelRatio = 1.0;
+
+        int resetCount = 0;
+
+        // The widget itself never filters `items` -- the caller does, the
+        // same way the example app's `_handleSearch` does -- so a query
+        // change that crosses the empty/non-empty boundary is simulated by
+        // pumping a new `items` list alongside the new `searchQuery`.
+        Future<void> pumpWith({
+          required List<TestItem> items,
+          required String searchQuery,
+        }) => tester.pumpWidget(
+          buildTestWidget(
+            items: items,
+            searchQuery: searchQuery,
+            onClearSearch: () {},
+            onSearchChangedRequestResetPagination: () => resetCount++,
+          ),
+        );
+
+        // Initial mount with a matching query (non-empty results): mounting
+        // is not a "change", so no reset yet.
+        await pumpWith(items: testItems, searchQuery: 'Item');
+        await tester.pump();
+        expect(find.text('Item 0'), findsOneWidget);
+        expect(resetCount, 0);
+
+        // The query changes to one that matches nothing: the widget swaps
+        // to its empty-state subtree. The callback must still fire for
+        // this transition.
+        await pumpWith(items: const [], searchQuery: 'NonExistent');
+        await tester.pump();
+        expect(find.text('No results for "NonExistent"'), findsOneWidget);
+        expect(resetCount, 1);
+
+        // The query changes back to one that matches again: the widget
+        // swaps back to its table content. The callback must fire again.
+        await pumpWith(items: testItems, searchQuery: 'Item');
+        await tester.pump();
+        expect(find.text('Item 0'), findsOneWidget);
+        expect(resetCount, 2);
+
+        // Rebuilding with the *same* query is not a change: no extra call.
+        await pumpWith(items: testItems, searchQuery: 'Item');
+        await tester.pump();
+        expect(resetCount, 2);
+      },
+    );
+
     testWidgets('sorting works without pagination', (
       WidgetTester tester,
     ) async {
@@ -342,5 +403,183 @@ void main() {
       expect(lastSortSpec?.key, 'id');
       expect(lastSortSpec?.ascending, true);
     });
+  });
+
+  group('IxResponsiveDataView keyboard focus and sort semantics (A-4)', () {
+    // No upstream counterpart: `@siemens/ix` has no table component (and
+    // therefore no `table.ct.ts`) -- `IxResponsiveDataView` is a
+    // Flutter-specific composite (see `doc/ix_responsive_data_view.md`,
+    // "Flutter-specific composite"). This guards WCAG 2.4.3 (focus order)
+    // per finding IXF-002 ("RDV focusability", spec
+    // `2026-09-04-ix-flutter-2-0-design.md`, task A-4).
+    testWidgets(
+      'Tab order: clear → headers → rows → row actions → pagination',
+      (tester) async {
+        await pumpIx(
+          tester,
+          IxResponsiveDataView<TestItem>(
+            items: testItems.take(2).toList(),
+            desktopColumns: sortableDesktopColumns,
+            mobileFields: mobileFields,
+            enableSorting: true,
+            onSortChanged: (_) {},
+            onRowTapDesktop: (_) {},
+            rowActions: [
+              IxRowAction<TestItem>(
+                id: 'edit',
+                label: 'Edit',
+                icon: const Icon(Icons.edit),
+                onSelected: (_) {},
+              ),
+            ],
+            searchQuery: 'Item',
+            onClearSearch: () {},
+            // `page: 2` (not 1): a disabled Material button is excluded
+            // from focus traversal, so page 1 would make "previous page"
+            // unreachable by Tab and contradict this test's own premise
+            // that it is one of the expected stops.
+            pagination: const IxPaginationConfig(
+              mode: IxPaginationMode.standard,
+              page: 2,
+              totalPages: 3,
+              pageSize: 10,
+              pageSizeOptions: [10, 20],
+            ),
+            onPageChanged: (_) {},
+            onPageSizeChanged: (_) {},
+          ),
+          size: const Size(1024, 768),
+        );
+        final expected = <Key>[
+          const Key('ix-rdv-clear'),
+          const Key('ix-rdv-header-id'),
+          const Key('ix-rdv-header-name'),
+          const Key('ix-rdv-row-0'),
+          const Key('ix-rdv-row-actions-0'),
+          const Key('ix-rdv-row-1'),
+          const Key('ix-rdv-row-actions-1'),
+          const Key('ix-pagination-size'),
+          const Key('ix-pagination-prev'),
+          const Key('ix-pagination-next'),
+        ];
+        for (final key in expected) {
+          await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+          await tester.pump();
+          expectFocusWithin(tester, key);
+        }
+      },
+    );
+
+    testWidgets(
+      'sortable header is a button with sort hint and toggles on Enter',
+      (tester) async {
+        final handle = tester.ensureSemantics();
+        IxSortSpec? spec;
+        await pumpIx(
+          tester,
+          buildTestWidget(
+            items: testItems,
+            columns: sortableDesktopColumns,
+            enableSorting: true,
+            onSortChanged: (s) => spec = s,
+          ),
+          size: const Size(1024, 768),
+        );
+        expect(
+          tester.getSemantics(find.byKey(const Key('ix-rdv-header-name'))),
+          matchesSemantics(
+            isButton: true,
+            hasEnabledState: true,
+            isEnabled: true,
+            isFocusable: true,
+            hasTapAction: true,
+            hasFocusAction: true,
+            label: 'Name',
+            hint: 'Sort',
+          ),
+        );
+        // One Tab reaches the first sortable header ("id", the leftmost
+        // column in `sortableDesktopColumns`). Its semantics node must
+        // report `isFocused` once actually focused -- InkWell's own focus
+        // state has to merge into the labelled node, not be swallowed by
+        // an `excludeSemantics` that spans the whole header (WCAG 2.4.7:
+        // a screen reader user must be able to tell the header is
+        // focused, not just that it is focusable).
+        await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+        await tester.pump();
+        expect(
+          tester.getSemantics(find.byKey(const Key('ix-rdv-header-id'))),
+          isSemantics(isFocused: true),
+        );
+        await tester.tap(find.byKey(const Key('ix-rdv-header-name')));
+        await tester.pump();
+        expect(spec, const IxSortSpec(key: 'name', ascending: true));
+        expect(
+          tester.getSemantics(find.byKey(const Key('ix-rdv-header-name'))).hint,
+          'Sorted ascending',
+        );
+        handle.dispose();
+      },
+    );
+
+    testWidgets('a non-sortable header is a plain label, not a disabled '
+        'control', (tester) async {
+      final handle = tester.ensureSemantics();
+      await pumpIx(
+        tester,
+        // `enableSorting` is off, so every heading is a plain label even
+        // though the columns declare a sortKey.
+        buildTestWidget(items: testItems, columns: sortableDesktopColumns),
+        size: const Size(1024, 768),
+      );
+      expect(
+        tester.getSemantics(find.text('Name').first),
+        isSemantics(hasEnabledState: false, isButton: false, label: 'Name'),
+      );
+      handle.dispose();
+    });
+
+    testWidgets('rows are focusable buttons only when onRowTapDesktop is set', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await pumpIx(
+        tester,
+        buildTestWidget(items: testItems.take(1).toList()),
+        size: const Size(1024, 768),
+      );
+      expect(
+        tester
+            .getSemantics(find.byKey(const Key('ix-rdv-row-0')))
+            .flagsCollection
+            .isButton,
+        isFalse,
+      );
+      handle.dispose();
+    });
+
+    testWidgets(
+      'search status header results label does not overflow with a long custom builder',
+      (tester) async {
+        await pumpIx(
+          tester,
+          IxResponsiveDataView<TestItem>(
+            items: testItems,
+            desktopColumns: desktopColumns,
+            mobileFields: mobileFields,
+            rowActions: const [],
+            searchQuery: 'q',
+            onClearSearch: () {},
+            strings: IxResponsiveDataViewStrings(
+              resultsCountBuilder: (c) =>
+                  'Insgesamt $c Ergebnisse in dieser Ansicht gefunden',
+            ),
+          ),
+          size: const Size(620, 800),
+          textScaler: const TextScaler.linear(2.0),
+        );
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }

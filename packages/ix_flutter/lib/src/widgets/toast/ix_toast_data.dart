@@ -11,13 +11,19 @@ enum IxToastType {
   /// Warning message.
   warning,
 
+  /// Error message.
+  error,
+
   /// Critical error message.
+  @Deprecated('Use error. Removed in 2.0.')
   critical,
 
   /// Alarm message.
+  @Deprecated('Use error. Removed in 2.0.')
   alarm,
 
   /// Neutral message.
+  @Deprecated('Use info. Removed in 2.0.')
   neutral,
 }
 
@@ -32,8 +38,11 @@ class IxToastData {
     this.autoClose = true,
     this.actionLabel,
     this.onAction,
+    this.action,
     this.icon,
     this.iconColor,
+    this.hideIcon = false,
+    this.dismissOnAction = true,
   });
 
   /// Unique identifier for the toast.
@@ -54,15 +63,33 @@ class IxToastData {
   /// Whether the toast should auto-close. Defaults to true.
   final bool autoClose;
 
-  /// Label for the action button.
+  /// Label for the default action button. Ignored when [action] is set.
   final String? actionLabel;
 
-  /// Callback for the action button.
+  /// Callback for the default action button. Ignored when [action] is set.
   final VoidCallback? onAction;
+
+  /// A fully custom action widget, shown under the message instead of the
+  /// default [actionLabel]/[onAction] text button when set.
+  final Widget? action;
 
   /// Custom icon widget. If null, a default icon based on [type] is used.
   final Widget? icon;
 
   /// Custom icon color.
   final Color? iconColor;
+
+  /// When true, hides the type icon entirely (the message still gets the
+  /// full content width).
+  final bool hideIcon;
+
+  /// Whether tapping [actionLabel]/[onAction] also closes the toast.
+  ///
+  /// Defaults to `true`, matching [IxToastService.show]'s 1.x-compatible
+  /// behaviour and [IxToastService.showToast]'s current default (the
+  /// planned 2.0 release changes [IxToastService.showToast]'s own default
+  /// to `false`; [IxToastService.show] is unaffected). Only applies to the
+  /// default action button -- a fully custom [action] widget controls its
+  /// own dismissal.
+  final bool dismissOnAction;
 }

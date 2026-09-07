@@ -1,0 +1,38 @@
+name: Wiki sync
+on:
+  push:
+    branches: [main]
+    # Every sync source in tool/wiki_sync_map.txt must be covered here, or a
+    # change to it never reaches the wiki. `doc/**` covers doc/wiki/ too.
+    paths:
+      - 'doc/**'
+      - '*.md'
+      - 'packages/ix_flutter/*.md'
+      - 'packages/ix_icons_generator/*.md'
+      - 'tool/wiki_sync*'
+  workflow_dispatch:
+    inputs:
+      dry_run: { description: 'Print actions only', type: boolean, default: true }
+permissions:
+  contents: read
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: SobSoft-s-r-o/ix_flutter.wiki
+          token: ${{ secrets.WIKI_SYNC_TOKEN }}
+          path: wiki-checkout
+      - run: tool/wiki_sync.sh ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }} wiki-checkout
+      - name: Commit and push
+        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
+        working-directory: wiki-checkout
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && echo "wiki up to date" && exit 0
+          git commit -m "docs: sync from ix_flutter@${{ github.sha }}"
+          git push

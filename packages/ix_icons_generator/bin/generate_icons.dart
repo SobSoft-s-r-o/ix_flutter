@@ -30,6 +30,21 @@ Future<void> main(List<String> arguments) async {
       abbr: 'n',
       help: 'Package name (leave empty if icons are in the same package)',
     )
+    ..addOption(
+      'icons-version',
+      defaultsTo: IconGenerator.defaultIconsVersion,
+      help: 'Version of @siemens/ix-icons to download',
+    )
+    ..addFlag(
+      'legacy-getters',
+      defaultsTo: true,
+      help: 'Emit deprecated IxIcons widget getters',
+    )
+    ..addFlag(
+      'format',
+      defaultsTo: true,
+      help: 'Run "dart format" on the generated file',
+    )
     ..addFlag(
       'help',
       abbr: 'h',
@@ -54,10 +69,14 @@ Future<void> main(List<String> arguments) async {
     final outputDir = path.join(projectRoot, results['output'] as String);
     final assetsDir = path.join(projectRoot, results['assets'] as String);
     final packageName = results['package'] as String?;
+    final iconsVersion = results['icons-version'] as String;
+    final legacyGetters = results['legacy-getters'] as bool;
+    final format = results['format'] as bool;
 
     print('Project root: $projectRoot');
     print('Output directory: $outputDir');
     print('Assets directory: $assetsDir');
+    print('Icons version: $iconsVersion');
     if (packageName != null && packageName.isNotEmpty) {
       print('Package name: $packageName');
     } else {
@@ -84,6 +103,9 @@ Future<void> main(List<String> arguments) async {
       outputDir: outputDir,
       assetsDir: assetsDir,
       flutterPackageName: packageName?.isNotEmpty == true ? packageName : null,
+      iconsVersion: iconsVersion,
+      legacyGetters: legacyGetters,
+      format: format,
     );
 
     // Update pubspec.yaml to include assets
@@ -100,9 +122,7 @@ Future<void> main(List<String> arguments) async {
     print('     assets:');
     print('       - ${path.relative(assetsDir, from: projectRoot)}/');
     print('2. Run: flutter pub get');
-    print(
-      '3. Import the generated icons: import \'package:your_package/ix_icons.dart\';',
-    );
+    print('3. Use: IxIcon(IxIconsData.about)');
     exit(0);
   } catch (e, stackTrace) {
     print('\n✗ Error during icon generation:');

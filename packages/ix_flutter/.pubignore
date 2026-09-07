@@ -1,39 +1,25 @@
-# Mirrors .gitignore plus publish-only exclusions
+# Publish-only exclusions, relative to this package root. Patterns that name
+# paths outside the package (the repository's .github/, doc/images/, ...) would
+# never match here, so only what actually exists in the package is listed.
+#
+# Editor and OS junk (.DS_Store, *.log, *.iml, .idea/, ...) is not repeated
+# here: in a git checkout `pub publish` honours the repository's .gitignore, so
+# anything git ignores is already left out of the package.
 
-# Miscellaneous
-*.class
-*.log
-*.pyc
-*.swp
-.DS_Store
-.atom/
-.buildlog/
-.history
-.svn/
-migrate_working_dir/
-
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# Flutter/Dart/Pub related
+# Libraries should not include pubspec.lock, per
+# https://dart.dev/guides/libraries/private-files#pubspeclock.
 /pubspec.lock
+
+# Generated API documentation and build output
 **/doc/api/
 .dart_tool/
-.flutter-plugins-dependencies
 /build/
 /coverage/
 
-# Exclude wiki submodule from published package
-/wiki/
+# Repository tooling: not part of the published library
+/tool/
 
-# Exclude GitHub metadata
-/.github/
-
-# Exclude repo-only wiki setup guide
-/WIKI_SETUP.md
-
-# Exclude documentation images from package (but keep screenshots for pub.dev)
-/doc/images/
+# The test suite is not part of the published library either, and
+# test/tool/* and test/upstream/* import ../../tool/..., which the
+# exclusion above removes from the tarball.
+/test/

@@ -187,7 +187,13 @@ class _ModalsPageState extends State<ModalsPage> {
     }
 
     _bottomSheetController?.close();
-    _bottomSheetController = scaffoldState.showBottomSheet((sheetContext) {
+
+    // Every control inside the sheet closes *this* sheet through its own
+    // controller rather than through `_bottomSheetController`: a sheet that
+    // a newer one supersedes must not be able to close the newer one, and
+    // must keep working while it is the one on screen.
+    late final PersistentBottomSheetController controller;
+    controller = scaffoldState.showBottomSheet((sheetContext) {
       final theme = Theme.of(sheetContext);
       return SafeArea(
         top: false,
@@ -207,7 +213,7 @@ class _ModalsPageState extends State<ModalsPage> {
                   ),
                   IconButton(
                     tooltip: 'Close sheet',
-                    onPressed: () => _bottomSheetController?.close(),
+                    onPressed: controller.close,
                     icon: const Icon(Icons.close),
                   ),
                 ],
@@ -229,12 +235,12 @@ class _ModalsPageState extends State<ModalsPage> {
               Row(
                 children: [
                   OutlinedButton(
-                    onPressed: () => _bottomSheetController?.close(),
+                    onPressed: controller.close,
                     child: const Text('Not now'),
                   ),
                   const SizedBox(width: 12),
                   FilledButton(
-                    onPressed: () => _bottomSheetController?.close(),
+                    onPressed: controller.close,
                     child: const Text('Publish release'),
                   ),
                 ],
@@ -245,8 +251,20 @@ class _ModalsPageState extends State<ModalsPage> {
       );
     });
 
-    _bottomSheetController?.closed.whenComplete(() {
+    // `showBottomSheet` rebuilds the Scaffold, not this page, so without a
+    // setState of its own the toggle below would keep offering "Show bottom
+    // sheet" while a sheet is already up -- and the next click would open a
+    // second one on top of the first.
+    setState(() {
+      _bottomSheetController = controller;
+    });
+
+    controller.closed.whenComplete(() {
       if (!mounted) return;
+      // A sheet that a newer one superseded completes *after* the newer
+      // controller was stored; only the sheet that still owns the field may
+      // clear it.
+      if (!identical(_bottomSheetController, controller)) return;
       setState(() {
         _bottomSheetController = null;
       });

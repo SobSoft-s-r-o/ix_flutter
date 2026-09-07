@@ -1,14 +1,20 @@
 name: ix_flutter
-description: "Flutter UI library implementing Siemens iX Design System with 1400+ icons, themes, and widgets for all platforms."
+description: "Flutter UI library implementing the Siemens iX Design System: themes, tokens, widgets and an optional generator for the full iX icon catalogue."
 version: 1.0.2
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
 repository: https://github.com/SobSoft-s-r-o/ix_flutter
 issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
-documentation: https://github.com/SobSoft-s-r-o/ix_flutter/wiki
+documentation: https://github.com/SobSoft-s-r-o/ix_flutter/tree/main/doc
 
 screenshots:
-  - description: 'Example app showing ix_flutter components with dark theme'
-    path: screenshots/main_page_example_dark.jpg
+  - description: 'Theme configuration and token overview with the bundled Work Sans typography (classic light)'
+    path: screenshots/overview_light.png
+  - description: 'Theme configuration and token overview with the bundled Work Sans typography (classic dark)'
+    path: screenshots/overview_dark.png
+  - description: 'Buttons: variants and states, Work Sans typography (classic light)'
+    path: screenshots/components_light.png
+  - description: 'Buttons: variants and states, Work Sans typography (classic dark)'
+    path: screenshots/components_dark.png
 
 platforms:
   android:
@@ -20,17 +26,20 @@ platforms:
 
 environment:
   sdk: ">=3.10.0 <4.0.0"
-  flutter: ">=3.10.0"
+  # SemanticsRole.* and SemanticsService.sendAnnouncement need Flutter 3.38.
+  flutter: ">=3.38.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_svg: ^2.2.3
+  flutter_svg: ^2.2.3 # direct dependency: renders bundled internal iX icons (lib/src/ix_icons)
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  fake_async: ^1.3.3 # direct dev dependency: test/toast/ix_toast_service_test.dart drives timers deterministically
+  clock: ^1.1.2 # direct dev dependency: tests assign IxToastService.now = clock.now inside fakeAsync() for deterministic pause/resume timing
 
 topics:
   - flutter
@@ -91,5 +100,17 @@ flutter:
         - asset: assets/fonts/Roboto_Mono/static/RobotoMono-Bold.ttf
           weight: 700
         - asset: assets/fonts/Roboto_Mono/static/RobotoMono-BoldItalic.ttf
+          weight: 700
+          style: italic
+    - family: Work Sans
+      fonts:
+        - asset: assets/fonts/Work_Sans/static/WorkSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Work_Sans/static/WorkSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Work_Sans/static/WorkSans-Italic.ttf
+          weight: 400
+          style: italic
+        - asset: assets/fonts/Work_Sans/static/WorkSans-BoldItalic.ttf
           weight: 700
           style: italic

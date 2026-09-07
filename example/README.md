@@ -1,16 +1,57 @@
-# example
+# ix_flutter example
 
-A new Flutter project.
+Showcase app for [`ix_flutter`](../packages/ix_flutter): every page under
+`lib/screen/` demonstrates one area of the Siemens iX design system (themes,
+buttons, chips, forms, navigation, ...) against the library's classic light
+and dark themes.
 
-## Getting Started
+## Run it
 
-This project is a starting point for a Flutter application.
+```bash
+flutter pub get
+flutter run -d chrome
+```
 
-A few resources to get you started if this is your first Flutter project:
+Any other configured device/target works too (`flutter run -d macos`,
+`flutter run -d <device-id>`, ...); Chrome is just the fastest way to try it
+without extra platform tooling.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Regenerate the bundled icons
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+The app vendors a generated subset of `@siemens/ix-icons` under
+`lib/ix_icons.dart` and `assets/ix_icons/`, built by
+[`ix_icons_generator`](../packages/ix_icons_generator):
+
+```bash
+dart run ix_icons_generator:generate_icons
+```
+
+Re-run it after upgrading the generator or changing which icons the app
+references.
+
+## Regenerate the pub.dev screenshots
+
+`packages/ix_flutter/screenshots/*.png` (referenced from
+`packages/ix_flutter/pubspec.yaml`'s `screenshots:` metadata) are captured by
+`test/screenshots_test.dart`, which renders `HomePage` and `ButtonsPage`
+against the light and dark classic themes at 1440x900 and writes the PNGs
+straight into the library's `screenshots/` directory. The capture explicitly
+opts into the bundled Work Sans typeface (`IxTypography(fontFamily:
+IxFonts.workSans, package: IxFonts.packageName)`) so the marketing
+screenshots show it off; the 1.x default typography stays Roboto Mono
+(a monospace face) until Work Sans becomes the default in 2.0, so an app
+that builds its theme with plain `IxThemeBuilder.light()/.dark()` still
+renders Roboto Mono today, unlike these screenshots:
+
+```bash
+flutter test --dart-define=IX_CAPTURE_SCREENSHOTS=true test/screenshots_test.dart
+```
+
+Without the `IX_CAPTURE_SCREENSHOTS` define the same test still runs (as part
+of the regular `flutter test`) but only pumps and asserts the pages render;
+it does not touch the PNGs. After regenerating, validate them from the
+library package:
+
+```bash
+cd ../packages/ix_flutter && dart run tool/check_screenshots.dart
+```

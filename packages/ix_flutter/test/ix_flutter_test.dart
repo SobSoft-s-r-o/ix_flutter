@@ -1,8 +1,23 @@
+// This file is the 1.x regression guard for the deprecated builder
+// (`family`/`mode`) and button-variant APIs: it keeps driving them on
+// purpose until they are removed in 2.0 (plan item B-2).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 void main() {
+  // `family: IxThemeFamily.brand` logs a one-time debug notice on its first
+  // use; trigger it here with `debugPrint` silenced so that none of the
+  // builds below leak it into the suite log.
+  setUpAll(() {
+    final previous = debugPrint;
+    debugPrint = (String? message, {int? wrapWidth}) {};
+    const IxThemeBuilder(family: IxThemeFamily.brand).build();
+    debugPrint = previous;
+  });
+
   test('builds Siemens IX theme with extension', () {
     const builder = IxThemeBuilder(
       family: IxThemeFamily.brand,
@@ -63,7 +78,17 @@ void main() {
     final ixButtons = theme.extension<IxButtonTheme>();
 
     expect(ixButtons, isNotNull);
-    expect(theme.filledButtonTheme.style, same(ixButtons!.primary));
+    // IxDensityAdapter.apply (run unconditionally by IxThemeBuilder.build,
+    // see test/density/ix_density_test.dart and test/theme/
+    // component_sizes_test.dart) now derives theme.filledButtonTheme.style
+    // from ixButtons.primary via copyWith(tapTargetSize:), so it is a
+    // distinct but wired-up instance rather than the same object; the
+    // backgroundColor property is untouched by that copyWith and so stays
+    // identical, confirming the derivation.
+    expect(
+      theme.filledButtonTheme.style?.backgroundColor,
+      same(ixButtons!.primary.backgroundColor),
+    );
 
     final secondaryBackground = ixButtons
         .style(IxButtonVariant.secondary)

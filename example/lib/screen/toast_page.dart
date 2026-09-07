@@ -103,7 +103,7 @@ class IxToastExampleTypes extends StatelessWidget {
           onPressed: () {
             ToastProvider.of(
               context,
-            ).show(type: IxToastType.critical, message: 'Critical toast');
+            ).show(type: IxToastType.error, message: 'Critical toast');
           },
           child: const Text('Critical'),
         ),
@@ -112,7 +112,7 @@ class IxToastExampleTypes extends StatelessWidget {
           onPressed: () {
             ToastProvider.of(
               context,
-            ).show(type: IxToastType.alarm, message: 'Alarm toast');
+            ).show(type: IxToastType.error, message: 'Alarm toast');
           },
           child: const Text('Alarm'),
         ),

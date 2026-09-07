@@ -296,7 +296,7 @@ class IxClassicDarkColors {
   static const Color primary = Color(0xFF00bde3);
 
   /// CSS Variable: --theme-color-primary--active
-  static const Color primaryActive = Color(0xFF00eaff);
+  static const Color primaryActive = Color(0xFF00d3e5);
 
   /// CSS Variable: --theme-color-primary--contrast
   static const Color primaryContrast = Color(0xFF000000);
@@ -311,10 +311,10 @@ class IxClassicDarkColors {
   static const Color secondary = Color(0xFF000000);
 
   /// CSS Variable: --theme-color-secondary--active
-  static const Color secondaryActive = Color(0xFF00252e);
+  static const Color secondaryActive = Color(0xFF001d2b);
 
   /// CSS Variable: --theme-color-secondary--hover
-  static const Color secondaryHover = Color(0xFF002e38);
+  static const Color secondaryHover = Color(0xFF002639);
 
   /// CSS Variable: --theme-color-shadow-1
   static const Color shadow1 = Color(0x99000000);
@@ -513,5 +513,4 @@ class IxClassicDarkColors {
     IxThemeColorToken.weakText: weakText,
     IxThemeColorToken.xWeakBdr: xWeakBdr,
   };
-
 }

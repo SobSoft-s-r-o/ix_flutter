@@ -191,7 +191,7 @@ class BadgesPage extends StatelessWidget {
                   description:
                       'Use for informational notices like planned downtime or configuration tips.',
                   style: ixBadges.style(IxBadgeTone.info),
-                  icon: IxIcons.info,
+                  icon: IxIconsData.info,
                 ),
                 const SizedBox(height: 12),
                 _BannerSemanticsExample(
@@ -200,7 +200,7 @@ class BadgesPage extends StatelessWidget {
                   description:
                       'Escalate when partial degradation or manual validation is required.',
                   style: ixBadges.style(IxBadgeTone.warning),
-                  icon: IxIcons.maintenanceWarning,
+                  icon: IxIconsData.maintenanceWarning,
                 ),
                 const SizedBox(height: 12),
                 _BannerSemanticsExample(
@@ -209,7 +209,7 @@ class BadgesPage extends StatelessWidget {
                   description:
                       'Reserve for outage scenarios where immediate user action is mandatory.',
                   style: ixBadges.style(IxBadgeTone.critical),
-                  icon: IxIcons.alarmBell,
+                  icon: IxIconsData.alarmBell,
                 ),
               ],
             ),
@@ -277,7 +277,13 @@ class _BannerSemanticsExample extends StatelessWidget {
   final String heading;
   final String description;
   final IxBadgeStyle style;
-  final Widget icon;
+  final IxIconData icon;
+
+  /// [IxIcon] renders at a fixed box size and ignores an ambient [IconTheme]
+  /// size, so the 20px this banner used to request has to be passed
+  /// explicitly. `s24` matches the banner heading slot used elsewhere in the
+  /// example (see `_SemanticBanner` on the forms page).
+  static const _iconSize = IxIconSize.s24;
 
   @override
   Widget build(BuildContext context) {
@@ -304,10 +310,7 @@ class _BannerSemanticsExample extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  IconTheme(
-                    data: IconThemeData(size: 20, color: style.foreground),
-                    child: icon,
-                  ),
+                  IxIcon(icon, size: _iconSize, color: style.foreground),
                   const SizedBox(width: 8),
                   Text(
                     heading,

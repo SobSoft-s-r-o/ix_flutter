@@ -1,0 +1,144 @@
+# Icon Licensing and EULA
+
+## Overview
+
+This Flutter package provides widgets based on the Siemens iX Design System. The package itself is licensed under the MIT License, but the icons require special licensing consideration.
+
+## Icon Licensing
+
+### Icon Source and License
+
+Icons come from the official `@siemens/ix-icons` npm package (MIT License, Copyright (c) 2022 Siemens AG). See [UPSTREAM.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/UPSTREAM.md) for the exact version, tag, commit and tarball checksum.
+
+- Once the LEGAL REVIEW gate documented in [UPSTREAM.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/UPSTREAM.md) is passed, the library will bundle a minimal internal set (28 icons) required by its own widgets, with the MIT notice in `packages/ix_flutter/assets/icons/internal/NOTICE`; until then library widgets fall back to Material glyphs through `IxIconResolver.material()`.
+- The full catalogue (1 479 icons in 3.5.0) is optional and generated into your app with `dart run ix_icons_generator:generate_icons`.
+- Redistribution keeps the MIT copyright/permission notice and `READMEOSS.html`. Siemens trademarks and brand guidelines are separate from the MIT copyright license.
+
+### Visual Language and Guidelines
+
+The design patterns and visual language implemented in this package are based on the Siemens iX Design System. Refer to the official documentation for:
+
+- Component guidelines
+- Design principles
+- Brand usage rules
+- Accessibility standards
+
+## Package Licensing
+
+### Code License
+
+All Flutter widget code is licensed under the **MIT License**.
+
+This includes:
+- Widget implementations
+- Component styles
+- Theme system
+- Icon generator tool
+- All Dart source code
+
+### Third-Party Components
+
+Each license below was read from the `LICENSE` file of the version this package
+resolves to.
+
+`ix_flutter` itself has one direct third-party dependency:
+- **flutter_svg** (MIT License, Copyright (c) 2018 Dan Field)
+
+The optional `ix_icons_generator` dev dependency, which runs at development
+time only, adds:
+- **http** (BSD License, Copyright 2014 the Dart project authors)
+- **path** (BSD License, Copyright 2014 the Dart project authors)
+- **args** (BSD License, Copyright 2013 the Dart project authors)
+- **recase** (BSD License, Copyright 2017 Keith Elliott)
+- **archive** (MIT License, Copyright (c) 2013-2021 Brendan Duncan)
+- **crypto** (BSD-3-Clause License, Copyright 2015 the Dart project authors)
+
+## Commercial Use
+
+If you intend to use this package commercially:
+
+1. **Review Licensing**: Ensure your use complies with MIT License terms
+2. **Icon Compliance**: Verify your usage of Siemens iX icons complies with their terms
+3. **Attribution**: Provide clear attribution to Siemens iX Design System
+4. **Legal Review**: Consider legal review before commercial deployment
+
+## Important Disclaimers
+
+### Not an Official Product
+
+This package is an **independent community adaptation** of the Siemens iX Design System for Flutter.
+
+- **Not developed by Siemens**: Created by independent developers
+- **Not maintained by Siemens**: Community maintained
+- **Not endorsed by Siemens**: Not an official Siemens product
+- **Not affiliated with Siemens**: Independent project
+
+### Trademark Notice
+
+- **Siemens**: Registered trademark of Siemens AG
+- **Siemens iX**: Trademark/Design System owned by Siemens AG
+- This package is not affiliated with or endorsed by Siemens AG
+
+### Warranty Disclaimer
+
+This package is provided "AS-IS" without any warranty or guarantee:
+
+- No warranty of compatibility with official Siemens products
+- No warranty of accuracy relative to official design system
+- No guarantee of license compliance
+- Users are solely responsible for license compliance
+
+## User Responsibilities
+
+When using this package, you are responsible for:
+
+1. **Icon Licensing**: Complying with Siemens iX Design System icon licensing terms
+2. **Attribution**: Properly attributing icons to Siemens iX Design System
+3. **Legal Compliance**: Ensuring your use complies with all applicable licenses
+4. **Design System Compliance**: Following Siemens iX guidelines for proper usage
+5. **Commercial Use**: Conducting legal review for commercial applications
+
+## Getting Help
+
+### For Design System Questions
+
+Visit the official Siemens iX Design System:
+- Website: https://ix.siemens.io
+- Documentation: https://ix.siemens.io/docs/home/overview
+- Icons: https://www.npmjs.com/package/@siemens/ix-icons
+
+### For Package Issues
+
+Report issues on the package repository, but note:
+- This is not an official Siemens project
+- Community support only
+- Not affiliated with Siemens support
+
+## Summary
+
+**TL;DR**:
+
+✅ **DO**:
+- Use this package for Flutter applications
+- Follow Siemens iX design guidelines
+- Attribute icons to Siemens iX
+- Generate icons from official source
+
+❌ **DON'T**:
+- Claim this is an official Siemens product
+- Distribute icons without proper attribution
+- Use icons contrary to Siemens iX terms
+- Assume Siemens endorsement or support
+
+## Questions?
+
+If you have licensing questions:
+
+1. **Package Code**: Refer to the MIT License
+2. **Icons**: Refer to Siemens iX terms at https://ix.siemens.io
+3. **Attribution**: Include proper credits to Siemens iX Design System
+4. **Doubt**: Consult with legal/compliance team before commercial use
+
+---
+
+Remember: Proper licensing compliance ensures sustainable use of this package and respect for Siemens iX intellectual property.

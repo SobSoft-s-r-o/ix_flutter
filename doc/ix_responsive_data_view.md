@@ -2,6 +2,57 @@
 
 The `IxResponsiveDataView<T>` widget is a powerful, responsive data presentation component that automatically switches between a data table layout on desktop/tablet and a card-based list layout on mobile devices. It adheres to the Siemens iX design system and supports sorting, row actions, and advanced pagination modes.
 
+## Flutter-specific composite
+
+`IxResponsiveDataView` is a **Flutter-specific composite**, not a 1:1 port of a
+single upstream `@siemens/ix` web component: it combines a table, a card
+list, a search status bar and pagination into one widget. Upstream's closest
+equivalent, `.ix-table`, is a utility style (not a component) that was moved
+from `src/components/table/table.scss` to `scss/utilities/_table.scss` in
+[PR #2632](https://github.com/siemens/ix/pull/2632) (commit
+`0c952102075ef40aa5768488efe0198af143719a`), targeting the upcoming v6 -- it
+was relocated, not deleted. This widget mirrors that utility's tokens
+(`color-0`/`soft-bdr`/`weak-bdr`/`ghost-hover`) for its table/row/card
+surfaces, and its own `IxPaginationBar` mirrors `ix-pagination`
+(`pagination.tsx`).
+
+A 2.0 milestone (internally tracked as "B-9") splits this composite into
+smaller primitives -- `IxTable`, `IxDataCard`, `IxRowActions` and friends --
+and moves the desktop/mobile breakpoint from 600px to 768px. Until then,
+`IxResponsiveDataView` stays as the single entry point, and the breakpoint
+stays at 600px for 1.x compatibility.
+
+## Keyboard and screen reader
+
+Every interactive part of `IxResponsiveDataView` is reachable by keyboard,
+in this order:
+
+1. The search status bar's clear button (`ix-rdv-clear`), when a search
+   query is shown.
+2. Each sortable column header (`ix-rdv-header-<sortKey>`), left to right.
+3. Each row (`ix-rdv-row-<index>`) -- only focusable when
+   `onRowTapDesktop` is set -- followed by that row's actions trigger
+   (`ix-rdv-row-actions-<index>`).
+4. The pagination bar's page-size selector (`ix-pagination-size`, when
+   shown), then the previous/next chevrons (`ix-pagination-prev` /
+   `ix-pagination-next`).
+
+A sortable column header is a real button: `Enter`/`Space` toggle its sort
+direction exactly like a tap, and it exposes a semantics hint so a screen
+reader announces what activating it does -- `IxResponsiveDataViewStrings
+.sortHint` ("Sort") when the column isn't the active sort key, or
+`.sortedAscending`/`.sortedDescending` ("Sorted ascending"/"Sorted
+descending") once it is. A mobile card (which always opens a details sheet
+on tap) similarly exposes `.rowHint` ("Open row"). All four strings default
+to English and can be overridden the same way as every other
+`IxResponsiveDataViewStrings` field.
+
+`IxPaginationBar`'s own controls -- including the pagination bar
+`IxResponsiveDataView` renders internally -- are labelled through
+[`IxPaginationStrings`](#ixpaginationstrings) (below): the previous/next
+chevrons and the page-size selector all carry an accessible name, and the
+selector additionally exposes its current value and expanded state.
+
 ## Features
 
 *   **Responsive Layout**: Automatically renders a table on screens >= 600px and a card list on smaller screens.
@@ -20,10 +71,18 @@ The `IxResponsiveDataView<T>` widget is a powerful, responsive data presentation
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-class MyDataView extends StatelessWidget {
-  final List<MyItem> items;
+/// The row model every example on this page uses.
+class MyItem {
+  const MyItem({required this.name, required this.status});
 
+  final String name;
+  final String status;
+}
+
+class MyDataView extends StatelessWidget {
   const MyDataView({super.key, required this.items});
+
+  final List<MyItem> items;
 
   @override
   Widget build(BuildContext context) {
@@ -60,20 +119,61 @@ class MyDataView extends StatelessWidget {
         IxRowAction(
           id: 'edit',
           label: 'Edit',
-          icon: IxIcons.pen,
-          onSelected: (item) => print('Edit ${item.name}'),
+          icon: const Icon(Icons.edit),
+          onSelected: (item) => debugPrint('Edit ${item.name}'),
         ),
         IxRowAction(
           id: 'delete',
           label: 'Delete',
-          icon: IxIcons.trashcan,
+          icon: const Icon(Icons.delete),
           destructive: true,
-          onSelected: (item) => print('Delete ${item.name}'),
+          onSelected: (item) => debugPrint('Delete ${item.name}'),
         ),
       ],
     );
   }
 }
+```
+
+### Shared definitions
+
+Every example below reuses the same column, field and action definitions:
+
+```dart
+/// The column, field and action definitions from [MyDataView], reused by the
+/// examples below.
+List<IxColumnDef<MyItem>> demoColumns() => [
+  IxColumnDef(
+    label: 'Name',
+    sortKey: 'name', // Key reported through onSortChanged
+    cellBuilder: (context, item) => Text(item.name),
+  ),
+  IxColumnDef(
+    label: 'Status',
+    sortKey: 'status',
+    cellBuilder: (context, item) => Text(item.status),
+  ),
+];
+
+List<IxMobileFieldDef<MyItem>> demoMobileFields() => [
+  IxMobileFieldDef(
+    label: 'Name',
+    valueBuilder: (context, item) => Text(item.name),
+  ),
+  IxMobileFieldDef(
+    label: 'Status',
+    valueBuilder: (context, item) => Text(item.status),
+  ),
+];
+
+List<IxRowAction<MyItem>> demoRowActions() => [
+  IxRowAction(
+    id: 'edit',
+    label: 'Edit',
+    icon: const Icon(Icons.edit),
+    onSelected: (item) => debugPrint('Edit ${item.name}'),
+  ),
+];
 ```
 
 ### Pagination
@@ -85,35 +185,84 @@ The widget supports two pagination modes via the `pagination` parameter.
 Displays a pagination bar at the bottom of the table with page controls and optional page size selector.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget standardPagination({
+  required List<MyItem> currentItems,
+  required int currentPage,
+  required ValueChanged<int> onPageChanged,
+  required ValueChanged<int> onPageSizeChanged,
+}) => IxResponsiveDataView<MyItem>(
   items: currentItems,
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
   pagination: IxPaginationConfig(
     mode: IxPaginationMode.standard,
-    page: currentPage,       // Current page number (1-based)
-    pageSize: 20,            // Items per page
-    totalItems: 100,         // Total items in dataset
-    totalPages: 5,           // Total pages
-    pageSizeOptions: [10, 20, 50], // Options for dropdown
+    page: currentPage, // Current page number (1-based)
+    pageSize: 20, // Items per page
+    totalItems: 100, // Total items in dataset
+    totalPages: 5, // Total pages
+    pageSizeOptions: const [10, 20, 50], // Options for dropdown
   ),
-  onPageChanged: (newPage) {
-    // Fetch new page and update state
-  },
-  onPageSizeChanged: (newSize) {
-    // Update page size and reset to page 1
-  },
-  // ...
-)
+  onPageChanged: onPageChanged,
+  onPageSizeChanged: onPageSizeChanged,
+);
 ```
+
+The pagination bar lays its controls out with a `Wrap` instead of a plain
+`Row`, so at a narrow width or a large text scale the page-size selector and
+the prev/next controls drop to their own line instead of overflowing (WCAG
+1.4.4 Resize text); it never shrinks below a 56px minimum height. Its
+chevrons are 32px `IxIconButton`s.
+
+##### IxPaginationStrings
+
+`IxPaginationBar` (and the pagination bar `IxResponsiveDataView` renders
+internally) can be localized directly through `paginationStrings`, without
+touching `IxResponsiveDataViewStrings`:
+
+```dart
+Widget localizedPaginationBar({
+  required int page,
+  required int totalPages,
+  required ValueChanged<int> onPageChanged,
+}) => IxPaginationBar(
+  page: page,
+  totalPages: totalPages,
+  onPageChanged: onPageChanged,
+  paginationStrings: const IxPaginationStrings(
+    previousPage: 'Back',
+    nextPage: 'Forward',
+    rowsPerPage: 'Rows per view',
+    pageSelection: 'Choose rows per page',
+  ),
+);
+```
+
+`paginationStrings` takes precedence over the legacy `strings:`
+(`IxResponsiveDataViewStrings`) parameter, which is still accepted and
+bridged via `IxPaginationStrings.fromDataView` for 1.x callers that never
+migrated. When `IxResponsiveDataView` renders its own pagination bar, it
+still only exposes `strings:` -- pass an `IxResponsiveDataViewStrings` with
+the matching fields overridden (`paginationPrevTooltip`,
+`paginationNextTooltip`, `rowsPerPageLabel`, `pageOfBuilder`, `pageBuilder`,
+`totalItemsBuilder`) to localize it from there.
 
 #### 2. Infinite Scroll
 
 Automatically triggers a callback when the user scrolls near the bottom of the list.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget infiniteScroll({
+  required List<MyItem> currentItems,
+  required bool isFetchingMore,
+  required Future<void> Function() fetchMoreItems,
+}) => IxResponsiveDataView<MyItem>(
   items: currentItems,
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
   isPageLoading: isFetchingMore, // Show bottom spinner while loading
-  pagination: IxPaginationConfig(
+  pagination: const IxPaginationConfig(
     mode: IxPaginationMode.infinite,
     hasMore: true, // Set to false when no more data
   ),
@@ -121,8 +270,7 @@ IxResponsiveDataView<MyItem>(
     // Fetch next batch of items and append to list
     await fetchMoreItems();
   },
-  // ...
-)
+);
 ```
 
 ### Sorting
@@ -130,48 +278,99 @@ IxResponsiveDataView<MyItem>(
 Enable sorting by setting `enableSorting: true` and providing `sortKey` in `IxColumnDef`. You can also set the initial sort state using `initialSortKey` and `initialSortAscending`.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget sortableDataView({
+  required List<MyItem> items,
+  required ValueChanged<IxSortSpec> onSortChanged,
+}) => IxResponsiveDataView<MyItem>(
   items: items,
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
   enableSorting: true,
   initialSortKey: 'name', // Initial sort column
   initialSortAscending: true, // Initial sort direction
-  onSortChanged: (IxSortSpec sortSpec) {
-    // Perform sorting logic here based on sortSpec.key and sortSpec.ascending
-    // e.g. items.sort(...) or fetchSortedData(...)
-  },
-  desktopColumns: [
-    IxColumnDef(
-      label: 'Name',
-      sortKey: 'name', // Key passed to onSortChanged
-      cellBuilder: (context, item) => Text(item.name),
-    ),
-    // ...
-  ],
-  // ...
-)
+  onSortChanged: onSortChanged,
+);
 ```
 
 ### Search / Filtering
 
-The widget provides a built-in search status bar and empty state handling for search results.
+The widget provides a built-in search *status* bar (a "Filtered by" chip,
+a results count and an optional clear button) and empty state handling for
+search results -- but it never renders an editable search field itself, and
+never filters `items` itself either. The full contract is:
+
+*   `searchQuery` -- the current query. Passing a non-empty value shows the
+    status bar (when `showSearchStatusBar` is true) and switches the empty
+    state to its "No results" variant once `items` is empty.
+*   `onClearSearch` -- called when the status bar's clear button is
+    pressed. Wire it to reset your own query state (and clear your own
+    field's text).
+*   `onSearchChangedRequestResetPagination` -- called once for every
+    `searchQuery` change, when `searchAffectsPagination` is true (the
+    default). Reset your pagination/paged-fetch state from here if you
+    don't already do so at the same call site that updates the query.
+*   The actual editable field, and the filtering of `items` against the
+    query, are entirely yours -- most apps already own a `TextField` for
+    this (search bars are commonly shared chrome, not specific to one data
+    view) and feed its value into `searchQuery`:
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget searchableDataView({
+  required List<MyItem> filteredItems,
+  required String currentSearchQuery,
+  required VoidCallback onClearSearch,
+  required VoidCallback onResetPagination,
+}) => IxResponsiveDataView<MyItem>(
   items: filteredItems,
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
   searchQuery: currentSearchQuery, // The current search string
-  onClearSearch: () {
-    // Clear the search query in your state
-    setState(() => currentSearchQuery = '');
-  },
+  onClearSearch: onClearSearch,
   // Optional: Customize the "No results" text
   noResultsTextBuilder: (query) => 'No items found for "$query"',
-  // Optional: Reset pagination when search changes (if handled internally)
+  // Optional: Reset pagination when the search changes
   searchAffectsPagination: true,
-  onSearchChangedRequestResetPagination: () {
-     // Reset to page 1
-  },
-  // ...
-)
+  onSearchChangedRequestResetPagination: onResetPagination,
+);
+```
+
+#### Wiring your own search field
+
+`searchHintText` is `@Deprecated`: it looks like it should hand a hint to a
+built-in field, but no such field has ever existed to render it (true
+already in 1.0.2). Build the field yourself, feed its `onChanged` into
+whatever updates `currentSearchQuery` above, and hand your hint text to the
+field's own `InputDecoration` instead:
+
+```dart
+Widget searchFieldAndDataView({
+  required List<MyItem> filteredItems,
+  required String currentSearchQuery,
+  required ValueChanged<String> onSearchChanged,
+  required VoidCallback onClearSearch,
+  required VoidCallback onResetPagination,
+}) => Column(
+  children: [
+    TextField(
+      decoration: const InputDecoration(hintText: 'Search items...'),
+      onChanged: onSearchChanged,
+    ),
+    Expanded(
+      child: IxResponsiveDataView<MyItem>(
+        items: filteredItems,
+        desktopColumns: demoColumns(),
+        mobileFields: demoMobileFields(),
+        rowActions: demoRowActions(),
+        searchQuery: currentSearchQuery,
+        onClearSearch: onClearSearch,
+        searchAffectsPagination: true,
+        onSearchChangedRequestResetPagination: onResetPagination,
+      ),
+    ),
+  ],
+);
 ```
 
 ### Custom Mobile Card
@@ -179,17 +378,19 @@ IxResponsiveDataView<MyItem>(
 By default, `IxResponsiveDataView` generates a card layout for mobile using `mobileFields`. You can override this by providing a `mobileItemBuilder`.
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget customMobileCard(List<MyItem> items) => IxResponsiveDataView<MyItem>(
   items: items,
-  desktopColumns: [...],
-  mobileFields: [], // Can be empty if mobileItemBuilder is used
+  desktopColumns: demoColumns(),
+  mobileFields: const [], // Can be empty if mobileItemBuilder is used
+  rowActions: demoRowActions(),
   mobileItemBuilder: (context, item) {
     return Card(
       child: ListTile(
         title: Text(item.name),
         subtitle: Text(item.status),
         trailing: IconButton(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
+          tooltip: 'Actions',
           onPressed: () {
             // Show actions
           },
@@ -197,8 +398,7 @@ IxResponsiveDataView<MyItem>(
       ),
     );
   },
-  // ...
-)
+);
 ```
 
 ### Localization
@@ -208,15 +408,16 @@ All user-visible strings in the widget can be localized. You can provide a `IxRe
 #### 1. Per-widget Override
 
 ```dart
-IxResponsiveDataView<MyItem>(
+Widget dataViewWithStrings(List<MyItem> items) => IxResponsiveDataView<MyItem>(
   items: items,
-  strings: IxResponsiveDataViewStrings(
+  desktopColumns: demoColumns(),
+  mobileFields: demoMobileFields(),
+  rowActions: demoRowActions(),
+  strings: const IxResponsiveDataViewStrings(
     emptyTitle: 'No data found',
     toolsColumnHeader: 'Actions',
-    // ... other strings
   ),
-  // ...
-)
+);
 ```
 
 #### 2. Context-based Resolver (Recommended)
@@ -224,19 +425,21 @@ IxResponsiveDataView<MyItem>(
 This approach allows you to integrate with `AppLocalizations` or any other localization solution.
 
 ```dart
-IxResponsiveDataView<MyItem>(
-  items: items,
-  stringsResolver: (context) {
-    // Example: Fetch from AppLocalizations
-    // final l10n = AppLocalizations.of(context);
-    return IxResponsiveDataViewStrings(
-      emptyTitle: 'Localized Empty Title', // l10n.emptyTitle
-      pageOfBuilder: (page, total) => 'Page $page / $total',
-      // ... map other strings
+Widget dataViewWithStringsResolver(List<MyItem> items) =>
+    IxResponsiveDataView<MyItem>(
+      items: items,
+      desktopColumns: demoColumns(),
+      mobileFields: demoMobileFields(),
+      rowActions: demoRowActions(),
+      stringsResolver: (context) {
+        // Example: fetch from AppLocalizations
+        // final l10n = AppLocalizations.of(context);
+        return IxResponsiveDataViewStrings(
+          emptyTitle: 'Localized Empty Title', // l10n.emptyTitle
+          pageOfBuilder: (page, total) => 'Page $page / $total',
+        );
+      },
     );
-  },
-  // ...
-)
 ```
 
 ## API Reference
@@ -250,6 +453,8 @@ IxResponsiveDataView<MyItem>(
 | `mobileFields` | `List<IxMobileFieldDef<T>>` | Configuration for card fields (Mobile). |
 | `mobileItemBuilder` | `Widget Function(BuildContext, T)?` | Optional custom builder for mobile items, overriding `mobileFields`. |
 | `rowActions` | `List<IxRowAction<T>>` | List of actions available for each item. |
+| `rowKey` | `String Function(T item)?` | Stable identifier for an item. Accepted, but not read by the current rendering; it is the hook the 2.0 primitives split (`IxTable`/`IxDataCard`) will key rows by. |
+| `onRowTapDesktop` | `void Function(T item)?` | Called when a table row is activated on desktop. A row is only focusable and keyboard-activatable when this is set. |
 | `isLoading` | `bool` | Whether the initial data is loading (shows full spinner). |
 | `isPageLoading` | `bool` | Whether the next page is loading (shows bottom spinner). |
 | `pagination` | `IxPaginationConfig?` | Configuration for pagination behavior. |
@@ -262,7 +467,7 @@ IxResponsiveDataView<MyItem>(
 | `initialSortAscending` | `bool` | The initial sort direction (default true). |
 | `searchQuery` | `String?` | The current search query to display in the status bar. |
 | `onClearSearch` | `VoidCallback?` | Callback when the "Clear search" button is clicked. |
-| `searchHintText` | `String?` | Hint text for the search field (if integrated). |
+| `searchHintText` | `String?` | **Deprecated.** Never rendered -- the widget has no built-in search field to apply a hint to (confirmed dead already in 1.0.2). Pass it to your own search input's `InputDecoration.hintText` instead; see [Search / Filtering](#search--filtering). Removed in 2.0. |
 | `showSearchStatusBar` | `bool` | Whether to show the search status bar (default true). |
 | `showSearchClearAction` | `bool` | Whether to show the clear action in the status bar (default true). |
 | `searchAffectsPagination` | `bool` | Whether search changes should trigger pagination reset callbacks (default true). |

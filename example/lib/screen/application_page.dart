@@ -36,8 +36,12 @@ class _ApplicationPageState extends State<ApplicationPage> {
       body: _DemoPageContent(activeEntryId: _activeEntryId),
       themeMode: themeMode,
       onThemeModeChanged: _handleThemeModeChanged,
-      onOpenSettings: _showSettingsOverlay,
-      onOpenAboutLegal: _showAboutDialog,
+      // Built-in bottom entries (1.1): the scaffold renders the Settings,
+      // Toggle theme and About entries itself and shows these widgets in a
+      // fly-out panel next to the menu. The reserved ids 'settings',
+      // 'theme-toggle' and 'about-legal' are no longer needed.
+      settings: const _SettingsPanel(),
+      about: const _AboutLegalPanel(),
     );
   }
 
@@ -90,28 +94,6 @@ class _ApplicationPageState extends State<ApplicationPage> {
         notificationCount: 12,
         selected: selectedId == 'alerts',
       ),
-      IxMenuEntry(
-        id: 'settings',
-        type: IxMenuEntryType.item,
-        icon: Icons.settings_outlined,
-        label: 'Settings',
-        isBottom: true,
-      ),
-      IxMenuEntry(
-        id: 'theme-toggle',
-        type: IxMenuEntryType.custom,
-        icon: Icons.brightness_6_outlined,
-        label: 'Theme',
-        tooltip: 'Switch between light, dark, and system',
-        isBottom: true,
-      ),
-      IxMenuEntry(
-        id: 'about-legal',
-        type: IxMenuEntryType.item,
-        icon: Icons.info_outline,
-        label: 'About & legal',
-        isBottom: true,
-      ),
     ];
   }
 
@@ -123,41 +105,43 @@ class _ApplicationPageState extends State<ApplicationPage> {
     ThemeControllerScope.of(context).setMode(mode);
     setState(() => _themeMode = mode);
   }
+}
 
-  void _showSettingsOverlay() {
-    showModalBottomSheet<void>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Settings', style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 12),
-              const Text(
-                'This is where settings or overlays would appear. You can place forms or quick toggles here while the current page remains visible.',
-              ),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Dismiss'),
-              ),
-            ],
-          ),
-        );
-      },
+/// Content of the built-in Settings fly-out panel.
+class _SettingsPanel extends StatelessWidget {
+  const _SettingsPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Text(
+        'This is where settings or overlays would appear. You can place forms or quick toggles here while the current page remains visible.',
+      ),
     );
   }
+}
 
-  void _showAboutDialog() {
-    showAboutDialog(
-      context: context,
-      applicationName: 'Operations hub',
-      applicationVersion: '1.0.0',
-      children: const [Text('IX Flutter design language demo for Flutter.')],
+/// Content of the built-in About & legal fly-out panel.
+class _AboutLegalPanel extends StatelessWidget {
+  const _AboutLegalPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Operations hub 1.0.0',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 8),
+          const Text('IX Flutter design language demo for Flutter.'),
+        ],
+      ),
     );
   }
 }

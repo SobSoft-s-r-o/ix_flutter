@@ -88,7 +88,7 @@ class IxDropdownButtonExampleIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return IxDropdownButton<String>(
       label: 'Dropdown with Icon',
-      icon: IxIcons.star,
+      icon: IxIcon(IxIconsData.star, size: IxIconSize.s16),
       items: const [
         IxDropdownMenuItem(
           label: 'Action 1',
@@ -155,13 +155,24 @@ class IxDropdownButtonExampleVariants extends StatelessWidget {
     return Wrap(
       spacing: 16,
       runSpacing: 16,
-      children: IxDropdownButtonVariant.values.map((variant) {
-        return IxDropdownButton<String>(
-          label: variant.name,
-          variant: variant,
-          items: const [IxDropdownMenuItem(label: 'Item', value: '1')],
-        );
-      }).toList(),
+      children:
+          const [
+            IxButtonVariant.primary,
+            IxButtonVariant.secondary,
+            IxButtonVariant.tertiary,
+            IxButtonVariant.subtlePrimary,
+            IxButtonVariant.subtleSecondary,
+            IxButtonVariant.subtleTertiary,
+            IxButtonVariant.dangerPrimary,
+            IxButtonVariant.dangerSecondary,
+            IxButtonVariant.dangerTertiary,
+          ].map((variant) {
+            return IxDropdownButton<String>(
+              label: variant.name,
+              buttonVariant: variant,
+              items: const [IxDropdownMenuItem(label: 'Item', value: '1')],
+            );
+          }).toList(),
     );
   }
 }

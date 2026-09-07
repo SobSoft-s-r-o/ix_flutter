@@ -1,3 +1,5 @@
+import 'ix_pagination_strings.dart';
+
 /// Holds all localizable strings for [IxResponsiveDataView] and its sub-components.
 class IxResponsiveDataViewStrings {
   const IxResponsiveDataViewStrings({
@@ -13,12 +15,17 @@ class IxResponsiveDataViewStrings {
     this.paginationNextTooltip = 'Next page',
     this.pageOfBuilder,
     this.pageBuilder,
-    this.rowsPerPageLabel = 'Items per page:',
+    this.rowsPerPageLabel = IxPaginationStrings.defaultRowsPerPage,
+    this.pageSelectionLabel = 'Page selection',
     this.totalItemsBuilder,
     this.resultsCountBuilder,
     this.detailsTitle = 'Details',
     this.actionsTitle = 'Actions',
     this.rowActionsTooltip = 'Actions',
+    this.sortHint = 'Sort',
+    this.sortedAscending = 'Sorted ascending',
+    this.sortedDescending = 'Sorted descending',
+    this.rowHint = 'Open row',
   });
 
   final String toolsColumnHeader;
@@ -33,12 +40,35 @@ class IxResponsiveDataViewStrings {
   final String paginationNextTooltip;
   final String Function(int page, int totalPages)? pageOfBuilder;
   final String Function(int page)? pageBuilder;
+
+  /// Label preceding the pagination bar's page-size selector, mapped onto
+  /// [IxPaginationStrings.rowsPerPage]. Defaults to
+  /// [IxPaginationStrings.defaultRowsPerPage] -- the single owner of that
+  /// default -- so this and a directly-constructed [IxPaginationStrings]
+  /// never drift apart.
   final String rowsPerPageLabel;
+
+  /// Accessible name of the pagination bar's page-size trigger, mapped onto
+  /// [IxPaginationStrings.pageSelection].
+  final String pageSelectionLabel;
   final String Function(int count)? totalItemsBuilder;
   final String Function(int count)? resultsCountBuilder;
   final String detailsTitle;
   final String actionsTitle;
   final String rowActionsTooltip;
+
+  /// Semantics hint on a sortable column header that is not currently
+  /// sorted (announced by screen readers, e.g. "Sort").
+  final String sortHint;
+
+  /// Semantics hint on a column header currently sorted ascending.
+  final String sortedAscending;
+
+  /// Semantics hint on a column header currently sorted descending.
+  final String sortedDescending;
+
+  /// Semantics hint on a mobile card, announcing what activating it does.
+  final String rowHint;
 
   /// English defaults
   factory IxResponsiveDataViewStrings.defaultsEn() {

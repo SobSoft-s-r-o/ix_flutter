@@ -17,9 +17,16 @@ class IxColorPalette {
     switch (family) {
       case IxThemeFamily.classic:
         return _classicPalette(variant);
+      // ignore: deprecated_member_use_from_same_package
       case IxThemeFamily.brand:
         // Brand palettes are proprietary and not bundled with the OSS build.
         // Consumers can supply a custom palette via IxThemeBuilder instead.
+        assert(() {
+          debugPrint(
+            'IxThemeFamily.brand is deprecated and resolves to classic',
+          );
+          return true;
+        }());
         return _classicPalette(variant);
       case IxThemeFamily.custom:
         // Custom relies on user-supplied palettes; fall back to classic when

@@ -14,6 +14,12 @@ Complete guide to get started with the ix_flutter component library.
 
 ## Installation
 
+### Prerequisites
+
+Flutter SDK 3.38 or later (Dart 3.10 or later). CI builds and tests
+against Flutter 3.44.6 (stable), the version this package is developed
+against.
+
 ### Step 1: Add Dependency
 
 Add `ix_flutter` to your `pubspec.yaml`:
@@ -22,7 +28,13 @@ Add `ix_flutter` to your `pubspec.yaml`:
 dependencies:
   flutter:
     sdk: flutter
-  ix_flutter: ^1.0.0  # Latest version
+  ix_flutter: ^1.1.0
+```
+
+Or add it with the Flutter CLI instead of editing `pubspec.yaml` by hand:
+
+```bash
+flutter pub add ix_flutter
 ```
 
 ### Step 2: Get Dependencies
@@ -44,25 +56,22 @@ flutter analyze
 
 ### Minimal App Setup
 
-Create your app with ix_flutter theming:
+Create your app with ix_flutter theming. `IxThemeBuilder.light()`/`.dark()` each
+build one `ThemeData`; `MaterialApp` picks between them:
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My ix_flutter App',
-      theme: IxTheme.lightTheme,
-      darkTheme: IxTheme.darkTheme,
+      theme: const IxThemeBuilder.light().build(),
+      darkTheme: const IxThemeBuilder.dark().build(),
       themeMode: ThemeMode.system,
       home: const HomePage(),
     );
@@ -70,15 +79,13 @@ class MyApp extends StatelessWidget {
 }
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Welcome')),
-      body: const Center(
-        child: Text('Hello from ix_flutter!'),
-      ),
+      body: const Center(child: Text('Hello from ix_flutter!')),
     );
   }
 }
@@ -88,22 +95,35 @@ class HomePage extends StatelessWidget {
 
 ## Icon Setup
 
-### Important: Icon Generation Required
+### Icons Work Out of the Box
 
-**⚠️ Icons are NOT bundled with this package.** You must generate them separately.
+`ix_flutter` widgets render their own icons without any setup (falling back to Material glyphs today — see [doc/ix_icons.md](doc/ix_icons.md#fallback-policy)). The steps below are only needed if your own code wants icons from the full 1 479-icon Siemens iX catalogue.
 
-### Step 1: Generate Icons
+### Step 1: Add the Generator
+
+```yaml
+dev_dependencies:
+  ix_icons_generator: ^1.1.0
+```
+
+Or:
 
 ```bash
-dart run ix_flutter:generate_icons
+dart pub add --dev ix_icons_generator
+```
+
+### Step 2: Generate Icons
+
+```bash
+dart run ix_icons_generator:generate_icons            # default: @siemens/ix-icons 3.5.0
 ```
 
 This command:
-- Downloads icons from the official Siemens source
-- Converts them to Flutter-compatible format
-- Generates an `ix_icons.dart` file in your app
+- Downloads the pinned `@siemens/ix-icons` release from the official npm package
+- Writes SVG assets into your assets directory (default `assets/svg/`)
+- Generates an `ix_icons.dart` file with `IxIconsData` constants in your app
 
-### Step 2: Verify Generation
+### Step 3: Verify Generation
 
 Check that `lib/ix_icons.dart` was created:
 
@@ -111,22 +131,29 @@ Check that `lib/ix_icons.dart` was created:
 ls lib/ix_icons.dart  # Should exist
 ```
 
-### Step 3: Use Icons in Your App
+### Step 4: Use Icons in Your App
 
 ```dart
-import 'package:your_app/ix_icons.dart';  // Generated file
-import 'package:flutter/material.dart';
+import 'package:ix_flutter/ix_flutter.dart';
+import 'package:your_app/ix_icons.dart';
 
 class MyIconWidget extends StatelessWidget {
+  const MyIconWidget({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return Icon(
-      IxIcons.home,
-      size: 24.0,
-    );
+    return const IxIcon(IxIconsData.home, size: IxIconSize.s24);
   }
 }
 ```
+
+`size:` is optional. An `IxIcon` sizes its box from the explicit `size:` if
+one is given, otherwise the ambient `IconTheme.size` (used exactly as given),
+otherwise 24px -- the same order Material's own `Icon` uses, so an `IxIcon`
+handed to a slot that styles its icon (`IxIconButton`, `TextButton.icon`,
+`InputDecoration.prefixIcon`) matches that slot. Pass `size:` when the icon
+should override the slot around it. See
+[doc/ix_icons.md](doc/ix_icons.md#sizing) for the full rule.
 
 ### Troubleshooting Icon Generation
 
@@ -134,23 +161,13 @@ class MyIconWidget extends StatelessWidget {
 ```bash
 # Make sure you're in the app directory
 cd my_app
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 ```
 
-**Problem**: Permission denied
+**Problem**: Generator fails to download icons
 ```bash
-# On Linux/Mac, you may need sudo
-sudo dart run ix_flutter:generate_icons
-```
-
-**Problem**: Icons not found
-```bash
-# Check if Node.js and npm are installed
-node --version
-npm --version
-
-# Verify npm package is available
-npm view @siemens/ix-icons
+# Check your internet connection and access to the npm registry
+curl -I https://registry.npmjs.org
 ```
 
 See [doc/ix_icons.md](doc/ix_icons.md) for more troubleshooting.
@@ -159,39 +176,32 @@ See [doc/ix_icons.md](doc/ix_icons.md) for more troubleshooting.
 
 ## Using Components
 
-### Example 1: Simple Dropdown
+### Example 1: Dropdown Button
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 class DropdownExample extends StatefulWidget {
+  const DropdownExample({super.key});
+
   @override
   State<DropdownExample> createState() => _DropdownExampleState();
 }
 
 class _DropdownExampleState extends State<DropdownExample> {
-  String? selectedOption = 'Option 1';
+  String selectedOption = 'Option 1';
 
   @override
   Widget build(BuildContext context) {
     return IxDropdownButton<String>(
-      value: selectedOption,
-      items: [
-        DropdownMenuItem(
-          value: 'Option 1',
-          child: Text('Option 1'),
-        ),
-        DropdownMenuItem(
-          value: 'Option 2',
-          child: Text('Option 2'),
-        ),
-        DropdownMenuItem(
-          value: 'Option 3',
-          child: Text('Option 3'),
-        ),
+      label: selectedOption,
+      items: const [
+        IxDropdownMenuItem(label: 'Option 1', value: 'Option 1'),
+        IxDropdownMenuItem(label: 'Option 2', value: 'Option 2'),
+        IxDropdownMenuItem(label: 'Option 3', value: 'Option 3'),
       ],
-      onChanged: (value) {
+      onItemSelected: (value) {
         setState(() => selectedOption = value);
       },
     );
@@ -199,34 +209,42 @@ class _DropdownExampleState extends State<DropdownExample> {
 }
 ```
 
+See [doc/ix_dropdown_button.md](doc/ix_dropdown_button.md) for placements,
+checked items and the keyboard model.
+
 ### Example 2: Toast Notifications
+
+Toasts are shown through an `IxToastService` and rendered by an
+`IxToastOverlay` in your `MaterialApp.builder` — see
+[doc/ix_toast.md](doc/ix_toast.md) for the full setup.
 
 ```dart
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 class ToastExample extends StatelessWidget {
+  const ToastExample({super.key, required this.toasts});
+
+  final IxToastService toasts;
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ElevatedButton(
+        FilledButton(
           onPressed: () {
-            IxToast.success(
-              context,
+            toasts.show(
+              type: IxToastType.success,
               message: 'Action completed successfully!',
             );
           },
-          child: Text('Show Success'),
+          child: const Text('Show Success'),
         ),
-        ElevatedButton(
+        FilledButton(
           onPressed: () {
-            IxToast.error(
-              context,
-              message: 'An error occurred!',
-            );
+            toasts.show(type: IxToastType.error, message: 'An error occurred!');
           },
-          child: Text('Show Error'),
+          child: const Text('Show Error'),
         ),
       ],
     );
@@ -241,17 +259,19 @@ import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 class EmptyListView extends StatelessWidget {
+  const EmptyListView({super.key, required this.onContinueShopping});
+
+  final VoidCallback onContinueShopping;
+
   @override
   Widget build(BuildContext context) {
     return IxEmptyState(
-      icon: Icons.shopping_cart_outlined,
+      icon: const Icon(Icons.shopping_cart_outlined, size: 32),
       title: 'Your cart is empty',
-      message: 'Add some items to get started',
-      action: ElevatedButton(
-        onPressed: () {
-          // Navigate to shop
-        },
-        child: Text('Continue Shopping'),
+      subtitle: 'Add some items to get started',
+      primaryAction: FilledButton(
+        onPressed: onContinueShopping,
+        child: const Text('Continue Shopping'),
       ),
     );
   }
@@ -260,173 +280,181 @@ class EmptyListView extends StatelessWidget {
 
 ### Example 4: Responsive Data View
 
+`IxResponsiveDataView` renders a table on wide screens and cards on narrow
+ones, from one set of definitions:
+
 ```dart
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-class DataTableExample extends StatelessWidget {
+/// One row of the data view example below.
+class Person {
+  const Person({required this.name, required this.email, required this.active});
+
+  final String name;
+  final String email;
+  final bool active;
+}
+
+class DataViewExample extends StatelessWidget {
+  const DataViewExample({super.key, required this.people});
+
+  final List<Person> people;
+
   @override
   Widget build(BuildContext context) {
-    return IxResponsiveDataView(
-      columns: [
-        DataColumn(label: Text('Name')),
-        DataColumn(label: Text('Email')),
-        DataColumn(label: Text('Status')),
+    return IxResponsiveDataView<Person>(
+      items: people,
+      desktopColumns: [
+        IxColumnDef(
+          label: 'Name',
+          cellBuilder: (context, person) => Text(person.name),
+        ),
+        IxColumnDef(
+          label: 'Email',
+          cellBuilder: (context, person) => Text(person.email),
+        ),
+        IxColumnDef(
+          label: 'Status',
+          cellBuilder: (context, person) =>
+              Text(person.active ? 'Active' : 'Inactive'),
+        ),
       ],
-      rows: [
-        DataRow(cells: [
-          DataCell(Text('John Doe')),
-          DataCell(Text('john@example.com')),
-          DataCell(
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.green,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Text('Active', style: TextStyle(color: Colors.white)),
-            ),
-          ),
-        ]),
+      mobileFields: [
+        IxMobileFieldDef(
+          label: 'Name',
+          valueBuilder: (context, person) => Text(person.name),
+        ),
+        IxMobileFieldDef(
+          label: 'Email',
+          valueBuilder: (context, person) => Text(person.email),
+        ),
       ],
+      rowActions: const [],
     );
   }
 }
 ```
+
+See [doc/ix_responsive_data_view.md](doc/ix_responsive_data_view.md) for
+sorting, pagination, search and localization.
 
 ---
 
 ## Theming
 
-### Light Theme
+### Light and Dark Themes
 
 ```dart
-MaterialApp(
-  theme: IxTheme.lightTheme,
-)
-```
-
-### Dark Theme
-
-```dart
-MaterialApp(
-  darkTheme: IxTheme.darkTheme,
-)
+(ThemeData light, ThemeData dark) buildThemes() =>
+    (const IxThemeBuilder.light().build(), const IxThemeBuilder.dark().build());
 ```
 
 ### System Theme (Auto Light/Dark)
 
 ```dart
-MaterialApp(
-  theme: IxTheme.lightTheme,
-  darkTheme: IxTheme.darkTheme,
-  themeMode: ThemeMode.system,  // Uses device setting
-)
+Widget systemThemedApp() => MaterialApp(
+  theme: const IxThemeBuilder.light().build(),
+  darkTheme: const IxThemeBuilder.dark().build(),
+  themeMode: ThemeMode.system, // Uses device setting
+  home: const HomePage(),
+);
 ```
+
+To change the theme at runtime (including `IxColorSchema.system`), use
+`IxThemeController` — see [doc/theming.md](doc/theming.md).
 
 ### Access Theme Colors
 
+Every built theme carries an `IxTheme` extension with the resolved palette:
+
 ```dart
-final themeData = Theme.of(context);
-final primaryColor = themeData.primaryColor;
-final textColor = themeData.textTheme.bodyMedium?.color;
+Color primaryToken(BuildContext context) {
+  final ixTheme = IxTheme.of(context);
+  return ixTheme.palette[IxThemeColorToken.primary]!;
+}
 ```
+
+The complete token list is in [doc/tokens.md](doc/tokens.md).
 
 ---
 
 ## Common Tasks
 
-### Task 1: Add Application Scaffold
+### Task 1: Add the Application Scaffold
 
 ```dart
-import 'package:ix_flutter/ix_flutter.dart';
+class MyAppShell extends StatelessWidget {
+  const MyAppShell({super.key, required this.onNavigate});
 
-class MyApp extends StatelessWidget {
+  final ValueChanged<String> onNavigate;
+
   @override
   Widget build(BuildContext context) {
     return IxApplicationScaffold(
-      title: 'My App',
-      child: Scaffold(
-        body: Center(
-          child: Text('Content here'),
+      appTitle: 'My App',
+      entries: const [
+        IxMenuEntry(
+          id: 'home',
+          label: 'Home',
+          icon: Icons.home,
+          type: IxMenuEntryType.item,
         ),
-      ),
+      ],
+      onNavigate: onNavigate,
+      body: const Center(child: Text('Content here')),
     );
   }
 }
 ```
+
+See [doc/ix_application_scaffold.md](doc/ix_application_scaffold.md) for
+categories, built-in settings/about panels and the theme toggle.
+
+The scaffold also dismisses the soft keyboard for you: a tap outside a focused
+text input releases it, and so does dragging any scroll view in the frame.
+Flutter does neither on a touch screen by default -- its tap-outside action
+only drops the focus on desktop, and dismissal on scroll is opt-in per scroll
+view (`ScrollView.keyboardDismissBehavior`, which defaults to `manual`) -- so a
+form under the scaffold behaves the way users expect without any per-field or
+per-list wiring. Pass `dismissKeyboardOnInteraction: false` to opt out, or wrap
+a screen that does not use the scaffold in `IxKeyboardDismissScope` to get the
+same behaviour there. See
+[Keyboard dismissal](doc/ix_application_scaffold.md#keyboard-dismissal).
 
 ### Task 2: Handle Navigation
 
 ```dart
-// Using breadcrumb navigation
-IxBreadcrumb(
-  items: [
-    BreadcrumbItem(label: 'Home', onTap: () => Navigator.pop(context)),
-    BreadcrumbItem(label: 'Settings', onTap: () {}),
+Widget breadcrumbNavigation(ValueChanged<String> go) => IxBreadcrumb(
+  items: const [
+    IxBreadcrumbItemData(
+      label: 'Home',
+      breadcrumbKey: '/',
+      icon: IxIcon.key(IxIconKey.home),
+    ),
+    IxBreadcrumbItemData(label: 'Settings', breadcrumbKey: '/settings'),
   ],
-)
+  onItemClick: (click) => go(click.breadcrumbKey),
+);
 ```
 
-### Task 3: Create a Form
-
-```dart
-class MyForm extends StatefulWidget {
-  @override
-  State<MyForm> createState() => _MyFormState();
-}
-
-class _MyFormState extends State<MyForm> {
-  String? selectedValue;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Form')),
-      body: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          children: [
-            IxDropdownButton<String>(
-              value: selectedValue,
-              items: [
-                DropdownMenuItem(value: 'opt1', child: Text('Option 1')),
-                DropdownMenuItem(value: 'opt2', child: Text('Option 2')),
-              ],
-              onChanged: (value) {
-                setState(() => selectedValue = value);
-              },
-            ),
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                IxToast.success(context, message: 'Form submitted!');
-              },
-              child: Text('Submit'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-```
-
-### Task 4: Display Loading State
+### Task 3: Display a Loading State
 
 ```dart
 class LoadingExample extends StatelessWidget {
+  const LoadingExample({super.key, required this.load});
+
+  final Future<void> Function() load;
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Future.delayed(Duration(seconds: 2)),
+    return FutureBuilder<void>(
+      future: load(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: IxSpinner());
         }
-        return Text('Data loaded!');
+        return const Text('Data loaded!');
       },
     );
   }
@@ -439,29 +467,30 @@ class LoadingExample extends StatelessWidget {
 
 ### Learn More
 
-1. **Check the Examples**: Browse [example/](example/) folder for complete working app
+1. **Check the Examples**: Browse [example/](example/) for a complete working app
 2. **Read Component Docs**: See [doc/](doc/) for detailed component documentation
 3. **API Reference**: Review [API_REFERENCE.md](API_REFERENCE.md)
 4. **Icon Guide**: Learn about icons in [doc/ix_icons.md](doc/ix_icons.md)
 
 ### Best Practices
 
-- ✅ Always generate icons before using them
-- ✅ Use appropriate theme colors from `IxTheme`
+- ✅ Only run the icon generator if you need the full iX icon catalogue
+- ✅ Build themes with `IxThemeBuilder`, and switch them with `IxThemeController`
+- ✅ Read colors from `IxTheme.of(context).palette` instead of hard-coding them
 - ✅ Follow Siemens iX design guidelines
-- ✅ Test on multiple screen sizes
-- ✅ Use responsive components for mobile
+- ✅ Test on multiple screen sizes and with a large text scale
+- ✅ Wrap the app in `IxDensityScope` so hit areas follow the input modality
 
 ### Resources
 
 - **Siemens iX**: https://ix.siemens.io
-- **Icon Library**: https://ix.siemens.io/docs/icon-library/
-- **Design Guidelines**: https://ix.siemens.io/docs/guidelines/
+- **Icon Library**: https://ix.siemens.io/docs/icons/icon-library
+- **Design Guidelines**: https://ix.siemens.io/docs/guidelines/overview
 - **Example App**: [example/](example/)
 
 ### Get Help
 
-- 📖 **Documentation**: Check [doc/](doc/) folder
+- 📖 **Documentation**: Check the [doc/](doc/) folder
 - 🐛 **Report Issues**: [GitHub Issues](https://github.com/SobSoft-s-r-o/ix_flutter/issues)
 - 💬 **Ask Questions**: [GitHub Discussions](https://github.com/SobSoft-s-r-o/ix_flutter/discussions)
 - 📝 **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -470,5 +499,5 @@ class LoadingExample extends StatelessWidget {
 
 **Happy coding with ix_flutter!** 🚀
 
-**Last Updated**: January 2026
-**Version**: 1.0.0
+Version history is in
+[packages/ix_flutter/CHANGELOG.md](packages/ix_flutter/CHANGELOG.md).

@@ -1,0 +1,17 @@
+# Links the link checker must not fail on. Each line is a regular expression
+# matched against the URL.
+
+# The generated Dart API reference only exists once 1.1.0 is published.
+https://pub.dev/documentation/ix_flutter/latest/
+
+# The wiki is a one-way sync target; it may not exist yet.
+https://github.com/SobSoft-s-r-o/ix_flutter/wiki
+
+# npmjs.com answers 403 to non-browser clients; the package itself is verified
+# through the registry API instead (see UPSTREAM.md for its checksum).
+https://www.npmjs.com/
+
+# This repository's own `blob/main` URLs (the package README and the notices
+# link absolutely, because they ship to pub.dev where relative links do not
+# resolve) are not ignored: CI remaps them onto the checkout with lychee's
+# `--remap`, so they are checked against the branch under test.

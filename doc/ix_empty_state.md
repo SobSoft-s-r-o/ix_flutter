@@ -20,15 +20,15 @@ The default layout is `IxEmptyStateLayout.large`, which centers the content vert
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
-IxEmptyState(
-  icon: IxIcons.add,
+Widget largeEmptyState(VoidCallback onCreate) => IxEmptyState(
+  icon: const IxIcon.key(IxIconKey.document),
   title: 'No elements available',
   subtitle: 'Create an element first',
   primaryAction: FilledButton(
-    onPressed: () {},
+    onPressed: onCreate,
     child: const Text('Create element'),
   ),
-)
+);
 ```
 
 ### Compact Layout
@@ -36,16 +36,16 @@ IxEmptyState(
 Use `IxEmptyStateLayout.compact` for a horizontal layout suitable for smaller spaces or lists.
 
 ```dart
-IxEmptyState(
+Widget compactEmptyState(VoidCallback onClearSearch) => IxEmptyState(
   layout: IxEmptyStateLayout.compact,
-  icon: IxIcons.search,
+  icon: const IxIcon.key(IxIconKey.search),
   title: 'No results found',
   subtitle: 'Try adjusting your search terms',
   primaryAction: FilledButton(
-    onPressed: () {},
+    onPressed: onClearSearch,
     child: const Text('Clear search'),
   ),
-)
+);
 ```
 
 ### Error State
@@ -53,16 +53,13 @@ IxEmptyState(
 You can specify the semantic type using `IxEmptyStateType`. While visually similar in the current version, this ensures semantic correctness.
 
 ```dart
-IxEmptyState(
+Widget errorEmptyState(VoidCallback onRetry) => IxEmptyState(
   type: IxEmptyStateType.error,
-  icon: IxIcons.error,
+  icon: const IxIcon.key(IxIconKey.error),
   title: 'Something went wrong',
   subtitle: 'Please try again later',
-  primaryAction: FilledButton(
-    onPressed: () {},
-    child: const Text('Retry'),
-  ),
-)
+  primaryAction: FilledButton(onPressed: onRetry, child: const Text('Retry')),
+);
 ```
 
 ## Properties

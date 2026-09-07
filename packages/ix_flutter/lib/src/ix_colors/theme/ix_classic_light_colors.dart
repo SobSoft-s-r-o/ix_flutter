@@ -287,7 +287,7 @@ class IxClassicLightColors {
   static const Color neutralContrast = Color(0xFFffffff);
 
   /// CSS Variable: --theme-color-neutral--hover
-  static const Color neutralHover = Color(0xFF66727e);
+  static const Color neutralHover = Color(0xFF5b6671);
 
   /// CSS Variable: --theme-color-neutral-40
   static const Color neutral40 = Color(0x6666727e);
@@ -513,5 +513,4 @@ class IxClassicLightColors {
     IxThemeColorToken.weakText: weakText,
     IxThemeColorToken.xWeakBdr: xWeakBdr,
   };
-
 }

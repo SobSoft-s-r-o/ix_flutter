@@ -5,6 +5,15 @@ import 'package:ix_flutter/src/ix_colors/ix_theme_color_tokens.dart';
 import 'package:ix_flutter/src/ix_core/ix_common_geometry.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 
+// This class's own `fromPalette`/`fallback` factories, `copyWith` and
+// `lerp` all still populate and read `dropdownBackground`/
+// `dropdownBorderRadius` below (so an explicit override keeps taking
+// effect at the one remaining read site, in `IxBreadcrumb`'s overflow
+// menu, until both fields are removed in 2.0), so the same-package
+// deprecation notice is suppressed file-wide instead of at each site
+// individually (mirrors `ix_button_theme.dart`).
+// ignore_for_file: deprecated_member_use_from_same_package
+
 /// Theme extension that exposes Siemens IX breadcrumb metrics and tokens.
 class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
   const IxBreadcrumbTheme({
@@ -110,11 +119,33 @@ class IxBreadcrumbTheme extends ThemeExtension<IxBreadcrumbTheme> {
   final Color separatorColor;
   final Color iconColor;
   final FontWeight ellipsisFontWeight;
+
+  /// Background of the overflow/next-items popup surface.
+  ///
+  /// The overflow menu still reads this field directly; `IxDropdownTheme`
+  /// already styles the rest of the popup (item height, padding, etc.) and
+  /// takes over this field too once it is removed.
+  @Deprecated(
+    'The overflow menu still reads this field directly; IxDropdownTheme '
+    'already styles the rest of the popup (item height, etc.). Removed in '
+    '2.0.',
+  )
   final Color dropdownBackground;
   final TextStyle dropdownTextStyle;
   final double dropdownElevation;
   final Color focusOutlineColor;
   final EdgeInsets dropdownPadding;
+
+  /// Corner radius of the overflow/next-items popup surface.
+  ///
+  /// The overflow menu still reads this field directly; `IxDropdownTheme`
+  /// already styles the rest of the popup (item height, padding, etc.) and
+  /// takes over this field too once it is removed.
+  @Deprecated(
+    'The overflow menu still reads this field directly; IxDropdownTheme '
+    'already styles the rest of the popup (item height, etc.). Removed in '
+    '2.0.',
+  )
   final BorderRadius dropdownBorderRadius;
 
   @override

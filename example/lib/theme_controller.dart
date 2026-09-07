@@ -2,18 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
 
 /// Drives IX Flutter theme configuration for the demo application.
+///
+/// The theme itself lives in [IxThemeController] (theme name, color schema,
+/// light/dark `ThemeData`); this wrapper only adds the demo-only "theme
+/// family" switch, which needs a fresh controller whenever the custom palette
+/// is switched on or off.
 class ThemeController extends ChangeNotifier {
-  IxThemeFamily _family = IxThemeFamily.classic;
-  ThemeMode _mode = ThemeMode.light;
+  ThemeController() {
+    _ix = _createController(IxColorSchema.light);
+  }
 
-  static final IxCustomPalette _demoPalette = IxCustomPalette.override(
-    lightOverrides: {
+  static final IxCustomPalette _demoPalette = IxCustomPalette.partial(
+    light: {
       IxThemeColorToken.primary: const Color(0xFF0050F5),
       IxThemeColorToken.dynamic: const Color(0xFF00B59B),
       IxThemeColorToken.color1: const Color(0xFFFAF5FF),
       IxThemeColorToken.color3: const Color(0xFFE8DFF6),
     },
-    darkOverrides: {
+    dark: {
       IxThemeColorToken.primary: const Color(0xFF82A0FF),
       IxThemeColorToken.dynamic: const Color(0xFF4FE0C2),
       IxThemeColorToken.color1: const Color(0xFF090B14),
@@ -21,35 +27,51 @@ class ThemeController extends ChangeNotifier {
     },
   );
 
+  late IxThemeController _ix;
+  IxThemeFamily _family = IxThemeFamily.classic;
+
   IxThemeFamily get family => _family;
-  ThemeMode get mode => _mode;
+  ThemeMode get mode => _ix.themeMode;
+
+  /// The light theme for the current family.
+  ThemeData get light => _ix.light;
+
+  /// The dark theme for the current family.
+  ThemeData get dark => _ix.dark;
 
   void setFamily(IxThemeFamily value) {
     if (value == _family) {
       return;
     }
     _family = value;
+    final colorSchema = _ix.colorSchema;
+    _disposeController();
+    _ix = _createController(colorSchema);
     notifyListeners();
   }
 
-  void setMode(ThemeMode value) {
-    if (value == _mode) {
-      return;
-    }
-    _mode = value;
-    notifyListeners();
-  }
+  void setMode(ThemeMode value) => _ix.setColorSchema(switch (value) {
+    ThemeMode.light => IxColorSchema.light,
+    ThemeMode.dark => IxColorSchema.dark,
+    ThemeMode.system => IxColorSchema.system,
+  });
 
-  ThemeData buildTheme(ThemeMode target) {
-    final builder = IxThemeBuilder(
-      family: _family,
-      mode: target,
-      systemBrightness: target == ThemeMode.dark
-          ? Brightness.dark
-          : Brightness.light,
+  IxThemeController _createController(IxColorSchema colorSchema) {
+    return IxThemeController(
+      colorSchema: colorSchema,
       customPalette: _family == IxThemeFamily.custom ? _demoPalette : null,
-    );
-    return builder.build();
+    )..addListener(notifyListeners);
+  }
+
+  void _disposeController() {
+    _ix.removeListener(notifyListeners);
+    _ix.dispose();
+  }
+
+  @override
+  void dispose() {
+    _disposeController();
+    super.dispose();
   }
 }
 

@@ -2,10 +2,13 @@
 
 ## Supported Versions
 
-| Version | Supported          | Notes                                    |
-| ------- | ------------------ | ---------------------------------------- |
-| 1.0.0   | ✅ Yes             | Current stable release                   |
-| < 1.0.0 | ❌ No              | Legacy preview builds                    |
+| Version | Supported | Notes                                          |
+| ------- | --------- | ---------------------------------------------- |
+| 1.x     | ✅ Yes    | Current stable line; fixes ship in a new 1.x    |
+| < 1.0.0 | ❌ No     | Legacy preview builds                          |
+
+Only the latest published 1.x release is patched; see
+[packages/ix_flutter/CHANGELOG.md](packages/ix_flutter/CHANGELOG.md).
 
 ## Reporting a Vulnerability
 
@@ -28,23 +31,31 @@ If you discover a security vulnerability in ix_flutter, please **do not** open a
 ### Icon Files
 
 - Icons are downloaded from the official [@siemens/ix-icons](https://www.npmjs.com/package/@siemens/ix-icons) npm package
-- The icon generator verifies source integrity
+- The pinned version, tag, commit and tarball checksum of `@siemens/ix-icons`
+  are recorded in [UPSTREAM.md](UPSTREAM.md) and enforced in CI by
+  `dart run tool/upstream_check.dart` (from `packages/ix_flutter`)
 - Always use the official generator tool
 - Keep the tool updated for security patches
 
 ### Dependencies
 
-This package uses the following dependencies:
+`ix_flutter` (the runtime dependency of your app) has exactly one direct
+third-party dependency:
 
-- **flutter_svg**: SVG rendering for Flutter
-- **http**: HTTP client for downloading icons
-- **path**: Path manipulation utilities
-- **args**: Command-line argument parsing
-- **recase**: String case conversion
-- **archive**: Archive extraction
-- **yaml**: YAML file parsing
+- **flutter_svg**: SVG rendering, used by `IxIcon`
 
-All dependencies are regularly updated for security fixes. Please keep your pubspec.yaml updated.
+`ix_icons_generator` is a **dev** dependency -- it runs at development time
+only and none of its dependencies ship in your app:
+
+- **http**: HTTP client for downloading the icon package
+- **path**: path manipulation utilities
+- **args**: command-line argument parsing
+- **recase**: string case conversion
+- **archive**: tarball extraction
+- **crypto**: sha1 verification of the downloaded tarball
+
+All dependencies are regularly updated for security fixes. Please keep your
+`pubspec.yaml` updated.
 
 ### Best Practices
 
@@ -67,7 +78,7 @@ When using ix_flutter:
    ```
 
 4. **Run Icon Generation Safely**
-   - Only run `dart run ix_flutter:generate_icons` on trusted machines
+   - Only run `dart run ix_icons_generator:generate_icons` on trusted machines
    - The generator downloads icons from official npm source
    - Verify icon files before use in production
 
@@ -79,8 +90,8 @@ Currently, there are no known security issues. If you discover one, please repor
 
 When a security vulnerability is identified and fixed:
 
-1. A patch version is released (e.g., 0.0.2)
-2. Security advisory is published
+1. A patch version is released (e.g. 1.1.1)
+2. A security advisory is published
 3. CHANGELOG.md is updated
 4. Release notes highlight the security fix
 
@@ -92,7 +103,7 @@ Users are encouraged to update immediately when security updates are available.
 
 - **Source**: https://ix.siemens.io
 - **Icons**: https://www.npmjs.com/package/@siemens/ix-icons
-- **Licensing**: See [ICON_LICENSING.md](ICON_LICENSING.md)
+- **Licensing**: See [ICON_LICENSING.md](packages/ix_flutter/ICON_LICENSING.md)
 
 The Siemens iX Design System is maintained by Siemens AG. Security considerations for icons should follow Siemens guidelines.
 
@@ -121,7 +132,4 @@ For security-related questions, please contact the maintainers privately rather 
 
 ---
 
-**Last Updated**: January 2026
-**Version**: 1.0
-
-Remember: Security is a shared responsibility. Please report vulnerabilities responsibly!
+Remember: security is a shared responsibility. Please report vulnerabilities responsibly!

@@ -43,10 +43,9 @@ jobs:
         with:
           channel: ${{ env.FLUTTER_VERSION }}
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
+      # No `dart-lang/setup-dart` here: `subosito/flutter-action` above puts
+      # the Flutter SDK's own `dart` on PATH, which runs `dart pub get`,
+      # `dart pub global activate cider` and cider itself.
 
       - name: Cache pub
         uses: actions/cache@v4
@@ -89,20 +88,22 @@ jobs:
         working-directory: packages/ix_flutter
         run: |
           if [ -n "${{ inputs.preid }}" ]; then
-            dart pub global run cider version ${{ inputs.bump }} --preid ${{ inputs.preid }}
+            dart pub global run cider bump ${{ inputs.bump }} --pre=${{ inputs.preid }}
           else
-            dart pub global run cider version ${{ inputs.bump }}
+            dart pub global run cider bump ${{ inputs.bump }}
           fi
+          dart pub global run cider release
 
       - name: Bump ix_icons_generator version
         if: inputs.package == 'ix_icons_generator' || inputs.package == 'both'
         working-directory: packages/ix_icons_generator
         run: |
           if [ -n "${{ inputs.preid }}" ]; then
-            dart pub global run cider version ${{ inputs.bump }} --preid ${{ inputs.preid }}
+            dart pub global run cider bump ${{ inputs.bump }} --pre=${{ inputs.preid }}
           else
-            dart pub global run cider version ${{ inputs.bump }}
+            dart pub global run cider bump ${{ inputs.bump }}
           fi
+          dart pub global run cider release
 
       - name: Capture ix_flutter version
         if: inputs.package == 'ix_flutter' || inputs.package == 'both'
@@ -134,5 +135,7 @@ jobs:
             **ix_icons_generator**: ${{ steps.ix_icons_generator_version.outputs.version || 'not bumped' }}
           add-paths: |
             packages/ix_flutter/pubspec.yaml
+            packages/ix_flutter/CHANGELOG.md
             packages/ix_icons_generator/pubspec.yaml
+            packages/ix_icons_generator/CHANGELOG.md
           labels: release

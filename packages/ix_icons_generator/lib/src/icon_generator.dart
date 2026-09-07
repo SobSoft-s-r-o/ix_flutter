@@ -4,14 +4,20 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:recase/recase.dart';
 import 'package:archive/archive.dart';
+import 'package:crypto/crypto.dart';
 
 /// Icon generator for Siemens iX Design System icons.
 ///
-/// Downloads icons from the official npm package and generates
-/// Flutter-compatible icon widgets.
+/// Downloads icons from the official npm package and generates an
+/// `IxIconsData` catalogue of `IxIconData` constants for `ix_flutter`'s
+/// `IxIcon` widget. The generated code never imports `flutter_svg`.
 class IconGenerator {
   static const _packageName = '@siemens/ix-icons';
-  static const _packageVersion = '3.2.0';
+
+  /// Version of `@siemens/ix-icons` downloaded when no other version is
+  /// requested.
+  static const String defaultIconsVersion = '3.5.0';
+
   static const _npmRegistryUrl = 'https://registry.npmjs.org';
 
   /// Generates icon assets and Dart code from the Siemens iX icons npm package.
@@ -20,11 +26,17 @@ class IconGenerator {
   /// [assetsDir] - Directory where SVG assets will be copied
   /// [flutterPackageName] - Optional package name for cross-package asset loading
   /// [client] - Optional HTTP client for testing
+  /// [iconsVersion] - Version of `@siemens/ix-icons` to download
+  /// [legacyGetters] - Also emit the deprecated `IxIcons` widget getters
+  /// [format] - Run `dart format` on the generated file (best effort)
   static Future<void> generateIcons({
     required String outputDir,
     required String assetsDir,
     String? flutterPackageName,
     http.Client? client,
+    String iconsVersion = defaultIconsVersion,
+    bool legacyGetters = true,
+    bool format = true,
   }) async {
     final httpClient = client ?? http.Client();
 
@@ -54,8 +66,11 @@ class IconGenerator {
       }
 
       // Download and extract the npm package
-      print('Downloading package $_packageName@$_packageVersion...');
-      final tempDir = await _downloadAndExtractPackage(httpClient);
+      print('Downloading package $_packageName@$iconsVersion...');
+      final (tempDir, shasum) = await _downloadAndExtractPackage(
+        httpClient,
+        iconsVersion,
+      );
 
       try {
         // Find the SVG directory in the extracted package
@@ -72,30 +87,37 @@ class IconGenerator {
         await _clearExistingSvgAssets(assetsDir);
 
         // Process all SVG files
-        final iconClassBuffer = StringBuffer();
-        iconClassBuffer.writeln('// GENERATED FILE - DO NOT EDIT');
-        iconClassBuffer.writeln("import 'package:flutter/widgets.dart';");
-        iconClassBuffer.writeln(
-          "import 'package:flutter_svg/flutter_svg.dart';",
+        final dataClassBuffer = StringBuffer();
+        dataClassBuffer.writeln('// GENERATED FILE - DO NOT EDIT');
+        dataClassBuffer.writeln(
+          '// $_packageName $iconsVersion (tarball sha1 ${shasum ?? 'unknown'})',
         );
-        iconClassBuffer.writeln('');
-        iconClassBuffer.writeln('/// Siemens iX Design System Icons');
-        iconClassBuffer.writeln('class IxIcons {');
-        iconClassBuffer.writeln('  IxIcons._();');
-        iconClassBuffer.writeln('');
-        if (flutterPackageName != null) {
-          iconClassBuffer.writeln(
-            "  static const _assetPackage = '$flutterPackageName';",
-          );
-        } else {
-          iconClassBuffer.writeln(
-            "  static const String? _assetPackage = null;",
-          );
+        if (legacyGetters) {
+          dataClassBuffer.writeln("import 'package:flutter/widgets.dart';");
         }
-        iconClassBuffer.writeln('');
+        dataClassBuffer.writeln("import 'package:ix_flutter/ix_flutter.dart';");
+        dataClassBuffer.writeln('');
+        dataClassBuffer.writeln(
+          '/// Siemens iX icon catalogue as [IxIconData].',
+        );
+        dataClassBuffer.writeln('class IxIconsData {');
+        dataClassBuffer.writeln('  IxIconsData._();');
+        dataClassBuffer.writeln('');
+
+        // Deprecated widget getters, only emitted when [legacyGetters] is set.
+        final legacyClassBuffer = StringBuffer();
+        legacyClassBuffer.writeln(
+          '/// Deprecated widget getters (removed in ix_flutter 2.0 / generator 2.0).',
+        );
+        legacyClassBuffer.writeln('class IxIcons {');
+        legacyClassBuffer.writeln('  IxIcons._();');
+        legacyClassBuffer.writeln('');
 
         var generatedCount = 0;
         final svgFiles = await _getSvgFiles(svgDir);
+        // Identifier -> the file it was derived from, so a collision names
+        // both sides instead of writing a class that does not compile.
+        final claimedNames = <String, String>{};
 
         print('Found ${svgFiles.length} SVG files');
 
@@ -109,23 +131,41 @@ class IconGenerator {
           }
 
           // Clean SVG content to allow proper coloring
-          svgContent = _cleanSvgContent(svgContent);
+          svgContent = cleanSvgContent(svgContent);
 
           // Copy cleaned SVG to assets directory
           final assetFile = File(path.join(assetsDir, fileName));
           await assetFile.writeAsString(svgContent);
 
-          // Generate icon constant
-          final iconName = ReCase(
+          // Generate icon data constant
+          final iconName = dartIdentifierFor(
             path.basenameWithoutExtension(fileName),
-          ).camelCase;
-          iconClassBuffer.writeln("  /// Icon: $fileName");
-          iconClassBuffer.writeln(
-            "  static Widget get $iconName => const _IxIconWidget(",
           );
-          iconClassBuffer.writeln("    '$relativeAssetsPath/$fileName',");
-          iconClassBuffer.writeln('  );');
-          iconClassBuffer.writeln('');
+          final claimedBy = claimedNames[iconName];
+          if (claimedBy != null) {
+            throw Exception(
+              'Duplicate icon identifier "$iconName": both "$claimedBy" and '
+              '"$fileName" map to it. Rename one of the source icons or '
+              'exclude it before generating.',
+            );
+          }
+          claimedNames[iconName] = fileName;
+          final packageArgument = flutterPackageName != null
+              ? ", package: '$flutterPackageName'"
+              : '';
+          dataClassBuffer.writeln(
+            "  static const IxIconData $iconName = "
+            "IxIconData.asset('$relativeAssetsPath/$fileName'$packageArgument);",
+          );
+
+          if (legacyGetters) {
+            legacyClassBuffer.writeln(
+              "  @Deprecated('Use IxIcon(IxIconsData.$iconName)')",
+            );
+            legacyClassBuffer.writeln(
+              '  static Widget get $iconName => const IxIcon(IxIconsData.$iconName);',
+            );
+          }
           generatedCount++;
         }
 
@@ -133,38 +173,20 @@ class IconGenerator {
           throw Exception('No valid SVG icons could be generated.');
         }
 
-        iconClassBuffer.writeln('}');
-        iconClassBuffer.writeln('');
-        iconClassBuffer.writeln(
-          'class _IxIconWidget extends StatelessWidget {',
-        );
-        iconClassBuffer.writeln('  const _IxIconWidget(this.assetPath);');
-        iconClassBuffer.writeln('');
-        iconClassBuffer.writeln('  final String assetPath;');
-        iconClassBuffer.writeln('');
-        iconClassBuffer.writeln('  @override');
-        iconClassBuffer.writeln('  Widget build(BuildContext context) {');
-        iconClassBuffer.writeln('    final iconTheme = IconTheme.of(context);');
-        iconClassBuffer.writeln(
-          '    final resolvedSize = iconTheme.size ?? 24;',
-        );
-        iconClassBuffer.writeln('    final resolvedColor = iconTheme.color;');
-        iconClassBuffer.writeln('');
-        iconClassBuffer.writeln('    return SvgPicture.asset(');
-        iconClassBuffer.writeln('      assetPath,');
-        iconClassBuffer.writeln('      width: resolvedSize,');
-        iconClassBuffer.writeln('      height: resolvedSize,');
-        iconClassBuffer.writeln('      package: IxIcons._assetPackage,');
-        iconClassBuffer.writeln('      colorFilter: resolvedColor == null');
-        iconClassBuffer.writeln('          ? null');
-        iconClassBuffer.writeln(
-          '          : ColorFilter.mode(resolvedColor, BlendMode.srcIn),',
-        );
-        iconClassBuffer.writeln('    );');
-        iconClassBuffer.writeln('  }');
-        iconClassBuffer.writeln('}');
+        dataClassBuffer.writeln('}');
+        legacyClassBuffer.writeln('}');
+
+        final outputBuffer = StringBuffer(dataClassBuffer.toString());
+        if (legacyGetters) {
+          outputBuffer.writeln('');
+          outputBuffer.write(legacyClassBuffer.toString());
+        }
+
         final outputFile = File(path.join(outputDir, 'ix_icons.dart'));
-        await outputFile.writeAsString(iconClassBuffer.toString());
+        await outputFile.writeAsString(outputBuffer.toString());
+        if (format) {
+          await _formatGeneratedFile(outputFile);
+        }
 
         print('Generated $generatedCount icons');
         print('Output file: ${outputFile.path}');
@@ -180,9 +202,15 @@ class IconGenerator {
     }
   }
 
-  /// Download the npm package and extract it to a temporary directory
-  static Future<Directory> _downloadAndExtractPackage(
+  /// Download the npm package [iconsVersion] and extract it to a temporary
+  /// directory.
+  ///
+  /// Returns the temporary directory together with the tarball's sha1 checksum
+  /// as published in the registry metadata (`dist.shasum`), or `null` when the
+  /// registry does not report one.
+  static Future<(Directory tempDir, String? shasum)> _downloadAndExtractPackage(
     http.Client client,
+    String iconsVersion,
   ) async {
     // Get package metadata from npm registry
     final metadataUrl = '$_npmRegistryUrl/$_packageName';
@@ -200,16 +228,16 @@ class IconGenerator {
 
     // Navigate to the specific version
     final versions = packageData['versions'] as Map<String, dynamic>?;
-    if (versions == null || !versions.containsKey(_packageVersion)) {
+    if (versions == null || !versions.containsKey(iconsVersion)) {
       // List available versions for debugging
       final availableVersions = versions?.keys.toList() ?? [];
       print(
         'Available versions: ${availableVersions.take(10).join(", ")}${availableVersions.length > 10 ? "..." : ""}',
       );
-      throw Exception('Version $_packageVersion not found in package metadata');
+      throw Exception('Version $iconsVersion not found in package metadata');
     }
 
-    final versionData = versions[_packageVersion] as Map<String, dynamic>;
+    final versionData = versions[iconsVersion] as Map<String, dynamic>;
     final dist = versionData['dist'] as Map<String, dynamic>?;
 
     if (dist == null || !dist.containsKey('tarball')) {
@@ -217,6 +245,7 @@ class IconGenerator {
     }
 
     final tarballUrl = dist['tarball'] as String;
+    final shasum = dist['shasum'] as String?;
     print('Downloading tarball from $tarballUrl');
 
     // Download the tarball
@@ -229,60 +258,184 @@ class IconGenerator {
 
     print('Downloaded ${tarballResponse.bodyBytes.length} bytes');
 
+    // Verify the download against the registry's own checksum before a
+    // single byte of it is written to disk or quoted in generated code.
+    // npm still publishes the legacy sha1 `dist.shasum` for every version;
+    // when the registry omits it there is nothing to check against and the
+    // generated header says so ("tarball sha1 unknown").
+    if (shasum != null) {
+      final actual = sha1.convert(tarballResponse.bodyBytes).toString();
+      if (actual != shasum) {
+        throw Exception(
+          'Tarball sha1 mismatch for $_packageName@$iconsVersion: the '
+          'registry declares $shasum but the downloaded bytes hash to '
+          '$actual. Refusing to extract.',
+        );
+      }
+      print('Verified tarball sha1 $actual');
+    } else {
+      print('Registry published no dist.shasum; skipping checksum check');
+    }
+
     // Create temporary directory
     final tempDir = await Directory.systemTemp.createTemp('ix_icons_');
 
-    // Extract the tarball
+    // Extract the tarball. A rejected entry aborts the whole extraction, so
+    // the half-written directory has to go with it - otherwise every refused
+    // archive leaves a stray `ix_icons_*` tree in the system temp directory.
     print('Extracting package to ${tempDir.path}');
-    final archive = TarDecoder().decodeBytes(
-      GZipDecoder().decodeBytes(tarballResponse.bodyBytes),
-    );
+    try {
+      final archive = TarDecoder().decodeBytes(
+        GZipDecoder().decodeBytes(tarballResponse.bodyBytes),
+      );
 
-    for (final file in archive) {
-      final filename = path.join(tempDir.path, file.name);
-      if (file.isFile) {
-        final outputFile = File(filename);
-        await outputFile.create(recursive: true);
-        await outputFile.writeAsBytes(file.content as List<int>);
-      } else {
-        await Directory(filename).create(recursive: true);
+      for (final file in archive) {
+        // A tar entry names its own output path, so a hostile or corrupt
+        // archive can point it outside the extraction directory
+        // ("zip slip", e.g. `../../.ssh/authorized_keys`). Resolve the entry
+        // against tempDir and refuse anything that does not stay inside it.
+        final filename = path.normalize(path.join(tempDir.path, file.name));
+        if (!path.isWithin(tempDir.path, filename)) {
+          throw Exception(
+            'Refusing to extract "${file.name}": it escapes the extraction '
+            'directory ${tempDir.path}.',
+          );
+        }
+        // Symlinks are never needed for an icon package and are the second
+        // half of the same attack (a link is followed by later entries
+        // written "through" it), so drop them instead of materialising them.
+        if (file.isSymbolicLink) {
+          print('Skipping symbolic link ${file.name}');
+          continue;
+        }
+        if (file.isFile) {
+          final outputFile = File(filename);
+          await outputFile.create(recursive: true);
+          await outputFile.writeAsBytes(file.content as List<int>);
+        } else {
+          await Directory(filename).create(recursive: true);
+        }
       }
+    } catch (_) {
+      if (await tempDir.exists()) {
+        await tempDir.delete(recursive: true);
+      }
+      rethrow;
     }
 
     print('Extraction complete');
-    return tempDir;
+    return (tempDir, shasum);
   }
 
-  /// Clean SVG content to allow proper rendering and coloring
-  static String _cleanSvgContent(String svgContent) {
-    var cleaned = svgContent;
+  /// Dart's reserved words, which may never be used as an identifier.
+  ///
+  /// Built-in identifiers (`export`, `import`, `library`, `extension`, …) are
+  /// deliberately absent: they are only restricted as type names and are
+  /// perfectly legal member names, so icons called `export.svg` or
+  /// `library.svg` keep the name they have always had.
+  static const _dartReservedWords = {
+    'assert', 'break', 'case', 'catch', 'class', 'const', 'continue',
+    'default', 'do', 'else', 'enum', 'extends', 'false', 'final', 'finally',
+    'for', 'if', 'in', 'is', 'new', 'null', 'rethrow', 'return', 'super',
+    'switch', 'this', 'throw', 'true', 'try', 'var', 'void', 'while', 'with',
+    // A static member may not repeat a name every class inherits from Object.
+    'hashCode', 'noSuchMethod', 'runtimeType', 'toString',
+  };
 
-    // Remove fill="white" or fill="#ffffff" or fill="#fff" (case insensitive)
-    // Using \x27 for single quote and \x22 for double quote in raw strings
-    cleaned = cleaned.replaceAll(
-      RegExp(
-        r'fill\s*=\s*[\x22\x27]#?(?:fff(?:fff)?|white)[\x22\x27]',
-        caseSensitive: false,
-      ),
-      '',
-    );
+  /// Turns an icon file's base name into a Dart identifier that compiles.
+  ///
+  /// The name is camel-cased as before; on top of that a leading digit is
+  /// prefixed (`3d-view` -> `icon3dView`, since Dart identifiers may not start
+  /// with one), a reserved word gets a trailing underscore (`class` ->
+  /// `class_`), and anything that is left empty falls back to `icon`.
+  static String dartIdentifierFor(String fileBaseName) {
+    var name = ReCase(
+      fileBaseName,
+    ).camelCase.replaceAll(RegExp(r'[^A-Za-z0-9_$]'), '');
+    if (name.isEmpty) {
+      return 'icon';
+    }
+    if (RegExp(r'^[0-9]').hasMatch(name)) {
+      name = 'icon${name[0].toUpperCase()}${name.substring(1)}';
+    }
+    if (_dartReservedWords.contains(name)) {
+      name = '${name}_';
+    }
+    return name;
+  }
 
-    // Remove stroke="white" or stroke="#ffffff"
-    cleaned = cleaned.replaceAll(
-      RegExp(
-        r'stroke\s*=\s*[\x22\x27]#?(?:fff(?:fff)?|white)[\x22\x27]',
-        caseSensitive: false,
-      ),
-      '',
-    );
+  /// Runs `dart format` over [file], best effort.
+  ///
+  /// The generated catalogue lands in the host project's `lib/`, which CI
+  /// formatting checks usually cover, so the generator formats it rather than
+  /// leaving that to the caller. A missing or failing `dart` executable is
+  /// only reported - it never fails the generation.
+  static Future<void> _formatGeneratedFile(File file) async {
+    try {
+      final result = await Process.run('dart', ['format', file.path]);
+      if (result.exitCode != 0) {
+        print('Could not format ${file.path}: ${result.stderr}');
+      } else {
+        print('Formatted ${file.path}');
+      }
+    } on ProcessException catch (e) {
+      print('Could not run "dart format" (${e.message}); output left as is');
+    }
+  }
 
-    // Remove fill="none" to allow coloring
-    cleaned = cleaned.replaceAll(
-      RegExp(r'fill\s*=\s*[\x22\x27]none[\x22\x27]'),
-      '',
-    );
+  /// Element start tag: name plus its attribute list, quote-aware so that an
+  /// attribute value may legally contain `>`.
+  static final RegExp _startTag = RegExp(
+    r'<([a-zA-Z][\w:.-]*)((?:[^>\x22\x27]|\x22[^\x22]*\x22|\x27[^\x27]*\x27)*)>',
+  );
 
-    return cleaned;
+  /// A `fill="none"` (or `fill='none'`) attribute, tolerating whitespace and
+  /// never matching `fill-rule` / `fill-opacity`.
+  static final RegExp _fillNone = RegExp(
+    r'(?<![\w-])fill\s*=\s*[\x22\x27]none[\x22\x27]',
+  );
+
+  /// A `stroke` paint attribute whose value is not `none`.
+  static final RegExp _paintingStroke = RegExp(
+    r'(?<![\w-])stroke\s*=\s*[\x22\x27](?!none[\x22\x27])[^\x22\x27]+[\x22\x27]',
+  );
+
+  /// SVG elements that only group other elements; a `fill` on one of them is
+  /// inherited by its children and never paints anything itself.
+  static const _containerElements = {'svg', 'g', 'a', 'switch', 'symbol'};
+
+  /// Strips the `fill="none"` attributes that would otherwise make an icon
+  /// invisible.
+  ///
+  /// Upstream ships its icons for the web, where `icon.css`
+  /// (`svg [fill] { fill: currentColor !important }`) overrides every `fill`
+  /// at paint time. Flutter has no such stylesheet, so a `fill="none"` that
+  /// upstream never honours is taken literally and the icon compiles to zero
+  /// draw commands. `@siemens/ix-icons` 3.5.0 declares `fill="none"` on the
+  /// root `<svg>` of 891 of its 1479 icons whose `<path>`s carry no fill of
+  /// their own, and all of those would render blank.
+  ///
+  /// The attribute is removed from container elements (`<svg>`, `<g>`, …),
+  /// which cannot paint themselves, and from shapes that carry no stroke.
+  /// A shape that pairs `fill="none"` with a real `stroke` is a deliberate
+  /// outline and keeps its attribute. No other part of the SVG is modified.
+  static String cleanSvgContent(String svgContent) {
+    return svgContent.replaceAllMapped(_startTag, (match) {
+      final attributes = match.group(2)!;
+      if (!_fillNone.hasMatch(attributes)) {
+        return match.group(0)!;
+      }
+      final name = match.group(1)!;
+      if (!_containerElements.contains(name.toLowerCase()) &&
+          _paintingStroke.hasMatch(attributes)) {
+        return match.group(0)!;
+      }
+      final cleaned = attributes
+          .replaceAll(_fillNone, '')
+          .replaceAll(RegExp(r'\s+'), ' ')
+          .trimRight();
+      return '<$name$cleaned>';
+    });
   }
 
   /// Recursively get all SVG files from a directory

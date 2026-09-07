@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/src/ix_colors/ix_colors.dart';
 import 'package:ix_flutter/src/ix_core/ix_color_palette.dart';
+import 'package:ix_flutter/src/ix_core/ix_density.dart';
 import 'package:ix_flutter/src/ix_core/ix_typography.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_header_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_app_menu_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_badge_theme.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_button_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_card_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_bottom_sheet_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_checkbox_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_chip_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_breadcrumb_theme.dart';
+import 'package:ix_flutter/src/ix_theme/components/ix_dropdown_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_form_field_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_label_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_modal_theme.dart';
@@ -22,7 +25,10 @@ import 'package:ix_flutter/src/ix_theme/components/ix_spinner_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_toggle_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_tabs_theme.dart';
 import 'package:ix_flutter/src/ix_theme/components/ix_upload_theme.dart';
+import 'package:ix_flutter/src/ix_theme/ix_color_schema.dart';
 import 'package:ix_flutter/src/ix_theme/ix_custom_palette.dart';
+import 'package:ix_flutter/src/ix_theme/ix_theme_name.dart';
+import 'package:ix_flutter/src/ix_icons/ix_icon_resolver.dart';
 
 /// Builds `ThemeData` instances that comply with the Siemens IX color and type
 /// scale guidance.
@@ -34,8 +40,8 @@ import 'package:ix_flutter/src/ix_theme/ix_custom_palette.dart';
 ///
 /// ```dart
 /// void main() {
-///   final lightTheme = const IxThemeBuilder().build();
-///   final darkTheme = const IxThemeBuilder(mode: ThemeMode.dark).build();
+///   final lightTheme = const IxThemeBuilder.light().build();
+///   final darkTheme = const IxThemeBuilder.dark().build();
 ///
 ///   runApp(
 ///     MaterialApp(
@@ -46,23 +52,89 @@ import 'package:ix_flutter/src/ix_theme/ix_custom_palette.dart';
 ///   );
 /// }
 /// ```
+///
+/// Use `IxThemeController` instead when the app has to resolve
+/// [IxColorSchema.system] at runtime.
 class IxThemeBuilder {
+  /// Creates a builder for a single [ThemeData] variant.
+  ///
+  /// Set [theme] and [brightness] (or use [IxThemeBuilder.light] /
+  /// [IxThemeBuilder.dark]); [family], [mode] and [systemBrightness] are the
+  /// deprecated 1.x spelling of the same configuration and stay functional
+  /// until 2.0.
   const IxThemeBuilder({
+    @Deprecated(
+      'Use theme: IxThemeName; brand is a classic alias. Removed in 2.0.',
+    )
     this.family = IxThemeFamily.classic,
+    @Deprecated('Use brightness: or IxThemeController. Removed in 2.0.')
     this.mode = ThemeMode.system,
+    @Deprecated('Use IxThemeController for system resolution. Removed in 2.0.')
     this.systemBrightness = Brightness.light,
+    this.theme,
+    this.brightness,
     this.typography,
     this.customPalette,
+    this.icons,
+    this.density = IxDensity.adaptive,
   });
 
+  /// Creates a builder for the light variant of [theme].
+  const IxThemeBuilder.light({
+    IxThemeName theme = IxThemeName.classic,
+    IxTypography? typography,
+    IxCustomPalette? customPalette,
+    IxIconResolver? icons,
+    IxDensity density = IxDensity.adaptive,
+  }) : this(
+         theme: theme,
+         brightness: Brightness.light,
+         typography: typography,
+         customPalette: customPalette,
+         icons: icons,
+         density: density,
+       );
+
+  /// Creates a builder for the dark variant of [theme].
+  const IxThemeBuilder.dark({
+    IxThemeName theme = IxThemeName.classic,
+    IxTypography? typography,
+    IxCustomPalette? customPalette,
+    IxIconResolver? icons,
+    IxDensity density = IxDensity.adaptive,
+  }) : this(
+         theme: theme,
+         brightness: Brightness.dark,
+         typography: typography,
+         customPalette: customPalette,
+         icons: icons,
+         density: density,
+       );
+
   /// Siemens IX visual family (classic vs. custom overrides).
+  @Deprecated(
+    'Use theme: IxThemeName; brand is a classic alias. Removed in 2.0.',
+  )
   final IxThemeFamily family;
 
   /// Material theme mode to resolve light/dark variants.
+  @Deprecated('Use brightness: or IxThemeController. Removed in 2.0.')
   final ThemeMode mode;
 
   /// Platform brightness hint used when [mode] is [ThemeMode.system].
+  @Deprecated('Use IxThemeController for system resolution. Removed in 2.0.')
   final Brightness systemBrightness;
+
+  /// Siemens iX theme identity (upstream `data-ix-theme`).
+  ///
+  /// Defaults to [IxThemeName.classic]; the deprecated [family] fills it in
+  /// when it is unset.
+  final IxThemeName? theme;
+
+  /// Brightness of the built [ThemeData].
+  ///
+  /// Takes precedence over the deprecated [mode]/[systemBrightness] pair.
+  final Brightness? brightness;
 
   /// Optional override for the Siemens IX type scale.
   final IxTypography? typography;
@@ -70,24 +142,145 @@ class IxThemeBuilder {
   /// Optional custom palette that replaces the built-in family colors.
   final IxCustomPalette? customPalette;
 
+  /// Optional icon resolver registered as the [IxIconResolver] theme
+  /// extension. Defaults to [IxIconResolver.material] when unset.
+  final IxIconResolver? icons;
+
+  /// The adaptive density policy for interactive control hit areas.
+  ///
+  /// Defaults to [IxDensity.adaptive]. [build] always bakes a static
+  /// [IxDensity.comfortable] tap-target sizing into the returned
+  /// [ThemeData] when this is [IxDensity.adaptive] (a touch-safe default
+  /// with no [BuildContext] to resolve modality from); wrap the app in an
+  /// [IxDensityScope] to resolve [IxDensity.adaptive] live instead.
+  final IxDensity density;
+
+  /// Forgets that the [IxThemeFamily.brand] deprecation notice was already
+  /// printed, so a test that asserts on the one-time notice starts from a
+  /// clean slate. Call it from `addTearDown`.
+  @visibleForTesting
+  static void debugResetBrandNotice() {
+    _brandNoticeShown = false;
+  }
+
+  /// Whether the `brand` deprecation notice has already been printed. Static
+  /// so an app that builds many themes is told exactly once.
+  static bool _brandNoticeShown = false;
+
+  /// Reports the deprecated `brand` family once per process, in debug builds
+  /// only; a no-op for every other family and in release builds.
+  static void _warnBrandOnce(IxThemeFamily family) {
+    assert(() {
+      // ignore: deprecated_member_use_from_same_package
+      if (family == IxThemeFamily.brand && !_brandNoticeShown) {
+        _brandNoticeShown = true;
+        debugPrint(
+          'IxThemeBuilder: IxThemeFamily.brand is deprecated and resolves to '
+          'the classic palette -- the brand palette is not part of the '
+          'open-source build. Use theme: IxThemeName.classic, or supply your '
+          'own customPalette; IxThemeFamily.brand is removed in 2.0.',
+        );
+      }
+      return true;
+    }());
+  }
+
+  /// Forgets that the "custom family without customPalette" notice was
+  /// already printed, so a test that asserts on the one-time notice starts
+  /// from a clean slate. Call it from `addTearDown`.
+  @visibleForTesting
+  static void debugResetCustomPaletteNotice() {
+    _customPaletteNoticeShown = false;
+  }
+
+  /// Whether the "custom family without customPalette" notice has already
+  /// been printed. Static so an app that builds many themes is told exactly
+  /// once.
+  static bool _customPaletteNoticeShown = false;
+
+  /// Reports, once per process and in debug builds only, that the
+  /// deprecated `family: IxThemeFamily.custom` was given without a
+  /// [customPalette]. 1.0.2 fell back to the classic palette silently in
+  /// that case; this keeps the fallback (`custom` itself is not deprecated,
+  /// only the `family` parameter that spells it) but names the remedy
+  /// instead of asserting.
+  static void _warnCustomPaletteOnce(
+    IxThemeFamily family,
+    IxCustomPalette? customPalette,
+  ) {
+    assert(() {
+      // ignore: deprecated_member_use_from_same_package
+      if (family == IxThemeFamily.custom &&
+          customPalette == null &&
+          !_customPaletteNoticeShown) {
+        _customPaletteNoticeShown = true;
+        debugPrint(
+          'IxThemeBuilder: family: IxThemeFamily.custom was given without a '
+          'customPalette -- falling back to the classic palette, as 1.0.2 '
+          'did. Pass the palette the family promises, or drop family and '
+          'pass customPalette: alone.',
+        );
+      }
+      return true;
+    }());
+  }
+
   /// Returns [ThemeData] configured with Siemens IX global colors and fonts.
   ///
   /// The resulting theme exports both Material defaults (color scheme,
   /// typographic scale, component theme data) and custom Siemens IX extensions
   /// such as [IxTheme], [IxButtonTheme], and component-specific tokens.
   ThemeData build() {
-    final brightness = _resolveBrightness(mode, systemBrightness);
+    // ignore: deprecated_member_use_from_same_package
+    _warnBrandOnce(family);
+    // ignore: deprecated_member_use_from_same_package
+    _warnCustomPaletteOnce(family, customPalette);
+    final resolvedBrightness =
+        brightness ??
+        // ignore: deprecated_member_use_from_same_package
+        _resolveBrightness(mode, systemBrightness);
+    // `brand` is a deprecated alias of classic, so only `custom` carries a
+    // theme name of its own.
+    final resolvedTheme =
+        theme ??
+        // ignore: deprecated_member_use_from_same_package
+        (family == IxThemeFamily.custom
+            ? const IxThemeName('custom')
+            : IxThemeName.classic);
+    // `theme:`/`brightness:` are the new API; when either is given, stamp
+    // `IxTheme.family`/`.mode` from what was actually resolved instead of
+    // parroting back the deprecated fields' defaults (`classic`/`system`),
+    // which made every `IxThemeBuilder.dark()` report `mode ==
+    // ThemeMode.system`. A caller who only ever touches the deprecated
+    // `family:`/`mode:` pair keeps seeing exactly what it passed.
+    final usesNewApi = theme != null || brightness != null;
+    final stampedFamily = usesNewApi
+        ? (resolvedTheme == IxThemeName.classic
+              ? IxThemeFamily.classic
+              : IxThemeFamily.custom)
+        // ignore: deprecated_member_use_from_same_package
+        : family;
+    final stampedMode = usesNewApi
+        ? (resolvedBrightness == Brightness.dark
+              ? ThemeMode.dark
+              : ThemeMode.light)
+        // ignore: deprecated_member_use_from_same_package
+        : mode;
+    // Every bundled family resolves to the classic palette (`brand` is a
+    // deprecated alias, `custom` is served by `customPalette`), so the
+    // palette only depends on the resolved brightness.
     final Map<IxThemeColorToken, Color> palette = Map.unmodifiable(
-      customPalette?.resolve(brightness) ??
+      customPalette?.resolve(resolvedBrightness) ??
           IxColorPalette.resolve(
-            family: family,
-            mode: mode,
-            systemBrightness: systemBrightness,
+            family: IxThemeFamily.classic,
+            mode: resolvedBrightness == Brightness.dark
+                ? ThemeMode.dark
+                : ThemeMode.light,
           ),
     );
 
     final typeScale = typography ?? IxTypography();
-    final colorScheme = _buildColorScheme(palette, brightness);
+    final colorScheme = _buildColorScheme(palette, resolvedBrightness);
     final textTheme = _buildTextTheme(typeScale, palette);
     final buttonTheme = IxButtonTheme.fromPalette(
       palette: palette,
@@ -136,6 +329,10 @@ class IxThemeBuilder {
       palette: palette,
       typography: typeScale,
     );
+    final dropdownTheme = IxDropdownTheme.fromPalette(
+      palette: palette,
+      typography: typeScale,
+    );
     final formFieldTheme = IxFormFieldTheme.fromPalette(
       palette: palette,
       typography: typeScale,
@@ -146,18 +343,33 @@ class IxThemeBuilder {
       typography: typeScale,
     );
     final scrollbarTheme = IxScrollbarTheme.fromPalette(palette: palette);
+    // `IxBlindTheme.fromPalette` existed since the blind's own theme
+    // extension was introduced, but was never added below to `extensions:`
+    // -- every `IxBlind` therefore silently used `IxBlindTheme.fallback`'s
+    // generic Material-role approximation instead of the upstream-aligned
+    // per-variant colors this builds (manual-testing regression: dark
+    // `warning`/`success` rendered as the same unreadable cyan).
+    final blindTheme = IxBlindTheme.fromPalette(palette: palette);
     final ixThemeExtension = IxTheme(
-      family: family,
-      mode: mode,
-      brightness: brightness,
+      themeName: resolvedTheme,
+      // ignore: deprecated_member_use_from_same_package
+      family: stampedFamily,
+      // ignore: deprecated_member_use_from_same_package
+      mode: stampedMode,
+      brightness: resolvedBrightness,
       palette: palette,
       typography: typeScale,
+      density: density,
     );
+    final iconResolver = icons ?? IxIconResolver.material();
 
-    return ThemeData(
+    // NOTE: named `themeData`, not `theme` -- `theme` is a field of this
+    // class and a local of that name would shadow it for the whole method
+    // body (including the `resolvedTheme` line above).
+    final themeData = ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
-      brightness: brightness,
+      brightness: resolvedBrightness,
       scaffoldBackgroundColor: palette[IxThemeColorToken.color1],
       canvasColor: palette[IxThemeColorToken.color1],
       dialogTheme: DialogThemeData(
@@ -182,7 +394,11 @@ class IxThemeBuilder {
       ),
       cardColor: palette[IxThemeColorToken.color3],
       dividerColor: palette[IxThemeColorToken.softBdr],
-      focusColor: palette[IxThemeColorToken.focusBdr],
+      // Material's built-in focus overlay is an opaque tint; the visible
+      // focus affordance is the 1px `focusBdr` outline painted by
+      // IxFocusRing and the state-based borders on checkbox/radio/button
+      // instead (WCAG 2.4.7), so this stays transparent.
+      focusColor: Colors.transparent,
       hoverColor: palette[IxThemeColorToken.color1Hover],
       highlightColor: palette[IxThemeColorToken.component1Hover],
       splashColor: palette[IxThemeColorToken.component1],
@@ -196,9 +412,9 @@ class IxThemeBuilder {
       radioTheme: radioTheme.materialRadioTheme,
       sliderTheme: sliderTheme.materialSliderTheme,
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: spinnerTheme.style(IxSpinnerVariant.standard).indicatorColor,
+        color: spinnerTheme.style(IxSpinnerVariant.secondary).indicatorColor,
         circularTrackColor: spinnerTheme
-            .style(IxSpinnerVariant.standard)
+            .style(IxSpinnerVariant.secondary)
             .trackColor,
       ),
       switchTheme: toggleTheme.materialSwitchTheme,
@@ -225,10 +441,11 @@ class IxThemeBuilder {
       textTheme: textTheme,
       fontFamily: typeScale.fontFamily,
       visualDensity: VisualDensity.standard,
-      applyElevationOverlayColor: brightness == Brightness.dark,
+      applyElevationOverlayColor: resolvedBrightness == Brightness.dark,
       scrollbarTheme: scrollbarTheme.materialScrollbarTheme,
       extensions: [
         ixThemeExtension,
+        iconResolver,
         buttonTheme,
         appHeaderTheme,
         appMenuTheme,
@@ -249,7 +466,25 @@ class IxThemeBuilder {
         badgeTheme,
         scrollbarTheme,
         breadcrumbTheme,
+        dropdownTheme,
+        blindTheme,
       ],
+    );
+
+    // No BuildContext is available here, so `adaptive` cannot be resolved
+    // to a real input modality yet: bake in the platform default the way
+    // Material derives `materialTapTargetSize` itself -- `comfortable`
+    // (48x48 hit areas) on touch platforms, `compact` (hit area equals the
+    // visual size) on desktop and desktop browsers. `IxDensityScope`
+    // re-adapts this live once a BuildContext exists. `stampTheme: false`
+    // for `adaptive` leaves `IxTheme.density` as `adaptive` rather than the
+    // platform default just baked into the Material component themes, so
+    // `IxDensity.effectiveOf` still resolves it live when no
+    // `IxDensityScope` is present; an explicit density stamps verbatim.
+    return IxDensityAdapter.apply(
+      themeData,
+      density == IxDensity.adaptive ? IxDensity.resolvePlatform() : density,
+      stampTheme: density != IxDensity.adaptive,
     );
   }
 
@@ -258,18 +493,34 @@ class IxThemeBuilder {
   /// Useful when you want to flip between light/dark or supply a custom
   /// [IxTypography] while reusing the remaining configuration.
   IxThemeBuilder copyWith({
+    @Deprecated(
+      'Use theme: IxThemeName; brand is a classic alias. Removed in 2.0.',
+    )
     IxThemeFamily? family,
+    @Deprecated('Use brightness: or IxThemeController. Removed in 2.0.')
     ThemeMode? mode,
+    @Deprecated('Use IxThemeController for system resolution. Removed in 2.0.')
     Brightness? systemBrightness,
+    IxThemeName? theme,
+    Brightness? brightness,
     IxTypography? typography,
     IxCustomPalette? customPalette,
+    IxIconResolver? icons,
+    IxDensity? density,
   }) {
     return IxThemeBuilder(
+      // ignore: deprecated_member_use_from_same_package
       family: family ?? this.family,
+      // ignore: deprecated_member_use_from_same_package
       mode: mode ?? this.mode,
+      // ignore: deprecated_member_use_from_same_package
       systemBrightness: systemBrightness ?? this.systemBrightness,
+      theme: theme ?? this.theme,
+      brightness: brightness ?? this.brightness,
       typography: typography ?? this.typography,
       customPalette: customPalette ?? this.customPalette,
+      icons: icons ?? this.icons,
+      density: density ?? this.density,
     );
   }
 
@@ -366,19 +617,85 @@ TextTheme _buildTextTheme(
 /// Theme extension that surfaces Siemens IX tokens and typography helpers from
 /// the widget tree.
 class IxTheme extends ThemeExtension<IxTheme> {
+  /// Creates the Siemens iX theme extension.
+  ///
+  /// [colorSchema] is derived from [brightness] rather than taken as a
+  /// parameter -- the two can never disagree; the deprecated [family]/[mode]
+  /// pair stays required so that 1.x call sites keep compiling.
   const IxTheme({
+    this.themeName = IxThemeName.classic,
     required this.family,
     required this.mode,
     required this.brightness,
     required this.palette,
     required this.typography,
+    this.density = IxDensity.adaptive,
   });
 
+  /// Resolves the [IxTheme] registered on the closest [Theme], or `null` if
+  /// the [ThemeData] wasn't built by [IxThemeBuilder].
+  static IxTheme? maybeOf(BuildContext context) =>
+      Theme.of(context).extension<IxTheme>();
+
+  /// Resolves the [IxTheme] registered on the closest [Theme].
+  ///
+  /// Throws a [FlutterError] with guidance if the context's [Theme] was not
+  /// built by [IxThemeBuilder]; wrap the app with
+  /// `MaterialApp(theme: IxThemeBuilder(...).build())`.
+  static IxTheme of(BuildContext context) {
+    final theme = maybeOf(context);
+    if (theme == null) {
+      throw FlutterError.fromParts(<DiagnosticsNode>[
+        ErrorSummary(
+          'IxTheme.of() called with a context that does not contain an '
+          'IxThemeBuilder theme.',
+        ),
+        ErrorDescription(
+          'Build your ThemeData with IxThemeBuilder(...).build() and pass '
+          'it to MaterialApp(theme: ...).',
+        ),
+        context.describeElement('The context used was'),
+      ]);
+    }
+    return theme;
+  }
+
+  /// The Siemens iX theme identity this [ThemeData] was built for (upstream
+  /// `data-ix-theme`).
+  final IxThemeName themeName;
+
+  /// The color schema this [ThemeData] was built for, derived from
+  /// [brightness] -- the two can never disagree.
+  ///
+  /// Always [IxColorSchema.light] or [IxColorSchema.dark] -- a built theme
+  /// has a resolved appearance. [IxColorSchema.system] only exists as the
+  /// *configured* schema on `IxThemeController`.
+  IxColorSchema get colorSchema =>
+      brightness == Brightness.dark ? IxColorSchema.dark : IxColorSchema.light;
+
+  /// The visual family this theme was built for.
+  @Deprecated('Use themeName. Removed in 2.0.')
   final IxThemeFamily family;
+
+  /// The [ThemeMode] this theme was built for.
+  @Deprecated('Use colorSchema / brightness. Removed in 2.0.')
   final ThemeMode mode;
+
+  /// The resolved brightness of this theme.
   final Brightness brightness;
+
+  /// The resolved Siemens iX color palette, keyed by token.
   final Map<IxThemeColorToken, Color> palette;
+
+  /// The Siemens iX type scale in effect for this theme.
   final IxTypography typography;
+
+  /// The adaptive density policy in effect for this theme.
+  ///
+  /// Set from `IxThemeBuilder(density:)`. Read via [IxDensity.effectiveOf]
+  /// rather than directly: an ambient [IxDensityScope] always takes
+  /// precedence over this value.
+  final IxDensity density;
 
   /// Resolves a tokenized Siemens IX color.
   Color color(IxThemeColorToken token) => palette[token]!;
@@ -398,18 +715,25 @@ class IxTheme extends ThemeExtension<IxTheme> {
 
   @override
   IxTheme copyWith({
-    IxThemeFamily? family,
+    IxThemeName? themeName,
+    @Deprecated('Use themeName. Removed in 2.0.') IxThemeFamily? family,
+    @Deprecated('Use colorSchema / brightness. Removed in 2.0.')
     ThemeMode? mode,
     Brightness? brightness,
     Map<IxThemeColorToken, Color>? palette,
     IxTypography? typography,
+    IxDensity? density,
   }) {
     return IxTheme(
+      themeName: themeName ?? this.themeName,
+      // ignore: deprecated_member_use_from_same_package
       family: family ?? this.family,
+      // ignore: deprecated_member_use_from_same_package
       mode: mode ?? this.mode,
       brightness: brightness ?? this.brightness,
       palette: palette ?? this.palette,
       typography: typography ?? this.typography,
+      density: density ?? this.density,
     );
   }
 
@@ -427,11 +751,15 @@ class IxTheme extends ThemeExtension<IxTheme> {
     }
 
     return IxTheme(
+      themeName: t < 0.5 ? themeName : other.themeName,
+      // ignore: deprecated_member_use_from_same_package
       family: t < 0.5 ? family : other.family,
+      // ignore: deprecated_member_use_from_same_package
       mode: t < 0.5 ? mode : other.mode,
       brightness: t < 0.5 ? brightness : other.brightness,
       palette: Map.unmodifiable(blended),
       typography: t < 0.5 ? typography : other.typography,
+      density: t < 0.5 ? density : other.density,
     );
   }
 

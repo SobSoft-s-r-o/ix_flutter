@@ -6,14 +6,22 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  schedule: [{cron: '0 5 * * 1'}]
+
+# Read-only by default; no job here writes to the repository.
+permissions:
+  contents: read
 
 env:
-  FLUTTER_VERSION: stable
+  FLUTTER_VERSION: 3.44.6
+  FLUTTER_CHANNEL: stable
   PUB_CACHE: ~/.pub-cache
 
 jobs:
   lint_and_test_ix_flutter:
     name: ix_flutter ${{ matrix.task }}
+    # The weekly `schedule` trigger only exists for latest_stable_smoke.
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -28,7 +36,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
 
       - name: Cache pub
         uses: actions/cache@v4
@@ -59,6 +69,8 @@ jobs:
 
   lint_ix_icons_generator:
     name: ix_icons_generator analyze
+    # The weekly `schedule` trigger only exists for latest_stable_smoke.
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -86,9 +98,107 @@ jobs:
       - name: Run analyzer
         run: dart analyze
 
+      - name: Run tests
+        run: dart test
+
+  format:
+    name: dart format check
+    # The weekly `schedule` trigger only exists for latest_stable_smoke.
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - name: Format ix_flutter
+        working-directory: packages/ix_flutter
+        run: dart format --output=none --set-exit-if-changed lib test tool example
+      - name: Install ix_flutter dependencies
+        working-directory: packages/ix_flutter
+        run: flutter pub get
+      - name: Check upstream evidence
+        working-directory: packages/ix_flutter
+        run: dart run tool/upstream_check.dart
+      - run: tool/check_svg_imports.sh
+      - name: Format ix_icons_generator
+        working-directory: packages/ix_icons_generator
+        run: dart format --output=none --set-exit-if-changed lib bin test
+      - name: Format example
+        working-directory: example
+        run: dart format --output=none --set-exit-if-changed lib test
+
+  docs:
+    name: documentation
+    # The weekly `schedule` trigger only exists for latest_stable_smoke.
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Check documentation claims, names and versions
+        run: tool/check_docs.sh
+
+      - name: Compile documentation snippets
+        working-directory: doc/snippets
+        run: |
+          flutter pub get
+          flutter analyze
+
+      - name: Install ix_flutter dependencies
+        working-directory: packages/ix_flutter
+        run: flutter pub get
+
+      - name: Check the generated token table is up to date
+        working-directory: packages/ix_flutter
+        run: |
+          dart run tool/gen_token_table.dart
+          git diff --exit-code ../../doc/tokens.md
+
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          # The repository's own blob/main URLs are remapped onto this
+          # checkout, so a link to a page that only exists on this branch is
+          # still verified (and a link to a page that exists nowhere fails).
+          # Single quotes keep the shell from eating `$1`.
+          args: >-
+            --no-progress --exclude-path wiki --exclude-path docs --exclude-path build
+            --remap 'https://github\.com/SobSoft-s-r-o/ix_flutter/blob/main/(.*) file://${{ github.workspace }}/$1'
+            './**/*.md'
+          fail: true
+
+  example_analyze_test:
+    name: example analyze + test
+    # The weekly `schedule` trigger only exists for latest_stable_smoke.
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: example
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test
+
   example_web_build:
     name: Example web build
-    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator]
+    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator, format, example_analyze_test]
+    # The weekly `schedule` trigger only exists for latest_stable_smoke.
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -97,7 +207,9 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
 
       - name: Cache pub
         uses: actions/cache@v4
@@ -126,9 +238,10 @@ jobs:
 
   publish_dry_run:
     name: Publish dry run
-    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator, example_web_build]
+    needs: [lint_and_test_ix_flutter, lint_ix_icons_generator, format, example_analyze_test]
+    # The weekly `schedule` trigger only exists for latest_stable_smoke.
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -136,12 +249,13 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
 
-      - name: Set up Dart
-        uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
+      # No `dart-lang/setup-dart` here: `subosito/flutter-action` above puts
+      # the pinned Flutter SDK's own `dart` on PATH, and a standalone stable
+      # Dart would shadow it with a possibly newer version.
 
       - name: Cache pub
         uses: actions/cache@v4
@@ -155,6 +269,10 @@ jobs:
         working-directory: packages/ix_flutter
         run: flutter pub get
 
+      - name: Check screenshots
+        working-directory: packages/ix_flutter
+        run: dart run tool/check_screenshots.dart
+
       - name: Install ix_icons_generator dependencies
         working-directory: packages/ix_icons_generator
         run: dart pub get
@@ -166,3 +284,19 @@ jobs:
       - name: Validate ix_icons_generator package
         working-directory: packages/ix_icons_generator
         run: dart pub publish --dry-run
+
+  latest_stable_smoke:
+    name: latest stable smoke (scheduled)
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/ix_flutter
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test

@@ -1,18 +1,54 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import 'ix_toast_data.dart';
-import 'ix_toast_service.dart';
+import 'package:flutter/semantics.dart';
+import 'package:ix_flutter/src/ix_core/ix_motion.dart';
+
 import 'ix_toast.dart';
+import 'ix_toast_data.dart';
+import 'ix_toast_position.dart';
+import 'ix_toast_service.dart';
+import 'ix_toast_strings.dart';
 
 /// Overlay widget that renders the stack of active toasts.
+///
+/// Safe-area aware (upstream `toast-container.scss:25-33`); its content
+/// sits inside a [FocusTraversalGroup] using [ReadingOrderTraversalPolicy]
+/// so Tab visits every toast's controls in on-screen order.
 class IxToastOverlay extends StatefulWidget {
   const IxToastOverlay({
     super.key,
     required this.service,
+    @Deprecated('Use placement. Removed in 2.0.')
     this.position = Alignment.topRight,
+    this.placement = IxToastPosition.topRight,
+    this.strings = const IxToastStrings(),
+    this.width = 280,
   });
 
   final IxToastService service;
+
+  /// Superseded by [placement]. Kept, and still fully functional (both
+  /// axes honoured, exactly as before [placement] existed), for 1.x
+  /// callers -- when set to anything other than its own default
+  /// ([Alignment.topRight]), it takes precedence over [placement].
+  @Deprecated('Use placement. Removed in 2.0.')
   final Alignment position;
+
+  /// Which corner the toast stack anchors to (always right-edge; upstream
+  /// only defines a top/bottom axis).
+  ///
+  /// Defaults to [IxToastPosition.topRight] (1.x-compatible behaviour);
+  /// 2.0 changes this default to [IxToastPosition.bottomRight]. Ignored
+  /// when [position] is set to anything other than its own default.
+  final IxToastPosition placement;
+
+  /// Localizable chrome strings, forwarded to every [IxToast].
+  final IxToastStrings strings;
+
+  /// Target card width in logical pixels; shrinks to fit narrower
+  /// viewports instead of overflowing past a 16px screen margin.
+  final double width;
 
   @override
   State<IxToastOverlay> createState() => _IxToastOverlayState();
@@ -27,6 +63,34 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
     super.initState();
     widget.service.addListener(_onServiceChanged);
     _displayedToasts.addAll(widget.service.toasts);
+  }
+
+  @override
+  void didUpdateWidget(covariant IxToastOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.service == widget.service) {
+      return;
+    }
+    oldWidget.service.removeListener(_onServiceChanged);
+    widget.service.addListener(_onServiceChanged);
+
+    // A service identity swap is a rare reconfiguration, not a user-facing
+    // toast transition -- there's nothing worth animating here. Instantly
+    // clear whatever the old service had on screen and reseed with the new
+    // service's current toasts, keeping the AnimatedList's own item count
+    // in sync with _displayedToasts.
+    for (var i = _displayedToasts.length - 1; i >= 0; i--) {
+      final toast = _displayedToasts.removeAt(i);
+      _listKey.currentState?.removeItem(
+        i,
+        (context, animation) => _buildItem(toast, animation),
+        duration: Duration.zero,
+      );
+    }
+    _displayedToasts.addAll(widget.service.toasts);
+    for (var i = 0; i < _displayedToasts.length; i++) {
+      _listKey.currentState?.insertItem(i, duration: Duration.zero);
+    }
   }
 
   @override
@@ -46,7 +110,7 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
         _listKey.currentState?.removeItem(
           i,
           (context, animation) => _buildItem(removedItem, animation),
-          duration: const Duration(milliseconds: 300),
+          duration: IxMotion.of(context, IxMotion.medium),
         );
       }
     }
@@ -58,7 +122,24 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
         _displayedToasts.insert(i, toast);
         _listKey.currentState?.insertItem(
           i,
-          duration: const Duration(milliseconds: 300),
+          duration: IxMotion.of(context, IxMotion.medium),
+        );
+        // toast.tsx:231-238 -- announce new toasts imperatively too, so
+        // assistive technology picks the change up even where structural
+        // live-region diffing might not (a brand new subtree rather than a
+        // text update inside an existing node). Guards against a literal
+        // `null` in the announcement when there's no title.
+        //
+        // SemanticsService.announce(message, textDirection) -- the plain
+        // two-argument form -- is deprecated in this Flutter version
+        // ("incompatible with multiple windows"; verified via `flutter
+        // analyze`); sendAnnouncement is its View-scoped replacement.
+        SemanticsService.sendAnnouncement(
+          View.of(context),
+          toast.title == null
+              ? toast.message
+              : '${toast.title} ${toast.message}',
+          Directionality.of(context),
         );
       }
     }
@@ -76,41 +157,123 @@ class _IxToastOverlayState extends State<IxToastOverlay> {
         ),
         child: Padding(
           padding: const EdgeInsets.only(bottom: 16.0),
-          child: IxToast(
-            data: toast,
-            onDismiss: () => widget.service.dismiss(toast.id),
-            onEnter: () => widget.service.pauseTimer(toast.id),
-            onExit: () => widget.service.resumeTimer(toast.id),
+          // Rebuilt from the service so the card follows its paused state:
+          // `IxToastHandle.pause()` reaches the timer, not this widget, and
+          // the progress bar would otherwise keep draining through it.
+          // Only the card rebuilds, not the whole list.
+          child: ListenableBuilder(
+            listenable: widget.service,
+            builder: (context, _) => IxToast(
+              data: toast,
+              strings: widget.strings,
+              paused: widget.service.isPaused(toast.id),
+              onDismiss: () => widget.service.dismiss(toast.id),
+              onEnter: () => widget.service.pauseTimer(toast.id),
+              onExit: () => widget.service.resumeTimer(toast.id),
+            ),
           ),
         ),
       ),
     );
   }
 
+  /// Resolves the four [Positioned] edge offsets.
+  ///
+  /// [IxToastOverlay.position] (when set to anything other than its own
+  /// [Alignment.topRight] default) takes precedence and is honoured on
+  /// both axes exactly as it was before [IxToastOverlay.placement]
+  /// existed; otherwise [IxToastOverlay.placement] anchors the (always
+  /// right-edge) top/bottom corner.
+  ({double? top, double? bottom, double? left, double? right}) get _edges {
+    // ignore: deprecated_member_use_from_same_package
+    final legacyPosition = widget.position;
+    if (legacyPosition != Alignment.topRight) {
+      return (
+        top: legacyPosition.y == -1.0 ? 16 : null,
+        bottom: legacyPosition.y == 1.0 ? 16 : null,
+        left: legacyPosition.x == -1.0 ? 16 : null,
+        right: legacyPosition.x == 1.0 ? 16 : null,
+      );
+    }
+    final isTop = widget.placement == IxToastPosition.topRight;
+    return (
+      top: isTop ? 32 : null,
+      bottom: isTop ? null : 32,
+      left: null,
+      right: 16,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final layer = _buildLayer(context);
+
+    // Placed above the Navigator -- the documented placement, a `Stack` in
+    // `MaterialApp.builder` -- there is no Overlay in scope, and anything
+    // inside a toast that needs one throws instead of building: the close
+    // button's tooltip (Material's `Tooltip` resolves `Overlay.of` when it
+    // shows, on hover *or* focus, and the raised "No Overlay widget found"
+    // replaces the button with an `ErrorWidget`), a menu or a fly-out in a
+    // custom `IxToastData.action`, and so on. So the overlay brings its
+    // own, exactly like `IxApplicationScaffold` does for its fly-out
+    // (`ix_application_scaffold.dart`, `Overlay.maybeOf(context) == null`).
+    //
+    // It fills the host `Stack` -- `_RenderTheater` has no `hitTestSelf`
+    // and only hit-tests actual children, so the empty area around the
+    // toast column stays click-through -- which also keeps tooltips
+    // positioned against the whole viewport rather than against the 280px
+    // toast column. The lookup is LookupBoundary-aware, matching what
+    // `Tooltip` itself asks for, and its answer is stable for a given
+    // placement.
+    if (Overlay.maybeOf(context) == null) {
+      return Positioned.fill(
+        child: Overlay.wrap(child: Stack(children: [layer])),
+      );
+    }
+    return layer;
+  }
+
+  /// The toast stack itself, as a [Positioned] for the host [Stack].
+  Widget _buildLayer(BuildContext context) {
+    final screenSize = MediaQuery.sizeOf(context);
+    // A viewport narrower than the two 16px margins leaves a negative
+    // width, and `MediaQueryData()` (no size at all) reports `Size.zero` --
+    // both used to reach `SizedBox`/`ConstrainedBox` as an illegal
+    // constraint ("BoxConstraints has a negative minimum width"). A zero
+    // size means "unknown", so the toast keeps its own width there.
+    final hasSize = !screenSize.isEmpty;
+    final effectiveWidth = hasSize
+        ? math.max(0.0, math.min(widget.width, screenSize.width - 32))
+        : widget.width;
+    final edges = _edges;
+
     return Positioned(
-      top: widget.position.y == -1.0 ? 16 : null,
-      bottom: widget.position.y == 1.0 ? 16 : null,
-      left: widget.position.x == -1.0 ? 16 : null,
-      right: widget.position.x == 1.0 ? 16 : null,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: 360, // Slightly wider than toast to allow padding
-          maxHeight: MediaQuery.of(
-            context,
-          ).size.height, // Limit height to screen
-        ),
-        child: AnimatedList(
-          shrinkWrap: true,
-          key: _listKey,
-          initialItemCount: _displayedToasts.length,
-          itemBuilder: (context, index, animation) {
-            if (index >= _displayedToasts.length) {
-              return const SizedBox.shrink();
-            }
-            return _buildItem(_displayedToasts[index], animation);
-          },
+      top: edges.top,
+      bottom: edges.bottom,
+      left: edges.left,
+      right: edges.right,
+      child: SafeArea(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: hasSize ? screenSize.height : double.infinity,
+          ),
+          child: FocusTraversalGroup(
+            policy: ReadingOrderTraversalPolicy(),
+            child: SizedBox(
+              width: effectiveWidth,
+              child: AnimatedList(
+                shrinkWrap: true,
+                key: _listKey,
+                initialItemCount: _displayedToasts.length,
+                itemBuilder: (context, index, animation) {
+                  if (index >= _displayedToasts.length) {
+                    return const SizedBox.shrink();
+                  }
+                  return _buildItem(_displayedToasts[index], animation);
+                },
+              ),
+            ),
+          ),
         ),
       ),
     );

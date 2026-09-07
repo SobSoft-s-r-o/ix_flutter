@@ -44,7 +44,7 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 
 ### Prerequisites
 
-- Flutter SDK: >=3.10.0
+- Flutter SDK: >=3.38.0 (CI pins 3.44.6 stable)
 - Dart SDK: >=3.10.0
 - Git
 - A code editor (VS Code, Android Studio, etc.)
@@ -68,11 +68,14 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
    ```
 
 4. **Install dependencies**
+
+   The repository root has no `pubspec.yaml`; every command runs inside a
+   package.
+
    ```bash
-   flutter pub get
-   cd example
-   flutter pub get
-   cd ..
+   cd packages/ix_flutter && flutter pub get && cd ../..
+   cd packages/ix_icons_generator && dart pub get && cd ../..
+   cd example && flutter pub get && cd ..
    ```
 
 5. **Create a new branch**
@@ -85,34 +88,39 @@ Enhancement suggestions are tracked as GitHub issues. When creating an enhanceme
 #### Run Tests
 
 ```bash
-# Run all tests
+# The library suite
+cd packages/ix_flutter
 flutter test
+flutter test --coverage                          # with coverage
+flutter test test/ix_theme_color_tokens_test.dart # one file
 
-# Run tests with coverage
-flutter test --coverage
+# The generator suite
+cd ../ix_icons_generator && dart test
 
-# Run specific test file
-flutter test test/ix_theme_color_tokens_test.dart
+# The example suite
+cd ../../example && flutter test
 ```
 
 #### Static Analysis
 
 ```bash
-# Analyze the library
-flutter analyze lib/
-
-# Analyze the example
-flutter analyze example/lib/
+cd packages/ix_flutter && flutter analyze          # the library
+cd ../ix_icons_generator && dart analyze           # the generator
+cd ../../example && flutter analyze                # the example
+cd ../doc/snippets && flutter analyze              # the doc snippets
 ```
 
 #### Format Code
 
-```bash
-# Format Dart code
-dart format lib/ test/ example/lib/
+Same directories CI checks (see `.github/workflows/ci.yml`, job `format`):
 
-# Check formatting without modifying
-dart format --dry-run lib/ test/ example/lib/
+```bash
+cd packages/ix_flutter && dart format lib test tool example
+cd ../ix_icons_generator && dart format lib bin test
+cd ../../example && dart format lib test
+
+# Check formatting without modifying (what CI runs)
+dart format --output=none --set-exit-if-changed lib test
 ```
 
 #### Build Examples
@@ -130,13 +138,31 @@ flutter run -d chrome
 
 ```bash
 # Generate icons for development/testing
-dart run ix_flutter:generate_icons
+dart run ix_icons_generator:generate_icons
 
 # Generate with custom output path
-dart run ix_flutter:generate_icons --output lib/generated --assets assets/icons
+dart run ix_icons_generator:generate_icons --output lib/generated --assets assets/icons
 ```
 
 ## Style Guidelines
+
+### Language
+
+Everything committed to this repository -- source code comments and
+dartdoc, tests, documentation, commit messages, pull request descriptions,
+CI workflow comments, and tool scripts -- is written in English (see
+[CLAUDE.md](CLAUDE.md#language)). The only exception is translation/
+localization files (for example `*.arb`, `*.po`, or a `l10n/`/`translations/`
+directory), which carry the target language of the translation.
+`tool/check_docs.sh` runs in CI and fails the build if it finds a letter
+unique to the Slovak alphabet (see that script's `check_no_slovak` function
+for the exact set) in a `*.dart`, `*.md`, `*.sh`, `*.yml`/`*.yaml` or `*.txt`
+file, guarding against a regression of the Slovak comments that had crept
+into tests and tooling before this rule existed. The check is deliberately
+narrow to that one alphabet rather than every non-English language, so a
+deliberate, narrow use of another language elsewhere (for example a
+localization-override example, or a string exercising text rendering) is
+still subject to the general rule above and should be justified in review.
 
 ### Dart/Flutter Code Style
 
@@ -178,16 +204,46 @@ When you make changes, update the relevant documentation:
 
 1. **Component Documentation**: Update files in [doc/](doc/) folder
 2. **Main README**: Update [README.md](README.md) if adding features
-3. **Changelog**: Add entry to [CHANGELOG.md](CHANGELOG.md)
+3. **Changelog**: Add entry to [packages/ix_flutter/CHANGELOG.md](packages/ix_flutter/CHANGELOG.md)
 4. **Inline Comments**: Add/update code comments and doc strings
 
 ### Documentation Structure
 
 - **doc/**: Component-specific documentation
-- **README.md**: Main package documentation
-- **CHANGELOG.md**: Version history
-- **LICENSE**: License terms
-- **ICON_LICENSING.md**: Icon licensing specifics
+- **doc/snippets/**: the compiled sources of every Dart snippet in the
+  documentation (see below)
+- **doc/tokens.md**: generated color-token table -- never edit it by hand
+- **README.md**: repository overview
+- **packages/ix_flutter/README.md**: the README published to pub.dev
+- **packages/ix_flutter/CHANGELOG.md**: version history
+- **packages/ix_flutter/LICENSE**: license terms
+- **packages/ix_flutter/ICON_LICENSING.md**: icon licensing specifics
+
+### Code snippets in documentation
+
+Every ```dart block in the component pages (`doc/*.md`) and the hub documents
+(`README.md`, `packages/ix_flutter/README.md`, `GETTING_STARTED.md`, `FAQ.md`)
+is a verbatim copy of a declaration in [doc/snippets](doc/snippets), so a
+snippet can never drift away from the API it documents. Exempt are the test
+skeleton in this file and the before/after fragments in `ICON_MIGRATION.md`,
+whose "before" half deliberately shows code that no longer compiles.
+
+When you change a snippet:
+
+1. Edit the declaration in `doc/snippets/lib/<page>_snippets.dart`
+2. Run `cd doc/snippets && flutter pub get && flutter analyze`
+3. Copy the declaration into the matching block in the documentation page
+
+### Regenerating the token table
+
+`doc/tokens.md` is generated from the classic palettes:
+
+```bash
+cd packages/ix_flutter
+dart run tool/gen_token_table.dart
+```
+
+CI regenerates it and fails if the committed file differs.
 
 ## Testing Requirements
 
@@ -197,6 +253,22 @@ When you make changes, update the relevant documentation:
 - Maintain or improve overall test coverage
 - Test edge cases and error conditions
 - Include integration tests where appropriate
+
+### Repository test conventions
+
+- `pumpIx()` (`packages/ix_flutter/test/helpers/pump_ix.dart`) is the standard
+  wrapper: IxTheme, viewport, text scale, `disableAnimations: true`.
+- A test that mirrors a specific upstream `.ct.ts` test or scss/tsx source
+  cites it with `@Upstream('...')` (`test/helpers/upstream.dart`). Where no
+  direct counterpart exists (for example the width/text-scale and RTL
+  matrices), the file instead carries a doc comment above `void main()` naming
+  the finding ID and the task that resolves it.
+- A matrix case in `test/a11y`, `test/responsive` or `test/rtl` that documents
+  an unfixed finding is marked `skip: true` with a trailing
+  `// IXF-xxx - <plan/task>` comment naming it (`skip` is `bool?` in
+  `flutter_test`, not `String`), and the task that fixes the finding un-skips
+  it. No test is skipped today -- the whole suite runs.
+- Goldens: see `packages/ix_flutter/test/golden/README.md`.
 
 ### Test Guidelines
 
@@ -274,14 +346,176 @@ When working with icons or design patterns:
 - Discussion may occur before merging
 - Be patient and respectful during review
 
+## Versioning and compatibility
+
+We follow [Semantic Versioning](https://semver.org/):
+
+- **MAJOR**: Breaking changes
+- **MINOR**: New features (backwards compatible)
+- **PATCH**: Bug fixes and minor improvements
+
+Each release's own `packages/ix_flutter/CHANGELOG.md` entry calls out its
+breaking changes inline, in that release's `Changed`/`Removed`/`Deprecated`
+bullets. Historically:
+
+- **1.1.0** (upcoming, still under `[Unreleased]`): raises the minimum Flutter
+  SDK to 3.38.0; adds enum values that break an exhaustive `switch` in
+  consumer code (`IxSpinnerVariant.secondary`, `IxToastType.error`,
+  `IxTypographyVariant.buttonLabel`/`.caption`/`.textDefault`); changes
+  `IxBlind` from a `StatelessWidget` to a `StatefulWidget`; makes
+  `ThemeData.focusColor` transparent; bakes a platform-derived tap-target
+  density, so controls grow about 7px on touch platforms; makes `IxIcon.size`
+  nullable so an unsized icon follows the slot around it; and moves
+  `IxToastOverlay`'s default top offset from 16px to 32px. Several APIs are
+  deprecated but still work. The changelog's `Changed` and `Deprecated`
+  sections carry the per-API detail and the opt-outs
+- **1.0.2**: the icon generator's command moved from the `ix_flutter`
+  package prefix to its own `ix_icons_generator` package, which must be
+  added as a dev dependency -- see [ICON_MIGRATION.md](ICON_MIGRATION.md)
+  for the exact old and new commands
+- **1.0.1**, **1.0.0**, **0.0.1**: no breaking changes
+
+### Flutter & Dart compatibility
+
+Every published version so far has required the same minimum SDKs. The
+upcoming 1.1.0 raises the Flutter floor for the first time; the Dart floor is
+unchanged:
+
+| Version           | Flutter  | Dart     |
+| ----------------- | -------- | -------- |
+| 1.1.0 (upcoming)  | >=3.38.0 | >=3.10.0 |
+| 1.0.2             | >=3.10.0 | >=3.10.0 |
+| 1.0.1             | >=3.10.0 | >=3.10.0 |
+| 1.0.0             | >=3.10.0 | >=3.10.0 |
+| 0.0.1             | >=3.10.0 | >=3.10.0 |
+
+`SemanticsRole.*` and `SemanticsService.sendAnnouncement`, which 1.1.0's menu,
+toast, dropdown and data-view semantics are built on, are only available from
+Flutter 3.38 -- hence the floor. `pub` will not resolve 1.1.0 for an app on an
+older Flutter, which stays on 1.0.2.
+
+See [README.md#requirements](README.md#requirements) for the current
+requirement and [README.md#platform-support](README.md#platform-support) for
+the current supported-platform list (unchanged since 0.0.1).
+
+### Migration guides
+
+See [ICON_MIGRATION.md](ICON_MIGRATION.md) for migrating between published
+releases -- currently just the 1.0.2 icon-generator package split above.
+
 ## Release Process
 
-Maintainers handle releases. The process typically includes:
+Maintainers handle releases. The version bump itself is done by the **Version
+Bump (Manual)** workflow ([.github/workflows/version-bump.yml](.github/workflows/version-bump.yml)),
+which only runs on demand (`workflow_dispatch`):
 
-1. Bump version in pubspec.yaml
-2. Update CHANGELOG.md
-3. Tag release in Git
-4. Publish to pub.dev
+1. Land everything the release contains, with its entries under `[Unreleased]`
+   in `packages/<package>/CHANGELOG.md`
+2. Work through the [release checklist](#release-checklist) below; in
+   particular `dart pub publish --dry-run` must report 0 warnings
+3. Start **Version Bump (Manual)** from the Actions tab and choose the package
+   (`ix_flutter`, `ix_icons_generator` or `both`), the semver bump
+   (`patch`/`minor`/`major`) and, if needed, a prerelease identifier. The run
+   installs dependencies, analyzes the selected package(s) and runs
+   `flutter test` for `ix_flutter` (`ix_icons_generator` is only analyzed
+   there -- its `dart test` suite runs in the regular CI workflow), bumps
+   `pubspec.yaml` and turns `[Unreleased]` into the new release section with
+   `cider bump` / `cider release`, and opens a `chore/release-…` pull request
+   labelled `release`
+4. Review that pull request: confirm the `Upstream:` line that sat under
+   `[Unreleased]` is still the first line under the *new* release header (see
+   [UPSTREAM.md](UPSTREAM.md#release-header-format) -- `cider release` renames
+   the header in place and carries the line with it, but the round trip is not
+   guaranteed lossless, so check rather than assume), update the CHANGELOG's
+   link reference definitions (`cider release` deletes the `[Unreleased]` one
+   and adds nothing for the new version), diff the rest of `CHANGELOG.md` for
+   anything `cider` dropped or reflowed, wait for CI, then merge it
+5. Tag the merge commit on `main` as `v<version>` (`ix_icons_generator-v<version>`
+   for the generator) and push the tag
+6. Publish from the package directory: `dart pub publish`
+7. Add the new version's link reference definition
+   (`https://pub.dev/packages/<package>/versions/<version>`) once the version
+   is live on pub.dev, and point `[Unreleased]` back at `commits/main`
+
+#### Which packages need which step
+
+The two packages are versioned independently, and they are not currently at
+the same point in that cycle:
+
+- **`ix_flutter`** is at 1.0.2 in `pubspec.yaml` and its 1.1.0 notes are still
+  under `[Unreleased]`. It needs the full run above: `bump minor` **and**
+  `release`.
+- **`ix_icons_generator`** is already at 1.1.0 in `pubspec.yaml` (bumped for
+  its own changes -- the tarball checksum and zip-slip guards, `--icons-version`,
+  `--no-legacy-getters`, `--no-format`, and `IxIconsData` output). Its notes
+  are under `[Unreleased]` too, so it needs `cider release` **only**; a
+  further `bump` would skip 1.1.0 and publish 1.2.0. Run the workflow for
+  `ix_flutter` alone, and cut the generator's release separately, rather than
+  choosing `both`.
+
+Neither version exists on pub.dev yet. Step 5 has also not been carried out
+for any past release: this repository currently has **no git tags and no
+GitHub releases**, despite 1.0.0, 1.0.1 and 1.0.2 being live on pub.dev. Until
+a tag is actually pushed, no changelog link may point at `releases/tag/…` or
+`compare/…` -- every such URL 404s and fails the `docs` job's link check (see
+[UPSTREAM.md](UPSTREAM.md#what-these-definitions-may-point-at)).
+
+### Release checklist
+
+Run through this before publishing `ix_flutter` or `ix_icons_generator` to
+pub.dev:
+
+- [ ] `packages/ix_flutter`: `flutter analyze`, `flutter test`,
+      `dart format --output=none --set-exit-if-changed lib test example`
+- [ ] `example`: `flutter analyze`, `flutter test`
+- [ ] `tool/check_docs.sh` passes (no stale API names, versions or claims)
+- [ ] `doc/snippets`: `flutter pub get && flutter analyze` -- every snippet in
+      the documentation still compiles
+- [ ] `packages/ix_flutter`: `dart run tool/gen_token_table.dart` leaves
+      `doc/tokens.md` unchanged
+- [ ] `packages/ix_flutter`: `dart run tool/upstream_check.dart` -- `UPSTREAM.md`
+      and the CHANGELOG release header agree with `IxUpstream`
+- [ ] CHANGELOG.md: the section being prepared -- `[Unreleased]` before the
+      bump, the new release section after it -- is followed by its `Upstream:`
+      line, and no *older* section was edited to carry one (see
+      [UPSTREAM.md](UPSTREAM.md#release-header-format))
+- [ ] CHANGELOG.md ends with a keep-a-changelog link reference definition for
+      `[Unreleased]` and for every **bracketed** version header -- required for
+      `cider release` to parse the file without mangling it. A version with
+      nothing truthful to link to (never published) carries no definition and
+      drops its brackets instead. Every definition must resolve: pub.dev
+      version pages for published versions, `commits/main` for `[Unreleased]`,
+      and no tag or release URLs while the repository has neither (see
+      [UPSTREAM.md](UPSTREAM.md#what-these-definitions-may-point-at))
+- [ ] CHANGELOG.md stays strictly keep-a-changelog after the Version Bump
+      run: the `# Changelog` intro, `## [Unreleased]` (or the release
+      section a bump just produced), the per-release sections and the
+      closing link reference definitions, and nothing else. `cider release`
+      silently drops or misfiles a heading or paragraph outside that shape
+      (a `## Versioning`-style section, a stray paragraph inside a category,
+      a non-standard `#### `-level heading) instead of erroring, which is
+      why the versioning policy, the per-release compatibility/breaking-change
+      history and the migration guide pointer live in this file's
+      [Versioning and compatibility](#versioning-and-compatibility) section
+      instead of the changelog -- the Version Bump run never touches this
+      file
+- [ ] Diff the whole `CHANGELOG.md` change from the Version Bump run anyway
+      (see [Release Process](#release-process) step 4): `cider release`
+      escapes a stray underscore and drops blank lines/`---` separators even
+      inside a section it keeps. That much is cosmetic (renders the same),
+      but the diff is the only way to confirm nothing else moved
+- [ ] The version the release will carry is referenced consistently in the
+      documentation (`ix_flutter: ^<version>`); the bump in
+      `packages/<package>/pubspec.yaml` itself is made by the Version Bump
+      workflow
+- [ ] Screenshots in `packages/ix_flutter/screenshots/` still match the current
+      UI, and `pubspec.yaml`'s `screenshots:` entry points at a file that exists
+- [ ] `dart pub publish --dry-run` in `packages/ix_flutter` **and**
+      `packages/ix_icons_generator`: 0 warnings, and the published file list
+      contains `LICENSE`, `README.md`, `CHANGELOG.md`, `ICON_LICENSING.md` and
+      `THIRD_PARTY_NOTICES.md` but no `tool/`
+- [ ] The **Version Bump (Manual)** run finished green and its release pull
+      request is CI-green before it is merged
 
 ## Recognition
 
@@ -290,6 +524,7 @@ Contributors are recognized in:
 - Pull request comments
 - Release notes in CHANGELOG.md
 - AUTHORS file (if applicable)
+- Individual commit history, for full contributor attribution
 
 ## Questions?
 
@@ -310,5 +545,4 @@ Thank you for contributing to ix_flutter! 🎉
 
 ---
 
-**Last Updated**: January 2026
 **License**: MIT

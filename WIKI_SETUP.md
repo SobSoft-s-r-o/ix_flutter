@@ -1,93 +1,70 @@
-# GitHub Wiki Setup
+# Wiki Sync
 
-The ix_flutter project now has a comprehensive GitHub Wiki with all documentation organized and easily navigable.
+The GitHub wiki at https://github.com/SobSoft-s-r-o/ix_flutter/wiki is **generated** from this repository. It is not a git submodule, it is not edited by hand, and a fresh clone of this repository never needs to initialize it.
 
-## Wiki Access
+## How it works
 
-**Wiki URL**: https://github.com/SobSoft-s-r-o/ix_flutter/wiki
+The [`wiki-sync.yml`](.github/workflows/wiki-sync.yml) workflow performs a **one-way** sync — repository to wiki, never the other direction — after every merge to `main`:
 
-## Wiki Structure
+1. A `push` to `main` touching `doc/**`, a root `*.md`, `packages/ix_flutter/*.md`, `packages/ix_icons_generator/*.md`, or `tool/wiki_sync*` triggers the workflow.
+2. The workflow checks out this repository and, separately, `SobSoft-s-r-o/ix_flutter.wiki` (into `wiki-checkout`).
+3. `tool/wiki_sync.sh wiki-checkout` copies every file listed in the mapping below into the wiki checkout. Local links are rewritten so they still work on the wiki:
+   - a link to another synced document (e.g. `doc/theming.md`, `GETTING_STARTED.md`, `#anchor` included) becomes a bare wiki page name (`theming`, `Getting-Started`);
+   - an **image** (`![alt](…)`) becomes a `https://raw.githubusercontent.com/SobSoft-s-r-o/ix_flutter/main/…` URL. It must not become a `blob/` URL: GitHub serves `blob/main/<path>.png` as the file-viewer HTML page (`Content-Type: text/html`), so the image renders broken;
+   - a link to anything else in the repository (source under `packages/`, `example/`, `.github/`, directories, `UPSTREAM.md`, `DOCUMENTATION.md`, …) becomes an absolute `https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/…` (or `tree/main/…` for a directory) URL instead of a dead relative path.
 
-The wiki includes the following sections:
+   Because those absolute URLs name `main`, a page that links to a file added by an unmerged branch resolves only after the merge — which is also when the sync runs, so the published wiki never links to a file `main` does not have.
+4. If the wiki checkout changed, the workflow commits and pushes it as `github-actions[bot]`.
 
-### Getting Started
-- **Home** - Wiki homepage and quick navigation
-- **Installation** - Setup and installation guide
-- **Getting Started** - Quick start guide and overview
+The `paths:` filter in the workflow must list every directory the mapping draws from, or a change to a source file never triggers a sync.
 
-### Documentation
-- **API Reference** - Complete API documentation for all components
-- **FAQ** - Frequently asked questions
-- **Icon Licensing** - Icon licensing and compliance information
+## Mapping
 
-### Components
-A dedicated Components section with individual pages for each UI component:
-- IxApplicationScaffold - Main application container and layout
-- IxBlind - Sliding drawer/panel component
-- IxBreadcrumb - Hierarchical navigation breadcrumb component
-- IxDropdownButton - Dropdown selection component
-- IxEmptyState - Empty state display component
-- IxResponsiveDataView - Responsive data table component
-- IxSpinner - Animated loading spinner component
-- IxToast - Toast notification component
-- IxIcons - Icon integration and management
-- Copilot Colors - Color system reference
+The source-to-destination mapping lives in [`tool/wiki_sync_map.txt`](tool/wiki_sync_map.txt) as `source -> destination` lines, for example:
 
-### Contributing & Community
-- **Contributing** - Contribution guidelines and code of conduct
-- **Security Policy** - Security and vulnerability reporting
-- **Changelog** - Version history and updates
-
-## Wiki Features
-
-✅ **Sidebar Navigation** - Easy navigation through all wiki pages  
-✅ **Component Documentation** - Dedicated pages for each UI component  
-✅ **Quick Links** - Links to GitHub issues, discussions, and external resources  
-✅ **Organized Structure** - Documentation organized by topic  
-✅ **Searchable** - GitHub wiki has built-in search functionality  
-
-## Updating Wiki Content
-
-To update the wiki:
-
-1. Clone the wiki repository:
-```bash
-git clone https://github.com/SobSoft-s-r-o/ix_flutter.wiki.git
-cd ix_flutter.wiki
+```text
+README.md -> Home.md
+GETTING_STARTED.md -> Getting-Started.md
+doc/ix_icons.md -> ix_icons.md
 ```
 
-2. Edit markdown files or create new pages
+To publish a new canonical document to the wiki, add a line to that file, and make sure the workflow's `paths:` filter covers its directory.
 
-3. Commit and push changes:
-```bash
-git add .
-git commit -m "Update wiki documentation"
-git push
+### Wiki-only pages
+
+A GitHub wiki has pages with no counterpart in the repository: the navigation sidebar, the footer, and a redirect standing in for a page that moved. These are still **generated, not hand-edited** — their sources live in [`doc/wiki/`](doc/wiki/) and are mapped like any other document:
+
+```text
+doc/wiki/_Sidebar.md -> _Sidebar.md
+doc/wiki/_Footer.md -> _Footer.md
+doc/wiki/Installation.md -> Installation.md
 ```
 
-## Wiki Pages
+Write their links as ordinary repository-relative paths (`../../GETTING_STARTED.md`, `../theming.md`). The sync rewrites them to wiki page names, and the repository's own link checker verifies them in place.
 
-All documentation files from the `doc/` folder and root documentation have been imported into the wiki:
+## Manual edits are overwritten
 
-- Root documentation files become top-level wiki pages
-- Component documentation (`doc/*.md`) are in the Components folder
-- File names are automatically converted to page URLs with spaces
+**Do not edit wiki pages directly.** Any push to `main` that touches a synced source file overwrites the corresponding wiki page on the next sync. Edit the canonical document in this repository instead (see the mapping above) and let the workflow publish it.
 
-## Integration with Main Repository
+## Orphaned pages
 
-The wiki is separate from the main repository but automatically linked from:
+The sync only ever writes the pages listed in `tool/wiki_sync_map.txt`; it never deletes a wiki page. Any existing wiki page that is not a sync destination is left untouched by every run and will keep drifting out of date.
 
-- **README.md** - Links to wiki and documentation
-- **DOCUMENTATION.md** - Index of all documentation resources
-- **GitHub repository settings** - Wiki enabled by default
+Two such pages existed, and they are handled differently because they are different things:
 
-## Resources
+- **`Installation.md`** was a second, hand-maintained copy of the getting-started guide, and had drifted — it still advertised the 1.0.2-era dependency constraints. It is now a sync destination generated from [`doc/wiki/Installation.md`](doc/wiki/Installation.md): a short pointer to [`GETTING_STARTED.md`](GETTING_STARTED.md). A redirect rather than a deletion, so existing links to the page keep working.
+- **`copilot_colors.md`** is authored content with no canonical source in this repository (Siemens iX colour guidance notes). It is **not** deleted and not overwritten; it is linked from the generated sidebar so it stays reachable.
 
-- Main Repository: https://github.com/SobSoft-s-r-o/ix_flutter
-- Package on Pub.dev: https://pub.dev/packages/ix_flutter
-- Siemens iX Design System: https://ix.siemens.io
-- Flutter Documentation: https://flutter.dev
+Prefer a generated redirect over deleting a page. If a page really must go, delete it from the wiki by hand — and only once nothing links to it.
 
----
+## Secret
 
-For more information, visit the [wiki homepage](https://github.com/SobSoft-s-r-o/ix_flutter/wiki).
+The workflow authenticates to the wiki repository with the `WIKI_SYNC_TOKEN` repository secret — a GitHub personal access token with `repo` scope. It is required because wiki repositories are not covered by the workflow's default `GITHUB_TOKEN`.
+
+## Dry run
+
+Trigger the workflow manually from the Actions tab (`workflow_dispatch`) with `dry_run: true` (the default) to print the planned copies without touching the wiki repository. Use `dry_run: false` to run a real sync on demand, outside of the `push`-to-`main` trigger.
+
+Locally, `tool/wiki_sync.sh --dry-run <wiki-checkout-dir>` prints the same plan against any wiki checkout on disk without writing anything; `tool/wiki_sync.sh <wiki-checkout-dir>` performs the sync.
+
+**A dry run only prints the copy plan.** It does not run the link rewriting, so it proves nothing about the generated pages. To check a change to the sync itself, clone the wiki into a throwaway directory, run the real sync into it, read the diff, and run it a second time — the second run must produce byte-identical files. `packages/ix_flutter/test/tool/wiki_sync_test.dart` covers the rewriting rules directly.

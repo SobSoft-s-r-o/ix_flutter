@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:ix_flutter/ix_flutter.dart';
-import 'package:ix_flutter/src/ix_icons/ix_icons.dart';
-import 'package:ix_flutter/src/widgets/ix_pagination_bar.dart';
 
 /// Pagination modes supported by [IxResponsiveDataView].
 enum IxPaginationMode { none, standard, infinite }
@@ -89,6 +87,14 @@ class IxSortSpec {
 
   final String key;
   final bool ascending;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is IxSortSpec && other.key == key && other.ascending == ascending);
+
+  @override
+  int get hashCode => Object.hash(key, ascending);
 }
 
 /// A responsive widget that renders a data table on desktop/tablet and a
@@ -114,6 +120,10 @@ class IxResponsiveDataView<T> extends StatelessWidget {
     this.isPageLoading = false,
     this.searchQuery,
     this.onClearSearch,
+    @Deprecated(
+      'IxResponsiveDataView renders no search field; pass the hint to '
+      'your own input. Removed in 2.0.',
+    )
     this.searchHintText,
     this.showSearchStatusBar = true,
     this.showSearchClearAction = true,
@@ -124,6 +134,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
     this.noResultsTextBuilder,
     this.mobileItemBuilder,
     this.strings,
+    this.paginationStrings,
     this.stringsResolver,
   });
 
@@ -148,6 +159,19 @@ class IxResponsiveDataView<T> extends StatelessWidget {
   // Search / Filtering
   final String? searchQuery;
   final VoidCallback? onClearSearch;
+
+  /// Hint text for a search field.
+  ///
+  /// Dead already in 1.0.2 (confirmed against `origin/main`): this widget
+  /// has never rendered a search input to apply the hint to -- it only
+  /// renders a read-only search *status* bar once [searchQuery] is
+  /// non-empty. Build your own field and pass this string to its own
+  /// `InputDecoration.hintText` instead; see "Search / Filtering" in
+  /// `doc/ix_responsive_data_view.md` for the recommended wiring.
+  @Deprecated(
+    'IxResponsiveDataView renders no search field; pass the hint to '
+    'your own input. Removed in 2.0.',
+  )
   final String? searchHintText;
   final bool showSearchStatusBar;
   final bool showSearchClearAction;
@@ -164,12 +188,36 @@ class IxResponsiveDataView<T> extends StatelessWidget {
   /// Optional strings override for this widget instance.
   final IxResponsiveDataViewStrings? strings;
 
+  /// Optional pagination strings, forwarded to the [IxPaginationBar] this
+  /// view builds.
+  ///
+  /// Without it the bar's strings are bridged from [strings], which covers
+  /// every label except the page-size trigger's accessible name -- set
+  /// [IxResponsiveDataViewStrings.pageSelectionLabel] for that, or pass a
+  /// whole [IxPaginationStrings] here.
+  final IxPaginationStrings? paginationStrings;
+
   /// Optional resolver to fetch strings from context (e.g. AppLocalizations).
   final IxResponsiveDataViewStrings Function(BuildContext context)?
   stringsResolver;
 
   @override
   Widget build(BuildContext context) {
+    // The tracker wraps the *whole* result of [_buildContent] -- including
+    // the branch below that swaps between the empty-state subtree and the
+    // table/card content -- so a `searchQuery` change is detected exactly
+    // once, here, no matter which side of that branch is mounted before and
+    // after the change. See `_SearchQueryTracker`.
+    return _SearchQueryTracker(
+      searchQuery: searchQuery,
+      searchAffectsPagination: searchAffectsPagination,
+      onSearchChangedRequestResetPagination:
+          onSearchChangedRequestResetPagination,
+      child: _buildContent(context),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
     final effectiveStrings =
         strings ??
         stringsResolver?.call(context) ??
@@ -183,7 +231,10 @@ class IxResponsiveDataView<T> extends StatelessWidget {
       if (searchQuery != null && searchQuery!.isNotEmpty) {
         return Center(
           child: IxEmptyState(
-            icon: IxIcons.search,
+            // No `size:`: `IxEmptyState` styles its icon slot (56px in the
+            // large layout, 32px compact) and an explicit size would
+            // override it.
+            icon: const IxIcon.key(IxIconKey.search),
             title:
                 noResultsTextBuilder?.call(searchQuery!) ??
                 effectiveStrings.noResultsTitle(searchQuery!),
@@ -207,7 +258,7 @@ class IxResponsiveDataView<T> extends StatelessWidget {
       }
       return Center(
         child: IxEmptyState(
-          icon: IxIcons.info,
+          icon: const IxIcon.key(IxIconKey.info),
           title: effectiveStrings.emptyTitle,
           subtitle: effectiveStrings.emptyBody,
         ),
@@ -223,8 +274,10 @@ class IxResponsiveDataView<T> extends StatelessWidget {
 
     final content = LayoutBuilder(
       builder: (context, constraints) {
-        // Siemens IX breakpoint for mobile is typically < 600 or similar.
-        // Using 600 as requested.
+        // Desktop/mobile breakpoint. Stays at 600 in 1.x for backward
+        // compatibility; B-9 (2.0, "RDV primitives") moves this to 768
+        // alongside splitting this widget into IxTable/IxDataCard/
+        // IxRowActions primitives.
         if (constraints.maxWidth < 600) {
           return _MobileView<T>(
             items: items,
@@ -238,13 +291,11 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             onClearSearch: onClearSearch,
             showSearchStatusBar: showSearchStatusBar,
             showSearchClearAction: showSearchClearAction,
-            searchAffectsPagination: searchAffectsPagination,
-            onSearchChangedRequestResetPagination:
-                onSearchChangedRequestResetPagination,
             resultsCountOverride: resultsCountOverride,
             resultsLabelBuilder: resultsLabelBuilder,
             itemBuilder: mobileItemBuilder,
             strings: effectiveStrings,
+            paginationStrings: paginationStrings,
           );
         } else {
           return _DesktopView<T>(
@@ -265,12 +316,10 @@ class IxResponsiveDataView<T> extends StatelessWidget {
             onClearSearch: onClearSearch,
             showSearchStatusBar: showSearchStatusBar,
             showSearchClearAction: showSearchClearAction,
-            searchAffectsPagination: searchAffectsPagination,
-            onSearchChangedRequestResetPagination:
-                onSearchChangedRequestResetPagination,
             resultsCountOverride: resultsCountOverride,
             resultsLabelBuilder: resultsLabelBuilder,
             strings: effectiveStrings,
+            paginationStrings: paginationStrings,
           );
         }
       },
@@ -294,6 +343,76 @@ class IxResponsiveDataView<T> extends StatelessWidget {
   }
 }
 
+/// Detects a [searchQuery] change and requests a pagination reset via
+/// [onSearchChangedRequestResetPagination], independent of what [child]
+/// renders.
+///
+/// [IxResponsiveDataView._buildContent] swaps between an empty-state
+/// subtree and its table/card content depending on whether [searchQuery]
+/// currently matches any items. A query change that crosses that boundary
+/// therefore unmounts whichever subtree was there and mounts the other one
+/// fresh -- a tracker that lived *inside* that swapped subtree (as this one
+/// used to, duplicated across `_DesktopViewState`/`_MobileViewState`) never
+/// saw the change: its `initState` starts over on the new subtree, and
+/// `didUpdateWidget` never runs on the one that got swapped out. Wrapping
+/// the whole branch in this tracker instead -- the one constant across
+/// every rebuild -- means `didUpdateWidget` reliably fires for every query
+/// change, whichever way it crosses the boundary.
+class _SearchQueryTracker extends StatefulWidget {
+  const _SearchQueryTracker({
+    required this.searchQuery,
+    required this.searchAffectsPagination,
+    required this.onSearchChangedRequestResetPagination,
+    required this.child,
+  });
+
+  final String? searchQuery;
+  final bool searchAffectsPagination;
+  final VoidCallback? onSearchChangedRequestResetPagination;
+  final Widget child;
+
+  @override
+  State<_SearchQueryTracker> createState() => _SearchQueryTrackerState();
+}
+
+class _SearchQueryTrackerState extends State<_SearchQueryTracker> {
+  // Deliberately not `late ... = widget.searchQuery`: a `late` initializer
+  // runs lazily, on first *read* -- which would be inside the first
+  // `didUpdateWidget` below, by which point the framework has already
+  // pointed `widget` at the *new* widget (`StatefulElement.update` assigns
+  // `state._widget` before calling `didUpdateWidget`). That would capture
+  // the new query as "previous" on the very first change and compare it
+  // against itself. Capturing it eagerly in `initState`, while `widget`
+  // still means the mount-time widget, avoids that.
+  String? _previousSearchQuery;
+
+  @override
+  void initState() {
+    super.initState();
+    _previousSearchQuery = widget.searchQuery;
+  }
+
+  @override
+  void didUpdateWidget(_SearchQueryTracker oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.searchAffectsPagination &&
+        widget.searchQuery != _previousSearchQuery) {
+      _previousSearchQuery = widget.searchQuery;
+      // Deferred like every other callback this widget schedules off a
+      // lifecycle method: consumers typically call `setState` from this
+      // callback (see `doc/ix_responsive_data_view.md`), and calling it
+      // synchronously from `didUpdateWidget` -- itself invoked mid-build --
+      // risks "setState() or markNeedsBuild() called during build".
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        widget.onSearchChangedRequestResetPagination?.call();
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
+
 class _DesktopView<T> extends StatefulWidget {
   const _DesktopView({
     required this.items,
@@ -313,11 +432,10 @@ class _DesktopView<T> extends StatefulWidget {
     this.onClearSearch,
     required this.showSearchStatusBar,
     required this.showSearchClearAction,
-    required this.searchAffectsPagination,
-    this.onSearchChangedRequestResetPagination,
     this.resultsCountOverride,
     this.resultsLabelBuilder,
     required this.strings,
+    this.paginationStrings,
   });
 
   final List<T> items;
@@ -339,11 +457,10 @@ class _DesktopView<T> extends StatefulWidget {
   final VoidCallback? onClearSearch;
   final bool showSearchStatusBar;
   final bool showSearchClearAction;
-  final bool searchAffectsPagination;
-  final VoidCallback? onSearchChangedRequestResetPagination;
   final int? resultsCountOverride;
   final String Function(int count)? resultsLabelBuilder;
   final IxResponsiveDataViewStrings strings;
+  final IxPaginationStrings? paginationStrings;
 
   @override
   State<_DesktopView<T>> createState() => _DesktopViewState<T>();
@@ -354,7 +471,6 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   bool _sortAscending = true;
   final ScrollController _scrollController = ScrollController();
   bool _loadTriggeredForCurrentExtent = false;
-  String? _previousSearchQuery;
 
   @override
   void initState() {
@@ -362,7 +478,6 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
     _sortKey = widget.initialSortKey;
     _sortAscending = widget.initialSortAscending;
     _scrollController.addListener(_onScroll);
-    _previousSearchQuery = widget.searchQuery;
   }
 
   @override
@@ -383,14 +498,6 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
     // If the parent reloads data (e.g. due to sort change), we want to keep our sort state.
     // However, if the parent *resets* the view completely (e.g. new instance), state is lost.
     // Since we are in State object, state persists across rebuilds.
-
-    if (widget.searchAffectsPagination &&
-        widget.searchQuery != _previousSearchQuery) {
-      _previousSearchQuery = widget.searchQuery;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onSearchChangedRequestResetPagination?.call();
-      });
-    }
   }
 
   @override
@@ -413,7 +520,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
     }
   }
 
-  void _handleSort(String key) {
+  void _onHeaderTap(String key) {
     if (!widget.enableSorting) return;
 
     final newAscending = _sortKey == key ? !_sortAscending : true;
@@ -429,8 +536,13 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
-    final color1 = theme?.color(IxThemeColorToken.color1) ?? Colors.grey[100]!;
-    final stdText = theme?.color(IxThemeColorToken.stdText) ?? Colors.black;
+    final cs = Theme.of(context).colorScheme;
+    final color1 =
+        theme?.color(IxThemeColorToken.color1) ?? cs.surfaceContainerHighest;
+    final ghostHover =
+        theme?.color(IxThemeColorToken.ghostHover) ??
+        cs.surfaceContainerHighest;
+    final labelStyle = theme?.textStyle(IxTypographyVariant.label);
 
     return Column(
       children: [
@@ -455,70 +567,62 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
           child: Container(
             height: 48,
             decoration: BoxDecoration(
-              color: color1,
               border: Border(
                 bottom: BorderSide(
-                  color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
+                  color:
+                      theme?.color(IxThemeColorToken.softBdr) ??
+                      cs.outlineVariant,
                 ),
               ),
             ),
-            child: Row(
-              children: [
-                ...widget.columns.map((col) {
-                  return Expanded(
-                    flex: col.flex,
-                    child: GestureDetector(
-                      onTap: (widget.enableSorting && col.sortKey != null)
-                          ? () => _handleSort(col.sortKey!)
-                          : null,
-                      child: MouseRegion(
-                        cursor: (widget.enableSorting && col.sortKey != null)
-                            ? SystemMouseCursors.click
-                            : SystemMouseCursors.basic,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          alignment: col.alignment,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  col.label,
-                                  style: theme?.textStyle(
-                                    IxTypographyVariant.label,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                              if (widget.enableSorting &&
-                                  col.sortKey != null &&
-                                  _sortKey == col.sortKey) ...[
-                                const SizedBox(width: 4),
-                                IconTheme(
-                                  data: IconThemeData(size: 16, color: stdText),
-                                  child: _sortAscending
-                                      ? IxIcons.chevronUp
-                                      : IxIcons.chevronDown,
-                                ),
-                              ],
-                            ],
-                          ),
-                        ),
+            // The header background lives on a `Material` rather than on the
+            // `Container` above so the per-column `InkWell`s have an ink
+            // canvas *inside* the header: painted on the enclosing page
+            // Material instead, their hover and press feedback disappeared
+            // under this opaque background.
+            child: Material(
+              color: color1,
+              child: Row(
+                children: [
+                  ...widget.columns.map((col) {
+                    final sortable =
+                        widget.enableSorting && col.sortKey != null;
+                    final sorted = sortable && _sortKey == col.sortKey;
+                    final hint = !sortable
+                        ? null
+                        : !sorted
+                        ? widget.strings.sortHint
+                        : (_sortAscending
+                              ? widget.strings.sortedAscending
+                              : widget.strings.sortedDescending);
+                    return Expanded(
+                      flex: col.flex,
+                      child: _HeaderCell(
+                        column: col,
+                        sortable: sortable,
+                        sorted: sorted,
+                        ascending: _sortAscending,
+                        hint: hint,
+                        labelStyle: labelStyle,
+                        hoverColor: ghostHover,
+                        onTap: sortable
+                            ? () => _onHeaderTap(col.sortKey!)
+                            : null,
+                      ),
+                    );
+                  }),
+                  // Tools column header
+                  SizedBox(
+                    width: 48,
+                    child: Center(
+                      child: Text(
+                        widget.strings.toolsColumnHeader,
+                        style: labelStyle,
                       ),
                     ),
-                  );
-                }),
-                // Tools column header
-                SizedBox(
-                  width: 48,
-                  child: Center(
-                    child: Text(
-                      widget.strings.toolsColumnHeader,
-                      style: theme?.textStyle(IxTypographyVariant.label),
-                    ),
-                  ),
-                ), // Fixed width for tools
-              ],
+                  ), // Fixed width for tools
+                ],
+              ),
             ),
           ),
         ),
@@ -542,6 +646,7 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
                 }
                 final item = widget.items[index];
                 return _DesktopRow<T>(
+                  index: index,
                   item: item,
                   columns: widget.columns,
                   actions: widget.actions,
@@ -565,14 +670,124 @@ class _DesktopViewState<T> extends State<_DesktopView<T>> {
             onPageChanged: widget.onPageChanged!,
             onPageSizeChanged: widget.onPageSizeChanged,
             strings: widget.strings,
+            paginationStrings: widget.paginationStrings,
           ),
       ],
     );
   }
 }
 
+/// One column heading of the desktop table.
+///
+/// A sortable heading is a keyboard-reachable button, so it carries the
+/// Siemens IX [IxFocusRing]; a plain label carries neither the ring nor the
+/// button/enabled semantics that would otherwise announce it as a *disabled*
+/// control to a screen reader.
+class _HeaderCell<T> extends StatefulWidget {
+  const _HeaderCell({
+    required this.column,
+    required this.sortable,
+    required this.sorted,
+    required this.ascending,
+    required this.hint,
+    required this.labelStyle,
+    required this.hoverColor,
+    required this.onTap,
+  });
+
+  final IxColumnDef<T> column;
+  final bool sortable;
+  final bool sorted;
+  final bool ascending;
+  final String? hint;
+  final TextStyle? labelStyle;
+  final Color hoverColor;
+  final VoidCallback? onTap;
+
+  @override
+  State<_HeaderCell<T>> createState() => _HeaderCellState<T>();
+}
+
+class _HeaderCellState<T> extends State<_HeaderCell<T>> {
+  bool _focused = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final col = widget.column;
+    // `excludeSemantics` sits on the *inner* visual content only (not on
+    // this whole `Semantics`/`InkWell` pair): it suppresses the label
+    // `Text`'s own contribution (it would otherwise duplicate `label:
+    // col.label` below), while letting `InkWell`'s own focus semantics --
+    // `isFocusable`/`isFocused`, the `focus` and `tap` actions -- merge up
+    // into this node normally (same pattern as `_DesktopRow`, which also
+    // leaves `focusable`/`onTap` for `InkWell` alone to supply).
+    // Redeclaring them here too, on the *ancestor* `Semantics`, made the
+    // merge fail silently instead: this node ended up with only `InkWell`'s
+    // own `isFocusable`/`focus`/`tap` contribution and none of
+    // `button`/`enabled`/`label`/`hint` below, dropping exactly the
+    // properties a screen reader needs to announce the header as a
+    // labelled, sortable button. Excluding the whole subtree instead of
+    // just the inner content would have the opposite problem: it drops
+    // `isFocused`/`focus` too, so a screen reader could tell a header is
+    // focusable but never that it *is* focused (WCAG 2.4.7).
+    return Semantics(
+      // `null`, not `false`, for a plain heading: `button: false` +
+      // `enabled: false` publish a *disabled control*, so a screen reader
+      // announced every non-sortable column label as unavailable.
+      button: widget.sortable ? true : null,
+      enabled: widget.sortable ? true : null,
+      label: col.label,
+      hint: widget.hint,
+      child: IxFocusRing(
+        focused: _focused,
+        // Negative, like the dropdown rows: the ring stays inside the cell
+        // instead of overlapping the neighbouring column and the header's
+        // bottom border.
+        offset: -IxCommonGeometry.focusBorderThickness,
+        child: InkWell(
+          key: widget.sortable ? Key('ix-rdv-header-${col.sortKey}') : null,
+          canRequestFocus: widget.sortable,
+          focusColor: Colors.transparent,
+          hoverColor: widget.hoverColor,
+          onFocusChange: (focused) => setState(() => _focused = focused),
+          onTap: widget.onTap,
+          child: ExcludeSemantics(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              alignment: col.alignment,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      col.label,
+                      style: widget.labelStyle,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  if (widget.sorted) ...[
+                    const SizedBox(width: 4),
+                    IxIcon.key(
+                      widget.ascending
+                          ? IxIconKey.chevronUp
+                          : IxIconKey.chevronDown,
+                      size: IxIconSize.s16,
+                      excludeFromSemantics: true,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _DesktopRow<T> extends StatefulWidget {
   const _DesktopRow({
+    required this.index,
     required this.item,
     required this.columns,
     required this.actions,
@@ -581,6 +796,9 @@ class _DesktopRow<T> extends StatefulWidget {
     required this.strings,
   });
 
+  /// The row's position in the list, used for its stable `ix-rdv-row-<index>`
+  /// / `ix-rdv-row-actions-<index>` keys.
+  final int index;
   final T item;
   final List<IxColumnDef<T>> columns;
   final List<IxRowAction<T>> actions;
@@ -593,96 +811,121 @@ class _DesktopRow<T> extends StatefulWidget {
 }
 
 class _DesktopRowState<T> extends State<_DesktopRow<T>> {
-  bool _isHovered = false;
+  bool _focused = false;
 
   @override
   Widget build(BuildContext context) {
-    final color0 =
-        widget.theme?.color(IxThemeColorToken.color0) ?? Colors.white;
-    final color1Hover =
-        widget.theme?.color(IxThemeColorToken.color1Hover) ?? Colors.grey[200]!;
+    final index = widget.index;
+    final item = widget.item;
+    final columns = widget.columns;
+    final actions = widget.actions;
+    final onTap = widget.onTap;
+    final theme = widget.theme;
+    final strings = widget.strings;
+    final cs = Theme.of(context).colorScheme;
+    final color0 = theme?.color(IxThemeColorToken.color0) ?? cs.surface;
+    final ghostHover =
+        theme?.color(IxThemeColorToken.ghostHover) ??
+        cs.surfaceContainerHighest;
     final borderColor =
-        widget.theme?.color(IxThemeColorToken.color4) ?? Colors.grey[300]!;
+        theme?.color(IxThemeColorToken.softBdr) ?? cs.outlineVariant;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: widget.onTap != null
-          ? SystemMouseCursors.click
-          : SystemMouseCursors.basic,
-      child: GestureDetector(
-        onTap: widget.onTap != null ? () => widget.onTap!(widget.item) : null,
-        child: Container(
-          height: 56, // Standard row height
-          decoration: BoxDecoration(
-            color: _isHovered ? color1Hover : color0,
-            border: Border(bottom: BorderSide(color: borderColor)),
-          ),
-          child: Row(
-            children: [
-              ...widget.columns.map((col) {
-                return Expanded(
-                  flex: col.flex,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    alignment: col.alignment,
-                    child: col.cellBuilder(context, widget.item),
-                  ),
-                );
-              }),
-              // Tools column
-              SizedBox(
-                width: 48,
-                child: Center(
-                  child: PopupMenuButton<IxRowAction<T>>(
-                    icon: IxIcons.moreMenu,
-                    tooltip: widget.strings.rowActionsTooltip,
-                    onSelected: (action) => action.onSelected(widget.item),
-                    itemBuilder: (context) {
-                      return widget.actions
-                          .where((a) => a.isVisible?.call(widget.item) ?? true)
-                          .map((action) {
-                            final enabled =
-                                action.isEnabled?.call(widget.item) ?? true;
-                            return PopupMenuItem<IxRowAction<T>>(
-                              value: action,
-                              enabled: enabled,
-                              child: Row(
-                                children: [
-                                  IconTheme(
-                                    data: IconThemeData(
-                                      color: action.destructive
-                                          ? widget.theme?.color(
-                                              IxThemeColorToken.alarm,
-                                            )
-                                          : widget.theme?.color(
-                                              IxThemeColorToken.stdText,
-                                            ),
-                                      size: 20,
+    return Semantics(
+      button: onTap != null,
+      label: null,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(bottom: BorderSide(color: borderColor)),
+        ),
+        // The row background lives on a `Material` rather than on the box
+        // above, so the `InkWell`'s hover and press feedback has an ink
+        // canvas *inside* the row: painted on the enclosing page Material
+        // instead, it was hidden under this opaque background.
+        child: Material(
+          color: color0,
+          child: IxFocusRing(
+            focused: _focused,
+            // Negative, like the dropdown rows: the ring stays inside the
+            // row instead of overlapping its neighbours.
+            offset: -IxCommonGeometry.focusBorderThickness,
+            child: InkWell(
+              key: Key('ix-rdv-row-$index'),
+              canRequestFocus: onTap != null,
+              focusColor: Colors.transparent,
+              hoverColor: ghostHover,
+              onFocusChange: (focused) => setState(() => _focused = focused),
+              onTap: onTap != null ? () => onTap(item) : null,
+              child: SizedBox(
+                height: 56, // Standard row height
+                child: Row(
+                  children: [
+                    ...columns.map((col) {
+                      return Expanded(
+                        flex: col.flex,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          alignment: col.alignment,
+                          child: col.cellBuilder(context, item),
+                        ),
+                      );
+                    }),
+                    // Tools column
+                    SizedBox(
+                      width: 48,
+                      child: Center(
+                        child: PopupMenuButton<IxRowAction<T>>(
+                          key: Key('ix-rdv-row-actions-$index'),
+                          icon: const IxIcon.key(IxIconKey.moreMenu),
+                          tooltip: strings.rowActionsTooltip,
+                          onSelected: (action) => action.onSelected(item),
+                          itemBuilder: (context) {
+                            return actions
+                                .where((a) => a.isVisible?.call(item) ?? true)
+                                .map((action) {
+                                  final enabled =
+                                      action.isEnabled?.call(item) ?? true;
+                                  return PopupMenuItem<IxRowAction<T>>(
+                                    value: action,
+                                    enabled: enabled,
+                                    child: Row(
+                                      children: [
+                                        IconTheme(
+                                          data: IconThemeData(
+                                            color: action.destructive
+                                                ? theme?.color(
+                                                    IxThemeColorToken.alarm,
+                                                  )
+                                                : theme?.color(
+                                                    IxThemeColorToken.stdText,
+                                                  ),
+                                            size: 20,
+                                          ),
+                                          child: action.icon,
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Text(
+                                          action.label,
+                                          style: TextStyle(
+                                            color: action.destructive
+                                                ? theme?.color(
+                                                    IxThemeColorToken.alarm,
+                                                  )
+                                                : null,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    child: action.icon,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    action.label,
-                                    style: TextStyle(
-                                      color: action.destructive
-                                          ? widget.theme?.color(
-                                              IxThemeColorToken.alarm,
-                                            )
-                                          : null,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          })
-                          .toList();
-                    },
-                  ),
+                                  );
+                                })
+                                .toList();
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
@@ -703,12 +946,11 @@ class _MobileView<T> extends StatefulWidget {
     this.onClearSearch,
     required this.showSearchStatusBar,
     required this.showSearchClearAction,
-    required this.searchAffectsPagination,
-    this.onSearchChangedRequestResetPagination,
     this.resultsCountOverride,
     this.resultsLabelBuilder,
     this.itemBuilder,
     required this.strings,
+    this.paginationStrings,
   });
 
   final List<T> items;
@@ -724,12 +966,11 @@ class _MobileView<T> extends StatefulWidget {
   final VoidCallback? onClearSearch;
   final bool showSearchStatusBar;
   final bool showSearchClearAction;
-  final bool searchAffectsPagination;
-  final VoidCallback? onSearchChangedRequestResetPagination;
   final int? resultsCountOverride;
   final String Function(int count)? resultsLabelBuilder;
   final Widget Function(BuildContext context, T item)? itemBuilder;
   final IxResponsiveDataViewStrings strings;
+  final IxPaginationStrings? paginationStrings;
 
   @override
   State<_MobileView<T>> createState() => _MobileViewState<T>();
@@ -738,13 +979,11 @@ class _MobileView<T> extends StatefulWidget {
 class _MobileViewState<T> extends State<_MobileView<T>> {
   final ScrollController _scrollController = ScrollController();
   bool _loadTriggeredForCurrentExtent = false;
-  String? _previousSearchQuery;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_onScroll);
-    _previousSearchQuery = widget.searchQuery;
   }
 
   @override
@@ -753,14 +992,6 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
     if (widget.items.length != oldWidget.items.length ||
         !widget.isPageLoading) {
       _loadTriggeredForCurrentExtent = false;
-    }
-
-    if (widget.searchAffectsPagination &&
-        widget.searchQuery != _previousSearchQuery) {
-      _previousSearchQuery = widget.searchQuery;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        widget.onSearchChangedRequestResetPagination?.call();
-      });
     }
   }
 
@@ -838,6 +1069,7 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
                 item: item,
                 fields: widget.fields,
                 onTap: () => _showDetail(context, item),
+                strings: widget.strings,
               );
             },
           ),
@@ -852,70 +1084,112 @@ class _MobileViewState<T> extends State<_MobileView<T>> {
             // Minimal mobile pagination usually doesn't show page size options
             onPageChanged: widget.onPageChanged!,
             strings: widget.strings,
+            paginationStrings: widget.paginationStrings,
           ),
       ],
     );
   }
 }
 
-class _MobileCard<T> extends StatelessWidget {
+class _MobileCard<T> extends StatefulWidget {
   const _MobileCard({
     required this.item,
     required this.fields,
     required this.onTap,
+    required this.strings,
   });
 
   final T item;
   final List<IxMobileFieldDef<T>> fields;
   final VoidCallback onTap;
+  final IxResponsiveDataViewStrings strings;
+
+  @override
+  State<_MobileCard<T>> createState() => _MobileCardState<T>();
+}
+
+class _MobileCardState<T> extends State<_MobileCard<T>> {
+  bool _focused = false;
 
   @override
   Widget build(BuildContext context) {
+    final item = widget.item;
+    final fields = widget.fields;
+    final onTap = widget.onTap;
+    final strings = widget.strings;
     final theme = Theme.of(context).extension<IxTheme>();
+    final cs = Theme.of(context).colorScheme;
     final cardTheme = Theme.of(context).extension<IxCardTheme>();
     final cardStyle = cardTheme?.style(IxCardVariant.filled);
 
     final cardColor =
         cardStyle?.background ??
         theme?.color(IxThemeColorToken.color0) ??
-        Colors.white;
+        cs.surface;
     final borderColor =
         cardStyle?.borderColor ??
-        theme?.color(IxThemeColorToken.color4) ??
-        Colors.grey;
+        theme?.color(IxThemeColorToken.weakBdr) ??
+        cs.outlineVariant;
+    final ghostHover =
+        theme?.color(IxThemeColorToken.ghostHover) ??
+        cs.surfaceContainerHighest;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
+    // `label: null` (like `_DesktopRow`) so the field label/value texts
+    // below merge into this button's accessible name automatically instead
+    // of it announcing just a single hand-picked field.
+    final radius = BorderRadius.circular(4); // IX Card radius
+    return Semantics(
+      button: true,
+      label: null,
+      hint: strings.rowHint,
+      child: IxFocusRing(
+        focused: _focused,
+        borderRadius: radius,
+        // The card background lives on a `Material` rather than on the box
+        // around it, so the `InkWell`'s hover and press feedback has an ink
+        // canvas *inside* the card: painted on the enclosing page Material
+        // instead, it was hidden under this opaque background.
+        child: Material(
+          type: MaterialType.card,
           color: cardColor,
-          border: Border.all(color: borderColor),
-          borderRadius: BorderRadius.circular(4), // IX Card radius
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: fields.map((field) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Row(
+          clipBehavior: Clip.antiAlias,
+          shape: RoundedRectangleBorder(
+            borderRadius: radius,
+            side: BorderSide(color: borderColor),
+          ),
+          child: InkWell(
+            onTap: onTap,
+            focusColor: Colors.transparent,
+            hoverColor: ghostHover,
+            onFocusChange: (focused) => setState(() => _focused = focused),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(
-                    width: 100,
-                    child: Text(
-                      field.label,
-                      style: theme?.textStyle(
-                        IxTypographyVariant.label,
-                        tone: IxThemeTextTone.soft,
-                      ),
+                children: fields.map((field) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: 100,
+                          child: Text(
+                            field.label,
+                            style: theme?.textStyle(
+                              IxTypographyVariant.label,
+                              tone: IxThemeTextTone.soft,
+                            ),
+                          ),
+                        ),
+                        Expanded(child: field.valueBuilder(context, item)),
+                      ],
                     ),
-                  ),
-                  Expanded(child: field.valueBuilder(context, item)),
-                ],
+                  );
+                }).toList(),
               ),
-            );
-          }).toList(),
+            ),
+          ),
         ),
       ),
     );
@@ -1037,62 +1311,72 @@ class _SearchStatusHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).extension<IxTheme>();
-    final color1 = theme?.color(IxThemeColorToken.color1) ?? Colors.grey[100]!;
-    final stdText = theme?.color(IxThemeColorToken.stdText) ?? Colors.black;
+    final cs = Theme.of(context).colorScheme;
+    final color1 =
+        theme?.color(IxThemeColorToken.color1) ?? cs.surfaceContainerHighest;
+    final weakBdr =
+        theme?.color(IxThemeColorToken.weakBdr) ?? cs.outlineVariant;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: color1,
-        border: Border(
-          bottom: BorderSide(
-            color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: weakBdr)),
       ),
+      // `spaceBetween` + a `Flexible` chip (instead of a fixed-width chip
+      // plus `Spacer`) keeps the results label flush right in the common
+      // case while letting the chip's own label ellipsize -- rather than
+      // overflow -- when a long query and the results label don't both fit
+      // (WCAG 1.4.4 Resize text).
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: theme?.color(IxThemeColorToken.component1),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme?.color(IxThemeColorToken.color4) ?? Colors.grey,
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color:
+                    theme?.color(IxThemeColorToken.component1) ??
+                    cs.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: weakBdr),
               ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${strings.searchChipLabel}: "$query"',
-                  style: theme?.textStyle(IxTypographyVariant.label),
-                ),
-                if (onClear != null) ...[
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: onClear,
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: Tooltip(
-                        message: strings.clearSearchTooltip,
-                        child: IconTheme(
-                          data: IconThemeData(size: 16, color: stdText),
-                          child: IxIcons.closeSmall,
-                        ),
-                      ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Flexible(
+                    child: Text(
+                      '${strings.searchChipLabel}: "$query"',
+                      style: theme?.textStyle(IxTypographyVariant.label),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                  if (onClear != null) ...[
+                    const SizedBox(width: 8),
+                    IxIconButton(
+                      key: const Key('ix-rdv-clear'),
+                      size: IxIconButtonSize.s24,
+                      icon: const IxIcon.key(
+                        IxIconKey.closeSmall,
+                        size: IxIconSize.s16,
+                      ),
+                      tooltip: strings.clearSearchTooltip,
+                      onPressed: onClear,
+                    ),
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
-          const Spacer(),
-          Text(
-            resultsLabelBuilder?.call(count) ?? strings.resultsCount(count),
-            style: theme?.textStyle(
-              IxTypographyVariant.label,
-              tone: IxThemeTextTone.soft,
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              resultsLabelBuilder?.call(count) ?? strings.resultsCount(count),
+              style: theme?.textStyle(
+                IxTypographyVariant.label,
+                tone: IxThemeTextTone.soft,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
