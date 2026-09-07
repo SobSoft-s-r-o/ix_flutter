@@ -728,4 +728,342 @@ void main() {
       });
     });
   });
+
+  /// The scope covers one subtree -- its [IxKeyboardDismissScope.child] --
+  /// but the two triggers reach that subtree by different means: the tap
+  /// trigger through an [Actions] override the field itself looks up, the
+  /// drag trigger through a [NotificationListener] paired with
+  /// `FocusManager.instance.primaryFocus`. These tests ask whether both stay
+  /// within the subtree: whether a scroll releases a field the scope does not
+  /// own, and whether a nested scope may opt out under an enabled one.
+  group('IxKeyboardDismissScope scope boundaries', () {
+    late FocusNode fieldNode;
+    late ScrollController controller;
+
+    FocusNode newFocusNode(String label) {
+      final node = FocusNode(debugLabel: label);
+      addTearDown(node.dispose);
+      return node;
+    }
+
+    ScrollController newController() {
+      final scroll = ScrollController();
+      addTearDown(scroll.dispose);
+      return scroll;
+    }
+
+    Future<void> withPlatform(
+      TargetPlatform platform,
+      Future<void> Function() body,
+    ) async {
+      debugDefaultTargetPlatformOverride = platform;
+      try {
+        await body();
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    }
+
+    List<Widget> rows() => <Widget>[
+      for (var i = 0; i < 20; i++)
+        SizedBox(
+          key: Key('row$i'),
+          height: 120,
+          child: ColoredBox(
+            color: const Color(0xFF445566),
+            child: Text('Row $i'),
+          ),
+        ),
+    ];
+
+    Future<void> focusField(WidgetTester tester) async {
+      await tester.tap(find.byKey(const Key('field')));
+      await tester.pump();
+      expect(fieldNode.hasPrimaryFocus, isTrue, reason: 'field did not focus');
+      expect(
+        tester.testTextInput.isVisible,
+        isTrue,
+        reason: 'keyboard did not open',
+      );
+    }
+
+    testWidgets('a scroll inside the scope leaves a field outside it alone', (
+      tester,
+    ) async {
+      await withPlatform(TargetPlatform.android, () async {
+        fieldNode = newFocusNode('field');
+        controller = newController();
+        await pumpIx(
+          tester,
+          Column(
+            children: [
+              // A sibling of the scope, not a descendant of it: a field this
+              // scope was never given.
+              TextField(key: const Key('field'), focusNode: fieldNode),
+              SizedBox(
+                height: 400,
+                child: IxKeyboardDismissScope(
+                  child: ListView(controller: controller, children: rows()),
+                ),
+              ),
+            ],
+          ),
+        );
+        await focusField(tester);
+
+        await tester.drag(find.byKey(const Key('row1')), const Offset(0, -200));
+        await tester.pump();
+
+        expect(
+          controller.offset,
+          greaterThan(0),
+          reason: 'the drag must still scroll the list',
+        );
+        expect(
+          fieldNode.hasPrimaryFocus,
+          isTrue,
+          reason: 'a scope may only release a field inside its own subtree',
+        );
+        expect(tester.testTextInput.isVisible, isTrue);
+      });
+    });
+
+    /// `enabled: false` is documented to put "Flutter's platform defaults
+    /// back for [child]", and a page inside an app that opted in globally --
+    /// what [IxApplicationScaffold] does for its whole frame by default -- is
+    /// exactly where a consumer reaches for it.
+    testWidgets('a nested enabled: false scope keeps the tap default', (
+      tester,
+    ) async {
+      await withPlatform(TargetPlatform.android, () async {
+        fieldNode = newFocusNode('field');
+        await pumpIx(
+          tester,
+          IxKeyboardDismissScope(
+            child: IxKeyboardDismissScope(
+              enabled: false,
+              child: Column(
+                children: [
+                  TextField(key: const Key('field'), focusNode: fieldNode),
+                  Container(
+                    key: const Key('outside'),
+                    height: 160,
+                    width: 400,
+                    color: const Color(0xFF445566),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+        await focusField(tester);
+
+        await tester.tap(find.byKey(const Key('outside')));
+        await tester.pump();
+
+        expect(
+          fieldNode.hasPrimaryFocus,
+          isTrue,
+          reason: 'the inner scope opted its subtree out of the tap trigger',
+        );
+        expect(tester.testTextInput.isVisible, isTrue);
+      });
+    });
+
+    testWidgets('a nested enabled: false scope keeps the drag default', (
+      tester,
+    ) async {
+      await withPlatform(TargetPlatform.android, () async {
+        fieldNode = newFocusNode('field');
+        controller = newController();
+        await pumpIx(
+          tester,
+          IxKeyboardDismissScope(
+            child: IxKeyboardDismissScope(
+              enabled: false,
+              child: ListView(
+                controller: controller,
+                children: [
+                  TextField(key: const Key('field'), focusNode: fieldNode),
+                  ...rows(),
+                ],
+              ),
+            ),
+          ),
+        );
+        await focusField(tester);
+
+        await tester.drag(find.byKey(const Key('row1')), const Offset(0, -200));
+        await tester.pump();
+
+        expect(
+          controller.offset,
+          greaterThan(0),
+          reason: 'the drag must still scroll the list',
+        );
+        expect(
+          fieldNode.hasPrimaryFocus,
+          isTrue,
+          reason: 'the inner scope opted its subtree out of the drag trigger',
+        );
+        expect(tester.testTextInput.isVisible, isTrue);
+      });
+    });
+
+    /// A field and an inert area beside it: the smallest thing the tap
+    /// trigger can act on.
+    Widget form() {
+      fieldNode = newFocusNode('field');
+      return Column(
+        children: [
+          TextField(key: const Key('field'), focusNode: fieldNode),
+          Container(
+            key: const Key('outside'),
+            height: 160,
+            width: 400,
+            color: const Color(0xFF445566),
+          ),
+        ],
+      );
+    }
+
+    /// A field at the top of a scrollable list, so one test can exercise
+    /// both triggers.
+    Widget listForm() {
+      fieldNode = newFocusNode('field');
+      controller = newController();
+      return ListView(
+        controller: controller,
+        children: [
+          TextField(key: const Key('field'), focusNode: fieldNode),
+          ...rows(),
+        ],
+      );
+    }
+
+    testWidgets('a nested onTapOutside: false keeps its own drag trigger', (
+      tester,
+    ) async {
+      await withPlatform(TargetPlatform.android, () async {
+        await pumpIx(
+          tester,
+          IxKeyboardDismissScope(
+            child: IxKeyboardDismissScope(
+              onTapOutside: false,
+              child: listForm(),
+            ),
+          ),
+        );
+        await focusField(tester);
+
+        await tester.tap(find.byKey(const Key('row1')));
+        await tester.pump();
+        expect(
+          fieldNode.hasPrimaryFocus,
+          isTrue,
+          reason: 'the inner scope turned the tap trigger off',
+        );
+        expect(tester.testTextInput.isVisible, isTrue);
+
+        await tester.drag(find.byKey(const Key('row1')), const Offset(0, -200));
+        await tester.pump();
+        expect(controller.offset, greaterThan(0));
+        expect(
+          fieldNode.hasFocus,
+          isFalse,
+          reason: 'the inner scope left the drag trigger on',
+        );
+        expect(tester.testTextInput.isVisible, isFalse);
+      });
+    });
+
+    testWidgets('a nested onDrag: false keeps its own tap trigger', (
+      tester,
+    ) async {
+      await withPlatform(TargetPlatform.android, () async {
+        await pumpIx(
+          tester,
+          IxKeyboardDismissScope(
+            child: IxKeyboardDismissScope(onDrag: false, child: listForm()),
+          ),
+        );
+        await focusField(tester);
+
+        await tester.drag(find.byKey(const Key('row1')), const Offset(0, -200));
+        await tester.pump();
+        expect(controller.offset, greaterThan(0));
+        expect(
+          fieldNode.hasPrimaryFocus,
+          isTrue,
+          reason: 'the inner scope turned the drag trigger off',
+        );
+        expect(tester.testTextInput.isVisible, isTrue);
+
+        await tester.tap(find.byKey(const Key('row1')));
+        await tester.pump();
+        expect(
+          fieldNode.hasFocus,
+          isFalse,
+          reason: 'the inner scope left the tap trigger on',
+        );
+        expect(tester.testTextInput.isVisible, isFalse);
+      });
+    });
+
+    /// An opt-out has to mean *Flutter's* behaviour, and that is not "do
+    /// nothing": on a desktop platform Flutter drops the focus on a tap
+    /// outside whatever the pointer is. The first test pins that stock
+    /// behaviour, the second requires the nested opt-out to match it down to
+    /// the IME calls -- a leading `TextInput.hide` would mean an enclosing
+    /// scope had answered in the inner scope's place.
+    const stockTeardown = <String>['TextInput.clearClient', 'TextInput.hide'];
+
+    testWidgets('without a scope macOS drops the focus on a tap outside', (
+      tester,
+    ) async {
+      await withPlatform(TargetPlatform.macOS, () async {
+        await pumpIx(tester, form());
+        await focusField(tester);
+
+        tester.testTextInput.log.clear();
+        await tester.tap(find.byKey(const Key('outside')));
+        await tester.pump();
+
+        expect(fieldNode.hasFocus, isFalse);
+        expect(
+          tester.testTextInput.log.map((call) => call.method),
+          stockTeardown,
+        );
+      });
+    });
+
+    testWidgets('a nested enabled: false matches that desktop default', (
+      tester,
+    ) async {
+      await withPlatform(TargetPlatform.macOS, () async {
+        await pumpIx(
+          tester,
+          IxKeyboardDismissScope(
+            child: IxKeyboardDismissScope(enabled: false, child: form()),
+          ),
+        );
+        await focusField(tester);
+
+        tester.testTextInput.log.clear();
+        await tester.tap(find.byKey(const Key('outside')));
+        await tester.pump();
+
+        expect(
+          fieldNode.hasFocus,
+          isFalse,
+          reason: "Flutter's own action drops the focus on desktop",
+        );
+        expect(
+          tester.testTextInput.log.map((call) => call.method),
+          stockTeardown,
+          reason: 'an enclosing scope answered instead of the field',
+        );
+      });
+    });
+  });
 }

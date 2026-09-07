@@ -75,6 +75,16 @@ import 'package:flutter/widgets.dart';
 /// never cleared by an unrelated tap. Taps are observed, never consumed:
 /// the button you tapped to dismiss the keyboard still fires.
 ///
+/// The override is installed whatever the flags below say, and answers the
+/// intent either way. `EditableText` registers its default through
+/// [Action.overridable], which looks up the *nearest* override above the
+/// field and hands it the overridden action as [Action.callingAction]; a
+/// scope that is switched off gives the intent straight back to that action,
+/// so `enabled: false` still means "Flutter's own behaviour" when an
+/// enclosing scope -- [IxApplicationScaffold]'s, say -- is switched on.
+/// Leaving the entry out instead would merely send the lookup one scope
+/// further up.
+///
 /// ## Which scrolls count
 ///
 /// A `NotificationListener<ScrollNotification>` watches the subtree, so one
@@ -87,6 +97,13 @@ import 'package:flutter/widgets.dart';
 /// no drag details, and a field scrolling its own text never dismisses its
 /// own keyboard. As with the tap trigger, only a focused *text input* is
 /// released; a focused button survives a scroll.
+///
+/// And only a field this scope owns: the one nearest above it. A
+/// `ScrollNotification` says where the *scroll* happened, not where the
+/// focus is -- `FocusManager.instance.primaryFocus` is application-wide --
+/// so a field that merely sits next to this scope, or one that a nested
+/// scope has opted out, keeps its keyboard. That is the same owner the tap
+/// trigger's [Actions] lookup resolves to.
 ///
 /// ## Taps, not scrolls
 ///
@@ -123,19 +140,25 @@ class IxKeyboardDismissScope extends StatefulWidget {
   /// field survives both a touch outside it on Android, iOS and Fuchsia and
   /// a scroll of any scroll view -- while keeping this widget in the tree,
   /// so toggling it never remounts the subtree.
+  ///
+  /// It holds for the whole of [child]: an enclosing scope that is switched
+  /// on, such as the one [IxApplicationScaffold] installs around its frame,
+  /// does not reach past this one.
   final bool enabled;
 
   /// Whether a tap outside a focused text input releases it.
   ///
   /// The two triggers are independent: turning this off leaves [onDrag]
-  /// working, and vice versa.
+  /// working, and vice versa. Like [enabled], it holds against an enclosing
+  /// scope that has the trigger on.
   final bool onTapOutside;
 
   /// Whether dragging a scroll view releases a focused text input.
   ///
   /// Only a *user* drag counts. A programmatic `jumpTo`/`animateTo`, the
   /// ballistic settling after a fling and the field's own internal text
-  /// scrolling all leave the keyboard alone.
+  /// scrolling all leave the keyboard alone. Like [enabled], the switch
+  /// holds against an enclosing scope that has the trigger on.
   final bool onDrag;
 
   /// Whether the platform is asked to take the keyboard down explicitly.
@@ -163,54 +186,68 @@ class _IxKeyboardDismissScopeState extends State<IxKeyboardDismissScope> {
   int? _touchPointer;
   Offset? _touchDownPosition;
 
+  /// The override this scope installs, whatever the flags say.
+  ///
+  /// Built once and never swapped, so the entry is always there -- the
+  /// nearest scope above a field is the one that answers for it -- and
+  /// flipping a flag leaves the [Actions] element and its state in place.
+  /// See [_IxTapOutsideAction].
   late final Map<Type, Action<Intent>> _actions = <Type, Action<Intent>>{
-    EditableTextTapOutsideIntent: CallbackAction<EditableTextTapOutsideIntent>(
-      onInvoke: _onTapOutside,
-    ),
-    EditableTextTapUpOutsideIntent:
-        CallbackAction<EditableTextTapUpOutsideIntent>(
-          onInvoke: _onTapUpOutside,
-        ),
+    EditableTextTapOutsideIntent: _IxTapOutsideAction(this),
+    EditableTextTapUpOutsideIntent: _IxTapUpOutsideAction(this),
   };
 
-  /// An empty map is not an override at all: the lookup walks past this
-  /// widget and the field runs Flutter's own action.
-  static const Map<Type, Action<Intent>> _passThrough =
-      <Type, Action<Intent>>{};
-
-  Object? _onTapOutside(EditableTextTapOutsideIntent intent) {
+  /// Handles the pointer going down outside the field that raised [intent].
+  ///
+  /// Returns whether this scope answered for the field. `false` means it is
+  /// switched off and [_IxTapOutsideAction] should hand the intent back to
+  /// `EditableText`'s own action instead, so the field gets Flutter's
+  /// platform behaviour -- which on a desktop platform is to unfocus -- and
+  /// not merely the mobile half of it.
+  bool _onTapOutside(EditableTextTapOutsideIntent intent) {
     _touchPointer = null;
     _touchDownPosition = null;
+    if (!widget.enabled || !widget.onTapOutside) {
+      return false;
+    }
     if (!intent.focusNode.hasFocus) {
-      return null;
+      return true;
     }
     if (intent.pointerDownEvent.kind == PointerDeviceKind.touch) {
       // Wait for the lift: this may still turn into a scroll.
       _touchPointer = intent.pointerDownEvent.pointer;
       _touchDownPosition = intent.pointerDownEvent.position;
-      return null;
+      return true;
     }
     _release(intent.focusNode);
-    return null;
+    return true;
   }
 
-  Object? _onTapUpOutside(EditableTextTapUpOutsideIntent intent) {
+  /// Handles the lift of a touch that went down outside the field.
+  ///
+  /// Returns whether this scope answered, as [_onTapOutside] does. A
+  /// switched-off scope hands the intent back to `EditableText`'s own
+  /// tap-up-outside action, which does nothing of its own.
+  bool _onTapUpOutside(EditableTextTapUpOutsideIntent intent) {
     final pointer = _touchPointer;
     final downPosition = _touchDownPosition;
     _touchPointer = null;
     _touchDownPosition = null;
+    if (!widget.enabled || !widget.onTapOutside) {
+      return false;
+    }
     if (pointer == null ||
         downPosition == null ||
         pointer != intent.pointerUpEvent.pointer ||
         !intent.focusNode.hasFocus) {
-      return null;
+      return true;
     }
     if ((intent.pointerUpEvent.position - downPosition).distance > kTouchSlop) {
       // A scroll (or any other drag), not a tap: leave the field alone.
-      return null;
+      return true;
     }
     _release(intent.focusNode);
-    return null;
+    return true;
   }
 
   /// Releases a focused text input when the user drags a scroll view.
@@ -222,7 +259,7 @@ class _IxKeyboardDismissScopeState extends State<IxKeyboardDismissScope> {
       return false;
     }
     final node = FocusManager.instance.primaryFocus;
-    if (node == null || !_isTextInput(node.context)) {
+    if (node == null || !_isTextInput(node.context) || !_owns(node)) {
       return false;
     }
     // The field scrolling its own content (a selection drag in a long
@@ -247,6 +284,19 @@ class _IxKeyboardDismissScopeState extends State<IxKeyboardDismissScope> {
   static bool _isUserDrag(ScrollNotification notification) =>
       notification is ScrollUpdateNotification &&
       notification.dragDetails != null;
+
+  /// Whether this scope is the one that answers for [node].
+  ///
+  /// The notification proves that the *scroll* happened inside this subtree;
+  /// `FocusManager.instance.primaryFocus` is application-wide and proves
+  /// nothing about where the field is. Without this test a scroll here would
+  /// release a field that merely sits next to this scope, or one that a
+  /// nested scope has opted out of the behaviour. The scope nearest above
+  /// the field owns it -- the same one the tap trigger's [Actions] lookup
+  /// arrives at.
+  bool _owns(FocusNode node) =>
+      node.context?.findAncestorStateOfType<_IxKeyboardDismissScopeState>() ==
+      this;
 
   /// Whether [context] sits inside a text input.
   ///
@@ -287,12 +337,43 @@ class _IxKeyboardDismissScopeState extends State<IxKeyboardDismissScope> {
     // themselves -- so flipping a flag never remounts the subtree.
     return NotificationListener<ScrollNotification>(
       onNotification: _onScroll,
-      child: Actions(
-        actions: widget.enabled && widget.onTapOutside
-            ? _actions
-            : _passThrough,
-        child: widget.child,
-      ),
+      child: Actions(actions: _actions, child: widget.child),
     );
   }
+}
+
+/// This scope's override of `EditableText`'s own tap-outside action.
+///
+/// `EditableText` registers that action with [Action.overridable]
+/// (`editable_text.dart`), so the nearest [Actions] entry above the field
+/// wins the lookup and is handed the action it overrode as
+/// [Action.callingAction]. Delegating to it is how a scope that is switched
+/// off asks for Flutter's own behaviour without copying the platform rules
+/// out of the framework, and without an enclosing scope answering instead.
+/// [Action.invoke] is protected, so that hand-back has to happen here rather
+/// than in the [State]: the scope decides, this action delegates.
+///
+/// [Action.isActionEnabled] is left at its default `true` on purpose: a
+/// disabled override is skipped and the lookup carries on to the next scope
+/// up, which is exactly what this class exists to stop.
+class _IxTapOutsideAction extends Action<EditableTextTapOutsideIntent> {
+  _IxTapOutsideAction(this.scope);
+
+  final _IxKeyboardDismissScopeState scope;
+
+  @override
+  Object? invoke(EditableTextTapOutsideIntent intent) =>
+      scope._onTapOutside(intent) ? null : callingAction?.invoke(intent);
+}
+
+/// This scope's override of `EditableText`'s tap-up-outside action, whose own
+/// default does nothing. See [_IxTapOutsideAction].
+class _IxTapUpOutsideAction extends Action<EditableTextTapUpOutsideIntent> {
+  _IxTapUpOutsideAction(this.scope);
+
+  final _IxKeyboardDismissScopeState scope;
+
+  @override
+  Object? invoke(EditableTextTapUpOutsideIntent intent) =>
+      scope._onTapUpOutside(intent) ? null : callingAction?.invoke(intent);
 }

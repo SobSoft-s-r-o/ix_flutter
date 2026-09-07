@@ -44,8 +44,24 @@ void main() {
       }
     }
 
-    Widget scaffold({bool dismissKeyboardOnInteraction = true}) {
+    /// [bodyOptsOut] wraps the body in a scope of its own that is switched
+    /// off -- one page declining the behaviour the frame turned on.
+    Widget scaffold({
+      bool dismissKeyboardOnInteraction = true,
+      bool bodyOptsOut = false,
+    }) {
       fieldNode = newFocusNode('field');
+      final body = Column(
+        children: [
+          TextField(key: const Key('field'), focusNode: fieldNode),
+          Container(
+            key: const Key('outside'),
+            height: 160,
+            width: 400,
+            color: const Color(0xFF445566),
+          ),
+        ],
+      );
       return IxApplicationScaffold(
         appTitle: 'Demo',
         entries: const [
@@ -58,17 +74,9 @@ void main() {
         ],
         onNavigate: (_) {},
         dismissKeyboardOnInteraction: dismissKeyboardOnInteraction,
-        body: Column(
-          children: [
-            TextField(key: const Key('field'), focusNode: fieldNode),
-            Container(
-              key: const Key('outside'),
-              height: 160,
-              width: 400,
-              color: const Color(0xFF445566),
-            ),
-          ],
-        ),
+        body: bodyOptsOut
+            ? IxKeyboardDismissScope(enabled: false, child: body)
+            : body,
       );
     }
 
@@ -122,6 +130,29 @@ void main() {
         });
       },
     );
+
+    /// The scaffold turns the behaviour on for the whole frame, so a page
+    /// that wants Flutter's default back has nowhere to go but a nested
+    /// scope with `enabled: false` -- documented as putting "Flutter's
+    /// platform defaults back for [child]".
+    testWidgets('a body scope with enabled: false opts that page out', (
+      tester,
+    ) async {
+      await withPlatform(TargetPlatform.android, () async {
+        await pumpIx(tester, scaffold(bodyOptsOut: true));
+        await focusField(tester);
+
+        await tester.tap(find.byKey(const Key('outside')));
+        await tester.pump();
+
+        expect(
+          fieldNode.hasPrimaryFocus,
+          isTrue,
+          reason: 'the page opted out of the scaffold-wide scope',
+        );
+        expect(tester.testTextInput.isVisible, isTrue);
+      });
+    });
 
     /// The same scaffold, but with a scrollable body.
     Widget scrollingScaffold({bool dismissKeyboardOnInteraction = true}) {
