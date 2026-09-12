@@ -1,6 +1,8 @@
 // These deprecated APIs intentionally compile as a published 1.0.2 consumer.
 // ignore_for_file: deprecated_member_use
 
+import 'dart:ui' show Tristate;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ix_flutter/ix_flutter.dart';
@@ -57,6 +59,27 @@ class _PublishedBlindSubclass extends IxBlind {
   // Delegation itself is the published subclass contract under test.
   @override
   // ignore: unnecessary_overrides
+  Widget build(BuildContext context) => super.build(context);
+}
+
+class _GetterControlledBlind extends IxBlind {
+  const _GetterControlledBlind({
+    required this.isOpen,
+    bool? constructorExpanded,
+    super.onExpandedChanged,
+  }) : super(
+         title: 'Getter-controlled subclass',
+         expanded: constructorExpanded,
+         child: const Text('Getter-controlled content'),
+       );
+
+  final bool isOpen;
+
+  @override
+  bool get expanded => isOpen;
+
+  @override
+  // ignore: unnecessary_overrides -- Exercise published subclass delegation.
   Widget build(BuildContext context) => super.build(context);
 }
 
@@ -136,6 +159,88 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: Scaffold(body: stateless)));
     expect(find.text('Content'), findsOneWidget);
     expect(tester.takeException(), isNull);
+  });
+
+  for (final constructorExpanded in <bool?>[null, false, true]) {
+    testWidgets(
+      'subclass expanded getter controls visibility and requests with '
+      'constructor expanded=$constructorExpanded',
+      (tester) async {
+        final semantics = tester.ensureSemantics();
+        final requests = <bool>[];
+        Future<void> pumpWith(bool isOpen) async {
+          await tester.pumpWidget(
+            MaterialApp(
+              home: Scaffold(
+                body: _GetterControlledBlind(
+                  isOpen: isOpen,
+                  constructorExpanded: constructorExpanded,
+                  onExpandedChanged: requests.add,
+                ),
+              ),
+            ),
+          );
+          await tester.pumpAndSettle();
+        }
+
+        await pumpWith(true);
+        expect(
+          tester
+              .getSemantics(find.text('Getter-controlled subclass'))
+              .flagsCollection
+              .isExpanded,
+          Tristate.isTrue,
+        );
+        expect(find.text('Getter-controlled content'), findsOneWidget);
+        await tester.tap(find.text('Getter-controlled subclass'));
+        await tester.pumpAndSettle();
+        expect(requests, [false]);
+        expect(find.text('Getter-controlled content'), findsOneWidget);
+
+        await pumpWith(false);
+        expect(
+          tester
+              .getSemantics(find.text('Getter-controlled subclass'))
+              .flagsCollection
+              .isExpanded,
+          Tristate.isFalse,
+        );
+        expect(find.text('Getter-controlled content'), findsNothing);
+        await tester.tap(find.text('Getter-controlled subclass'));
+        await tester.pumpAndSettle();
+        expect(requests, [false, true]);
+        expect(find.text('Getter-controlled content'), findsNothing);
+        semantics.dispose();
+      },
+    );
+  }
+
+  testWidgets('delegated build preserves the getter on uncontrolled handover', (
+    tester,
+  ) async {
+    Future<void> pumpDelegated(IxBlind blind) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(body: Builder(builder: blind.build)),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    await pumpDelegated(
+      const _GetterControlledBlind(isOpen: true, constructorExpanded: false),
+    );
+    expect(find.text('Getter-controlled content'), findsOneWidget);
+    await pumpDelegated(
+      const IxBlind(
+        title: 'Uncontrolled successor',
+        child: Text('Successor content'),
+      ),
+    );
+    expect(find.text('Successor content'), findsOneWidget);
+    await tester.tap(find.text('Uncontrolled successor'));
+    await tester.pumpAndSettle();
+    expect(find.text('Successor content'), findsNothing);
   });
 
   test('uncontrolled Blind exposes a non-null initial expanded value', () {

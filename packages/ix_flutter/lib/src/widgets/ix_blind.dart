@@ -22,7 +22,8 @@ export 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart'
 ///
 /// The widget is uncontrolled by default: omitting the `expanded` argument makes it
 /// manage its own state internally, starting from [initiallyExpanded] and
-/// toggling on every header tap.
+/// toggling on every header tap. Subclasses retain the published controlled
+/// contract: their public [expanded] getter always determines visibility.
 ///
 /// ```dart
 /// const IxBlind(title: 'Details', child: Text('...'))
@@ -87,10 +88,18 @@ class IxBlind extends StatelessWidget {
   /// the live uncontrolled state is managed by the private implementation.
   ///
   /// Pass a non-null `expanded` constructor argument for controlled mode.
-  /// Omit it (or pass `null`) to toggle internally on header taps.
+  /// On an exact [IxBlind] instance, omit it (or pass `null`) to toggle
+  /// internally on header taps. Subclasses always use this getter as their
+  /// controlled value, preserving overrides used with `super.build(context)`.
   bool get expanded => _controlledExpanded ?? initiallyExpanded;
 
   final bool? _controlledExpanded;
+
+  // Do not infer whether expanded is overridden from its current value:
+  // an override may equal initiallyExpanded now and change on a later build.
+  // All subclasses keep the published controlled getter contract.
+  bool get _uncontrolled =>
+      runtimeType == IxBlind && _controlledExpanded == null;
 
   /// The expanded state used on first build when the `expanded` constructor
   /// argument is omitted or `null` (uncontrolled mode).
@@ -133,7 +142,7 @@ class _IxBlindImplementation extends StatefulWidget {
 
 class _IxBlindState extends State<_IxBlindImplementation> {
   /// Backing store for the uncontrolled contract; only consulted when
-  /// the `expanded` constructor argument is `null`. `late` because it reads
+  /// the configuration is uncontrolled. `late` because it reads
   /// [widget], which is not assigned during field initialization.
   late bool _internal = widget.configuration.initiallyExpanded;
 
@@ -148,7 +157,9 @@ class _IxBlindState extends State<_IxBlindImplementation> {
 
   /// The effective expanded state: the controlled [IxBlind.expanded] value
   /// when set, otherwise the internally-tracked uncontrolled state.
-  bool get _expanded => widget.configuration._controlledExpanded ?? _internal;
+  bool get _expanded => widget.configuration._uncontrolled
+      ? _internal
+      : widget.configuration.expanded;
 
   @override
   void dispose() {
@@ -163,9 +174,9 @@ class _IxBlindState extends State<_IxBlindImplementation> {
     // state from the last controlled value so the next toggle continues
     // from where the caller left it, instead of jumping back to
     // `initiallyExpanded`.
-    if (oldWidget.configuration._controlledExpanded != null &&
-        widget.configuration._controlledExpanded == null) {
-      _internal = oldWidget.configuration._controlledExpanded!;
+    if (!oldWidget.configuration._uncontrolled &&
+        widget.configuration._uncontrolled) {
+      _internal = oldWidget.configuration.expanded;
     }
     // No explicit animate-on-change call needed: build() below always
     // passes the current `_expanded` to IxCollapsible, whose own
@@ -174,7 +185,7 @@ class _IxBlindState extends State<_IxBlindImplementation> {
 
   void _toggle() {
     final next = !_expanded;
-    if (widget.configuration._controlledExpanded == null) {
+    if (widget.configuration._uncontrolled) {
       setState(() => _internal = next);
     }
     widget.configuration.onExpandedChanged?.call(next);
