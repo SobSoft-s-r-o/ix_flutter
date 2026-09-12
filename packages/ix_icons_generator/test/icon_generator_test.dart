@@ -12,10 +12,26 @@ import 'package:test/test.dart';
 /// (use the tarball's real sha1) from an explicit `null` (omit the field).
 const Object _useRealShasum = Object();
 
+typedef InvalidNoticeScenario = ({
+  String description,
+  bool includeLicense,
+  List<int>? licenseBytes,
+  bool includeDisclosure,
+  List<int>? disclosureBytes,
+  String expectedMessage,
+});
+
 void main() {
   late Directory tmp;
   setUp(() => tmp = Directory.systemTemp.createTempSync('gen_'));
   tearDown(() => tmp.deleteSync(recursive: true));
+
+  final licenseBytes = utf8.encode(
+    'DISTINCTIVE ICON LICENSE\r\nCopyright 2026 Example\r\n',
+  );
+  final disclosureBytes = utf8.encode(
+    '<html><body>DISTINCTIVE DISCLOSURE µ</body></html>\n',
+  );
 
   MockClient client({String version = '3.5.0'}) => MockClient((req) async {
     if (req.url.path == '/@siemens/ix-icons') {
@@ -69,13 +85,36 @@ void main() {
     });
   }
 
-  Archive validArchive() => Archive()
-    ..add(
-      ArchiveFile.string('package/svg/a.svg', '<svg><path d="M0 0"/></svg>'),
-    )
-    ..add(
-      ArchiveFile.string('package/svg/b-c.svg', '<svg><path d="M1 1"/></svg>'),
-    );
+  Archive addNotices(
+    Archive archive, {
+    bool includeLicense = true,
+    List<int>? customLicenseBytes,
+    bool includeDisclosure = true,
+    List<int>? customDisclosureBytes,
+  }) {
+    if (includeLicense) {
+      final bytes = customLicenseBytes ?? licenseBytes;
+      archive.add(ArchiveFile('package/LICENSE.md', bytes.length, bytes));
+    }
+    if (includeDisclosure) {
+      final bytes = customDisclosureBytes ?? disclosureBytes;
+      archive.add(ArchiveFile('package/READMEOSS.html', bytes.length, bytes));
+    }
+    return archive;
+  }
+
+  Archive validArchive() => addNotices(
+    Archive()
+      ..add(
+        ArchiveFile.string('package/svg/a.svg', '<svg><path d="M0 0"/></svg>'),
+      )
+      ..add(
+        ArchiveFile.string(
+          'package/svg/b-c.svg',
+          '<svg><path d="M1 1"/></svg>',
+        ),
+      ),
+  );
 
   test('cleanSvgContent removes fill="none" from <g> elements', () {
     const svg =
@@ -112,13 +151,14 @@ void main() {
   });
 
   test('generated assets carry no root-level fill="none"', () async {
-    final archive = Archive()
-      ..add(
+    final archive = addNotices(
+      Archive()..add(
         ArchiveFile.string(
           'package/svg/blank.svg',
           '<svg viewBox="0 0 24 24" fill="none"><path d="M0 0"/></svg>',
         ),
-      );
+      ),
+    );
     await IconGenerator.generateIcons(
       outputDir: '${tmp.path}/lib',
       assetsDir: '${tmp.path}/assets/ix_icons',
@@ -181,6 +221,106 @@ void main() {
     expect(code, isNot(contains('class IxIcons {')));
   });
 
+  test(
+    'copies upstream notices byte-for-byte without getters or formatting',
+    () async {
+      await IconGenerator.generateIcons(
+        outputDir: '${tmp.path}/lib',
+        assetsDir: '${tmp.path}/assets/ix_icons',
+        client: clientForArchive(validArchive()),
+        legacyGetters: false,
+        format: false,
+      );
+
+      expect(
+        File('${tmp.path}/assets/ix_icons/LICENSE.md').readAsBytesSync(),
+        licenseBytes,
+      );
+      expect(
+        File('${tmp.path}/assets/ix_icons/READMEOSS.html').readAsBytesSync(),
+        disclosureBytes,
+      );
+      final code = File('${tmp.path}/lib/ix_icons.dart').readAsStringSync();
+      expect(code, isNot(contains('class IxIcons {')));
+    },
+  );
+
+  final invalidNotices = <InvalidNoticeScenario>[
+    (
+      description: 'LICENSE.md is missing',
+      includeLicense: false,
+      licenseBytes: null,
+      includeDisclosure: true,
+      disclosureBytes: disclosureBytes,
+      expectedMessage: 'LICENSE.md is missing',
+    ),
+    (
+      description: 'LICENSE.md is empty',
+      includeLicense: true,
+      licenseBytes: <int>[],
+      includeDisclosure: true,
+      disclosureBytes: disclosureBytes,
+      expectedMessage: 'LICENSE.md is empty',
+    ),
+    (
+      description: 'READMEOSS.html is missing',
+      includeLicense: true,
+      licenseBytes: licenseBytes,
+      includeDisclosure: false,
+      disclosureBytes: null,
+      expectedMessage: 'READMEOSS.html is missing',
+    ),
+    (
+      description: 'READMEOSS.html is empty',
+      includeLicense: true,
+      licenseBytes: licenseBytes,
+      includeDisclosure: true,
+      disclosureBytes: <int>[],
+      expectedMessage: 'READMEOSS.html is empty',
+    ),
+  ];
+
+  for (final scenario in invalidNotices) {
+    test(
+      'leaves existing output intact when ${scenario.description}',
+      () async {
+        final outputDir = Directory('${tmp.path}/lib')..createSync();
+        final assetsDir = Directory('${tmp.path}/assets/ix_icons')
+          ..createSync(recursive: true);
+        final oldSvg = File('${assetsDir.path}/old.svg')
+          ..writeAsStringSync('<svg id="old"/>');
+        final oldDart = File('${outputDir.path}/ix_icons.dart')
+          ..writeAsStringSync('// old generated catalogue\n');
+        final archive = addNotices(
+          Archive()
+            ..add(ArchiveFile.string('package/svg/new.svg', '<svg id="new"/>')),
+          includeLicense: scenario.includeLicense,
+          customLicenseBytes: scenario.licenseBytes,
+          includeDisclosure: scenario.includeDisclosure,
+          customDisclosureBytes: scenario.disclosureBytes,
+        );
+
+        await expectLater(
+          IconGenerator.generateIcons(
+            outputDir: outputDir.path,
+            assetsDir: assetsDir.path,
+            client: clientForArchive(archive),
+            format: false,
+          ),
+          throwsA(
+            predicate(
+              (error) => error.toString().contains(scenario.expectedMessage),
+            ),
+          ),
+        );
+
+        expect(oldSvg.readAsStringSync(), '<svg id="old"/>');
+        expect(oldDart.readAsStringSync(), '// old generated catalogue\n');
+        expect(File('${assetsDir.path}/new.svg').existsSync(), isFalse);
+      },
+    );
+  }
+
   test('rejects a tarball entry that escapes the temp directory', () async {
     final archive = validArchive()
       ..add(ArchiveFile.string('package/../../escape.svg', '<svg/>'));
@@ -234,10 +374,12 @@ void main() {
   });
 
   test('sanitises identifiers that Dart cannot spell', () async {
-    final archive = Archive()
-      ..add(ArchiveFile.string('package/svg/3d-view.svg', '<svg/>'))
-      ..add(ArchiveFile.string('package/svg/class.svg', '<svg/>'))
-      ..add(ArchiveFile.string('package/svg/ok.svg', '<svg/>'));
+    final archive = addNotices(
+      Archive()
+        ..add(ArchiveFile.string('package/svg/3d-view.svg', '<svg/>'))
+        ..add(ArchiveFile.string('package/svg/class.svg', '<svg/>'))
+        ..add(ArchiveFile.string('package/svg/ok.svg', '<svg/>')),
+    );
     await IconGenerator.generateIcons(
       outputDir: '${tmp.path}/lib',
       assetsDir: '${tmp.path}/assets/ix_icons',
@@ -250,9 +392,11 @@ void main() {
   });
 
   test('fails on two icons that collapse to one identifier', () async {
-    final archive = Archive()
-      ..add(ArchiveFile.string('package/svg/a-b.svg', '<svg/>'))
-      ..add(ArchiveFile.string('package/svg/a_b.svg', '<svg/>'));
+    final archive = addNotices(
+      Archive()
+        ..add(ArchiveFile.string('package/svg/a-b.svg', '<svg/>'))
+        ..add(ArchiveFile.string('package/svg/a_b.svg', '<svg/>')),
+    );
     await expectLater(
       IconGenerator.generateIcons(
         outputDir: '${tmp.path}/lib',

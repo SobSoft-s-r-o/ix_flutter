@@ -15,6 +15,8 @@ The newest published version is
 [1.0.0](https://pub.dev/packages/ix_icons_generator/versions/1.0.0).
 
 ### Added
+- Generated icon assets preserve upstream `LICENSE.md` and `READMEOSS.html`,
+  and packages where either notice is missing or empty are refused
 - `--icons-version` option to pick the `@siemens/ix-icons` version to download
 - `--no-legacy-getters` flag to omit the deprecated `IxIcons` widget getters
 - `--no-format` flag; the generated `ix_icons.dart` is now run through

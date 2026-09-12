@@ -123,6 +123,10 @@ Future<void> main(List<String> arguments) async {
     print('       - ${path.relative(assetsDir, from: projectRoot)}/');
     print('2. Run: flutter pub get');
     print('3. Use: IxIcon(IxIconsData.about)');
+    print(
+      '4. Keep LICENSE.md and READMEOSS.html with the generated SVGs when '
+      'redistributing them',
+    );
     exit(0);
   } catch (e, stackTrace) {
     print('\n✗ Error during icon generation:');

@@ -2,7 +2,10 @@
 
 Icon generator tool for Siemens iX Design System Flutter icons.
 
-This tool downloads the icons of the official `@siemens/ix-icons` npm package (1479 icons in the default version 3.5.0) and generates an `IxIconsData` catalogue for `ix_flutter`'s `IxIcon` widget.
+This tool downloads the icons of the official `@siemens/ix-icons` npm package
+(1479 icons in the default version 3.5.0) and generates an `IxIconsData`
+catalogue for `ix_flutter`'s `IxIcon` widget. Generated code requires
+`ix_flutter` 1.1.0 or later.
 
 ## Installation
 
@@ -12,6 +15,9 @@ Add to your `pubspec.yaml` as a dev dependency:
 dev_dependencies:
   ix_icons_generator: ^1.1.0
 ```
+
+The application or package using the generated catalogue must depend on
+`ix_flutter: ^1.1.0` or a later compatible version.
 
 ## Usage
 
@@ -23,9 +29,15 @@ dart run ix_icons_generator:generate_icons
 
 This will:
 - Download all Siemens iX icons from the official npm package
-- Create `assets/svg/` directory with SVG files
+- Create `assets/svg/` with the SVG files and the upstream `LICENSE.md` and
+  `READMEOSS.html`
 - Generate `lib/ix_icons.dart` with `IxIconsData` constants
 - Update your `pubspec.yaml` with asset paths
+
+Keep both notice files in the generated asset directory when retaining or
+redistributing the SVGs. The generator copies their bytes from the selected
+`@siemens/ix-icons` version; it refuses a package whose notice files are
+missing or empty.
 
 ## Command Line Options
 
@@ -110,8 +122,8 @@ using `--no-legacy-getters`.
 > const IxIcon(IxIconsData.home, size: IxIconSize.s16)
 > ```
 
-The generated file is not run through `dart format`; if your project checks
-formatting, run `dart format lib/ix_icons.dart` after generating.
+The generated file is run through `dart format` by default. Pass `--no-format`
+to opt out, for example when no `dart` executable is available on `PATH`.
 
 ## Related Packages
 
@@ -121,7 +133,9 @@ formatting, run `dart format lib/ix_icons.dart` after generating.
 
 MIT License - See [LICENSE](LICENSE)
 
-Icons are subject to Siemens iX Design System licensing.
+For the generated icons and their required upstream notices, see
+[Icon Licensing](ICON_LICENSING.md) and
+[Third-Party Notices](THIRD_PARTY_NOTICES.md).
 
 ---
 
