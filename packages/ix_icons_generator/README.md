@@ -19,8 +19,8 @@ dev_dependencies:
 The application or package using the generated catalogue must depend on
 `ix_flutter: ^1.1.0` or a later compatible version.
 
-For the generated API transition planned for 2.0, see the
-[1.1-to-2.0 migration guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_1_1_to_2_0.md).
+For the generated API replacements available in 1.1.0, see the
+[1.1.0 upgrade guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_to_1_1.md).
 
 ## Usage
 

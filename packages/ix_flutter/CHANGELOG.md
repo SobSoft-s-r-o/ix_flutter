@@ -27,7 +27,7 @@ Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 - `IxResponsiveDataView.paginationStrings` and `IxResponsiveDataViewStrings.pageSelectionLabel`
 - `IxApplicationStrings`, `IxApplicationScaffold` `settings`/`about`/`enableToggleTheme` API, menu keyboard navigation (Arrow/Home/End), `menuBar` landmark with a single semantics node per tile, and a category fly-out in the collapsed rail
 - `IxThemeName` and `IxColorSchema` (the upstream `data-ix-theme`/`data-ix-color-schema` model), `IxThemeController` (resolves the `system` schema at runtime, `themeChanged` stream, `updatePlatformBrightness`, and forwards `icons:`/`density:` to both built themes), `IxThemeBuilder.light()`/`IxThemeBuilder.dark()` plus `IxThemeBuilder(theme:/brightness:)`, `IxTheme.themeName`/`IxTheme.colorSchema`, `IxCustomPalette.partial()`/`IxCustomPalette.copyWith()` -- see `doc/theming.md`
-- An English [1.1-to-2.0 migration guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_1_1_to_2_0.md) that distinguishes migrations available in 1.1 from APIs and default changes scheduled for 2.0
+- An English [1.1.0 upgrade guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_to_1_1.md) covering the upgrade from 1.0.2, SDK requirements, behavior changes and deprecated API replacements available in 1.1.0
 
 ### Changed
 - **The minimum Flutter SDK is now 3.38.0** (`environment: flutter: ">=3.38.0"`, was `>=3.10.0`). The Dart SDK floor remains `>=3.10.0`, which 1.0.2 already required. `SemanticsRole.*` and `SemanticsService.sendAnnouncement` -- which the menu, toast, dropdown and data-view semantics in this release use -- are only available from Flutter 3.38. Package resolution considers both SDK constraints; verify the application's Dart and Flutter toolchain before upgrading. CI builds and tests on Flutter 3.44.6 stable
@@ -59,6 +59,7 @@ Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 - `IxResponsiveDataView.searchHintText` -- confirmed dead already in 1.0.2 (`origin/main`): the widget has never rendered a search field to apply a hint to, only a read-only search status bar. Pass the hint to your own search input's `InputDecoration.hintText` instead -- see "Search / Filtering" in `doc/ix_responsive_data_view.md`. Removed in 2.0
 
 ### Fixed
+- `IxEmptyState` action entries pass pub.dev's `use_null_aware_elements` lint; the rule is also enabled in local analysis
 - `IxBlind` now honours `IxThemeBuilder(typography:)` instead of always falling back to the default typography
 - `neutralHover` (light), `primaryActive`/`secondaryActive`/`secondaryHover` (dark) aligned with iX 5.2.1
 - Code typography now loads the bundled JetBrains Mono (package-prefixed font family)

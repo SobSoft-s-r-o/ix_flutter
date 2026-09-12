@@ -17,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   reported), so it satisfies a project's own formatting check as generated
 - Generated header records the icons version and the tarball sha1 checksum
 - Unit tests covering SVG cleaning, generated code and version selection
-- An English [1.1-to-2.0 migration guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_1_1_to_2_0.md) covering the generated getter transition
+- An English [1.1.0 upgrade guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_to_1_1.md) covering the generated getter transition
 
 ### Changed
 - Default `@siemens/ix-icons` version is now 3.5.0 (1479 icons)

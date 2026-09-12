@@ -145,10 +145,10 @@ class IxEmptyState extends StatelessWidget {
                 ? MainAxisAlignment.start
                 : MainAxisAlignment.center,
             children: [
-              if (primaryAction != null) primaryAction!,
+              ?primaryAction,
               if (primaryAction != null && secondaryAction != null)
                 const SizedBox(width: 16), // Spacing between actions
-              if (secondaryAction != null) secondaryAction!,
+              ?secondaryAction,
             ],
           ),
         ],

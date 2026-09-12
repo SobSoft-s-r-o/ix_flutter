@@ -400,8 +400,7 @@ the current supported-platform list (unchanged since 0.0.1).
 ### Migration guides
 
 See [ICON_MIGRATION.md](ICON_MIGRATION.md) for the icon-generator package split
-and [doc/migration_1_1_to_2_0.md](doc/migration_1_1_to_2_0.md) for the APIs
-available in 1.1 and the changes still scheduled for 2.0.
+and [doc/migration_to_1_1.md](doc/migration_to_1_1.md) for upgrading to 1.1.0 and addressing its deprecation warnings.
 
 ## Release Process
 
