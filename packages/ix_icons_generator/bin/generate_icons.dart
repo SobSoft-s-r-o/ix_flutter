@@ -3,6 +3,7 @@ import 'package:path/path.dart' as path;
 import 'package:args/args.dart';
 
 import 'package:ix_icons_generator/ix_icons_generator.dart';
+import 'package:ix_icons_generator/src/pubspec_asset_updater.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
@@ -148,34 +149,15 @@ Future<void> _updatePubspec(String projectRoot, String assetsPath) async {
   }
 
   final pubspecContent = await pubspecFile.readAsString();
-
-  // Check if the assets path is already in pubspec
-  if (pubspecContent.contains('- $assetsPath/')) {
+  final updatedContent = PubspecAssetUpdater.addAsset(
+    pubspecContent,
+    assetsPath,
+  );
+  if (updatedContent == pubspecContent) {
     print('Assets path already in pubspec.yaml');
     return;
   }
 
-  // Add assets section if needed
-  if (!pubspecContent.contains('flutter:')) {
-    final newContent =
-        '$pubspecContent\nflutter:\n  assets:\n    - $assetsPath/\n';
-    await pubspecFile.writeAsString(newContent);
-    print('Added flutter assets section to pubspec.yaml');
-  } else if (!pubspecContent.contains('assets:')) {
-    // Flutter section exists but no assets
-    final newContent = pubspecContent.replaceFirst(
-      RegExp(r'flutter:\s*\n'),
-      'flutter:\n  assets:\n    - $assetsPath/\n',
-    );
-    await pubspecFile.writeAsString(newContent);
-    print('Added assets section to pubspec.yaml');
-  } else {
-    // Assets section exists, add our path
-    final newContent = pubspecContent.replaceFirst(
-      RegExp(r'assets:\s*\n'),
-      'assets:\n    - $assetsPath/\n',
-    );
-    await pubspecFile.writeAsString(newContent);
-    print('Added assets path to pubspec.yaml');
-  }
+  await pubspecFile.writeAsString(updatedContent);
+  print('Added assets path to pubspec.yaml');
 }
