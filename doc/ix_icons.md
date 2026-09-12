@@ -176,7 +176,9 @@ On the successful path, iX and Material glyphs are never mixed for the same icon
 
 ## Dependencies
 
-- `ix_flutter` depends on `flutter_svg` directly because it renders its bundled internal icons.
+- `ix_flutter` depends on `flutter_svg` directly so `IxIcon` can render SVG
+  sources supplied by consumers or another package. The planned internal
+  Siemens SVG set is not bundled in 1.1.0.
 - Apps do **not** need to declare `flutter_svg`: generated icon code (generator ≥ 1.1.0) uses `IxIcon`/`IxIconData`.
 - If the icon runtime is extracted into a separate package in the future, `flutter_svg` moves with it.
 

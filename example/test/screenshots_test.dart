@@ -20,7 +20,7 @@ const _out = '../packages/ix_flutter/screenshots';
 /// built with. [IxThemeBuilder]'s own default resolves to
 /// `IxFonts.robotoMono` -- a monospace face -- because Work Sans
 /// ([IxFonts.workSans]) is opt-in pre-2.0 (see its doc comment); pub.dev
-/// screenshots should show the bundled iX typeface instead, so `main()`
+/// screenshots should show the bundled Work Sans family instead, so `main()`
 /// below passes `typography: IxTypography(fontFamily: IxFonts.workSans,
 /// package: IxFonts.packageName)`, which resolves to this package-prefixed
 /// family name.

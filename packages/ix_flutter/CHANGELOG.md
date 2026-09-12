@@ -5,15 +5,8 @@ All notable changes to the ix_flutter project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## 1.1.0 - 2026-09-12
 Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
-
-Prepared as **1.1.0**, and not published. `pubspec.yaml` still carries 1.0.2:
-the version bump and this section's release date are made later by the
-**Version Bump (Manual)** workflow, which turns `[Unreleased]` into the new
-release section in place -- see [CONTRIBUTING.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/CONTRIBUTING.md#release-process).
-Until that runs, the newest published version is
-[1.0.2](https://pub.dev/packages/ix_flutter/versions/1.0.2).
 
 ### Added
 - Public exports for `IxPaginationBar` and `IxBottomSheetTheme` from the package barrel
@@ -34,12 +27,13 @@ Until that runs, the newest published version is
 - `IxResponsiveDataView.paginationStrings` and `IxResponsiveDataViewStrings.pageSelectionLabel`
 - `IxApplicationStrings`, `IxApplicationScaffold` `settings`/`about`/`enableToggleTheme` API, menu keyboard navigation (Arrow/Home/End), `menuBar` landmark with a single semantics node per tile, and a category fly-out in the collapsed rail
 - `IxThemeName` and `IxColorSchema` (the upstream `data-ix-theme`/`data-ix-color-schema` model), `IxThemeController` (resolves the `system` schema at runtime, `themeChanged` stream, `updatePlatformBrightness`, and forwards `icons:`/`density:` to both built themes), `IxThemeBuilder.light()`/`IxThemeBuilder.dark()` plus `IxThemeBuilder(theme:/brightness:)`, `IxTheme.themeName`/`IxTheme.colorSchema`, `IxCustomPalette.partial()`/`IxCustomPalette.copyWith()` -- see `doc/theming.md`
+- An English [1.1-to-2.0 migration guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_1_1_to_2_0.md) that distinguishes migrations available in 1.1 from APIs and default changes scheduled for 2.0
 
 ### Changed
-- **The minimum Flutter SDK is now 3.38.0** (`environment: flutter: ">=3.38.0"`, was `>=3.10.0`). The Dart SDK floor is unchanged at `>=3.10.0`. `SemanticsRole.*` and `SemanticsService.sendAnnouncement` -- which the menu, toast, dropdown and data-view semantics in this release are built on -- are only available from Flutter 3.38. `pub` will not resolve this version for an app on an older Flutter; such an app stays on 1.0.2. CI builds and tests on Flutter 3.44.6 stable
+- **The minimum Flutter SDK is now 3.38.0** (`environment: flutter: ">=3.38.0"`, was `>=3.10.0`). The Dart SDK floor remains `>=3.10.0`, which 1.0.2 already required. `SemanticsRole.*` and `SemanticsService.sendAnnouncement` -- which the menu, toast, dropdown and data-view semantics in this release use -- are only available from Flutter 3.38. Package resolution considers both SDK constraints; verify the application's Dart and Flutter toolchain before upgrading. CI builds and tests on Flutter 3.44.6 stable
 - `IxThemeBuilder.build()` now bakes the static tap-target density from the platform the way Material derives `materialTapTargetSize` itself: touch platforms (Android/iOS/Fuchsia) get 48x48 hit areas (`IxDensity.comfortable`), desktop and desktop browsers keep the 1.0.2 layout (`IxDensity.compact`). Buttons, checkboxes, radios and switches therefore grow ~7px taller on touch platforms only. Pass `density: IxDensity.comfortable` (or wrap the app in `IxDensityScope`, which resolves the density live from the input modality) to opt every platform in; `density: IxDensity.compact` pins the 1.0.2 layout everywhere
-- New enum values break exhaustive `switch` statements in consumer code (Dart 3 makes a non-exhaustive `switch` over an enum a compile error): `IxSpinnerVariant.secondary`, `IxToastType.error`, and `IxTypographyVariant.buttonLabel`/`.caption`/`.textDefault`. Add a `default:` arm to any `switch` over these enums
-- `IxBlind` changed supertype from `StatelessWidget` to `StatefulWidget` (required by the new uncontrolled mode); subclasses and `find.byType`-style structural assumptions may need updating
+- `IxSpinnerVariant.secondary` and `IxToastType.error` are static aliases of the published `standard` and `critical` values, preserving enum values, indices and exhaustive switches. Their 1.x `.name` values remain `standard` and `critical`. The additional `IxTypography.buttonLabel`, `.caption` and `.textDefault` styles are getters rather than enum values, so the published typography enum remains exhaustive
+- `IxBlind` remains a `StatelessWidget` with its published non-null `expanded` getter. Exact `IxBlind` instances gain automatic uncontrolled state when `expanded` is omitted or null; subclasses remain controlled by their virtual `expanded` getter and can compose a plain `IxBlind` when they want automatic state
 - `IxToastOverlay`'s default top offset is 32px (was 16px), matching the upstream toast container; the deprecated `position:` path keeps its 16px offsets
 - `ThemeData.focusColor` is transparent; Material widgets without an iX adapter no longer receive an opaque focus fill — wrap custom focusables in `IxFocusRing`
 - `IxSpinner`'s default variant is now `IxSpinnerVariant.secondary` (identical styling to the deprecated `standard`)

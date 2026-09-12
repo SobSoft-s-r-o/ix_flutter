@@ -19,6 +19,9 @@ dev_dependencies:
 The application or package using the generated catalogue must depend on
 `ix_flutter: ^1.1.0` or a later compatible version.
 
+For the generated API transition planned for 2.0, see the
+[1.1-to-2.0 migration guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_1_1_to_2_0.md).
+
 ## Usage
 
 Run the generator in your Flutter project:
@@ -32,7 +35,9 @@ This will:
 - Create `assets/svg/` with the SVG files and the upstream `LICENSE.md` and
   `READMEOSS.html`
 - Generate `lib/ix_icons.dart` with `IxIconsData` constants
-- Update your `pubspec.yaml` with asset paths
+- Update the top-level `flutter.assets` list in `pubspec.yaml`, preserving
+  existing entries. Unsupported YAML shapes are reported without writing the
+  manifest
 
 Keep both notice files in the generated asset directory when retaining or
 redistributing the SVGs. The generator copies their bytes from the selected

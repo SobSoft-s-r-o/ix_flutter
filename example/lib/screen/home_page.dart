@@ -35,7 +35,7 @@ class HomePage extends StatelessWidget {
         _ComponentThemeCard(
           title: 'Application Menu',
           description:
-              'Menu surfaces reuse color-2 backgrounds, subtle outlines, and Siemens Sans labels.',
+              'Menu surfaces reuse color-2 backgrounds, subtle outlines, and the active theme typography.',
           chips: [
             _InfoChip('Background', appMenuTheme?.backgroundColor),
             _InfoChip('Divider', appMenuTheme?.dividerColor),

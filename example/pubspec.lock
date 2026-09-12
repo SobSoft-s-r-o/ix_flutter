@@ -142,7 +142,7 @@ packages:
       path: "../packages/ix_flutter"
       relative: true
     source: path
-    version: "1.0.2"
+    version: "1.1.0"
   ix_icons_generator:
     dependency: "direct dev"
     description:
@@ -373,4 +373,4 @@ packages:
     version: "6.6.1"
 sdks:
   dart: ">=3.10.0 <4.0.0"
-  flutter: ">=3.32.0"
+  flutter: ">=3.38.0"

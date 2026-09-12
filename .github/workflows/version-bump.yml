@@ -4,17 +4,17 @@ on:
   workflow_dispatch:
     inputs:
       package:
-        description: Package to bump
+        description: Package to finalize
         required: true
         default: ix_flutter
         type: choice
         options: [ix_flutter, ix_icons_generator, both]
       bump:
-        description: Semver bump (patch/minor/major)
+        description: Semver bump, or none when pubspec already has the release version
         required: true
         default: patch
         type: choice
-        options: [patch, minor, major]
+        options: [none, patch, minor, major]
       preid:
         description: Optional prerelease identifier (e.g., rc1)
         required: false
@@ -22,12 +22,14 @@ on:
         type: string
 
 env:
-  FLUTTER_VERSION: stable
+  FLUTTER_VERSION: 3.44.6
+  FLUTTER_CHANNEL: stable
+  CIDER_VERSION: 0.2.10
   PUB_CACHE: ~/.pub-cache
 
 jobs:
   bump:
-    name: Bump version
+    name: Finalize release
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -41,7 +43,8 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: ${{ env.FLUTTER_VERSION }}
+          channel: ${{ env.FLUTTER_CHANNEL }}
+          flutter-version: ${{ env.FLUTTER_VERSION }}
 
       # No `dart-lang/setup-dart` here: `subosito/flutter-action` above puts
       # the Flutter SDK's own `dart` on PATH, which runs `dart pub get`,
@@ -75,33 +78,56 @@ jobs:
         working-directory: packages/ix_icons_generator
         run: dart analyze
 
+      - name: Test ix_icons_generator
+        if: inputs.package == 'ix_icons_generator' || inputs.package == 'both'
+        working-directory: packages/ix_icons_generator
+        run: dart test
+
       - name: Test ix_flutter
         if: inputs.package == 'ix_flutter' || inputs.package == 'both'
         working-directory: packages/ix_flutter
         run: flutter test
 
       - name: Activate cider
-        run: dart pub global activate cider
+        run: dart pub global activate cider "$CIDER_VERSION"
 
-      - name: Bump ix_flutter version
+      - name: Finalize ix_flutter release
         if: inputs.package == 'ix_flutter' || inputs.package == 'both'
         working-directory: packages/ix_flutter
+        env:
+          RELEASE_BUMP: ${{ inputs.bump }}
+          RELEASE_PREID: ${{ inputs.preid }}
         run: |
-          if [ -n "${{ inputs.preid }}" ]; then
-            dart pub global run cider bump ${{ inputs.bump }} --pre=${{ inputs.preid }}
-          else
-            dart pub global run cider bump ${{ inputs.bump }}
+          if [ "$RELEASE_BUMP" = "none" ] && [ -n "$RELEASE_PREID" ]; then
+            echo "::error::preid cannot be used when bump is none"
+            exit 1
+          fi
+          if [ "$RELEASE_BUMP" != "none" ]; then
+            if [ -n "$RELEASE_PREID" ]; then
+              dart pub global run cider bump "$RELEASE_BUMP" --pre="$RELEASE_PREID"
+            else
+              dart pub global run cider bump "$RELEASE_BUMP"
+            fi
           fi
           dart pub global run cider release
 
-      - name: Bump ix_icons_generator version
+      - name: Finalize ix_icons_generator release
         if: inputs.package == 'ix_icons_generator' || inputs.package == 'both'
         working-directory: packages/ix_icons_generator
+        env:
+          RELEASE_BUMP: ${{ inputs.bump }}
+          RELEASE_PREID: ${{ inputs.preid }}
         run: |
-          if [ -n "${{ inputs.preid }}" ]; then
-            dart pub global run cider bump ${{ inputs.bump }} --pre=${{ inputs.preid }}
-          else
-            dart pub global run cider bump ${{ inputs.bump }}
+          if [ "$RELEASE_BUMP" = "none" ] && [ -n "$RELEASE_PREID" ]; then
+            echo "::error::preid cannot be used when bump is none"
+            exit 1
+          fi
+          if [ "$RELEASE_BUMP" != "none" ]; then
+            if [ -n "$RELEASE_PREID" ]; then
+              dart pub global run cider bump "$RELEASE_BUMP" --pre="$RELEASE_PREID"
+            else
+              dart pub global run cider bump "$RELEASE_BUMP"
+            fi
           fi
           dart pub global run cider release
 
@@ -120,13 +146,16 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Create pull request
+        # Repository Actions settings must allow GitHub Actions to create pull
+        # requests. A GITHUB_TOKEN-created PR can also require explicit
+        # approval before its workflows run; see CONTRIBUTING.md.
         uses: peter-evans/create-pull-request@v7
         with:
           branch: chore/release-${{ inputs.package }}-${{ steps.ix_flutter_version.outputs.version || steps.ix_icons_generator_version.outputs.version }}
           title: "chore: release ${{ inputs.package }} ${{ steps.ix_flutter_version.outputs.version || steps.ix_icons_generator_version.outputs.version }}"
-          commit-message: "chore: bump ${{ inputs.package }} to ${{ steps.ix_flutter_version.outputs.version || steps.ix_icons_generator_version.outputs.version }}"
+          commit-message: "chore: prepare ${{ inputs.package }} ${{ steps.ix_flutter_version.outputs.version || steps.ix_icons_generator_version.outputs.version }}"
           body: |
-            Automated version bump.
+            Automated release finalization.
             - package: ${{ inputs.package }}
             - bump: ${{ inputs.bump }}
             - preid: ${{ inputs.preid }}

@@ -89,6 +89,10 @@ Widget catalogueIcon() => const IxIcon(IxIconsData.home);
 
 ## Getting started
 
+Upgrading from 1.1 toward the planned 2.0 release? Read the
+[1.1-to-2.0 migration guide](doc/migration_1_1_to_2_0.md) for the APIs
+available today and the changes that remain planned.
+
 ### 1. Build your theme
 
 ```dart
@@ -175,6 +179,7 @@ Every Dart snippet in this repository's documentation is compiled in
 | Responsive data view and pagination | [doc/ix_responsive_data_view.md](doc/ix_responsive_data_view.md) |
 | Spinner | [doc/ix_spinner.md](doc/ix_spinner.md) |
 | Toasts | [doc/ix_toast.md](doc/ix_toast.md) |
+| 1.1 to 2.0 migration | [doc/migration_1_1_to_2_0.md](doc/migration_1_1_to_2_0.md) |
 | Upstream baseline (`@siemens/ix` versions) | [UPSTREAM.md](UPSTREAM.md) |
 
 ## Example

@@ -27,11 +27,12 @@ See [GETTING_STARTED.md](GETTING_STARTED.md) for detailed setup instructions.
 
 Run `flutter --version` and `dart --version` to check your versions.
 
-The Flutter floor rose from 3.10.0 in 1.0.2 to 3.38.0 for the upcoming 1.1.0,
+The Flutter floor rose from 3.10.0 in 1.0.2 to 3.38.0 in 1.1.0,
 because the semantics APIs the menu, toast, dropdown and data-view roles are
 built on (`SemanticsRole.*`, `SemanticsService.sendAnnouncement`) only exist
-from 3.38. The Dart floor is unchanged. An app that cannot move off an older
-Flutter stays on 1.0.2 -- `pub` will not resolve 1.1.0 for it.
+from 3.38. The Dart floor remains `>=3.10.0`, which 1.0.2 also required.
+Package resolution considers both SDK constraints; verify the application's
+Dart and Flutter toolchain before upgrading.
 
 ---
 
