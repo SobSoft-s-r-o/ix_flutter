@@ -23,7 +23,6 @@ Widget compactEmptyState(VoidCallback onClearSearch) => IxEmptyState(
 );
 
 Widget errorEmptyState(VoidCallback onRetry) => IxEmptyState(
-  type: IxEmptyStateType.error,
   icon: const IxIcon.key(IxIconKey.error),
   title: 'Something went wrong',
   subtitle: 'Please try again later',

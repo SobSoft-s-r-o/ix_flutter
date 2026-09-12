@@ -52,7 +52,7 @@ class IxToastExampleBasic extends StatelessWidget {
     return FilledButton(
       style: ixButtons?.style(IxButtonVariant.primary),
       onPressed: () {
-        ToastProvider.of(context).show(message: 'My toast message!');
+        ToastProvider.of(context).showToast(message: 'My toast message!');
       },
       child: const Text('Trigger toast'),
     );
@@ -76,7 +76,7 @@ class IxToastExampleTypes extends StatelessWidget {
           onPressed: () {
             ToastProvider.of(
               context,
-            ).show(type: IxToastType.info, message: 'Info toast');
+            ).showToast(type: IxToastType.info, message: 'Info toast');
           },
           child: const Text('Info'),
         ),
@@ -85,7 +85,7 @@ class IxToastExampleTypes extends StatelessWidget {
           onPressed: () {
             ToastProvider.of(
               context,
-            ).show(type: IxToastType.success, message: 'Success toast');
+            ).showToast(type: IxToastType.success, message: 'Success toast');
           },
           child: const Text('Success'),
         ),
@@ -94,7 +94,7 @@ class IxToastExampleTypes extends StatelessWidget {
           onPressed: () {
             ToastProvider.of(
               context,
-            ).show(type: IxToastType.warning, message: 'Warning toast');
+            ).showToast(type: IxToastType.warning, message: 'Warning toast');
           },
           child: const Text('Warning'),
         ),
@@ -103,7 +103,7 @@ class IxToastExampleTypes extends StatelessWidget {
           onPressed: () {
             ToastProvider.of(
               context,
-            ).show(type: IxToastType.error, message: 'Critical toast');
+            ).showToast(type: IxToastType.error, message: 'Critical toast');
           },
           child: const Text('Critical'),
         ),
@@ -112,7 +112,7 @@ class IxToastExampleTypes extends StatelessWidget {
           onPressed: () {
             ToastProvider.of(
               context,
-            ).show(type: IxToastType.error, message: 'Alarm toast');
+            ).showToast(type: IxToastType.error, message: 'Alarm toast');
           },
           child: const Text('Alarm'),
         ),
@@ -130,7 +130,7 @@ class IxToastExampleAction extends StatelessWidget {
     return FilledButton(
       style: ixButtons?.style(IxButtonVariant.primary),
       onPressed: () {
-        ToastProvider.of(context).show(
+        ToastProvider.of(context).showToast(
           message: 'Toast with action',
           actionLabel: 'Undo',
           onAction: () {
@@ -152,9 +152,10 @@ class IxToastExampleTitle extends StatelessWidget {
     return FilledButton(
       style: ixButtons?.style(IxButtonVariant.primary),
       onPressed: () {
-        ToastProvider.of(
-          context,
-        ).show(title: 'Toast Title', message: 'Toast message with a title');
+        ToastProvider.of(context).showToast(
+          title: 'Toast Title',
+          message: 'Toast message with a title',
+        );
       },
       child: const Text('Trigger toast with title'),
     );

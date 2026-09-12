@@ -74,14 +74,14 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 ToastProvider.of(
                   context,
-                ).show(message: 'This is a basic toast message.');
+                ).showToast(message: 'This is a basic toast message.');
               },
               child: const Text('Show Toast'),
             ),
             const SizedBox(height: 16),
             FilledButton(
               onPressed: () {
-                ToastProvider.of(context).show(
+                ToastProvider.of(context).showToast(
                   type: IxToastType.success,
                   title: 'Success',
                   message: 'Operation completed successfully.',
@@ -99,7 +99,7 @@ class HomePage extends StatelessWidget {
 void showToastWithAction(BuildContext context, {required VoidCallback onUndo}) {
   ToastProvider.of(
     context,
-  ).show(message: 'Item deleted.', actionLabel: 'Undo', onAction: onUndo);
+  ).showToast(message: 'Item deleted.', actionLabel: 'Undo', onAction: onUndo);
 }
 
 Future<Object?> showUploadToast(

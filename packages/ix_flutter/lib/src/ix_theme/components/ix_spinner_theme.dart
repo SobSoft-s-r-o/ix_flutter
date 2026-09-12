@@ -19,16 +19,19 @@ enum IxSpinnerSize { xxSmall, xSmall, small, medium, large }
 
 /// Supported Siemens IX spinner color variants.
 enum IxSpinnerVariant {
-  /// Deprecated alias of [secondary]; the value is unchanged, only the name.
+  /// The published value for the muted spinner style; use [secondary].
   @Deprecated('Use secondary. Removed in 2.0.')
   standard,
 
-  /// Uses the muted "soft" UI colors from the theme for subtle loading
-  /// indicators. Replaces [standard].
-  secondary,
-
   /// Uses the primary brand color for emphasized loading states.
-  primary,
+  primary;
+
+  /// Uses muted UI colors for subtle loading indicators.
+  ///
+  /// In 1.x this aliases [standard], preserving published enum values and
+  /// indices. Its [name] remains `standard` until 2.0.
+  // ignore: deprecated_member_use_from_same_package
+  static const IxSpinnerVariant secondary = standard;
 }
 
 /// Captures the physical footprint and stroke width for a given spinner size.
@@ -162,34 +165,14 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
     palette: IxClassicLightColors.palette,
   );
 
-  /// The variant that names the same style as [variant].
-  ///
-  /// [IxSpinnerVariant.standard] is a deprecated alias of
-  /// [IxSpinnerVariant.secondary]; the two are one style under two names, so
-  /// either key answers a lookup for the other.
-  static IxSpinnerVariant _aliasOf(IxSpinnerVariant variant) =>
-      switch (variant) {
-        // ignore: deprecated_member_use_from_same_package
-        IxSpinnerVariant.standard => IxSpinnerVariant.secondary,
-        // ignore: deprecated_member_use_from_same_package
-        IxSpinnerVariant.secondary => IxSpinnerVariant.standard,
-        IxSpinnerVariant.primary => IxSpinnerVariant.primary,
-      };
-
   static IxSpinnerVariantStyle _resolveVariant(
     Map<IxSpinnerVariant, IxSpinnerVariantStyle> variants,
     IxSpinnerVariant variant,
   ) {
-    // standard/secondary name the same style, so the alias is canonicalised
-    // once up front and the exact-key-then-alias fallback is then the same
-    // two-key lookup against both the caller's map and the built-in one,
-    // instead of a four-way chain that repeated it.
-    final alias = _aliasOf(variant);
-    IxSpinnerVariantStyle? lookup(
-      Map<IxSpinnerVariant, IxSpinnerVariantStyle> map,
-    ) => map[variant] ?? map[alias];
-    return lookup(variants) ??
-        lookup(_builtIn.variants) ??
+    // The secondary spelling is the same enum value as standard, so maps
+    // written with either spelling answer the same lookup.
+    return variants[variant] ??
+        _builtIn.variants[variant] ??
         _builtIn.variants[IxSpinnerVariant.secondary]!;
   }
 
@@ -216,9 +199,9 @@ class IxSpinnerTheme extends ThemeExtension<IxSpinnerTheme> {
 
   /// The variant style for [variant].
   ///
-  /// Resolution order: the exact key, then its alias
+  /// Resolution order: the requested key, then the built-in style.
   /// ([IxSpinnerVariant.standard] and [IxSpinnerVariant.secondary] name the
-  /// same style by definition), then the built-in style for that variant.
+  /// same enum value by definition).
   /// A [variants] map supplied by a consumer therefore never has to be
   /// exhaustive -- in particular a map written before
   /// [IxSpinnerVariant.secondary] existed keeps rendering every spinner.

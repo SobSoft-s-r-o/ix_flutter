@@ -15,9 +15,8 @@ enum IxEmptyStateLayout {
 
 /// The semantic variant of the [IxEmptyState].
 ///
-/// Note: The web component `<ix-empty-state>` does not currently support
-/// semantic variants (like error, warning, etc.) via a property.
-/// This enum is provided for future compatibility and API consistency.
+/// This legacy selector has no effect on rendering.
+@Deprecated('Has no effect. Omit IxEmptyState.type. Removed in 2.0.')
 enum IxEmptyStateType { neutral, info, warning, error, success }
 
 /// A widget that mirrors the Siemens iX `<ix-empty-state>` component.
@@ -30,6 +29,8 @@ class IxEmptyState extends StatelessWidget {
     this.icon,
     required this.title,
     this.subtitle,
+    @Deprecated('Has no effect. Omit type. Removed in 2.0.')
+    // ignore: deprecated_member_use_from_same_package
     this.type = IxEmptyStateType.neutral,
     this.layout = IxEmptyStateLayout.large,
     this.primaryAction,
@@ -45,7 +46,9 @@ class IxEmptyState extends StatelessWidget {
   /// Optional subtitle/description text.
   final String? subtitle;
 
-  /// Visual/semantic variant (maps to iX empty state variants).
+  /// Legacy semantic selector; has no effect on rendering.
+  @Deprecated('Has no effect. Omit type. Removed in 2.0.')
+  // ignore: deprecated_member_use_from_same_package
   final IxEmptyStateType type;
 
   /// The layout variant of the empty state.

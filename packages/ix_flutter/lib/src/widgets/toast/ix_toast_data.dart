@@ -11,9 +11,6 @@ enum IxToastType {
   /// Warning message.
   warning,
 
-  /// Error message.
-  error,
-
   /// Critical error message.
   @Deprecated('Use error. Removed in 2.0.')
   critical,
@@ -24,7 +21,12 @@ enum IxToastType {
 
   /// Neutral message.
   @Deprecated('Use info. Removed in 2.0.')
-  neutral,
+  neutral;
+
+  /// Error message. Aliases [critical] in 1.x to preserve published enum
+  /// values and indices; its [name] remains `critical` until 2.0.
+  // ignore: deprecated_member_use_from_same_package
+  static const IxToastType error = critical;
 }
 
 /// Data model representing a single toast notification.
@@ -87,8 +89,8 @@ class IxToastData {
   ///
   /// Defaults to `true`, matching [IxToastService.show]'s 1.x-compatible
   /// behaviour and [IxToastService.showToast]'s current default (the
-  /// planned 2.0 release changes [IxToastService.showToast]'s own default
-  /// to `false`; [IxToastService.show] is unaffected). Only applies to the
+  /// planned 2.0 release changes the toast service default to `false` and
+  /// makes `show` return a handle). Only applies to the
   /// default action button -- a fully custom [action] widget controls its
   /// own dismissal.
   final bool dismissOnAction;

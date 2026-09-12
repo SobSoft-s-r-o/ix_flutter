@@ -131,7 +131,9 @@ class _ThemeSwitcherCard extends StatelessWidget {
           children: [
             Text('Theme family', style: theme.textTheme.titleSmall),
             const SizedBox(height: 12),
+            // ignore: deprecated_member_use -- Retain the legacy demo family selector.
             SegmentedButton<IxThemeFamily>(
+              // ignore: deprecated_member_use -- Retain the legacy demo family selector.
               segments: IxThemeFamily.values
                   // Brand family is not available in the OSS build and is
                   // deprecated (removed in 2.0).
@@ -295,10 +297,13 @@ Color _resolveColor(BuildContext context, IxThemeColorToken token) {
   return ixTheme?.color(token) ?? Theme.of(context).colorScheme.primary;
 }
 
+// ignore: deprecated_member_use -- Retain the legacy demo family selector.
 String _familyLabel(IxThemeFamily family) {
   switch (family) {
+    // ignore: deprecated_member_use -- Retain the legacy demo family selector.
     case IxThemeFamily.custom:
       return 'Custom';
+    // ignore: deprecated_member_use -- Retain the legacy demo family selector.
     case IxThemeFamily.classic:
       return 'Classic';
     // ignore: deprecated_member_use
