@@ -36,7 +36,7 @@ void main() {
         home: home,
         builder: (context, child) => Stack(
           children: [
-            if (child != null) child,
+            ?child,
             IxToastOverlay(service: service),
           ],
         ),

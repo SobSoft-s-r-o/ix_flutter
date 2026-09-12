@@ -80,6 +80,11 @@ Widget catalogueIcon() => const IxIcon(IxIconsData.home);
 
 ## Getting started
 
+Upgrading from 1.0.2? Read the
+[1.1.0 upgrade guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_to_1_1.md)
+for SDK requirements, behavior changes and deprecated API replacements
+available in 1.1.0.
+
 ### 1. Build your theme
 
 ```dart
@@ -179,6 +184,7 @@ The full documentation lives in the repository:
 | Responsive data view | [doc/ix_responsive_data_view.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_responsive_data_view.md) |
 | Spinner | [doc/ix_spinner.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_spinner.md) |
 | Toasts | [doc/ix_toast.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/ix_toast.md) |
+| Upgrade to 1.1.0 | [doc/migration_to_1_1.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_to_1_1.md) |
 
 The generated Dart API reference is on
 [pub.dev](https://pub.dev/documentation/ix_flutter/latest/).

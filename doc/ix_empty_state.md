@@ -8,7 +8,7 @@ The `IxEmptyState` widget mirrors the Siemens iX `<ix-empty-state>` web componen
 *   **Customizable Content**: Supports a title, optional subtitle, and an optional leading icon.
 *   **Actions**: Supports primary and secondary action widgets (typically buttons) to guide the user.
 *   **Theming**: Fully integrated with `IxTheme` for consistent styling (colors, typography) across the application.
-*   **Semantic Types**: Includes an `IxEmptyStateType` enum for future compatibility with semantic variants (neutral, info, warning, error, success).
+*   **Legacy Type Argument**: `IxEmptyStateType` and `type:` are retained for source compatibility but have no visual or semantic effect. Omit them; both are removed in 2.0.
 
 ## Usage
 
@@ -50,11 +50,10 @@ Widget compactEmptyState(VoidCallback onClearSearch) => IxEmptyState(
 
 ### Error State
 
-You can specify the semantic type using `IxEmptyStateType`. While visually similar in the current version, this ensures semantic correctness.
+Choose the icon and copy that communicate the error. The legacy `type:` argument has no effect and should be omitted.
 
 ```dart
 Widget errorEmptyState(VoidCallback onRetry) => IxEmptyState(
-  type: IxEmptyStateType.error,
   icon: const IxIcon.key(IxIconKey.error),
   title: 'Something went wrong',
   subtitle: 'Please try again later',
@@ -70,6 +69,6 @@ Widget errorEmptyState(VoidCallback onRetry) => IxEmptyState(
 | `subtitle` | `String?` | Optional description text displayed below the title. | `null` |
 | `icon` | `Widget?` | Optional icon widget displayed above (large) or beside (compact) the text. | `null` |
 | `layout` | `IxEmptyStateLayout` | The visual layout variant (`large`, `compact`, `compactBreak`). | `large` |
-| `type` | `IxEmptyStateType` | The semantic variant (`neutral`, `info`, `warning`, `error`, `success`). | `neutral` |
+| `type` | `IxEmptyStateType` | **Deprecated.** Has no visual or semantic effect; omit it. Removed in 2.0. | `neutral` |
 | `primaryAction` | `Widget?` | Primary action widget (e.g., a button). | `null` |
 | `secondaryAction` | `Widget?` | Secondary action widget. | `null` |

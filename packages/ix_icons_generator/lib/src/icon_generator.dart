@@ -13,6 +13,7 @@ import 'package:crypto/crypto.dart';
 /// `IxIcon` widget. The generated code never imports `flutter_svg`.
 class IconGenerator {
   static const _packageName = '@siemens/ix-icons';
+  static const _requiredNoticeFileNames = ['LICENSE.md', 'READMEOSS.html'];
 
   /// Version of `@siemens/ix-icons` downloaded when no other version is
   /// requested.
@@ -23,7 +24,7 @@ class IconGenerator {
   /// Generates icon assets and Dart code from the Siemens iX icons npm package.
   ///
   /// [outputDir] - Directory where the generated Dart file will be written
-  /// [assetsDir] - Directory where SVG assets will be copied
+  /// [assetsDir] - Directory where SVG assets and upstream notices are copied
   /// [flutterPackageName] - Optional package name for cross-package asset loading
   /// [client] - Optional HTTP client for testing
   /// [iconsVersion] - Version of `@siemens/ix-icons` to download
@@ -83,8 +84,33 @@ class IconGenerator {
 
         print('Found SVG directory at ${svgDir.path}');
 
+        final noticeBytes = <String, List<int>>{};
+        for (final fileName in _requiredNoticeFileNames) {
+          final noticeFile = File(path.join(tempDir.path, 'package', fileName));
+          if (!await noticeFile.exists()) {
+            throw Exception(
+              'Required upstream notice $fileName is missing from '
+              '$_packageName@$iconsVersion.',
+            );
+          }
+          final bytes = await noticeFile.readAsBytes();
+          if (bytes.isEmpty) {
+            throw Exception(
+              'Required upstream notice $fileName is empty in '
+              '$_packageName@$iconsVersion.',
+            );
+          }
+          noticeBytes[fileName] = bytes;
+        }
+
         // Clear existing SVG assets
         await _clearExistingSvgAssets(assetsDir);
+
+        for (final fileName in _requiredNoticeFileNames) {
+          await File(
+            path.join(assetsDir, fileName),
+          ).writeAsBytes(noticeBytes[fileName]!);
+        }
 
         // Process all SVG files
         final dataClassBuffer = StringBuffer();

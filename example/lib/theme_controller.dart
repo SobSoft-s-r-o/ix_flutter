@@ -28,8 +28,10 @@ class ThemeController extends ChangeNotifier {
   );
 
   late IxThemeController _ix;
+  // ignore: deprecated_member_use -- Retain the legacy demo family selector.
   IxThemeFamily _family = IxThemeFamily.classic;
 
+  // ignore: deprecated_member_use -- Retain the legacy demo family selector.
   IxThemeFamily get family => _family;
   ThemeMode get mode => _ix.themeMode;
 
@@ -39,6 +41,7 @@ class ThemeController extends ChangeNotifier {
   /// The dark theme for the current family.
   ThemeData get dark => _ix.dark;
 
+  // ignore: deprecated_member_use -- Retain the legacy demo family selector.
   void setFamily(IxThemeFamily value) {
     if (value == _family) {
       return;
@@ -59,6 +62,7 @@ class ThemeController extends ChangeNotifier {
   IxThemeController _createController(IxColorSchema colorSchema) {
     return IxThemeController(
       colorSchema: colorSchema,
+      // ignore: deprecated_member_use -- Retain the legacy demo family selector.
       customPalette: _family == IxThemeFamily.custom ? _demoPalette : null,
     )..addListener(notifyListeners);
   }

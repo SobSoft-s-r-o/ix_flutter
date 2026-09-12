@@ -4,6 +4,7 @@
 
 - [Home](../../README.md)
 - [Getting Started](../../GETTING_STARTED.md)
+- [Upgrade to 1.1.0](../migration_to_1_1.md)
 - [FAQ](../../FAQ.md)
 
 **Reference**

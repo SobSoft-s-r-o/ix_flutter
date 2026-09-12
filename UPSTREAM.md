@@ -21,10 +21,11 @@ Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 ```
 
 `cider release` renames that header in place, so the line travels with its own
-content and becomes the released section's line without anybody moving it:
+content and becomes the released section's line. A maintainer may instead
+finalize an already-prepared release section directly, preserving the line:
 
 ```markdown
-## 1.1.0 - 2026-10-01
+## 1.1.0 - 2026-09-12
 Upstream: @siemens/ix@5.2.1 (56dfa751), @siemens/ix-icons v3.5.0 (c46e1b13)
 ```
 
@@ -41,7 +42,8 @@ version that shipped months ago states something nobody verified. A release
 that has no record of what it was checked against carries no `Upstream:` line
 at all -- as 1.0.2 does.
 
-`cider release` (run by the **Version Bump (Manual)** workflow) needs a
+`cider release` (run by the **Version Bump (Manual)** workflow when automated
+finalization is selected) needs a
 keep-a-changelog [link reference definition](https://spec.commonmark.org/0.31.2/#link-reference-definition)
 for `[Unreleased]` and for every bracketed released version at the bottom of
 each `CHANGELOG.md` -- without one, its markdown parser cannot tell a version
@@ -78,7 +80,7 @@ been created, and do not exclude these links from the checker instead.
 `[<new>]` definition once the version is live on pub.dev -- otherwise the
 *next* cycle's `[Unreleased]` has no definition and the mangling above
 returns. The header `cider release` writes for the new section itself has no
-brackets (`## 1.1.0 - 2026-09-06`, not `## [1.1.0]`); that is what
+brackets (`## 1.1.0 - 2026-09-12`, not `## [1.1.0]`); that is what
 `tool/upstream_check.dart` tolerating both forms is for -- it is not worth
 fighting cider's own output shape.
 
@@ -89,7 +91,9 @@ Changes`/`## Migration Guides`/`## Contributors`/`## License` sections and
 the closing links), and it backslash-escapes stray `_`/`~` characters in
 plain prose it re-serializes. **Diff `CHANGELOG.md` carefully** in the
 Version Bump pull request (not just the new release section) and restore
-anything it dropped from git history before merging.
+anything it dropped from git history before merging. A direct
+maintainer-authored release pull request does not run cider again after the
+version and dated section have already been prepared.
 
 ## Sync procedure
 

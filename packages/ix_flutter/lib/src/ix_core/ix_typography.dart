@@ -27,9 +27,6 @@ enum IxTypographyVariant {
   code,
   codeSm,
   codeLg,
-  buttonLabel,
-  caption,
-  textDefault,
 }
 
 /// Sentinel default for [IxTypography.new]'s and [IxTypography.copyWith]'s
@@ -388,12 +385,6 @@ class IxTypography {
         return codeSm;
       case IxTypographyVariant.codeLg:
         return codeLg;
-      case IxTypographyVariant.buttonLabel:
-        return buttonLabel;
-      case IxTypographyVariant.caption:
-        return caption;
-      case IxTypographyVariant.textDefault:
-        return textDefault;
     }
   }
 

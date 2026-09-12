@@ -2,6 +2,7 @@
 ///
 /// Superseded by `IxThemeName` (upstream `data-ix-theme`) plus an explicit
 /// brightness; `IxThemeBuilder(family:)` is deprecated accordingly.
+@Deprecated('Use IxThemeName with an explicit brightness. Removed in 2.0.')
 enum IxThemeFamily {
   /// The Siemens iX classic theme -- the only theme bundled with this
   /// package.

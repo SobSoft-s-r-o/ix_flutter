@@ -8,10 +8,14 @@ import 'package:flutter/material.dart';
 
 /// Placeholder IxIcons class.
 ///
-/// This stub exists only for library widgets that use icons as defaults.
-/// End users should generate icons using the icon generator tool.
+/// This legacy stub remains for consumers that imported this source file.
+/// Use IxIcon with IxIconKey for defaults, or generate app icons with
+/// `dart run ix_icons_generator:generate_icons`.
 ///
 /// These placeholders display Material Icons as fallbacks.
+@Deprecated(
+  'Use IxIcon with IxIconKey, or generated app icons. Removed in 2.0.',
+)
 class IxIcons {
   IxIcons._();
 

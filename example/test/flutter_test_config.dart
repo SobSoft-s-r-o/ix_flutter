@@ -12,10 +12,13 @@ import 'package:flutter_test/flutter_test.dart';
 /// real 1.x default typeface, per `IxTypography()`'s default). Work Sans is
 /// loaded in addition, under its package-prefixed family name, because
 /// `screenshots_test.dart` explicitly opts into it for the pub.dev
-/// screenshots -- it is the bundled iX typeface the package ships, and
+/// screenshots -- it is the bundled Work Sans family the package ships, and
 /// becomes the 2.0 default, but stays opt-in pre-2.0.
 Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   TestWidgetsFlutterBinding.ensureInitialized();
+  final materialIcons = FontLoader('MaterialIcons')
+    ..addFont(rootBundle.load('fonts/MaterialIcons-Regular.otf'));
+  await materialIcons.load();
   await _loadFont('Roboto Mono', [
     '../packages/ix_flutter/assets/fonts/Roboto_Mono/static/RobotoMono-Regular.ttf',
     '../packages/ix_flutter/assets/fonts/Roboto_Mono/static/RobotoMono-Bold.ttf',

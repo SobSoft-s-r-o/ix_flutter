@@ -241,11 +241,6 @@ String _sizeValueLabel(IxSpinnerSizeSpec spec) {
 
 String _variantLabel(IxSpinnerVariant variant) {
   switch (variant) {
-    // Deprecated alias of secondary (identical styling); still listed here
-    // so the token summary table below covers every IxSpinnerVariant value.
-    // ignore: deprecated_member_use
-    case IxSpinnerVariant.standard:
-      return 'Standard (deprecated)';
     case IxSpinnerVariant.secondary:
       return 'Secondary';
     case IxSpinnerVariant.primary:

@@ -18,21 +18,46 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          repository: SobSoft-s-r-o/ix_flutter.wiki
-          token: ${{ secrets.WIKI_SYNC_TOKEN }}
-          path: wiki-checkout
-      - run: tool/wiki_sync.sh ${{ (github.event_name == 'workflow_dispatch' && inputs.dry_run) && '--dry-run' || '' }} wiki-checkout
-      - name: Commit and push
-        if: ${{ !(github.event_name == 'workflow_dispatch' && inputs.dry_run) }}
-        working-directory: wiki-checkout
+
+      - name: Show dry-run plan
+        if: env.DRY_RUN == 'true'
+        run: tool/wiki_sync.sh --dry-run "$RUNNER_TEMP/wiki-dry-run"
+
+      - name: Clone, sync and push wiki
+        if: env.DRY_RUN != 'true'
+        env:
+          WIKI_SYNC_TOKEN: ${{ secrets.WIKI_SYNC_TOKEN }}
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git diff --cached --quiet && echo "wiki up to date" && exit 0
-          git commit -m "docs: sync from ix_flutter@${{ github.sha }}"
-          git push
+          if [ -z "$WIKI_SYNC_TOKEN" ]; then
+            echo "::error::WIKI_SYNC_TOKEN is required for a real wiki sync. Configure the repository secret or run the documented authenticated local Git sync."
+            exit 1
+          fi
+
+          askpass="$RUNNER_TEMP/wiki-git-askpass.sh"
+          {
+            echo '#!/bin/sh'
+            echo 'case "$1" in'
+            echo '  *Username*) printf "%s\n" "x-access-token" ;;'
+            echo '  *) printf "%s\n" "$WIKI_SYNC_TOKEN" ;;'
+            echo 'esac'
+          } > "$askpass"
+          chmod 700 "$askpass"
+
+          export GIT_ASKPASS="$askpass"
+          export GIT_TERMINAL_PROMPT=0
+          git clone "https://github.com/SobSoft-s-r-o/ix_flutter.wiki.git" wiki-checkout
+          tool/wiki_sync.sh wiki-checkout
+
+          git -C wiki-checkout config user.name "github-actions[bot]"
+          git -C wiki-checkout config user.email "github-actions[bot]@users.noreply.github.com"
+          git -C wiki-checkout add -A
+          if git -C wiki-checkout diff --cached --quiet; then
+            echo "No wiki pages changed; the remote wiki is already up to date."
+            exit 0
+          fi
+          git -C wiki-checkout commit -m "docs: sync from ix_flutter@${{ github.sha }}"
+          git -C wiki-checkout push

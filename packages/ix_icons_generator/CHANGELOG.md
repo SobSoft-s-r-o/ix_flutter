@@ -5,16 +5,11 @@ All notable changes to ix_icons_generator will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
-
-Prepared as **1.1.0**, and not published. Unlike `ix_flutter`, this package's
-`pubspec.yaml` already carries 1.1.0, so its release run stamps the date on
-this section without a further bump -- see
-[CONTRIBUTING.md](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/CONTRIBUTING.md#release-process).
-The newest published version is
-[1.0.0](https://pub.dev/packages/ix_icons_generator/versions/1.0.0).
+## 1.1.0 - 2026-09-12
 
 ### Added
+- Generated icon assets preserve upstream `LICENSE.md` and `READMEOSS.html`,
+  and packages where either notice is missing or empty are refused
 - `--icons-version` option to pick the `@siemens/ix-icons` version to download
 - `--no-legacy-getters` flag to omit the deprecated `IxIcons` widget getters
 - `--no-format` flag; the generated `ix_icons.dart` is now run through
@@ -22,6 +17,7 @@ The newest published version is
   reported), so it satisfies a project's own formatting check as generated
 - Generated header records the icons version and the tarball sha1 checksum
 - Unit tests covering SVG cleaning, generated code and version selection
+- An English [1.1.0 upgrade guide](https://github.com/SobSoft-s-r-o/ix_flutter/blob/main/doc/migration_to_1_1.md) covering the generated getter transition
 
 ### Changed
 - Default `@siemens/ix-icons` version is now 3.5.0 (1479 icons)
@@ -39,6 +35,8 @@ The newest published version is
   Pass `size:` only where the icon should override the surrounding slot
 
 ### Fixed
+- Asset registration quotes YAML-significant directory names and preserves
+  asset entries across dedented comments, including structured flavor entries
 - SVG cleaning also strips `fill="none"` from the root `<svg>` element and from
   shapes that carry no stroke. 891 of the 1479 `@siemens/ix-icons` 3.5.0 icons
   declare `fill="none"` on the root `<svg>` and fill their `<path>`s by
@@ -53,6 +51,9 @@ The newest published version is
   (`3d-view` → `icon3dView`) and a reserved word suffixed (`class` → `class_`).
   Two icons that collapse to the same identifier now abort generation with a
   message naming both files
+- The manifest updater writes only to the top-level `flutter.assets` list,
+  preserves existing asset entries, and reports unsupported YAML shapes
+  without modifying `pubspec.yaml`
 
 ### Security
 - The downloaded tarball is verified against the registry's `dist.shasum`

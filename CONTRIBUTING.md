@@ -358,11 +358,10 @@ Each release's own `packages/ix_flutter/CHANGELOG.md` entry calls out its
 breaking changes inline, in that release's `Changed`/`Removed`/`Deprecated`
 bullets. Historically:
 
-- **1.1.0** (upcoming, still under `[Unreleased]`): raises the minimum Flutter
-  SDK to 3.38.0; adds enum values that break an exhaustive `switch` in
-  consumer code (`IxSpinnerVariant.secondary`, `IxToastType.error`,
-  `IxTypographyVariant.buttonLabel`/`.caption`/`.textDefault`); changes
-  `IxBlind` from a `StatelessWidget` to a `StatefulWidget`; makes
+- **1.1.0**: raises the minimum Flutter SDK to 3.38.0; preserves the
+  published enum values and exhaustive switches by implementing
+  `IxSpinnerVariant.secondary` and `IxToastType.error` as aliases, and keeps
+  `IxBlind` as a `StatelessWidget` with its published getter contract; makes
   `ThemeData.focusColor` transparent; bakes a platform-derived tap-target
   density, so controls grow about 7px on touch platforms; makes `IxIcon.size`
   nullable so an unsized icon follows the slot around it; and moves
@@ -377,22 +376,22 @@ bullets. Historically:
 
 ### Flutter & Dart compatibility
 
-Every published version so far has required the same minimum SDKs. The
-upcoming 1.1.0 raises the Flutter floor for the first time; the Dart floor is
-unchanged:
+1.1.0 raises the Flutter floor for the first time; the Dart floor is
+unchanged from 1.0.2:
 
 | Version           | Flutter  | Dart     |
 | ----------------- | -------- | -------- |
-| 1.1.0 (upcoming)  | >=3.38.0 | >=3.10.0 |
+| 1.1.0             | >=3.38.0 | >=3.10.0 |
 | 1.0.2             | >=3.10.0 | >=3.10.0 |
 | 1.0.1             | >=3.10.0 | >=3.10.0 |
 | 1.0.0             | >=3.10.0 | >=3.10.0 |
 | 0.0.1             | >=3.10.0 | >=3.10.0 |
 
 `SemanticsRole.*` and `SemanticsService.sendAnnouncement`, which 1.1.0's menu,
-toast, dropdown and data-view semantics are built on, are only available from
-Flutter 3.38 -- hence the floor. `pub` will not resolve 1.1.0 for an app on an
-older Flutter, which stays on 1.0.2.
+toast, dropdown and data-view semantics use, are only available from Flutter
+3.38 -- hence the explicit floor. Package resolution considers both Dart and
+Flutter constraints; verify both parts of the application toolchain before
+upgrading.
 
 See [README.md#requirements](README.md#requirements) for the current
 requirement and [README.md#platform-support](README.md#platform-support) for
@@ -400,28 +399,29 @@ the current supported-platform list (unchanged since 0.0.1).
 
 ### Migration guides
 
-See [ICON_MIGRATION.md](ICON_MIGRATION.md) for migrating between published
-releases -- currently just the 1.0.2 icon-generator package split above.
+See [ICON_MIGRATION.md](ICON_MIGRATION.md) for the icon-generator package split
+and [doc/migration_to_1_1.md](doc/migration_to_1_1.md) for upgrading to 1.1.0 and addressing its deprecation warnings.
 
 ## Release Process
 
-Maintainers handle releases. The version bump itself is done by the **Version
-Bump (Manual)** workflow ([.github/workflows/version-bump.yml](.github/workflows/version-bump.yml)),
-which only runs on demand (`workflow_dispatch`):
+Maintainers handle releases. Package publication is always an authenticated
+local `dart pub publish`; no workflow publishes to pub.dev.
+
+For a release whose notes are still under `[Unreleased]`, the **Version Bump
+(Manual)** workflow ([.github/workflows/version-bump.yml](.github/workflows/version-bump.yml))
+can prepare a release pull request on demand (`workflow_dispatch`):
 
 1. Land everything the release contains, with its entries under `[Unreleased]`
    in `packages/<package>/CHANGELOG.md`
 2. Work through the [release checklist](#release-checklist) below; in
    particular `dart pub publish --dry-run` must report 0 warnings
 3. Start **Version Bump (Manual)** from the Actions tab and choose the package
-   (`ix_flutter`, `ix_icons_generator` or `both`), the semver bump
-   (`patch`/`minor`/`major`) and, if needed, a prerelease identifier. The run
-   installs dependencies, analyzes the selected package(s) and runs
-   `flutter test` for `ix_flutter` (`ix_icons_generator` is only analyzed
-   there -- its `dart test` suite runs in the regular CI workflow), bumps
-   `pubspec.yaml` and turns `[Unreleased]` into the new release section with
-   `cider bump` / `cider release`, and opens a `chore/release-…` pull request
-   labelled `release`
+   (`ix_flutter`, `ix_icons_generator` or `both`) and the semver bump. Choose
+   `none` when `pubspec.yaml` already carries the intended version; this runs
+   `cider release` without running `cider bump`. A prerelease identifier is
+   valid only with `patch`, `minor`, or `major`. The run uses Flutter 3.44.6
+   and cider 0.2.10, installs dependencies, analyzes and tests every selected
+   package, finalizes the changelog, and opens a labelled release pull request
 4. Review that pull request: confirm the `Upstream:` line that sat under
    `[Unreleased]` is still the first line under the *new* release header (see
    [UPSTREAM.md](UPSTREAM.md#release-header-format) -- `cider release` renames
@@ -430,35 +430,41 @@ which only runs on demand (`workflow_dispatch`):
    link reference definitions (`cider release` deletes the `[Unreleased]` one
    and adds nothing for the new version), diff the rest of `CHANGELOG.md` for
    anything `cider` dropped or reflowed, wait for CI, then merge it
-5. Tag the merge commit on `main` as `v<version>` (`ix_icons_generator-v<version>`
-   for the generator) and push the tag
-6. Publish from the package directory: `dart pub publish`
-7. Add the new version's link reference definition
+5. Merge the reviewed release pull request, then publish from the package
+   directory with `dart pub publish`
+6. Add the new version's link reference definition
    (`https://pub.dev/packages/<package>/versions/<version>`) once the version
    is live on pub.dev, and point `[Unreleased]` back at `commits/main`
 
+The workflow needs `contents: write` and `pull-requests: write`, plus the
+repository setting that allows GitHub Actions to create pull requests. A pull
+request created through `GITHUB_TOKEN` can require a maintainer's explicit
+approval before its workflows run; review the pending checks rather than
+assuming the event was skipped. See GitHub's
+[workflow trigger documentation](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
+
+### Direct maintainer-authored release pull request
+
+When the intended versions and dated changelog sections were prepared and
+reviewed locally, open a normal maintainer-authored pull request with those
+files. Do not run `cider bump` or `cider release` again. This is the path for
+the prepared 1.1.0 release: both pubspecs already carry 1.1.0 and both
+changelogs already carry the 2026-09-12 release section. Wait for that pull
+request's CI, merge it, then run the two authenticated local publish commands:
+
+```bash
+cd packages/ix_icons_generator && dart pub publish
+cd ../ix_flutter && dart pub publish
+```
+
 #### Which packages need which step
 
-The two packages are versioned independently, and they are not currently at
-the same point in that cycle:
-
-- **`ix_flutter`** is at 1.0.2 in `pubspec.yaml` and its 1.1.0 notes are still
-  under `[Unreleased]`. It needs the full run above: `bump minor` **and**
-  `release`.
-- **`ix_icons_generator`** is already at 1.1.0 in `pubspec.yaml` (bumped for
-  its own changes -- the tarball checksum and zip-slip guards, `--icons-version`,
-  `--no-legacy-getters`, `--no-format`, and `IxIconsData` output). Its notes
-  are under `[Unreleased]` too, so it needs `cider release` **only**; a
-  further `bump` would skip 1.1.0 and publish 1.2.0. Run the workflow for
-  `ix_flutter` alone, and cut the generator's release separately, rather than
-  choosing `both`.
-
-Neither version exists on pub.dev yet. Step 5 has also not been carried out
-for any past release: this repository currently has **no git tags and no
-GitHub releases**, despite 1.0.0, 1.0.1 and 1.0.2 being live on pub.dev. Until
-a tag is actually pushed, no changelog link may point at `releases/tag/…` or
-`compare/…` -- every such URL 404s and fails the `docs` job's link check (see
-[UPSTREAM.md](UPSTREAM.md#what-these-definitions-may-point-at)).
+The packages remain independently versioned even when they happen to share a
+release number. Neither 1.1.0 package is published yet. This repository has no
+git tags or GitHub releases, so no changelog link may point at `releases/tag/…`
+or `compare/…`; every such URL currently 404s (see
+[UPSTREAM.md](UPSTREAM.md#what-these-definitions-may-point-at)). Add a pub.dev
+version link only after that package is live.
 
 ### Release checklist
 
@@ -487,9 +493,9 @@ pub.dev:
       version pages for published versions, `commits/main` for `[Unreleased]`,
       and no tag or release URLs while the repository has neither (see
       [UPSTREAM.md](UPSTREAM.md#what-these-definitions-may-point-at))
-- [ ] CHANGELOG.md stays strictly keep-a-changelog after the Version Bump
-      run: the `# Changelog` intro, `## [Unreleased]` (or the release
-      section a bump just produced), the per-release sections and the
+- [ ] CHANGELOG.md stays strictly keep-a-changelog after automated or manual
+      finalization: the `# Changelog` intro, the current release section,
+      the per-release sections and the
       closing link reference definitions, and nothing else. `cider release`
       silently drops or misfiles a heading or paragraph outside that shape
       (a `## Versioning`-style section, a stray paragraph inside a category,
@@ -499,23 +505,21 @@ pub.dev:
       [Versioning and compatibility](#versioning-and-compatibility) section
       instead of the changelog -- the Version Bump run never touches this
       file
-- [ ] Diff the whole `CHANGELOG.md` change from the Version Bump run anyway
+- [ ] Diff the whole `CHANGELOG.md` finalization change
       (see [Release Process](#release-process) step 4): `cider release`
       escapes a stray underscore and drops blank lines/`---` separators even
       inside a section it keeps. That much is cosmetic (renders the same),
       but the diff is the only way to confirm nothing else moved
 - [ ] The version the release will carry is referenced consistently in the
-      documentation (`ix_flutter: ^<version>`); the bump in
-      `packages/<package>/pubspec.yaml` itself is made by the Version Bump
-      workflow
+      package pubspec and documentation (`ix_flutter: ^<version>`)
 - [ ] Screenshots in `packages/ix_flutter/screenshots/` still match the current
       UI, and `pubspec.yaml`'s `screenshots:` entry points at a file that exists
 - [ ] `dart pub publish --dry-run` in `packages/ix_flutter` **and**
       `packages/ix_icons_generator`: 0 warnings, and the published file list
       contains `LICENSE`, `README.md`, `CHANGELOG.md`, `ICON_LICENSING.md` and
       `THIRD_PARTY_NOTICES.md` but no `tool/`
-- [ ] The **Version Bump (Manual)** run finished green and its release pull
-      request is CI-green before it is merged
+- [ ] The automated or direct maintainer-authored release pull request is
+      CI-green before it is merged
 
 ## Recognition
 

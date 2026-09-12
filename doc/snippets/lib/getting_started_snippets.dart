@@ -78,7 +78,7 @@ class ToastExample extends StatelessWidget {
       children: [
         FilledButton(
           onPressed: () {
-            toasts.show(
+            toasts.showToast(
               type: IxToastType.success,
               message: 'Action completed successfully!',
             );
@@ -87,7 +87,10 @@ class ToastExample extends StatelessWidget {
         ),
         FilledButton(
           onPressed: () {
-            toasts.show(type: IxToastType.error, message: 'An error occurred!');
+            toasts.showToast(
+              type: IxToastType.error,
+              message: 'An error occurred!',
+            );
           },
           child: const Text('Show Error'),
         ),

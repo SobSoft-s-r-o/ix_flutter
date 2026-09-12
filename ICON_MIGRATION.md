@@ -4,7 +4,11 @@
 
 **The full Siemens iX icon catalogue is not bundled in the `ix_flutter` library package.**
 
-`ix_flutter` renders its own widgets from a small internal icon set (falling back to Material glyphs today — see `doc/ix_icons.md`). To use the full Siemens iX catalogue in your own code, run the optional `ix_icons_generator` tool to download icons from the official Siemens source.
+`ix_flutter` addresses its own widget icons through a small set of semantic
+keys, resolved to Material glyphs by default today; the planned internal
+Siemens SVG set is not bundled (see `doc/ix_icons.md`). To use the full Siemens
+iX catalogue in your own code, run the optional `ix_icons_generator` tool to
+download icons from the official Siemens source.
 
 ## Why This Change?
 
@@ -293,4 +297,7 @@ If you encounter issues during migration:
 
 ---
 
-**Important**: This document tracks how icons are set up in `ix_flutter` today: a small internal set ships in the library (see `doc/ix_icons.md`), and the full catalogue is generated on demand from the official Siemens source.
+**Important**: This document tracks how icons are set up in `ix_flutter`
+today: semantic internal keys use the Material default because the planned
+internal Siemens SVG set is not bundled (see `doc/ix_icons.md`), and the full
+catalogue is generated on demand from the official Siemens source.

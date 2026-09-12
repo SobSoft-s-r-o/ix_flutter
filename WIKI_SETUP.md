@@ -7,7 +7,9 @@ The GitHub wiki at https://github.com/SobSoft-s-r-o/ix_flutter/wiki is **generat
 The [`wiki-sync.yml`](.github/workflows/wiki-sync.yml) workflow performs a **one-way** sync — repository to wiki, never the other direction — after every merge to `main`:
 
 1. A `push` to `main` touching `doc/**`, a root `*.md`, `packages/ix_flutter/*.md`, `packages/ix_icons_generator/*.md`, or `tool/wiki_sync*` triggers the workflow.
-2. The workflow checks out this repository and, separately, `SobSoft-s-r-o/ix_flutter.wiki` (into `wiki-checkout`).
+2. A dry run needs only this repository. A real sync clones the wiki through
+   the Git endpoint `https://github.com/SobSoft-s-r-o/ix_flutter.wiki.git`
+   into `wiki-checkout`.
 3. `tool/wiki_sync.sh wiki-checkout` copies every file listed in the mapping below into the wiki checkout. Local links are rewritten so they still work on the wiki:
    - a link to another synced document (e.g. `doc/theming.md`, `GETTING_STARTED.md`, `#anchor` included) becomes a bare wiki page name (`theming`, `Getting-Started`);
    - an **image** (`![alt](…)`) becomes a `https://raw.githubusercontent.com/SobSoft-s-r-o/ix_flutter/main/…` URL. It must not become a `blob/` URL: GitHub serves `blob/main/<path>.png` as the file-viewer HTML page (`Content-Type: text/html`), so the image renders broken;
@@ -59,12 +61,42 @@ Prefer a generated redirect over deleting a page. If a page really must go, dele
 
 ## Secret
 
-The workflow authenticates to the wiki repository with the `WIKI_SYNC_TOKEN` repository secret — a GitHub personal access token with `repo` scope. It is required because wiki repositories are not covered by the workflow's default `GITHUB_TOKEN`.
+The workflow authenticates a real wiki Git clone and push with the
+`WIKI_SYNC_TOKEN` repository secret — a GitHub personal access token with
+`repo` scope. Wiki repositories are not covered by the workflow's default
+`GITHUB_TOKEN`. If the secret is missing, a real sync fails immediately with
+an actionable error; it does not report a successful publication. Do not copy
+a personal token into source, workflow YAML, logs, or another secret name.
+
+At the time the 1.1.0 release metadata was prepared, this repository did not
+have `WIKI_SYNC_TOKEN` configured. Token-free dry runs remain available. A
+maintainer with an authenticated Git credential can also perform the real
+sync locally without creating or copying a repository secret.
 
 ## Dry run
 
-Trigger the workflow manually from the Actions tab (`workflow_dispatch`) with `dry_run: true` (the default) to print the planned copies without touching the wiki repository. Use `dry_run: false` to run a real sync on demand, outside of the `push`-to-`main` trigger.
+Trigger the workflow manually from the Actions tab (`workflow_dispatch`) with
+`dry_run: true` (the default) to print the planned copies without a wiki
+checkout or credential. Use `dry_run: false` to run a real sync on demand,
+outside of the `push`-to-`main` trigger; that path requires
+`WIKI_SYNC_TOKEN`.
 
-Locally, `tool/wiki_sync.sh --dry-run <wiki-checkout-dir>` prints the same plan against any wiki checkout on disk without writing anything; `tool/wiki_sync.sh <wiki-checkout-dir>` performs the sync.
+Locally, `tool/wiki_sync.sh --dry-run <unused-dir>` prints the same plan
+without requiring that directory to exist and without writing anything. A
+real local sync uses a disposable clone, never the user's original `wiki/`
+directory:
+
+```bash
+git clone https://github.com/SobSoft-s-r-o/ix_flutter.wiki.git /private/tmp/ix-flutter-wiki-sync
+tool/wiki_sync.sh /private/tmp/ix-flutter-wiki-sync
+git -C /private/tmp/ix-flutter-wiki-sync diff --check
+git -C /private/tmp/ix-flutter-wiki-sync add -A
+git -C /private/tmp/ix-flutter-wiki-sync commit -m "docs: sync from ix_flutter"
+git -C /private/tmp/ix-flutter-wiki-sync push
+```
+
+The clone and push use the maintainer's existing Git credential. Review the
+diff before committing; if there are no changes, state that the remote wiki
+is already current rather than claiming pages were published.
 
 **A dry run only prints the copy plan.** It does not run the link rewriting, so it proves nothing about the generated pages. To check a change to the sync itself, clone the wiki into a throwaway directory, run the real sync into it, read the diff, and run it a second time — the second run must produce byte-identical files. `packages/ix_flutter/test/tool/wiki_sync_test.dart` covers the rewriting rules directly.

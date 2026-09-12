@@ -19,6 +19,7 @@ dependencies:
 
 dev_dependencies:
   test: ^1.25.0
+  yaml: ^3.1.4
 
 executables:
   generate_icons: generate_icons

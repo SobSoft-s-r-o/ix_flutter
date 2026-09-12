@@ -62,7 +62,6 @@ class EmptyStatePage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             IxEmptyState(
-              type: IxEmptyStateType.error,
               icon: IxIcon(IxIconsData.error),
               title: 'Something went wrong',
               subtitle: 'Please try again later',

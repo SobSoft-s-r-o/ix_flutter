@@ -1,6 +1,6 @@
 name: ix_flutter
 description: "Flutter UI library implementing the Siemens iX Design System: themes, tokens, widgets and an optional generator for the full iX icon catalogue."
-version: 1.0.2
+version: 1.1.0
 homepage: https://github.com/SobSoft-s-r-o/ix_flutter
 repository: https://github.com/SobSoft-s-r-o/ix_flutter
 issue_tracker: https://github.com/SobSoft-s-r-o/ix_flutter/issues
@@ -32,7 +32,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_svg: ^2.2.3 # direct dependency: renders bundled internal iX icons (lib/src/ix_icons)
+  flutter_svg: ^2.2.3 # direct dependency: renders consumer and package SVG sources through IxIcon
 
 dev_dependencies:
   flutter_test:

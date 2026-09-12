@@ -39,8 +39,9 @@ class IxToastService extends ChangeNotifier {
   ///
   /// This overload's defaults (`dismissOnAction: true`) match `IxToast`'s
   /// 1.x behaviour; [showToast]'s own default is also `true` today (a
-  /// planned 2.0 change flips [showToast]'s default to `false` -- `show`
-  /// is unaffected).
+  /// planned 2.0 change flips the default to `false` and makes [show]
+  /// return a handle).
+  @Deprecated('Use showToast. In 2.0, show will return IxToastHandle.')
   IxToastData show({
     IxToastType type = IxToastType.info,
     required String message,

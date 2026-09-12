@@ -24,3 +24,4 @@ doc/ix_empty_state.md -> ix_empty_state.md
 doc/ix_responsive_data_view.md -> ix_responsive_data_view.md
 doc/ix_spinner.md -> ix_spinner.md
 doc/ix_toast.md -> ix_toast.md
+doc/migration_to_1_1.md -> migration_to_1_1.md

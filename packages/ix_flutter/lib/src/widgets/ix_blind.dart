@@ -20,9 +20,10 @@ export 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart'
 ///
 /// ## Expanded state
 ///
-/// The widget is uncontrolled by default: leaving [expanded] `null` makes it
+/// The widget is uncontrolled by default: omitting the `expanded` argument makes it
 /// manage its own state internally, starting from [initiallyExpanded] and
-/// toggling on every header tap.
+/// toggling on every header tap. Subclasses retain the published controlled
+/// contract: their public [expanded] getter always determines visibility.
 ///
 /// ```dart
 /// const IxBlind(title: 'Details', child: Text('...'))
@@ -43,7 +44,7 @@ export 'package:ix_flutter/src/ix_theme/components/ix_blind_theme.dart'
 ///
 /// See also:
 /// * [IxBlindVariant], which defines the visual style of the blind.
-class IxBlind extends StatefulWidget {
+class IxBlind extends StatelessWidget {
   /// Creates a Siemens iX blind.
   const IxBlind({
     super.key,
@@ -52,12 +53,12 @@ class IxBlind extends StatefulWidget {
     this.variant = IxBlindVariant.filled,
     this.icon,
     this.headerActions,
-    this.expanded,
+    bool? expanded,
     this.initiallyExpanded = false,
     this.onExpandedChanged,
     this.disabled = false,
     required this.child,
-  });
+  }) : _controlledExpanded = expanded;
 
   /// The main label of the blind.
   final String title;
@@ -82,20 +83,26 @@ class IxBlind extends StatefulWidget {
   /// their own accessible name instead of inheriting [title].
   final Widget? headerActions;
 
-  /// Whether the blind content is visible.
+  /// The configured expanded state, or [initiallyExpanded] in uncontrolled
+  /// mode. This non-null property preserves the published 1.x contract;
+  /// the live uncontrolled state is managed by the private implementation.
   ///
-  /// When `null` (the default), the blind is *uncontrolled*: it manages its
-  /// own expanded state internally, starting from [initiallyExpanded], and
-  /// flips it on every header tap.
-  ///
-  /// When non-null, the blind is *controlled*: it always renders exactly
-  /// this value and never changes it on its own. The caller must update
-  /// [expanded] (typically from [onExpandedChanged]) to make the header
-  /// responsive to taps.
-  final bool? expanded;
+  /// Pass a non-null `expanded` constructor argument for controlled mode.
+  /// On an exact [IxBlind] instance, omit it (or pass `null`) to toggle
+  /// internally on header taps. Subclasses always use this getter as their
+  /// controlled value, preserving overrides used with `super.build(context)`.
+  bool get expanded => _controlledExpanded ?? initiallyExpanded;
 
-  /// The expanded state used on first build when [expanded] is `null`
-  /// (uncontrolled mode). Ignored once [expanded] is set.
+  final bool? _controlledExpanded;
+
+  // Do not infer whether expanded is overridden from its current value:
+  // an override may equal initiallyExpanded now and change on a later build.
+  // All subclasses keep the published controlled getter contract.
+  bool get _uncontrolled =>
+      runtimeType == IxBlind && _controlledExpanded == null;
+
+  /// The expanded state used on first build when the `expanded` constructor
+  /// argument is omitted or `null` (uncontrolled mode).
   ///
   /// Defaults to `false` for 1.x source compatibility. The iX Flutter 2.0
   /// breaking-changes plan flips this default to `true`.
@@ -120,14 +127,24 @@ class IxBlind extends StatefulWidget {
   final Widget child;
 
   @override
-  State<IxBlind> createState() => _IxBlindState();
+  Widget build(BuildContext context) =>
+      _IxBlindImplementation(configuration: this);
 }
 
-class _IxBlindState extends State<IxBlind> {
+class _IxBlindImplementation extends StatefulWidget {
+  const _IxBlindImplementation({required this.configuration});
+
+  final IxBlind configuration;
+
+  @override
+  State<_IxBlindImplementation> createState() => _IxBlindState();
+}
+
+class _IxBlindState extends State<_IxBlindImplementation> {
   /// Backing store for the uncontrolled contract; only consulted when
-  /// [IxBlind.expanded] is `null`. `late` because it reads [widget], which
-  /// is not yet assigned during this object's own field initialization.
-  late bool _internal = widget.initiallyExpanded;
+  /// the configuration is uncontrolled. `late` because it reads
+  /// [widget], which is not assigned during field initialization.
+  late bool _internal = widget.configuration.initiallyExpanded;
 
   // Tracks whether the header's InkWell currently has keyboard focus, so the
   // focus ring can be painted around the *whole* blind (see build() below)
@@ -140,7 +157,9 @@ class _IxBlindState extends State<IxBlind> {
 
   /// The effective expanded state: the controlled [IxBlind.expanded] value
   /// when set, otherwise the internally-tracked uncontrolled state.
-  bool get _expanded => widget.expanded ?? _internal;
+  bool get _expanded => widget.configuration._uncontrolled
+      ? _internal
+      : widget.configuration.expanded;
 
   @override
   void dispose() {
@@ -149,14 +168,15 @@ class _IxBlindState extends State<IxBlind> {
   }
 
   @override
-  void didUpdateWidget(covariant IxBlind oldWidget) {
+  void didUpdateWidget(covariant _IxBlindImplementation oldWidget) {
     super.didUpdateWidget(oldWidget);
     // Transitioning from controlled to uncontrolled: seed the internal
     // state from the last controlled value so the next toggle continues
     // from where the caller left it, instead of jumping back to
     // `initiallyExpanded`.
-    if (oldWidget.expanded != null && widget.expanded == null) {
-      _internal = oldWidget.expanded!;
+    if (!oldWidget.configuration._uncontrolled &&
+        widget.configuration._uncontrolled) {
+      _internal = oldWidget.configuration.expanded;
     }
     // No explicit animate-on-change call needed: build() below always
     // passes the current `_expanded` to IxCollapsible, whose own
@@ -165,10 +185,10 @@ class _IxBlindState extends State<IxBlind> {
 
   void _toggle() {
     final next = !_expanded;
-    if (widget.expanded == null) {
+    if (widget.configuration._uncontrolled) {
       setState(() => _internal = next);
     }
-    widget.onExpandedChanged?.call(next);
+    widget.configuration.onExpandedChanged?.call(next);
   }
 
   @override
@@ -176,7 +196,7 @@ class _IxBlindState extends State<IxBlind> {
     final themeData = Theme.of(context);
     final blindTheme =
         themeData.extension<IxBlindTheme>() ?? IxBlindTheme.fallback(themeData);
-    final style = blindTheme.style(widget.variant);
+    final style = blindTheme.style(widget.configuration.variant);
     final isExpanded = _expanded;
 
     // Resolve colors based on state (hover, active handled by InkWell/Material)
@@ -212,14 +232,14 @@ class _IxBlindState extends State<IxBlind> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _IxBlindHeader(
-              title: widget.title,
-              subtitle: widget.subtitle,
-              icon: widget.icon,
-              headerActions: widget.headerActions,
+              title: widget.configuration.title,
+              subtitle: widget.configuration.subtitle,
+              icon: widget.configuration.icon,
+              headerActions: widget.configuration.headerActions,
               expanded: isExpanded,
-              onTap: widget.disabled ? null : _toggle,
+              onTap: widget.configuration.disabled ? null : _toggle,
               style: style,
-              disabled: widget.disabled,
+              disabled: widget.configuration.disabled,
               focused: _headerFocused,
               focusNode: _headerFocusNode,
               onFocusChanged: (focused) =>
@@ -246,7 +266,7 @@ class _IxBlindState extends State<IxBlind> {
                     ),
                   ),
                 ),
-                child: widget.child,
+                child: widget.configuration.child,
               ),
             ),
           ],

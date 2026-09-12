@@ -3,6 +3,7 @@ import 'package:path/path.dart' as path;
 import 'package:args/args.dart';
 
 import 'package:ix_icons_generator/ix_icons_generator.dart';
+import 'package:ix_icons_generator/src/pubspec_asset_updater.dart';
 
 Future<void> main(List<String> arguments) async {
   final parser = ArgParser()
@@ -120,9 +121,16 @@ Future<void> main(List<String> arguments) async {
     print('1. Make sure your pubspec.yaml includes:');
     print('   flutter:');
     print('     assets:');
-    print('       - ${path.relative(assetsDir, from: projectRoot)}/');
+    final assetEntry = PubspecAssetUpdater.assetEntry(
+      path.relative(assetsDir, from: projectRoot),
+    );
+    print('       - $assetEntry');
     print('2. Run: flutter pub get');
     print('3. Use: IxIcon(IxIconsData.about)');
+    print(
+      '4. Keep LICENSE.md and READMEOSS.html with the generated SVGs when '
+      'redistributing them',
+    );
     exit(0);
   } catch (e, stackTrace) {
     print('\n✗ Error during icon generation:');
@@ -144,34 +152,15 @@ Future<void> _updatePubspec(String projectRoot, String assetsPath) async {
   }
 
   final pubspecContent = await pubspecFile.readAsString();
-
-  // Check if the assets path is already in pubspec
-  if (pubspecContent.contains('- $assetsPath/')) {
+  final updatedContent = PubspecAssetUpdater.addAsset(
+    pubspecContent,
+    assetsPath,
+  );
+  if (updatedContent == pubspecContent) {
     print('Assets path already in pubspec.yaml');
     return;
   }
 
-  // Add assets section if needed
-  if (!pubspecContent.contains('flutter:')) {
-    final newContent =
-        '$pubspecContent\nflutter:\n  assets:\n    - $assetsPath/\n';
-    await pubspecFile.writeAsString(newContent);
-    print('Added flutter assets section to pubspec.yaml');
-  } else if (!pubspecContent.contains('assets:')) {
-    // Flutter section exists but no assets
-    final newContent = pubspecContent.replaceFirst(
-      RegExp(r'flutter:\s*\n'),
-      'flutter:\n  assets:\n    - $assetsPath/\n',
-    );
-    await pubspecFile.writeAsString(newContent);
-    print('Added assets section to pubspec.yaml');
-  } else {
-    // Assets section exists, add our path
-    final newContent = pubspecContent.replaceFirst(
-      RegExp(r'assets:\s*\n'),
-      'assets:\n    - $assetsPath/\n',
-    );
-    await pubspecFile.writeAsString(newContent);
-    print('Added assets path to pubspec.yaml');
-  }
+  await pubspecFile.writeAsString(updatedContent);
+  print('Added assets path to pubspec.yaml');
 }
