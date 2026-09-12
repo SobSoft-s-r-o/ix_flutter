@@ -35,6 +35,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   Pass `size:` only where the icon should override the surrounding slot
 
 ### Fixed
+- Asset registration quotes YAML-significant directory names and preserves
+  asset entries across dedented comments, including structured flavor entries
 - SVG cleaning also strips `fill="none"` from the root `<svg>` element and from
   shapes that carry no stroke. 891 of the 1479 `@siemens/ix-icons` 3.5.0 icons
   declare `fill="none"` on the root `<svg>` and fill their `<path>`s by

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Adds the generated asset directory to a Flutter pubspec.
 class PubspecAssetUpdater {
   PubspecAssetUpdater._();
@@ -16,7 +18,8 @@ class PubspecAssetUpdater {
   /// Flutter pubspecs. Unsupported forms throw before a caller writes the
   /// returned content, preventing a partial or corrupt manifest update.
   static String addAsset(String pubspecContent, String assetsPath) {
-    final asset = _assetEntry(assetsPath);
+    final assetPath = _assetPath(assetsPath);
+    final asset = assetEntry(assetPath);
     final newline = _newlineFor(pubspecContent);
     final lines = pubspecContent.split(newline);
     final flutterHeaders = <int>[];
@@ -129,7 +132,7 @@ class PubspecAssetUpdater {
           'Unsupported flutter.assets value; expected a block list.',
         );
       }
-      if (_listEntryEquals(trimmed, asset)) {
+      if (_listEntryEquals(trimmed, assetPath)) {
         return pubspecContent;
       }
     }
@@ -139,7 +142,22 @@ class PubspecAssetUpdater {
     ]);
   }
 
-  static String _assetEntry(String assetsPath) {
+  /// Returns a YAML string scalar for the asset directory, including its slash.
+  ///
+  /// Shared by manifest insertion and the CLI's copyable next-step example.
+  static String assetEntry(String assetsPath) {
+    final asset = _assetPath(assetsPath);
+    return RegExp(r'^[a-zA-Z0-9_./-]+$').hasMatch(asset)
+        ? asset
+        : _quotedAsset(asset);
+  }
+
+  static String _quotedAsset(String asset) => jsonEncode(asset)
+      .replaceAll('\u0085', r'\u0085')
+      .replaceAll('\u2028', r'\u2028')
+      .replaceAll('\u2029', r'\u2029');
+
+  static String _assetPath(String assetsPath) {
     if (assetsPath.isEmpty ||
         assetsPath.trim() != assetsPath ||
         assetsPath.contains('\n') ||
@@ -221,7 +239,7 @@ class PubspecAssetUpdater {
     int parentIndent,
   ) {
     for (var index = start; index < outerEnd; index++) {
-      if (lines[index].trim().isEmpty) {
+      if (_isIgnorable(lines[index].trim())) {
         continue;
       }
       if (_indentOf(lines[index]) <= parentIndent) {
@@ -237,7 +255,9 @@ class PubspecAssetUpdater {
     if (comment >= 0) {
       value = value.substring(0, comment).trimRight();
     }
-    return value == asset || value == "'$asset'" || value == '"$asset"';
+    return value == asset ||
+        value == "'${asset.replaceAll("'", "''")}'" ||
+        value == _quotedAsset(asset);
   }
 
   static String _insertLines(

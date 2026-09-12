@@ -121,7 +121,10 @@ Future<void> main(List<String> arguments) async {
     print('1. Make sure your pubspec.yaml includes:');
     print('   flutter:');
     print('     assets:');
-    print('       - ${path.relative(assetsDir, from: projectRoot)}/');
+    final assetEntry = PubspecAssetUpdater.assetEntry(
+      path.relative(assetsDir, from: projectRoot),
+    );
+    print('       - $assetEntry');
     print('2. Run: flutter pub get');
     print('3. Use: IxIcon(IxIconsData.about)');
     print(
